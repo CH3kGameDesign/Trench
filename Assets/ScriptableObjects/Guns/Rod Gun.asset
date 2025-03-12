@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1193da42a97f48e4f8765beb63408398, type: 3}
+  m_Name: Rod Gun
+  m_EditorClassIdentifier: 
+  name: Rod
+  id: gun_Rod
+  prefab: {fileID: 0}
+  bullet: {fileID: 3411593917391162664, guid: d7390d13c9ba5f54cae859ecd0d35d56, type: 3}
+  sprite: {fileID: 21300000, guid: 01e5895c7333a544c9475e84a981ec48, type: 3}
+  fireVariables:
+    fireRate: 1
+    damage: 10
+    burstAmount: 1
+    burstRate: 0.1
+    recoilCam: 0.25
+    recoilUpwards: 1
+  clipVariables:
+    reloadSpeed: 2
+    clipSize: 4
+    clipAmount: 5
+  clipAmmo: 5
+  reserveAmmo: 100
+  b_aiming: 0
+  f_fireTimer: 0
+  PM_player: {fileID: 0}
+  F_floatDrag: 10

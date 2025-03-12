@@ -1,0 +1,90 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f68d4cd0fe1d6df46ab7e0b3d4d8eaf9, type: 3}
+  m_Name: Conversation Manager
+  m_EditorClassIdentifier: 
+  list:
+  - id: DEBUG_001
+    strings:
+    - speaker: 
+      english: Well Howdy Stranger
+      spanish: Peace weirdo
+      japanese: Hola and heya
+      speed: 0.04
+    - speaker: 
+      english: Surprise This is English, real slow English
+      spanish: Surprise This is Spanish, real slow Spanish
+      japanese: Surprise This is Japanese, real slow Japanese
+      speed: 0.1
+    singleUse: 0
+    used: 0
+  - id: MSG_Break_001
+    strings:
+    - speaker: Chowder
+      english: Hey we're trying to be quiet here!
+      spanish: 
+      japanese: 
+      speed: 0.04
+    - speaker: Chowder
+      english: Brilliant, make everyone hate us
+      spanish: 
+      japanese: 
+      speed: 0.04
+    singleUse: 0
+    used: 0
+  - id: MSG_Betray_001
+    strings:
+    - speaker: Chowder
+      english: Oh you are so dead
+      spanish: 
+      japanese: 
+      speed: 0.04
+    - speaker: Chowder
+      english: Et tu Brutus
+      spanish: 
+      japanese: 
+      speed: 0.04
+    - speaker: Chowder
+      english: Bullets are meant for the enemy you ass
+      spanish: 
+      japanese: 
+      speed: 0.04
+    singleUse: 0
+    used: 0
+  - id: MSG_Found_001
+    strings:
+    - speaker: Mance
+      english: Found the Intruder!
+      spanish: 
+      japanese: 
+      speed: 0.04
+    - speaker: Mance
+      english: I've got someone here!
+      spanish: 
+      japanese: 
+      speed: 0.04
+    singleUse: 0
+    used: 0
+  - id: MSG_Attacked_001
+    strings:
+    - speaker: Mance
+      english: Under attack!
+      spanish: 
+      japanese: 
+      speed: 0.04
+    - speaker: Mance
+      english: Send Help!
+      spanish: 
+      japanese: 
+      speed: 0.04
+    singleUse: 0
+    used: 0

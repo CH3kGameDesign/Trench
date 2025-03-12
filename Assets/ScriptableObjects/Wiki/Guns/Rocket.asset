@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a84b0fd6a357a14797df4139966b637, type: 3}
+  m_Name: Rocket
+  m_EditorClassIdentifier: 
+  data:
+  - id: New
+    type: 1
+    splits:
+    - splitType: 0
+      text: 'Overview
+
+        Intended to be a rocket launcher that has a locked
+        on function and melees like a rocket-jumped gravity hammer'
+      image: {fileID: 0}
+    - splitType: 0
+      text: 
+      image: {fileID: 0}
+    - splitType: 0
+      text: 
+      image: {fileID: 0}
+  - id: New
+    type: 3
+    splits:
+    - splitType: 0
+      text: 'OnFire
+
+        Fires 1 Rocket, Clip holds 2'
+      image: {fileID: 0}
+    - splitType: 0
+      text: 'OnAim
+
+        Aiming on a target applies a lock on after 3 seconds'
+      image: {fileID: 0}
+    - splitType: 0
+      text: 'OnMelee
+
+        Empties clip dealing rocket damage to surrounding area
+        and launching player upwards'
+      image: {fileID: 0}

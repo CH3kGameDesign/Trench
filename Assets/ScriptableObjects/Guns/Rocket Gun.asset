@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0d7dd9038a9209418e6ecb800b68afe, type: 3}
+  m_Name: Rocket Gun
+  m_EditorClassIdentifier: 
+  name: Rocket
+  id: gun_Rocket
+  prefab: {fileID: 0}
+  bullet: {fileID: 1255204390982052295, guid: 3ffd2592e3ebdaa4da48e636ba200d47, type: 3}
+  sprite: {fileID: 21300000, guid: 31d5c220e24d4b14f8af325bbcc10ac7, type: 3}
+  fireVariables:
+    fireRate: 1
+    damage: 10
+    burstAmount: 1
+    burstRate: 0.1
+    recoilCam: 0.25
+    recoilUpwards: 1
+  meleeVariables:
+    fireRate: 1
+    damage: 10
+    burstAmount: 1
+    burstRate: 0.1
+    recoilCam: 0.25
+    recoilUpwards: 1
+  clipVariables:
+    reloadSpeed: 2
+    clipSize: 2
+    clipAmount: 5
+  clipAmmo: 2
+  reserveAmmo: 100
+  b_aiming: 0
+  f_fireTimer: 0
+  LM_GunRay:
+    serializedVersion: 2
+    m_Bits: 0
+  PM_player: {fileID: 0}
+  PF_meleeExplosion: {fileID: 619156510942422913, guid: 49f3b6922c366374bb7b390cbf5e8f09, type: 3}
+  F_lockOnTime: 1
+  F_lockOnDistance: 100
+  S_lockOnTags:
+  - Character
+  - Vehicle
