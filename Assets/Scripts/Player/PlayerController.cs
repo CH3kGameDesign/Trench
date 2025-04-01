@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
 using TMPro;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : BaseController
 {
     public static PlayerController Instance;
     public GunManager gunManager;
@@ -16,6 +17,9 @@ public class PlayerController : MonoBehaviour
     {
         public RadialMenu RM_radial;
         public TextMeshProUGUI TM_interactText;
+        public Slider S_healthSlider;
+        public TextMeshProUGUI TM_healthText;
+        public Image I_curWeapon;
     }
 
     [Header ("Camera Values")]
@@ -29,6 +33,7 @@ public class PlayerController : MonoBehaviour
     public Vector3 V3_camOffset = new Vector3(2,0.25f,-5);
     private float f_camRadius = 0.15f;
     public LayerMask LM_CameraRay;
+    public LayerMask LM_TerrainRay;
     public LayerMask LM_GunRay;
 
     [Header("Movement Values")]
@@ -64,13 +69,13 @@ public class PlayerController : MonoBehaviour
     public RectTransform RT_hitPoint;
     public RectTransform RT_lockOnPoint;
     public Transform T_barrelHook;
-    public List<Transform> T_targetTransforms = new List<Transform>();
     private GunClass gun_Equipped;
     private GunClass[] gun_EquippedList = new GunClass[3];
 
     private bool b_radialOpen = false;
     private Coroutine C_timeScale = null;
     private Coroutine C_interactCoyote = null;
+    private Coroutine C_updateHealth = null;
 
     [Header("Debug Variables")]
     public int[] DEBUG_EquippedGunNum = { 0, 1, 2 };
@@ -94,7 +99,7 @@ public class PlayerController : MonoBehaviour
     }
 
     public static gameStateEnum GameState = gameStateEnum.active;
-    public enum gameStateEnum { inactive, active, dialogue, vehicle}
+    public enum gameStateEnum { inactive, active, dialogue, vehicle, ragdoll}
     [HideInInspector] public Vehicle V_curVehicle = null;
     [HideInInspector] public Interactable I_curInteractable = null;
 
@@ -105,9 +110,12 @@ public class PlayerController : MonoBehaviour
         Cursor.visible = false;
     }
 
-    private void Start()
+    public override void Start()
     {
         f_curHealth = F_maxHealth;
+        Ref.S_healthSlider.maxValue = F_maxHealth;
+        Ref.S_healthSlider.value = f_curHealth;
+        Ref.TM_healthText.text = f_curHealth.ToString();
         v3_camDir = T_camHolder.localEulerAngles;
         v3_camDir.z = 0;
         SetNavIDs();
@@ -143,7 +151,7 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    void Update()
+    public override void Update()
     {
         switch (GameState)
         {
@@ -340,7 +348,7 @@ public class PlayerController : MonoBehaviour
             if (f_jumpTimer <= 0)
             {
                 RaycastHit hit;
-                if (Physics.SphereCast(NMA_player.transform.position, 0.2f, Vector3.down, out hit, 1f, LM_GunRay))
+                if (Physics.SphereCast(NMA_player.transform.position, 0.2f, Vector3.down, out hit, 1f, LM_TerrainRay))
                 {
                     GroundedUpdate(true);
                     Vector3 _modelPos = T_model.position;
@@ -376,8 +384,8 @@ public class PlayerController : MonoBehaviour
             //T_model.localScale = new Vector3(1, 0.5f, 1);
             //v3_modelLocalPos = new Vector3(0, -0.5f, 0);
             //T_model.localPosition = v3_modelLocalPos;
-            RB_player.GetComponent<CapsuleCollider>().height = 0.6666f;
-            RB_player.GetComponent<CapsuleCollider>().center = new Vector3(0,-0.6f,0);
+            //RB_player.GetComponent<CapsuleCollider>().height = 0.6666f;
+            //RB_player.GetComponent<CapsuleCollider>().center = new Vector3(0,-0.6f,0);
         }
         if (!Inputs.b_crouch && i_currentNavID != i_humanoidNavID)
         {
@@ -387,8 +395,8 @@ public class PlayerController : MonoBehaviour
                 T_model.localScale = Vector3.one;
                 v3_modelLocalPos = Vector3.zero;
                 T_model.localPosition = v3_modelLocalPos;
-                RB_player.GetComponent<CapsuleCollider>().height = 2;
-                RB_player.GetComponent<CapsuleCollider>().center = Vector3.zero;
+                //RB_player.GetComponent<CapsuleCollider>().height = 2;
+                //RB_player.GetComponent<CapsuleCollider>().center = Vector3.zero;
             }
         }
     }
@@ -424,7 +432,7 @@ public class PlayerController : MonoBehaviour
     bool CheckStandingRoom()
     {
         RaycastHit hit;
-        if (Physics.SphereCast(NMA_player.transform.position - (Vector3.up * 0.5f), 0.4f, Vector3.up, out hit, 1.2f, LM_GunRay))
+        if (Physics.SphereCast(NMA_player.transform.position - (Vector3.up * 0.5f), 0.4f, Vector3.up, out hit, 1.2f, LM_TerrainRay))
             return false;
         return true;
     }
@@ -533,9 +541,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void OnHit(GunManager.bulletClass _bullet)
+    public override void OnHit(GunManager.bulletClass _bullet)
     {
         f_curHealth -= _bullet.F_damage;
+
+        if (C_updateHealth != null) StopCoroutine(C_updateHealth);
+        C_updateHealth = StartCoroutine(Health_Update(f_curHealth));
+
         if (f_curHealth <= 0)
             OnDeath();
     }
@@ -546,10 +558,21 @@ public class PlayerController : MonoBehaviour
             gun_Equipped.OnUnEquip();
         gun_Equipped = gun_EquippedList[_invNum];
         gun_Equipped.OnEquip();
+        Ref.I_curWeapon.sprite = gun_Equipped.sprite;
     }
 
     void OnDeath()
     {
+        GameState = gameStateEnum.ragdoll;
+        GroundedUpdate(false);
+        RM_ragdoll.EnableRigidbodies(true);
+        A_model.enabled = false;
+        Invoke(nameof(Restart), 3f);
+    }
+
+    void Restart()
+    {
+        GameState = gameStateEnum.active;
         UnityEngine.SceneManagement.SceneManager.LoadScene(0);
     }
 
@@ -589,6 +612,21 @@ public class PlayerController : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         T_model.localPosition = v3_modelLocalPos;
+    }
+
+    IEnumerator Health_Update(float _health)
+    {
+        float _timer = 0;
+        float _oldHealth = Ref.S_healthSlider.value;
+        Ref.S_healthSlider.maxValue = F_maxHealth;
+        while (_timer < 1)
+        {
+            Ref.S_healthSlider.value = Mathf.Lerp(_oldHealth, _health, _timer);
+            Ref.TM_healthText.text = Mathf.RoundToInt(Ref.S_healthSlider.value).ToString();
+            _timer += Time.deltaTime / 0.2f;
+            yield return new WaitForEndOfFrame();
+        }
+        Ref.S_healthSlider.value = _health;
     }
 
     #region Input Actions

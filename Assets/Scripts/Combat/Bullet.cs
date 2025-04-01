@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bullet : MonoBehaviour
+public class Bullet : DamageSource
 {
     public GunManager.bulletClass B_info;
     public LayerMask LM_targets;
@@ -55,7 +55,7 @@ public class Bullet : MonoBehaviour
     {
         HitObject hitObject;
         if (hit.transform.TryGetComponent<HitObject>(out hitObject))
-            hitObject.OnDamage(B_info);
+            hitObject.OnDamage(B_info, this);
     }
 
     public void HitPoint(RaycastHit hit)

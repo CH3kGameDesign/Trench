@@ -9,8 +9,8 @@ public class HitObject : MonoBehaviour
     public float I_maxHealth = 10;
     private float f_health = 10;
 
-    public UnityEvent<GunManager.bulletClass> UE_OnHit;
-    public UnityEvent<GunManager.bulletClass> UE_OnDestroy;
+    public UnityEvent<GunManager.bulletClass, DamageSource> UE_OnHit;
+    public UnityEvent<GunManager.bulletClass, DamageSource> UE_OnDestroy;
 
     public List<damageTypeEnum> ignoreDamageType = new List<damageTypeEnum>();
     public enum damageTypeEnum { all, bullet, fire, explosive};
@@ -20,19 +20,19 @@ public class HitObject : MonoBehaviour
         f_health = I_maxHealth;
     }
 
-    public void OnDamage(GunManager.bulletClass _bullet)
+    public void OnDamage(GunManager.bulletClass _bullet, DamageSource _source = null)
     {
         if (!ignoreDamageType.Contains(_bullet.D_damageType))
         {
-            UE_OnHit.Invoke(_bullet);
+            UE_OnHit.Invoke(_bullet, _source);
             if (B_useHealth)
                 f_health -= _bullet.F_damage;
             if (f_health <= 0)
                 Destroy(_bullet);
         }
     }
-    private void Destroy(GunManager.bulletClass _bullet)
+    private void Destroy(GunManager.bulletClass _bullet, DamageSource _source = null)
     {
-        UE_OnDestroy.Invoke(_bullet);
+        UE_OnDestroy.Invoke(_bullet, _source);
     }    
 }

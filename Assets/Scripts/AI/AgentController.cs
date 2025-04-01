@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent (typeof (NavMeshAgent))]
-public class AgentController : MonoBehaviour
+public class AgentController : BaseController
 {
     public GunManager gunManager;
     public FieldOfView fieldOfView;
@@ -46,7 +46,7 @@ public class AgentController : MonoBehaviour
     public AgentController DEBUG_TargetAgent;
 
     public stateEnum state = stateEnum.protect;
-    public enum stateEnum { idle, patrol, protect, hunt};
+    public enum stateEnum { idle, patrol, protect, hunt, ragdoll};
 
     class TargetClass
     {
@@ -111,14 +111,14 @@ public class AgentController : MonoBehaviour
         }
         public bool GetTargetPos(Vector3 _fromPos, LayerMask _mask, out Vector3 pos)
         {
-            List<Transform> _potTargets;
+            Transform[] _potTargets;
             switch (targetType)
             {
                 case targetTypeEnum.player:
-                    _potTargets = PC_tarPlayer.T_targetTransforms;
+                    _potTargets = PC_tarPlayer.RM_ragdoll.T_transforms;
                     break;
                 case targetTypeEnum.agent:
-                    _potTargets = AC_tarAgent.T_targetTransforms;
+                    _potTargets = AC_tarAgent.RM_ragdoll.T_transforms;
                     break;
                 default:
                     pos = Vector3.zero;
@@ -146,7 +146,7 @@ public class AgentController : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    void Start()
+    public override void Start()
     {
         NMA_agent = GetComponent<NavMeshAgent>();
         NMA_agent.updateRotation = false;
@@ -166,7 +166,7 @@ public class AgentController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    public override void Update()
     {
         bool _firing = false;
         UpdateIsFriendly();
@@ -339,7 +339,7 @@ public class AgentController : MonoBehaviour
         attackTarget.Stop();
     }
 
-    public void OnHit(GunManager.bulletClass _bullet)
+    public override void OnHit(GunManager.bulletClass _bullet)
     {
         if (_bullet.B_player)
         {
@@ -405,7 +405,17 @@ public class AgentController : MonoBehaviour
             if (_bullet.con_Agent != null)
                 _bullet.con_Agent.TargetDead();
         }
-        gameObject.SetActive(false);
+
+        state = stateEnum.ragdoll;
+        RM_ragdoll.EnableRigidbodies(true);
+        GroundedUpdate(false);
+        A_model.enabled = false;
+        //gameObject.SetActive(false);
+    }
+
+    void GroundedUpdate(bool _grounded)
+    {
+        NMA_agent.updatePosition = _grounded;
     }
 
     bool IsHostile()

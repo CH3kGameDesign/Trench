@@ -2,16 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Explosion : MonoBehaviour
+public class Explosion : DamageSource
 {
     public GunManager.bulletClass B_info;
     public AnimationCurve AC_dropOffCurve = new AnimationCurve();
     private float f_size = 5;
-    private Rigidbody rb_ignore = null;
     public float F_force = 100;
 
     private List<GameObject> g_affectedObjects = new List<GameObject>();
-    private void Start()
+    public override void Start()
     {
         
     }
@@ -24,11 +23,10 @@ public class Explosion : MonoBehaviour
     {
         GetComponent<SphereCollider>().enabled = false;
     }
-    public void OnCreate(GunManager.bulletClass _classOverride = null, Rigidbody _ignoreRB = null)
+    public void OnCreate(GunManager.bulletClass _classOverride = null)
     {
         if (_classOverride != null)
             B_info = _classOverride;
-        rb_ignore = _ignoreRB;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -49,8 +47,6 @@ public class Explosion : MonoBehaviour
         float _dist = Vector3.Distance(transform.position, other.ClosestPoint(transform.position));
         if (other.TryGetComponent<Rigidbody>(out _rb))
         {
-            if (_rb == rb_ignore)
-                return;
             _rb.AddExplosionForce(F_force, transform.position, f_size, 2);
         }
         if (other.TryGetComponent<HitObject>(out _ho))
@@ -58,7 +54,7 @@ public class Explosion : MonoBehaviour
             float _damage = B_info.F_damage * AC_dropOffCurve.Evaluate(Mathf.Clamp01(_dist / f_size));
             GunManager.bulletClass _bc = B_info.Clone();
             _bc.F_damage = _damage;
-            _ho.OnDamage(_bc);
+            _ho.OnDamage(_bc, this);
         }
     }
 }

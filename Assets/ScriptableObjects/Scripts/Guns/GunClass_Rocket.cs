@@ -27,8 +27,9 @@ public class GunClass_Rocket : GunClass
         if (clipAmmo > 0 && f_fireTimer <= 0)
         {
             Explosion GO = Instantiate(PF_meleeExplosion, PM_player.T_barrelHook.position, PF_meleeExplosion.transform.rotation);
-            GO.OnCreate(null, PM_player.RB_player);
+            GO.OnCreate(null);
             Destroy(GO, 5);
+            PM_player.RM_ragdoll.AddSource(GO);
             PM_player.Jump_Force(2f);
             clipAmmo = 0;
         }
