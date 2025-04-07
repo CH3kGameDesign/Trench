@@ -23,21 +23,39 @@ public class LevelGen_Theme : ScriptableObject
         
     }
 
-    public LevelGen_Block GetBlock(LevelGen_Block.blockTypeEnum _type)
+    public LevelGen_Block GetBlock(LevelGen_Block.blockTypeEnum _type, LevelGen_Block.entryTypeEnum _entryType)
     {
         switch (_type)
         {
-            case LevelGen_Block.blockTypeEnum.corridor: return GetBlockFromList(Corridors);
-            case LevelGen_Block.blockTypeEnum.bridge:   return GetBlockFromList(Bridges);
-            case LevelGen_Block.blockTypeEnum.hangar:   return GetBlockFromList(Hangars);
+            case LevelGen_Block.blockTypeEnum.corridor: return GetBlockFromList(Corridors, _entryType);
+            case LevelGen_Block.blockTypeEnum.bridge:   return GetBlockFromList(Bridges, _entryType);
+            case LevelGen_Block.blockTypeEnum.hangar:   return GetBlockFromList(Hangars, _entryType);
             default:
                 break;
         }
         return null;
     }
-    private LevelGen_Block GetBlockFromList(List<LevelGen_Block> _list)
+    private LevelGen_Block GetBlockFromList(List<LevelGen_Block> _list, LevelGen_Block.entryTypeEnum _entryType)
     {
-        int _temp = Random.Range(0, _list.Count);
-        return _list[_temp];
+        int _temp;
+        if (_entryType == LevelGen_Block.entryTypeEnum.any)
+        {
+            _temp = Random.Range(0, _list.Count);
+            return _list[_temp];
+        }
+        List<LevelGen_Block> _listFiltered = new List<LevelGen_Block>();
+        foreach (var item in _list)
+        {
+            foreach (var _entry in item.List_Entries)
+            {
+                if (_entry.type == _entryType)
+                {
+                    _listFiltered.Add(item);
+                    break;
+                }
+            }
+        }
+        _temp = Random.Range(0, _listFiltered.Count);
+        return _listFiltered[_temp];
     }
 }

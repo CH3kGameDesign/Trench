@@ -79,6 +79,7 @@ using UnityEngine;
     {
         PlayerController _player = _seat.PC_Player;
         _player.RB_player.isKinematic = true;
+        _player.RB_player.gameObject.layer = 8;
         _player.RM_ragdoll.SetLayer(8);
         _player.RB_player.transform.parent = _seat.T_seatPos;
         _player.RB_player.transform.position = _seat.T_seatPos.position;
@@ -93,7 +94,8 @@ using UnityEngine;
         _player.RB_player.transform.position = _seat.T_exitPos.position;
         _player.RB_player.transform.rotation = _seat.T_seatPos.rotation;
         _player.RB_player.isKinematic = false;
-        _player.RM_ragdoll.SetLayer(3);
+        _player.RB_player.gameObject.layer = 3;
+        _player.RM_ragdoll.SetLayer(11);
         _player.NMA_player.enabled = true;
     }
 

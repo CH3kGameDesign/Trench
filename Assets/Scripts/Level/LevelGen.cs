@@ -34,15 +34,14 @@ public class LevelGen : MonoBehaviour
         lHolder.parent = transform;
         lHolder.localPosition = Vector3.zero;
 
-        LevelGen_Block _bridge = Instantiate(_theme.GetBlock(LevelGen_Block.blockTypeEnum.bridge),lHolder);
+        LevelGen_Block _bridge = Instantiate(_theme.GetBlock(LevelGen_Block.blockTypeEnum.bridge, LevelGen_Block.entryTypeEnum.any),lHolder);
         _bridge.transform.localPosition = Vector3.zero;
         UpdateBounds(_bridge);
         LG_Blocks.Add(_bridge);
         List<LevelGen_Block> _firstGroup = GenerateRooms(_bridge, _theme, lHolder);
-        foreach (var item in _firstGroup)
-        {
-            GenerateRooms(item, _theme, lHolder);
-        }
+        List<LevelGen_Block> _secondGroup = GenerateRoomSeries(_firstGroup, _theme, lHolder);
+        List<LevelGen_Block> _thirdGroup = GenerateRoomSeries(_secondGroup, _theme, lHolder);
+
         UpdateNavMeshes();
     }
 
@@ -52,6 +51,15 @@ public class LevelGen : MonoBehaviour
         {
             item.BuildNavMesh();
         }
+    }
+    List<LevelGen_Block> GenerateRoomSeries(List<LevelGen_Block> _rooms, LevelGen_Theme _theme, Transform lHolder)
+    {
+        List<LevelGen_Block> _new = new List<LevelGen_Block>();
+        foreach (var item in _rooms)
+        {
+            _new.AddRange(GenerateRooms(item, _theme, lHolder));
+        }
+        return _new;
     }
     List<LevelGen_Block> GenerateRooms(LevelGen_Block _room, LevelGen_Theme _theme, Transform lHolder)
     {
@@ -82,8 +90,19 @@ public class LevelGen : MonoBehaviour
     {
         for (int i = 0; i < 10; i++)
         {
-            LevelGen_Block _corridor = Instantiate(_theme.GetBlock(LevelGen_Block.blockTypeEnum.corridor), lholder);
-            var entry = _corridor.List_Entries[Random.Range(0, _corridor.List_Entries.Count)];
+            LevelGen_Block _corridor = Instantiate(_theme.GetBlock(LevelGen_Block.blockTypeEnum.corridor, _entry.type), lholder);
+            List<LevelGen_Block.entryClass> potEntries = new List<LevelGen_Block.entryClass>();
+            foreach (var item in _corridor.List_Entries)
+            {
+                if (item.type == _entry.type)
+                    potEntries.Add(item);
+            }
+            if (potEntries.Count == 0)
+            {
+                DestroyImmediate(_corridor.gameObject);
+                continue;
+            }
+            var entry = potEntries[Random.Range(0, potEntries.Count)];
             
             _holder.position = entry.transform.position;
             _holder.transform.forward = -entry.transform.forward;

@@ -73,6 +73,7 @@ GameObject:
   - component: {fileID: 8259084526427721123}
   - component: {fileID: 2806240414845446853}
   - component: {fileID: 748759331089592094}
+  - component: {fileID: 5634573469513103511}
   m_Layer: 3
   m_Name: Mover
   m_TagString: Untagged
@@ -145,6 +146,29 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!136 &5634573469513103511
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4218579458554171712}
+  m_Material: {fileID: 13400000, guid: 0eaacad75800ab3438ab60ab4d27d69a, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.25
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4909041737158493750
 GameObject:
   m_ObjectHideFlags: 0
@@ -321,6 +345,9 @@ MonoBehaviour:
   Ref:
     RM_radial: {fileID: 0}
     TM_interactText: {fileID: 0}
+    S_healthSlider: {fileID: 0}
+    TM_healthText: {fileID: 0}
+    I_curWeapon: {fileID: 0}
   F_camLatSpeed: 10
   F_camRotSpeed: 240
   C_camera: {fileID: 8809411587627827170}
@@ -337,7 +364,7 @@ MonoBehaviour:
     m_Bits: 577
   LM_GunRay:
     serializedVersion: 2
-    m_Bits: 713
+    m_Bits: 2753
   NMA_player: {fileID: 2806240414845446853}
   RB_player: {fileID: 748759331089592094}
   T_model: {fileID: 1073136819019016012}
@@ -351,14 +378,6 @@ MonoBehaviour:
   RT_hitPoint: {fileID: 0}
   RT_lockOnPoint: {fileID: 0}
   T_barrelHook: {fileID: 4177102336443992729}
-  T_targetTransforms:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   DEBUG_EquippedGunNum: 
   V_curVehicle: {fileID: 0}
   I_curInteractable: {fileID: 0}

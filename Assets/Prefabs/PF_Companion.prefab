@@ -96,6 +96,7 @@ GameObject:
   - component: {fileID: 8013797752655817064}
   - component: {fileID: 7200468561229621239}
   - component: {fileID: 5897938074839651205}
+  - component: {fileID: 7094972244604953718}
   m_Layer: 3
   m_Name: PF_Companion
   m_TagString: Character
@@ -248,6 +249,29 @@ MonoBehaviour:
   edgeDstThreshold: 0.5
   maskCutawayDst: 0.1
   viewMeshFilter: {fileID: 8463034437258619324}
+--- !u!136 &7094972244604953718
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769648362584213684}
+  m_Material: {fileID: 13400000, guid: 0eaacad75800ab3438ab60ab4d27d69a, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.25
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1164543979666629969
 GameObject:
   m_ObjectHideFlags: 0

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2423058521104115476}
   - component: {fileID: 4557132954586189479}
   - component: {fileID: 4549200126231332181}
+  - component: {fileID: 4891139177274797899}
   m_Layer: 3
   m_Name: PF_Enemy
   m_TagString: Character
@@ -165,6 +166,29 @@ MonoBehaviour:
   edgeDstThreshold: 0.5
   maskCutawayDst: 0.1
   viewMeshFilter: {fileID: 1145035624854842613}
+--- !u!136 &4891139177274797899
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 153541626221342559}
+  m_Material: {fileID: 13400000, guid: 0eaacad75800ab3438ab60ab4d27d69a, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.25
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &239527486133730383
 GameObject:
   m_ObjectHideFlags: 0

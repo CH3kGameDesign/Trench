@@ -20,7 +20,7 @@ public class LevelGen_Block : MonoBehaviour
         public entryTypeEnum type = entryTypeEnum.singleDoor;
         public bool connected = false;
     }
-    public enum entryTypeEnum { singleDoor, wideDoor, vent}
+    public enum entryTypeEnum { singleDoor, wideDoor, vent, any}
 
     [System.Serializable]
     public class decorClass
@@ -91,10 +91,12 @@ public class LevelGen_Block : MonoBehaviour
                 _temp.Encapsulate(item.bounds);
             _temp.Expand(-0.5f);
             B_bounds.Add(_temp);
+            /*
             BoxCollider GO = new GameObject().AddComponent<BoxCollider>();
             GO.transform.position = Vector3.zero;
             GO.center = _temp.center;
             GO.size = _temp.size;
+            */
         }
     }
 }
