@@ -8,28 +8,11 @@ public class LevelGen_Block : MonoBehaviour
     public enum blockTypeEnum { corridor, bridge, hangar }
 
     public List<Transform> T_architecture = new List<Transform>();
-    public List<Bounds> B_bounds = new List<Bounds>();
-    public List<entryClass> List_Entries = new List<entryClass>();
-    public List<decorClass> List_Decor = new List<decorClass>();
+    public List<LevelGen_Bounds> B_bounds = new List<LevelGen_Bounds>();
+    public LevelGen_Door[] LGD_Entries = new LevelGen_Door[0];
+    public LevelGen_Spawn[] LGS_Spawns = new LevelGen_Spawn[0];
 
-    [System.Serializable]
-    public class entryClass
-    {
-        public Transform transform = null;
-        public Vector2Int size = Vector2Int.one;
-        public entryTypeEnum type = entryTypeEnum.singleDoor;
-        public bool connected = false;
-    }
     public enum entryTypeEnum { singleDoor, wideDoor, vent, any}
-
-    [System.Serializable]
-    public class decorClass
-    {
-        public Transform transform = null;
-        public Vector2Int size = Vector2Int.one;
-        public decorTypeEnum type = decorTypeEnum.standard;
-    }
-    public enum decorTypeEnum { standard}
     // Start is called before the first frame update
     void Start()
     {
@@ -50,34 +33,23 @@ public class LevelGen_Block : MonoBehaviour
     }
     void UpdateEntryList()
     {
-        List_Entries.Clear();
         Transform _holder = transform.GetChild(0);
-        for (int i = 0; i < _holder.childCount; i++)
-        {
-            entryClass _temp = new entryClass();
-            _temp.transform = _holder.GetChild(i);
-            _temp.size = new Vector2Int(1, 2);
-            _temp.type = entryTypeEnum.singleDoor;
-            List_Entries.Add(_temp);
-        }
+        LGD_Entries = _holder.GetComponentsInChildren<LevelGen_Door>();
     }
     void UpdateDecorList()
     {
-        List_Decor.Clear();
         Transform _holder = transform.GetChild(1);
-        for (int i = 0; i < _holder.childCount; i++)
-        {
-            decorClass _temp = new decorClass();
-            _temp.transform = _holder.GetChild(i);
-            _temp.size = new Vector2Int(1, 2);
-            _temp.type = decorTypeEnum.standard;
-            List_Decor.Add(_temp);
-        }
+        LGS_Spawns = _holder.GetComponentsInChildren<LevelGen_Spawn>();
     }
 
     public void UpdateBoundingBox()
     {
         //transform.position = Vector3.zero;
+        foreach (var item in B_bounds)
+        {
+            if (item != null)
+                DestroyImmediate(item.gameObject);
+        }
         B_bounds.Clear();
         T_architecture.Clear();
         for (int i = 0; i < transform.GetChild(2).childCount; i++)
@@ -90,7 +62,16 @@ public class LevelGen_Block : MonoBehaviour
             foreach (var item in _collider)
                 _temp.Encapsulate(item.bounds);
             _temp.Expand(-0.5f);
-            B_bounds.Add(_temp);
+
+            GameObject GO = new GameObject();
+            GO.transform.parent = transform.GetChild(3);
+            GO.transform.position = _temp.center;
+            BoxCollider BC = GO.AddComponent<BoxCollider>();
+            BC.size = _temp.size;
+            LevelGen_Bounds LGB = GO.AddComponent<LevelGen_Bounds>();
+            LGB.Setup(BC);
+            //GO.AddComponent<TriggerDisplay>();
+            B_bounds.Add(LGB);
             /*
             BoxCollider GO = new GameObject().AddComponent<BoxCollider>();
             GO.transform.position = Vector3.zero;

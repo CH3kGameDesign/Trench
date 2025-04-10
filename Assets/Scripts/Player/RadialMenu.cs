@@ -139,6 +139,12 @@ public class RadialMenu : MonoBehaviour
         Ref.RT_cursor.anchoredPosition = Vector2.ClampMagnitude(Ref.RT_cursor.anchoredPosition + _pos, Values.F_radial_BaseDistance);
         UpdateSelected();
     }
+    public void MoveCursor_Gamepad(Vector2 _pos)
+    {
+        _pos = Vector2.ClampMagnitude(_pos, 1);
+        Ref.RT_cursor.anchoredPosition = _pos * Values.F_radial_BaseDistance;
+        UpdateSelected();
+    }
 
     void UpdateSelected()
     {

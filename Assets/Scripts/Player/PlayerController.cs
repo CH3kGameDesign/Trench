@@ -84,6 +84,7 @@ public class PlayerController : BaseController
     [HideInInspector] public inputClass Inputs = new inputClass();
     public class inputClass
     {
+        public bool b_isGamepad = false;
         public Vector2 v2_inputDir;
         public Vector2 v2_camInputDir;
         public bool b_sprinting = false;
@@ -418,7 +419,10 @@ public class PlayerController : BaseController
                 b_radialOpen = true;
                 SetTimeScale(0.1f);
             }
-            Ref.RM_radial.MoveCursor(Inputs.v2_camInputDir);
+            if (Inputs.b_isGamepad)
+                Ref.RM_radial.MoveCursor_Gamepad(Inputs.v2_camInputDir);
+            else
+                Ref.RM_radial.MoveCursor(Inputs.v2_camInputDir);
         }
         else if (b_radialOpen)
         {
@@ -643,6 +647,8 @@ public class PlayerController : BaseController
     public void Input_Reload(InputAction.CallbackContext cxt) { Inputs.b_reload = Input_GetPressed(cxt); }
     public void Input_Radial(InputAction.CallbackContext cxt) { Inputs.b_radial = Input_GetPressed(cxt); }
     public void Input_Melee(InputAction.CallbackContext cxt) { Inputs.b_melee = Input_GetPressed(cxt); }
+
+    public void Input_ChangedInput(PlayerInput input) { Inputs.b_isGamepad = input.currentControlScheme == "Gamepad"; }
 
     bool Input_GetPressed(InputAction.CallbackContext cxt)
     {

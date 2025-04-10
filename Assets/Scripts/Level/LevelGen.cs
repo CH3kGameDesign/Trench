@@ -9,6 +9,12 @@ public class LevelGen : MonoBehaviour
     private NavMeshSurface[] nm_Surfaces;
 
     private List<LevelGen_Block> LG_Blocks = new List<LevelGen_Block>();
+
+    public LayerMask LM_mask;
+
+    private int i_series = 3;
+    private int i_attempts = 10;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -34,15 +40,13 @@ public class LevelGen : MonoBehaviour
         lHolder.parent = transform;
         lHolder.localPosition = Vector3.zero;
 
-        LevelGen_Block _bridge = Instantiate(_theme.GetBlock(LevelGen_Block.blockTypeEnum.bridge, LevelGen_Block.entryTypeEnum.any),lHolder);
+        LevelGen_Block _bridge = Instantiate(_theme.GetBlock(LevelGen_Block.blockTypeEnum.bridge, LevelGen_Block.entryTypeEnum.any), lHolder);
         _bridge.transform.localPosition = Vector3.zero;
-        UpdateBounds(_bridge);
         LG_Blocks.Add(_bridge);
-        List<LevelGen_Block> _firstGroup = GenerateRooms(_bridge, _theme, lHolder);
-        List<LevelGen_Block> _secondGroup = GenerateRoomSeries(_firstGroup, _theme, lHolder);
-        List<LevelGen_Block> _thirdGroup = GenerateRoomSeries(_secondGroup, _theme, lHolder);
 
+        GenerateBuildings(LG_Blocks, _theme, lHolder, i_series);
         UpdateNavMeshes();
+        SpawnObjects();
     }
 
     public void UpdateNavMeshes()
@@ -52,102 +56,132 @@ public class LevelGen : MonoBehaviour
             item.BuildNavMesh();
         }
     }
-    List<LevelGen_Block> GenerateRoomSeries(List<LevelGen_Block> _rooms, LevelGen_Theme _theme, Transform lHolder)
-    {
-        List<LevelGen_Block> _new = new List<LevelGen_Block>();
-        foreach (var item in _rooms)
-        {
-            _new.AddRange(GenerateRooms(item, _theme, lHolder));
-        }
-        return _new;
-    }
-    List<LevelGen_Block> GenerateRooms(LevelGen_Block _room, LevelGen_Theme _theme, Transform lHolder)
-    {
-        List<LevelGen_Block> _blocks = new List<LevelGen_Block>();
-        foreach (var item in _room.List_Entries)
-        {
-            if (item.connected)
-                continue;
-            Transform _holder = new GameObject().transform;
-            _holder.gameObject.name = item.type.ToString() + " " + item.transform.position.ToString();
-            _holder.parent = lHolder;
 
-            LevelGen_Block _temp = GenerateRoom(_room, _theme, lHolder, _holder, item);
-            if (_temp != null)
-            {
-                _blocks.Add(_temp);
-                LG_Blocks.Add(_temp);
-            }
-            else
-            {
-                Destroy(_holder.gameObject);
-            }
-        }
-        return _blocks;
-    }
-
-    LevelGen_Block GenerateRoom(LevelGen_Block _room, LevelGen_Theme _theme, Transform lholder, Transform _holder, LevelGen_Block.entryClass _entry)
+    private void SpawnObjects()
     {
-        for (int i = 0; i < 10; i++)
+        GameObject prefab;
+        GameObject GO;
+        bool playerSpawned = false;
+        foreach (var item in LG_Blocks)
         {
-            LevelGen_Block _corridor = Instantiate(_theme.GetBlock(LevelGen_Block.blockTypeEnum.corridor, _entry.type), lholder);
-            List<LevelGen_Block.entryClass> potEntries = new List<LevelGen_Block.entryClass>();
-            foreach (var item in _corridor.List_Entries)
+            foreach (var spawn in item.LGS_Spawns)
             {
-                if (item.type == _entry.type)
-                    potEntries.Add(item);
-            }
-            if (potEntries.Count == 0)
-            {
-                DestroyImmediate(_corridor.gameObject);
-                continue;
-            }
-            var entry = potEntries[Random.Range(0, potEntries.Count)];
-            
-            _holder.position = entry.transform.position;
-            _holder.transform.forward = -entry.transform.forward;
-            _corridor.transform.parent = _holder;
-            _holder.position = _entry.transform.position;
-            _holder.rotation = _entry.transform.rotation;
-
-            UpdateBounds(_corridor);
-            bool _overlap = CheckBounds(_corridor);
-            if (!_overlap)
-            {
-                entry.connected = true;
-                _entry.connected = true;
-                return _corridor;
-            }
-            else
-                DestroyImmediate(_corridor.gameObject);
-        }
-        return null;
-    }
-
-    void UpdateBounds(LevelGen_Block _corridor)
-    {
-        for (int i = 0; i < _corridor.B_bounds.Count; i++)
-        {
-            Bounds _temp = _corridor.B_bounds[i];
-            _temp.center += _corridor.transform.position;
-            _corridor.B_bounds[i] = _temp;
-        }
-    }
-
-    bool CheckBounds(LevelGen_Block _corridor)
-    {
-        foreach (var _bounds1 in _corridor.B_bounds)
-        {
-            foreach (var _blocks in LG_Blocks)
-            {
-                foreach (var _bounds2 in _blocks.B_bounds)
+                switch (spawn.spawnType)
                 {
-                    if (_bounds1.Intersects(_bounds2))
-                    {
-                        return true;
-                    }
+                    case LevelGen_Spawn.spawnTypeEnum.player:
+                        prefab = LG_Theme.PF_Player;
+                        if (prefab != null && playerSpawned == false)
+                        {
+                            GO = Instantiate(prefab, spawn.transform.position, spawn.transform.rotation, transform);
+                            playerSpawned = true;
+                        }
+                        break;
+                    case LevelGen_Spawn.spawnTypeEnum.companion:
+                        prefab = LG_Theme.GetCompanion();
+                        if (prefab != null)
+                            GO = Instantiate(prefab, spawn.transform.position, spawn.transform.rotation, transform);
+                        break;
+                    case LevelGen_Spawn.spawnTypeEnum.enemy:
+                        prefab = LG_Theme.GetEnemy();
+                        if (prefab != null)
+                            GO = Instantiate(prefab, spawn.transform.position, spawn.transform.rotation, transform);
+                        break;
+                    case LevelGen_Spawn.spawnTypeEnum.treasure:
+                        prefab = LG_Theme.GetTreasure();
+                        if (prefab != null)
+                            GO = Instantiate(prefab, spawn.transform.position, spawn.transform.rotation, transform);
+                        break;
+                    default:
+                        break;
                 }
             }
+        }
+    }
+    
+    void GenerateBuildings(List<LevelGen_Block> _rooms, LevelGen_Theme _theme, Transform lHolder, int series = 3)
+    {
+        if (series > 0)
+        {
+            List<LevelGen_Block> newRooms = new List<LevelGen_Block>();
+            foreach (var item in _rooms)
+            {
+                foreach (var entry in item.LGD_Entries)
+                {
+                    if (entry.B_connected)
+                        continue;
+                    Transform _holder = new GameObject().transform;
+                    _holder.gameObject.name = entry.entryType.ToString() + " " + entry.transform.position.ToString();
+                    _holder.parent = lHolder;
+
+                    for (int i = 0; i < i_attempts; i++)
+                    {
+                        LevelGen_Block _temp = GenerateRoom(_theme, lHolder, _holder, entry);
+                        if (_temp == null)
+                            continue;
+                        foreach (var bound in _temp.B_bounds)
+                            bound.B_Bounds.enabled = false;
+                        Physics.SyncTransforms();
+                        if (CheckBounds(_temp))
+                        {
+                            DestroyImmediate(_temp.gameObject);
+                        }
+                        else
+                        {
+                            entry.OnConnect();
+                            newRooms.Add(_temp);
+                            foreach (var bound in _temp.B_bounds)
+                                bound.B_Bounds.enabled = true;
+                            break;
+                        }
+                    }
+
+                }
+            }
+            LG_Blocks.AddRange(newRooms);
+            GenerateBuildings(newRooms, _theme, lHolder, series - 1);
+        }
+        else
+        {
+            UpdateNavMeshes();
+        }
+    }
+
+    LevelGen_Block GenerateRoom(LevelGen_Theme _theme, Transform lholder, Transform _holder, LevelGen_Door _entry)
+    {
+        LevelGen_Block _corridor = Instantiate(_theme.GetBlock(LevelGen_Block.blockTypeEnum.corridor, _entry.entryType), lholder);
+        List<LevelGen_Door> potEntries = new List<LevelGen_Door>();
+        foreach (var item in _corridor.LGD_Entries)
+        {
+            if (item.entryType == _entry.entryType)
+                potEntries.Add(item);
+        }
+        if (potEntries.Count == 0)
+        {
+            DestroyImmediate(_corridor.gameObject);
+            return null;
+        }
+        var entry = potEntries[Random.Range(0, potEntries.Count)];
+
+        _holder.position = entry.transform.position;
+        _holder.transform.forward = -entry.transform.forward;
+        _corridor.transform.parent = _holder;
+        _holder.position = _entry.transform.position;
+        _holder.rotation = _entry.transform.rotation;
+
+        entry.OnConnect();
+
+        return _corridor;
+    }
+
+    bool CheckBounds(LevelGen_Block _temp)
+    {
+        foreach (var item in _temp.B_bounds)
+        {
+            if (Physics.OverlapBox(item.B_Bounds.center + item.transform.position, item.B_Bounds.size / 2, item.transform.rotation, LM_mask).Length > 0)
+            {
+                return true;
+            }
+
         }
         return false;
     }
