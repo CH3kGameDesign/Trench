@@ -20,6 +20,8 @@ public class PlayerController : BaseController
         public Slider S_healthSlider;
         public TextMeshProUGUI TM_healthText;
         public Image I_curWeapon;
+
+        public Transform T_backPivot;
     }
 
     [Header ("Camera Values")]
@@ -76,6 +78,8 @@ public class PlayerController : BaseController
     private Coroutine C_timeScale = null;
     private Coroutine C_interactCoyote = null;
     private Coroutine C_updateHealth = null;
+
+    [HideInInspector] public Treasure T_equippedTreasure = null;
 
     [Header("Debug Variables")]
     public int[] DEBUG_EquippedGunNum = { 0, 1, 2 };
@@ -327,6 +331,15 @@ public class PlayerController : BaseController
         }
     }
 
+    public void PickUp_Treasure(Treasure _treasure)
+    {
+        if (T_equippedTreasure == null)
+        {
+            T_equippedTreasure = _treasure;
+            _treasure.OnPickUp(this);
+        }    
+    }
+
     IEnumerator InteractCoyote ()
     {
         yield return new WaitForSecondsRealtime(0.2f);
@@ -519,7 +532,14 @@ public class PlayerController : BaseController
         if (Inputs.b_firing)
             gun_Equipped.OnFire();
         if (Inputs.b_melee)
+        {
             gun_Equipped.OnMelee();
+            if (T_equippedTreasure != null)
+            {
+                T_equippedTreasure.OnDrop(this);
+                T_equippedTreasure = null;
+            }
+        }
         gun_Equipped.OnUpdate();
     }
 
