@@ -12,7 +12,7 @@ public class LevelGen_Block : MonoBehaviour
     public LevelGen_Door[] LGD_Entries = new LevelGen_Door[0];
     public LevelGen_Spawn[] LGS_Spawns = new LevelGen_Spawn[0];
 
-    public enum entryTypeEnum { singleDoor, wideDoor, vent, any}
+    public enum entryTypeEnum { singleDoor, wideDoor, vent, shipDoor, shipPark, any}
     // Start is called before the first frame update
     void Start()
     {

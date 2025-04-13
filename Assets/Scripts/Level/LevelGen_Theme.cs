@@ -52,7 +52,7 @@ public class LevelGen_Theme : ScriptableObject
         {
             foreach (var _entry in item.LGD_Entries)
             {
-                if (_entry.entryType == _entryType)
+                if (_entryType.CheckEntry(_entry.entryType))
                 {
                     _listFiltered.Add(item);
                     break;
@@ -62,6 +62,7 @@ public class LevelGen_Theme : ScriptableObject
         _temp = Random.Range(0, _listFiltered.Count);
         return _listFiltered[_temp];
     }
+
 
     public GameObject GetEnemy()
     {

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
 using TMPro;
+using Unity.Collections;
 
 public class PlayerController : BaseController
 {
@@ -101,6 +102,8 @@ public class PlayerController : BaseController
         public bool b_reload = false;
         public bool b_radial = false;
         public bool b_melee = false;
+
+        public string[] s_inputStrings = new string[2];
     }
 
     public static gameStateEnum GameState = gameStateEnum.active;
@@ -134,6 +137,17 @@ public class PlayerController : BaseController
 
         NMA_player.updateRotation = false;
         Setup_Radial();
+        Setup_InteractStrings();
+    }
+
+    void Setup_InteractStrings()
+    {
+        PlayerInput playerInput = GetComponent<PlayerInput>();
+        string[] _temp = {
+            playerInput.actions.FindAction("Interact").GetBindingDisplayString(0).Remove(0,6),
+            playerInput.actions.FindAction("Interact").GetBindingDisplayString(1)
+        };
+        Inputs.s_inputStrings = _temp;
     }
 
     void Setup_Radial()
@@ -307,7 +321,8 @@ public class PlayerController : BaseController
                 if (_interact != I_curInteractable)
                 {
                     I_curInteractable = _interact;
-                    string _temp = "Press [0] to interact with " + I_curInteractable.S_interactName;
+                    int _controlScheme = Inputs.b_isGamepad ? 1 : 0;
+                    string _temp = I_curInteractable.S_interactName.ToString_Input(Inputs.s_inputStrings[_controlScheme]);
                     Ref.TM_interactText.gameObject.SetActive(true);
                     Ref.TM_interactText.text = _temp;
 

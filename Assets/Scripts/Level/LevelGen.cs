@@ -12,7 +12,7 @@ public class LevelGen : MonoBehaviour
 
     public LayerMask LM_mask;
 
-    private int i_series = 3;
+    private int i_series = 2;
     private int i_attempts = 10;
 
     // Start is called before the first frame update
@@ -121,7 +121,9 @@ public class LevelGen : MonoBehaviour
                         foreach (var bound in _temp.B_bounds)
                             bound.B_Bounds.enabled = false;
                         Physics.SyncTransforms();
-                        if (CheckBounds(_temp))
+                        int _tarOverlaps = 0;
+                        if (entry.entryType == LevelGen_Block.entryTypeEnum.shipPark) _tarOverlaps = 1;
+                        if (CheckBounds(_temp, _tarOverlaps))
                         {
                             DestroyImmediate(_temp.gameObject);
                         }
@@ -152,7 +154,7 @@ public class LevelGen : MonoBehaviour
         List<LevelGen_Door> potEntries = new List<LevelGen_Door>();
         foreach (var item in _corridor.LGD_Entries)
         {
-            if (item.entryType == _entry.entryType)
+            if (_entry.entryType.CheckEntry(item.entryType))
                 potEntries.Add(item);
         }
         if (potEntries.Count == 0)
@@ -173,11 +175,11 @@ public class LevelGen : MonoBehaviour
         return _corridor;
     }
 
-    bool CheckBounds(LevelGen_Block _temp)
+    bool CheckBounds(LevelGen_Block _temp, int _tarAmount = 0)
     {
         foreach (var item in _temp.B_bounds)
         {
-            if (Physics.OverlapBox(item.B_Bounds.center + item.transform.position, item.B_Bounds.size / 2, item.transform.rotation, LM_mask).Length > 0)
+            if (Physics.OverlapBox(item.B_Bounds.center + item.transform.position, item.B_Bounds.size / 2, item.transform.rotation, LM_mask).Length != _tarAmount)
             {
                 return true;
             }

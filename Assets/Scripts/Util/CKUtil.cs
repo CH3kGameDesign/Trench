@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public static class CKUtil
 {
@@ -8,5 +9,29 @@ public static class CKUtil
     {
         string _temp = "$" + _value.ToString();
         return _temp;
+    }
+
+    public static string ToString_Input(this string _interactable, string _input)
+    {
+        string _temp = "Press ";
+        _temp += _input;
+        _temp += " to interact with ";
+        _temp += _interactable;
+        return _temp;
+    }
+
+    public static bool CheckEntry(this LevelGen_Block.entryTypeEnum _entry, LevelGen_Block.entryTypeEnum _exit)
+    {
+        switch (_entry)
+        {
+            case LevelGen_Block.entryTypeEnum.shipDoor:
+                return _exit == LevelGen_Block.entryTypeEnum.shipPark;
+            case LevelGen_Block.entryTypeEnum.shipPark:
+                return _exit == LevelGen_Block.entryTypeEnum.shipDoor;
+            case LevelGen_Block.entryTypeEnum.any:
+                return true;
+            default:
+                return _entry == _exit;
+        }
     }
 }
