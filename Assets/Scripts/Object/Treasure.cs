@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEditor.UIElements;
 
 public class Treasure : Interactable
 {
@@ -12,6 +13,10 @@ public class Treasure : Interactable
     public TextMeshProUGUI TM_valueText;
     public Rigidbody RB_rigidbody;
     public Collider C_collider;
+
+    private int i_droppedLayer = 7;
+    private int i_heldLayer = 2;
+
 
     // Start is called before the first frame update
     void Start()
@@ -25,9 +30,9 @@ public class Treasure : Interactable
         
     }
 
-    public override void OnInteract(PlayerController _player)
+    public override void OnInteract(BaseController _player)
     {
-        _player.PickUp_Treasure(this);
+        _player.PickUp(this);
     }
 
     public void OnPickUp(PlayerController _player)
@@ -39,22 +44,22 @@ public class Treasure : Interactable
         transform.localRotation = _rot;
 
         RB_rigidbody.isKinematic = true;
-        C_collider.enabled = false;
+        gameObject.layer = i_heldLayer;
     }
-    public void OnDrop(PlayerController _player)
+    public void OnDrop(PlayerController _player, bool _isSprinting = false)
     {
         transform.parent = null;
         RB_rigidbody.isKinematic = false;
-        C_collider.enabled = true;
+        gameObject.layer = i_droppedLayer;
 
-        StartCoroutine(OnThrown(_player));
+        StartCoroutine(OnThrown(_player, _isSprinting ? 1f : 2f));
     }
 
-    IEnumerator OnThrown(PlayerController _player)
+    IEnumerator OnThrown(PlayerController _player, float _mult)
     {
         Vector3 _forceDir = _player.C_camera.transform.forward;
         _forceDir += _player.C_camera.transform.up * 0.5f;
-        RB_rigidbody.AddForce(_forceDir * F_throwForce, ForceMode.Impulse);
+        RB_rigidbody.AddForce(_forceDir * F_throwForce * _mult, ForceMode.Impulse);
         C_collider.excludeLayers = LM_thrownIgnoreLayers;
         yield return new WaitForSeconds(0.5f);
         C_collider.excludeLayers = new LayerMask();

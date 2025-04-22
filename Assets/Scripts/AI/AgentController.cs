@@ -1,15 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using static UnityEditor.Experimental.GraphView.GraphView;
+using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
-[RequireComponent (typeof (NavMeshAgent))]
+
 public class AgentController : BaseController
 {
     public GunManager gunManager;
     public FieldOfView fieldOfView;
 
-    private NavMeshAgent NMA_agent;
     private TargetClass followTarget = new TargetClass();
     private TargetClass attackTarget = new TargetClass();
 
@@ -18,7 +20,6 @@ public class AgentController : BaseController
     [HideInInspector] public Relationship.characterClass C_character = null;
     public List<Relationship.groupEnum> G_backupGroups = new List<Relationship.groupEnum>();
     private bool b_friendly = true;
-    private float f_relationshipTimer = 0;
     public Transform T_messageHook;
 
     [Header("Combat Variables")]
@@ -32,9 +33,9 @@ public class AgentController : BaseController
     private int i_burstRemaining = 0;
     private Vector3 v3_attackLocation;
     private float f_searchDelay = 0.2f;
-    private float f_searchTimer = 0;
     public float F_maxHealth = 100;
     private float f_curHealth = 100;
+    private bool b_firing = false;
 
     [Header("Animations")]
     public Animator A_model;
@@ -45,6 +46,10 @@ public class AgentController : BaseController
     public bool DEBUG_FollowPlayerImmediately = true;
     public AgentController DEBUG_TargetAgent;
 
+    private Coroutine Coroutine_Relationship;
+    private Coroutine Coroutine_Target;
+    private Coroutine Coroutine_RandomPathing;
+
     public stateEnum state = stateEnum.protect;
     public enum stateEnum { idle, patrol, protect, hunt, ragdoll};
 
@@ -54,6 +59,17 @@ public class AgentController : BaseController
 
         public PlayerController PC_tarPlayer;
         public AgentController AC_tarAgent;
+
+        public Vehicle GetVehicle()
+        {
+            switch (targetType)
+            {
+                case targetTypeEnum.none:   return null;
+                case targetTypeEnum.player: return PC_tarPlayer.V_curVehicle;
+                case targetTypeEnum.agent:  return AC_tarAgent.V_curVehicle;
+                default:                    return null;
+            }
+        }
 
         public enum targetTypeEnum { none, player, agent };
 
@@ -85,7 +101,7 @@ public class AgentController : BaseController
                     pos = PC_tarPlayer.GetPos();
                     break;
                 case TargetClass.targetTypeEnum.agent:
-                    pos = AC_tarAgent.NMA_agent.transform.position;
+                    pos = AC_tarAgent.NMA.transform.position;
                     break;
                 default:
                     pos = Vector3.zero;
@@ -98,10 +114,10 @@ public class AgentController : BaseController
             switch (targetType)
             {
                 case TargetClass.targetTypeEnum.player:
-                    pos = PC_tarPlayer.NMA_player.transform.position;
+                    pos = PC_tarPlayer.NMA.transform.position;
                     break;
                 case TargetClass.targetTypeEnum.agent:
-                    pos = AC_tarAgent.NMA_agent.transform.position;
+                    pos = AC_tarAgent.NMA.transform.position;
                     break;
                 default:
                     pos = Vector3.zero;
@@ -145,138 +161,209 @@ public class AgentController : BaseController
         }
     }
 
+    public void Awake()
+    {
+        NMA.updateRotation = false;
+    }
+
     // Start is called before the first frame update
     public override void Start()
     {
-        NMA_agent = GetComponent<NavMeshAgent>();
-        NMA_agent.updateRotation = false;
-
         C_character = Relationship.Instance.GetCharacterFromID(S_characterID);
 
         if (DEBUG_FollowPlayerImmediately)
         {
             if (b_friendly)
-                followTarget.FollowPlayer(FindObjectOfType<PlayerController>());
+                followTarget.FollowPlayer(FindFirstObjectByType<PlayerController>());
             else
-                attackTarget.FollowPlayer(FindObjectOfType<PlayerController>());
+                attackTarget.FollowPlayer(FindFirstObjectByType<PlayerController>());
         }
         attackTarget.FollowAgent(DEBUG_TargetAgent);
 
         gun_Equipped = gunManager.GetGunByInt(DEBUG_EquippedGunNum, this);
     }
 
+    private void OnEnable()
+    {
+        Coroutine_Relationship = StartCoroutine(UpdateIsFriendly());
+        Coroutine_Target = StartCoroutine(UpdateTarget());
+    }
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
     // Update is called once per frame
     public override void Update()
     {
-        bool _firing = false;
-        UpdateIsFriendly();
         switch (state)
         {
             case stateEnum.idle:
                 break;
             case stateEnum.patrol:
-                if (fieldOfView != null)
-                    FindTarget();
+                ModelRotate(b_firing);
                 break;
             case stateEnum.protect:
-                Follow(followTarget);
-                _firing = FireManager();
-                if (fieldOfView != null && !_firing)
-                    FindTarget();
-                ModelRotate(_firing);
+                b_firing = FireManager();
+                ModelRotate(b_firing);
                 break;
             case stateEnum.hunt:
-                Follow(attackTarget);
-                _firing  = FireManager();
-                ModelRotate(_firing);
+                b_firing = FireManager();
+                ModelRotate(b_firing);
                 break;
             default:
                 break;
         }
-        AnimationUpdate(_firing);
+        AnimationUpdate(b_firing);
     }
 
-    void UpdateIsFriendly()
+    private IEnumerator UpdateIsFriendly()
     {
-        if (f_relationshipTimer <= 0)
+        while (true)
         {
-            f_relationshipTimer = 1f;
             b_friendly = !IsHostile();
+            yield return new WaitForSeconds(1f);
         }
-        else
-            f_relationshipTimer -= Time.deltaTime;
+    }
+    private IEnumerator UpdateTarget()
+    {
+        while (true)
+        {
+            switch (state)
+            {
+                case stateEnum.idle:
+                    yield return new WaitForSeconds(0.5f);
+                    break;
+                case stateEnum.patrol:
+                    if (fieldOfView != null)
+                        FindTarget();
+                    GoToRandomPoint();
+                    yield return new WaitForSeconds(f_searchDelay);
+                    break;
+                case stateEnum.protect:
+                    Follow(followTarget);
+                    if (fieldOfView != null && !b_firing)
+                        FindTarget();
+                    yield return new WaitForSeconds(f_searchDelay);
+                    break;
+                case stateEnum.hunt:
+                    Follow(attackTarget);
+                    if (fieldOfView != null && !b_firing)
+                        FindTarget();
+                    yield return new WaitForSeconds(f_searchDelay);
+                    break;
+                case stateEnum.ragdoll:
+                    yield return new WaitForSeconds(0.5f);
+                    break;
+                default:
+                    yield return new WaitForSeconds(0.5f);
+                    break;
+            }
+        }
+    }
+    void GoToRandomPoint()
+    {
+        if (!NMA.isOnNavMesh || V_curVehicle != null)
+            return;
+        //PLACEHOLDER
+        if (!NMA.hasPath || NMA.velocity.sqrMagnitude == 0f)
+            SetDestination(NMA.navMeshOwner.GetComponent<LevelGen>().GetRandomPoint());
     }
 
     void FindTarget()
     {
-        if (f_searchTimer <= 0)
+        PlayerController _PC;
+        AgentController _AC;
+        foreach (var item in fieldOfView.visibleTargets)
         {
-            f_searchTimer = f_searchDelay;
-            PlayerController _PC;
-            AgentController _AC;
-            foreach (var item in fieldOfView.visibleTargets)
+            if (item.parent.TryGetComponent<PlayerController>(out _PC))
             {
-                if (item.parent.TryGetComponent<PlayerController> (out _PC))
+                if (!b_friendly)
                 {
-                    if (!b_friendly)
-                    {
-                        attackTarget.FollowPlayer(_PC);
+                    attackTarget.FollowPlayer(_PC);
 
-                        if (state == stateEnum.patrol)
-                        {
-                            state = stateEnum.hunt;
-                            Conversation.Instance.StartMessage("MSG_Found_001", T_messageHook);
-                        }
-                        break;
+                    if (state == stateEnum.patrol)
+                    {
+                        state = stateEnum.hunt;
+                        Conversation.Instance.StartMessage("MSG_Found_001", T_messageHook);
                     }
+                    break;
                 }
-                if (item.TryGetComponent<AgentController>(out _AC))
+            }
+            if (item.TryGetComponent<AgentController>(out _AC))
+            {
+                if (b_friendly != _AC.b_friendly)
                 {
-                    if (b_friendly != _AC.b_friendly)
-                    {
-                        attackTarget.FollowAgent(_AC);
+                    attackTarget.FollowAgent(_AC);
 
-                        if (state == stateEnum.patrol)
-                        {
-                            state = stateEnum.hunt;
-                            Conversation.Instance.StartMessage("MSG_Found_001", T_messageHook);
-                        }
-                        break;
+                    if (state == stateEnum.patrol)
+                    {
+                        state = stateEnum.hunt;
+                        Conversation.Instance.StartMessage("MSG_Found_001", T_messageHook);
                     }
+                    break;
                 }
             }
         }
-        else
-            f_searchTimer -= Time.deltaTime;
+    }
+
+    void SetDestination(Vector3 _destination)
+    {
+        if (V_curVehicle == null)
+            NMA.SetDestination(_destination);
     }
 
     void Follow(TargetClass _target)
     {
         Vector3 _tarPos;
         if (_target.GetNavPos(out _tarPos))
-            NMA_agent.SetDestination(_tarPos);
+            SetDestination(_tarPos);
+        Vehicle_FollowCheck(_target);
+    }
+
+    void Vehicle_FollowCheck(TargetClass _target)
+    {
+        Vehicle _vehicle = _target.GetVehicle();
+        if (_vehicle != null)
+        {
+            if (V_curVehicle == null)
+            {
+                _vehicle.OnInteract(this);
+            }
+        }
+        else
+        {
+            if (V_curVehicle != null)
+            {
+                V_curVehicle.OnInteract(this);
+                transform.parent = null;
+            }
+        }
     }
 
     void ModelRotate(bool _attacking)
     {
-        if (_attacking)
+        if (V_curVehicle == null)
         {
-            Quaternion _look = Quaternion.LookRotation(v3_attackLocation - NMA_agent.transform.position);
-            _look = Quaternion.Euler(new Vector3(0, _look.eulerAngles.y, 0));
-            NMA_agent.transform.localRotation = Quaternion.Lerp(NMA_agent.transform.localRotation, _look, Time.deltaTime * 6);
-        }
-        else if (NMA_agent.remainingDistance > NMA_agent.stoppingDistance)
-        {
-            Quaternion _look = Quaternion.LookRotation(NMA_agent.desiredVelocity);
-            NMA_agent.transform.localRotation = Quaternion.Lerp(NMA_agent.transform.localRotation, _look, Time.deltaTime * 4);
+            if (_attacking)
+            {
+                Quaternion _look = Quaternion.LookRotation(v3_attackLocation - NMA.transform.position);
+                _look = Quaternion.Euler(new Vector3(0, _look.eulerAngles.y, 0));
+                NMA.transform.localRotation = Quaternion.Lerp(NMA.transform.localRotation, _look, Time.deltaTime * 6);
+            }
+            else if (NMA.remainingDistance > NMA.stoppingDistance)
+            {
+                Quaternion _look = Quaternion.LookRotation(NMA.desiredVelocity);
+                NMA.transform.localRotation = Quaternion.Lerp(NMA.transform.localRotation, _look, Time.deltaTime * 4);
+            }
         }
     }
 
     void AnimationUpdate(bool _firing)
     {
-        Vector3 _input = NMA_agent.desiredVelocity;
+        Vector3 _input = NMA.desiredVelocity;
         if (_firing)
-            _input = Quaternion.Inverse(NMA_agent.transform.localRotation) * _input;
+            _input = Quaternion.Inverse(NMA.transform.localRotation) * _input;
         else
             _input = Vector2.up * _input.magnitude;
 
@@ -415,7 +502,7 @@ public class AgentController : BaseController
 
     void GroundedUpdate(bool _grounded)
     {
-        NMA_agent.updatePosition = _grounded;
+        NMA.updatePosition = _grounded;
     }
 
     bool IsHostile()

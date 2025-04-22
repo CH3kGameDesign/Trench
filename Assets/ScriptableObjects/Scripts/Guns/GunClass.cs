@@ -34,6 +34,8 @@ public class GunClass : ScriptableObject
     private Transform T_camHolder;
     [HideInInspector]
     public PlayerController PM_player;
+    [HideInInspector]
+    public Animator A_charModel;
 
     private bool b_playerGun = false;
 
@@ -95,6 +97,7 @@ public class GunClass : ScriptableObject
     public virtual void Setup(PlayerController _player)
     {
         PM_player = _player;
+        A_charModel = PM_player.A_model;
         T_camHolder = _player.T_camHolder;
         LM_GunRay = _player.LM_GunRay;
         b_playerGun = true;
@@ -102,6 +105,7 @@ public class GunClass : ScriptableObject
     public virtual void Setup(AgentController _agent)
     {
         b_playerGun = false;
+        A_charModel = _agent.A_model;
     }
 
     public virtual void OnFire()
@@ -119,13 +123,14 @@ public class GunClass : ScriptableObject
         f_recoilUpwards = _fireVariables.recoilUpwards;
         PM_player.reticle.RotateReticle(f_fireTimer);
     }
-    public virtual void OnMelee()
+    public virtual void OnMelee(bool _isSprinting = false)
     {
         if (f_fireTimer <= 0)
         {
             f_fireTimer = meleeVariables.fireRate;
             PM_player.reticle.UpdateRoundCount(this);
             PM_player.reticle.RotateReticle(f_fireTimer);
+            A_charModel.Play("Melee_Rifle", 1);
         }
     }
     public virtual void OnReload()
@@ -135,6 +140,7 @@ public class GunClass : ScriptableObject
             f_fireTimer = clipVariables.reloadSpeed;
             PM_player.reticle.ReloadReticle(f_fireTimer, this);
             clipAmmo = clipVariables.clipSize;
+            A_charModel.Play("Reload_Rifle", 1);
         }
     }
     public virtual void OnAim(bool _aiming)
@@ -184,7 +190,7 @@ public class GunClass : ScriptableObject
 
     public virtual void OnBullet(Bullet _bullet)
     {
-
+        A_charModel.Play("Fire_Rifle", 1);
     }
 
     public virtual void OnHit(Bullet _bullet)

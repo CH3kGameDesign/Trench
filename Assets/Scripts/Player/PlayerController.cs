@@ -27,22 +27,23 @@ public class PlayerController : BaseController
 
     [Header ("Camera Values")]
     public float F_camLatSpeed = 1;
-    public float F_camRotSpeed = 120f;
+    public float F_camRotSpeed = 240f;
+    public float F_camAimRotSpeed = 80f;
+    public float F_camSprintRotSpeed = 80f;
     public Camera C_camera;
     public Transform T_camHolder;
     public Transform T_camHook;
     public Transform T_camHookAiming;
+    public Transform T_camHookCrouching;
     [HideInInspector] public Vector3 v3_camDir;
     public Vector3 V3_camOffset = new Vector3(2,0.25f,-5);
+    public Vector3 V3_camOffset_Crouch = new Vector3(1f, 0.125f, -1.5f);
     private float f_camRadius = 0.15f;
     public LayerMask LM_CameraRay;
     public LayerMask LM_TerrainRay;
     public LayerMask LM_GunRay;
 
     [Header("Movement Values")]
-    public NavMeshAgent NMA_player;
-    public Rigidbody RB_player;
-    public Transform T_model;
     public float F_moveSpeed = 5;
     public float F_sprintModifier = 1.5f;
     [Space(10)]
@@ -53,6 +54,9 @@ public class PlayerController : BaseController
     private Vector3 v3_lastNavPos;
     private Vector3 v3_modelLocalPos = Vector3.zero;
     private bool b_grounded = true;
+    private bool b_isMoving = false;
+    private bool b_isSprinting = false;
+    private bool b_isCrouching = false;
     private float f_jumpDelay = 0.3f;
     private float f_jumpTimer = 0;
 
@@ -79,6 +83,7 @@ public class PlayerController : BaseController
     private Coroutine C_timeScale = null;
     private Coroutine C_interactCoyote = null;
     private Coroutine C_updateHealth = null;
+    private Coroutine C_idleAnim = null;
 
     [HideInInspector] public Treasure T_equippedTreasure = null;
 
@@ -106,9 +111,6 @@ public class PlayerController : BaseController
         public string[] s_inputStrings = new string[2];
     }
 
-    public static gameStateEnum GameState = gameStateEnum.active;
-    public enum gameStateEnum { inactive, active, dialogue, vehicle, ragdoll}
-    [HideInInspector] public Vehicle V_curVehicle = null;
     [HideInInspector] public Interactable I_curInteractable = null;
 
     void Awake()
@@ -135,7 +137,7 @@ public class PlayerController : BaseController
         Gun_Equip(0);
         reticle.UpdateRoundCount(gun_Equipped);
 
-        NMA_player.updateRotation = false;
+        NMA.updateRotation = false;
         Setup_Radial();
         Setup_InteractStrings();
     }
@@ -257,14 +259,16 @@ public class PlayerController : BaseController
     void AnimationUpdate()
     {
         Vector2 _input = Inputs.v2_inputDir;
-        if (Inputs.b_sprinting)
-            _input *= 2;
+        if (b_isSprinting)
+            _input.y = 2;
         if (!Inputs.b_firing && !Inputs.b_aiming)
             _input = Vector2.up * _input.magnitude;
         v2_animMove = Vector2.Lerp(v2_animMove, _input, Time.deltaTime / 0.25f);
         A_model.SetFloat("posX", v2_animMove.x);
         A_model.SetFloat("posY", v2_animMove.y);
         A_model.SetBool("Crouching", i_currentNavID == i_crouchingNavID);
+        A_model.SetBool("Moving", v2_animMove.magnitude > 0.1f);
+        A_model.SetBool("InAir", !b_grounded);
     }
     void AnimationEnd()
     {
@@ -275,25 +279,50 @@ public class PlayerController : BaseController
 
     void Movement()
     {
-        if (Inputs.b_sprinting)
+        /*
+        if (Inputs.b_sprinting && !Inputs.b_crouch)
             NMA_player.speed = F_moveSpeed * F_sprintModifier;
         else
             NMA_player.speed = F_moveSpeed;
-
-        if (Inputs.v2_inputDir.magnitude > 0.05f)
+        */
+        if (Inputs.v2_inputDir.magnitude > 0.05f || b_isSprinting)
         {
             Vector3 _tarPos = new Vector3(Inputs.v2_inputDir.x, 0, Inputs.v2_inputDir.y);
             v3_moveDir = Quaternion.Euler(0, v3_camDir.y, 0) * _tarPos;
-
-            if (Inputs.b_sprinting)
-                v3_moveDir *= F_sprintModifier;
+            b_isMoving = true;
 
             if (b_grounded)
             {
+                if (Inputs.b_sprinting && !Inputs.b_crouch)
+                {
+                    _tarPos = new Vector3(Inputs.v2_inputDir.x/2, 0, 1);
+                    v3_moveDir = Quaternion.Euler(0, v3_camDir.y, 0) * _tarPos;
+                    v3_moveDir *= F_sprintModifier;
+                    b_isSprinting = true;
+                }
+                else
+                    b_isSprinting = false;
+
                 v3_moveDir *= F_moveSpeed;
 
-                NMA_player.Move(v3_moveDir * Time.deltaTime);
+                NMA.Move(v3_moveDir * Time.deltaTime);
             }
+            else
+            {
+                b_isSprinting = false;
+            }
+            if (C_idleAnim != null)
+            {
+                StopCoroutine(C_idleAnim);
+                C_idleAnim = null;
+            }
+        }
+        else
+        {
+            if (C_idleAnim == null)
+                C_idleAnim = StartCoroutine(Idle_Anim());
+            b_isMoving = false;
+            b_isSprinting = false;
         }
     }
 
@@ -301,9 +330,9 @@ public class PlayerController : BaseController
     {
         if (!b_grounded && Inputs.v2_inputDir.magnitude > 0.05f)
         {
-            Vector3 _tarPos = RB_player.position;
+            Vector3 _tarPos = RB.position;
             _tarPos += v3_moveDir * F_aerialSpeed * Time.fixedDeltaTime;
-            RB_player.MovePosition(_tarPos);
+            RB.MovePosition(_tarPos);
         }
     }
 
@@ -346,7 +375,7 @@ public class PlayerController : BaseController
         }
     }
 
-    public void PickUp_Treasure(Treasure _treasure)
+    public override void PickUp(Treasure _treasure)
     {
         if (T_equippedTreasure == null)
         {
@@ -369,6 +398,12 @@ public class PlayerController : BaseController
         {
             if (Inputs.b_jumping && f_jumpTimer <= 0)
             {
+                A_model.Play("Jump");
+                if (C_idleAnim != null)
+                {
+                    StopCoroutine(C_idleAnim);
+                    C_idleAnim = null;
+                }
                 Jump_Force();
             }
         }
@@ -377,16 +412,16 @@ public class PlayerController : BaseController
             if (f_jumpTimer <= 0)
             {
                 RaycastHit hit;
-                if (Physics.SphereCast(NMA_player.transform.position, 0.2f, Vector3.down, out hit, 1f, LM_TerrainRay))
+                if (Physics.SphereCast(NMA.transform.position, 0.2f, Vector3.down, out hit, 1f, LM_TerrainRay))
                 {
                     GroundedUpdate(true);
                     Vector3 _modelPos = T_model.position;
                     NavMeshHit navHit;
-                    if (NavMesh.SamplePosition(NMA_player.transform.position, out navHit, 2f, -1))
+                    if (NavMesh.SamplePosition(NMA.transform.position, out navHit, 2f, -1))
                     {
                         Vector3 _pos = navHit.position;
-                        _pos.y = NMA_player.transform.position.y;
-                        NMA_player.Warp(_pos);
+                        _pos.y = NMA.transform.position.y;
+                        NMA.Warp(_pos);
                     }
                     StartCoroutine(MoveModel(_modelPos));
                 }
@@ -399,10 +434,22 @@ public class PlayerController : BaseController
     {
         if (b_grounded)
         {
-            v3_lastNavPos = NMA_player.transform.position;
+            v3_lastNavPos = NMA.transform.position;
             GroundedUpdate(false);
         }
-        RB_player.AddForce(Vector3.up * F_jumpForce * _forceMultiplier, ForceMode.VelocityChange);
+        RB.AddForce(Vector3.up * F_jumpForce * _forceMultiplier, ForceMode.VelocityChange);
+        f_jumpTimer = f_jumpDelay;
+    }
+    public void Apply_Force(Vector3 _dir, float _force = -1)
+    {
+        if (b_grounded)
+        {
+            v3_lastNavPos = NMA.transform.position;
+            GroundedUpdate(false);
+        }
+
+        if (_force < 0) _force = F_jumpForce;
+        RB.AddForce(_dir * _force, ForceMode.Impulse);
         f_jumpTimer = f_jumpDelay;
     }
     void CrouchHandler()
@@ -410,11 +457,8 @@ public class PlayerController : BaseController
         if (Inputs.b_crouch && i_currentNavID != i_crouchingNavID)
         {
             NavMesh_SwitchAgentID(i_crouchingNavID);
-            //T_model.localScale = new Vector3(1, 0.5f, 1);
-            //v3_modelLocalPos = new Vector3(0, -0.5f, 0);
-            //T_model.localPosition = v3_modelLocalPos;
-            //RB_player.GetComponent<CapsuleCollider>().height = 0.6666f;
-            //RB_player.GetComponent<CapsuleCollider>().center = new Vector3(0,-0.6f,0);
+            if (b_grounded)
+                b_isCrouching = true;
         }
         if (!Inputs.b_crouch && i_currentNavID != i_humanoidNavID)
         {
@@ -424,10 +468,11 @@ public class PlayerController : BaseController
                 T_model.localScale = Vector3.one;
                 v3_modelLocalPos = Vector3.zero;
                 T_model.localPosition = v3_modelLocalPos;
-                //RB_player.GetComponent<CapsuleCollider>().height = 2;
-                //RB_player.GetComponent<CapsuleCollider>().center = Vector3.zero;
+                b_isCrouching = false;
             }
         }
+        if (!b_grounded)
+            b_isCrouching = false;
     }
 
     void ReloadHandler()
@@ -464,14 +509,14 @@ public class PlayerController : BaseController
     bool CheckStandingRoom()
     {
         RaycastHit hit;
-        if (Physics.SphereCast(NMA_player.transform.position - (Vector3.up * 0.5f), 0.4f, Vector3.up, out hit, 1.2f, LM_TerrainRay))
+        if (Physics.SphereCast(NMA.transform.position - (Vector3.up * 0.5f), 0.4f, Vector3.up, out hit, 1.2f, LM_TerrainRay))
             return false;
         return true;
     }
 
     void NavMesh_SwitchAgentID (int _id)
     {
-        NMA_player.agentTypeID = _id;
+        NMA.agentTypeID = _id;
         i_currentNavID = _id;
     }    
 
@@ -491,22 +536,22 @@ public class PlayerController : BaseController
     {
         b_grounded = _grounded;
         //NMA_player.updateRotation = _grounded;
-        NMA_player.updatePosition = _grounded;
+        NMA.updatePosition = _grounded;
         //NMA_player.isStopped = !_grounded;
-        RB_player.isKinematic = _grounded;
-        RB_player.useGravity = !_grounded;
+        RB.isKinematic = _grounded;
+        RB.useGravity = !_grounded;
     }    
     
     void ModelRotate()
     {
         if (Inputs.b_aiming || Inputs.b_firing)
         {
-            NMA_player.transform.eulerAngles = new Vector3(0, T_camHolder.eulerAngles.y, 0);
+            NMA.transform.eulerAngles = new Vector3(0, T_camHolder.eulerAngles.y, 0);
         }
-        else if (Inputs.v2_inputDir.magnitude > 0.05f)
+        else if (b_isMoving)
         {
             Quaternion lookRot = Quaternion.LookRotation(v3_moveDir, Vector3.up);
-            NMA_player.transform.localRotation = Quaternion.Lerp(NMA_player.transform.localRotation, lookRot, Time.deltaTime * 4);
+            NMA.transform.localRotation = Quaternion.Lerp(NMA.transform.localRotation, lookRot, Time.deltaTime * 4);
         }
     }
 
@@ -514,13 +559,23 @@ public class PlayerController : BaseController
     {
         if (!b_radialOpen)
         {
-            v3_camDir += new Vector3(-Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0) * F_camRotSpeed * Time.deltaTime;
+            float _mult = Time.deltaTime;
+            if (Inputs.b_aiming)        _mult *= F_camAimRotSpeed;
+            else if (b_isSprinting)     _mult *= F_camSprintRotSpeed;
+            else                        _mult *= F_camRotSpeed;
+            v3_camDir += new Vector3(-Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0) * _mult;
             v3_camDir.x = Mathf.Clamp(v3_camDir.x, -80, 80);
         }
         T_camHolder.transform.rotation = Quaternion.Slerp(T_camHolder.transform.rotation, Quaternion.Euler(v3_camDir), Time.deltaTime * 10);
     }
 
-    void CamCollision() { CamCollision(T_camHook, V3_camOffset); }
+    void CamCollision()
+    { 
+        if (b_isCrouching)
+            CamCollision(T_camHookCrouching, V3_camOffset_Crouch);
+        else
+            CamCollision(T_camHook, V3_camOffset);
+    }
     void CamCollision(Transform _camHook, Vector3 _camOffset, bool _canAim = true)
     {
         if (Inputs.b_aiming && _canAim)
@@ -544,14 +599,15 @@ public class PlayerController : BaseController
     void FireManager()
     {
         Update_HitPoint();
-        if (Inputs.b_firing)
+        if (Inputs.b_firing && !b_isSprinting)
             gun_Equipped.OnFire();
         if (Inputs.b_melee)
         {
-            gun_Equipped.OnMelee();
+            gun_Equipped.OnMelee(b_isSprinting);
+
             if (T_equippedTreasure != null)
             {
-                T_equippedTreasure.OnDrop(this);
+                T_equippedTreasure.OnDrop(this, b_isSprinting);
                 T_equippedTreasure = null;
             }
         }
@@ -582,6 +638,8 @@ public class PlayerController : BaseController
 
     public override void OnHit(GunManager.bulletClass _bullet)
     {
+        if (_bullet.B_player && !_bullet.D_damageType.isSelfHittable())
+            return;
         f_curHealth -= _bullet.F_damage;
 
         if (C_updateHealth != null) StopCoroutine(C_updateHealth);
@@ -602,7 +660,7 @@ public class PlayerController : BaseController
 
     void OnDeath()
     {
-        GameState = gameStateEnum.ragdoll;
+        GameState_Change(gameStateEnum.ragdoll);
         GroundedUpdate(false);
         RM_ragdoll.EnableRigidbodies(true);
         A_model.enabled = false;
@@ -611,7 +669,7 @@ public class PlayerController : BaseController
 
     void Restart()
     {
-        GameState = gameStateEnum.active;
+        GameState_Change(gameStateEnum.active);
         UnityEngine.SceneManagement.SceneManager.LoadScene(0);
     }
 
@@ -621,10 +679,6 @@ public class PlayerController : BaseController
         C_timeScale = StartCoroutine(TimeScale(_scale));
     }
 
-    public void GameState_Change(gameStateEnum _state)
-    {
-        GameState = _state;
-    }
 
     IEnumerator TimeScale (float _scale)
     {
@@ -666,6 +720,19 @@ public class PlayerController : BaseController
             yield return new WaitForEndOfFrame();
         }
         Ref.S_healthSlider.value = _health;
+    }
+
+    IEnumerator Idle_Anim(float _animWait = 20f)
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(_animWait);
+            if (RB.linearVelocity.magnitude < 0.1f)
+            {
+                A_model.SetInteger("Idle", Random.Range(0, 4));
+                A_model.Play("Idle");
+            }
+        }
     }
 
     #region Input Actions
@@ -710,7 +777,7 @@ public class PlayerController : BaseController
     public Vector3 GetPos()
     {
         if (b_grounded)
-            return NMA_player.transform.position;
+            return NMA.transform.position;
         else
             return v3_lastNavPos;
     }

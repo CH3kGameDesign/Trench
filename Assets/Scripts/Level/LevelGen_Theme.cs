@@ -27,24 +27,24 @@ public class LevelGen_Theme : ScriptableObject
         
     }
 
-    public LevelGen_Block GetBlock(LevelGen_Block.blockTypeEnum _type, LevelGen_Block.entryTypeEnum _entryType)
+    public LevelGen_Block GetBlock(LevelGen_Block.blockTypeEnum _type, LevelGen_Block.entryTypeEnum _entryType, Unity.Mathematics.Random _random)
     {
         switch (_type)
         {
-            case LevelGen_Block.blockTypeEnum.corridor: return GetBlockFromList(Corridors, _entryType);
-            case LevelGen_Block.blockTypeEnum.bridge:   return GetBlockFromList(Bridges, _entryType);
-            case LevelGen_Block.blockTypeEnum.hangar:   return GetBlockFromList(Hangars, _entryType);
+            case LevelGen_Block.blockTypeEnum.corridor: return GetBlockFromList(Corridors, _entryType, _random);
+            case LevelGen_Block.blockTypeEnum.bridge:   return GetBlockFromList(Bridges, _entryType, _random);
+            case LevelGen_Block.blockTypeEnum.hangar:   return GetBlockFromList(Hangars, _entryType, _random);
             default:
                 break;
         }
         return null;
     }
-    private LevelGen_Block GetBlockFromList(List<LevelGen_Block> _list, LevelGen_Block.entryTypeEnum _entryType)
+    private LevelGen_Block GetBlockFromList(List<LevelGen_Block> _list, LevelGen_Block.entryTypeEnum _entryType, Unity.Mathematics.Random _random)
     {
         int _temp;
         if (_entryType == LevelGen_Block.entryTypeEnum.any)
         {
-            _temp = Random.Range(0, _list.Count);
+            _temp = _random.NextInt(0, _list.Count);
             return _list[_temp];
         }
         List<LevelGen_Block> _listFiltered = new List<LevelGen_Block>();
@@ -59,32 +59,32 @@ public class LevelGen_Theme : ScriptableObject
                 }
             }
         }
-        _temp = Random.Range(0, _listFiltered.Count);
+        _temp = _random.NextInt(0, _listFiltered.Count);
         return _listFiltered[_temp];
     }
 
 
-    public GameObject GetEnemy()
+    public GameObject GetEnemy(Unity.Mathematics.Random _random)
     {
         if (PF_Enemies.Count == 0)
             return null;
-        int ran = Random.Range(0, PF_Enemies.Count);
+        int ran = _random.NextInt(0, PF_Enemies.Count);
         return PF_Enemies[ran];
     }
 
-    public GameObject GetCompanion()
+    public GameObject GetCompanion(Unity.Mathematics.Random _random)
     {
         if (PF_Companions.Count == 0)
             return null;
-        int ran = Random.Range(0, PF_Companions.Count);
+        int ran = _random.NextInt(0, PF_Companions.Count);
         return PF_Companions[ran];
     }
 
-    public GameObject GetTreasure()
+    public GameObject GetTreasure(Unity.Mathematics.Random _random)
     {
         if (PF_Treasure.Count == 0)
             return null;
-        int ran = Random.Range(0, PF_Treasure.Count);
+        int ran = _random.NextInt(0, PF_Treasure.Count);
         return PF_Treasure[ran];
     }
 }

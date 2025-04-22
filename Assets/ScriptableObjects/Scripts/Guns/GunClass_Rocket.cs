@@ -22,7 +22,7 @@ public class GunClass_Rocket : GunClass
         base.Clone(_temp);
         return _temp;
     }
-    public override void OnMelee()
+    public override void OnMelee(bool _isSprinting = false)
     {
         if (clipAmmo > 0 && f_fireTimer <= 0)
         {
@@ -31,6 +31,7 @@ public class GunClass_Rocket : GunClass
             Destroy(GO, 5);
             PM_player.RM_ragdoll.AddSource(GO);
             PM_player.Jump_Force(2f);
+            if (_isSprinting) PM_player.Apply_Force(PM_player.RB.transform.forward);
             clipAmmo = 0;
         }
         base.OnMelee();

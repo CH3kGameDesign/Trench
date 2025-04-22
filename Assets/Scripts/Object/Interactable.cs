@@ -11,11 +11,11 @@ public class Interactable : MonoBehaviour
         return this;
     }
 
-    public virtual void OnInteract(PlayerController _player)
+    public virtual void OnInteract(BaseController _player)
     {
 
     }
-    public virtual void OnUpdate(PlayerController _player)
+    public virtual void OnUpdate(BaseController _player)
     {
 
     }

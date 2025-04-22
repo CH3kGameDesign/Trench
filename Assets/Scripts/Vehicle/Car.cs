@@ -233,51 +233,55 @@ public class Car : Vehicle
             }
         }
     }
-    public override void OnUpdate_Driver(PlayerController _player)
+    public override void OnUpdate_Driver(BaseController _player)
     {
-        if (_player.Inputs.v2_inputDir.y > 0)
+        if (_player is PlayerController)
         {
-            CancelInvoke("DecelerateCar");
-            deceleratingCar = false;
-            GoForward();
-        }
-        if (_player.Inputs.v2_inputDir.y < 0)
-        {
-            CancelInvoke("DecelerateCar");
-            deceleratingCar = false;
-            GoReverse();
-        }
+            PlayerController _temp = _player as PlayerController;
+            if (_temp.Inputs.v2_inputDir.y > 0)
+            {
+                CancelInvoke("DecelerateCar");
+                deceleratingCar = false;
+                GoForward();
+            }
+            if (_temp.Inputs.v2_inputDir.y < 0)
+            {
+                CancelInvoke("DecelerateCar");
+                deceleratingCar = false;
+                GoReverse();
+            }
 
-        if (_player.Inputs.v2_inputDir.x < 0)
-        {
-            TurnLeft();
-        }
-        if (_player.Inputs.v2_inputDir.x > 0)
-        {
-            TurnRight();
-        }
-        if (_player.Inputs.b_jumping)
-        {
-            CancelInvoke("DecelerateCar");
-            deceleratingCar = false;
-            Handbrake();
-        }
-        if (!_player.Inputs.b_jumping)
-        {
-            RecoverTraction();
-        }
-        if (_player.Inputs.v2_inputDir.y == 0)
-        {
-            ThrottleOff();
-        }
-        if (_player.Inputs.v2_inputDir.y == 0 && !_player.Inputs.b_jumping && !deceleratingCar)
-        {
-            InvokeRepeating("DecelerateCar", 0f, 0.1f);
-            deceleratingCar = true;
-        }
-        if (_player.Inputs.v2_inputDir.x == 0 && steeringAxis != 0f)
-        {
-            ResetSteeringAngle();
+            if (_temp.Inputs.v2_inputDir.x < 0)
+            {
+                TurnLeft();
+            }
+            if (_temp.Inputs.v2_inputDir.x > 0)
+            {
+                TurnRight();
+            }
+            if (_temp.Inputs.b_jumping)
+            {
+                CancelInvoke("DecelerateCar");
+                deceleratingCar = false;
+                Handbrake();
+            }
+            if (!_temp.Inputs.b_jumping)
+            {
+                RecoverTraction();
+            }
+            if (_temp.Inputs.v2_inputDir.y == 0)
+            {
+                ThrottleOff();
+            }
+            if (_temp.Inputs.v2_inputDir.y == 0 && !_temp.Inputs.b_jumping && !deceleratingCar)
+            {
+                InvokeRepeating("DecelerateCar", 0f, 0.1f);
+                deceleratingCar = true;
+            }
+            if (_temp.Inputs.v2_inputDir.x == 0 && steeringAxis != 0f)
+            {
+                ResetSteeringAngle();
+            }
         }
     }
     // Update is called once per frame

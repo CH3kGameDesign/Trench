@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -32,6 +33,23 @@ public static class CKUtil
                 return true;
             default:
                 return _entry == _exit;
+        }
+    }
+
+    public static bool isSelfHittable(this HitObject.damageTypeEnum _damageType)
+    {
+        switch (_damageType)
+        {
+            case HitObject.damageTypeEnum.all:
+                return true;
+            case HitObject.damageTypeEnum.bullet:
+                return false;
+            case HitObject.damageTypeEnum.fire:
+                return true;
+            case HitObject.damageTypeEnum.explosive:
+                return true;
+            default:
+                return true;
         }
     }
 }

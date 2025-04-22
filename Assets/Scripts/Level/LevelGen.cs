@@ -2,9 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.AI.Navigation;
+using Unity.Mathematics;
 
 public class LevelGen : MonoBehaviour
 {
+    public uint seed = new uint();
+    private Unity.Mathematics.Random Random_Seeded;
     public LevelGen_Theme LG_Theme;
     private NavMeshSurface[] nm_Surfaces;
 
@@ -23,6 +26,9 @@ public class LevelGen : MonoBehaviour
 
     void Setup()
     {
+        if (seed == uint.MinValue)
+            seed = (uint)UnityEngine.Random.Range(0, int.MaxValue);
+        Random_Seeded = new Unity.Mathematics.Random(seed);
         nm_Surfaces = GetComponents<NavMeshSurface>();
         GenerateLayout(LG_Theme);
     }
@@ -33,6 +39,13 @@ public class LevelGen : MonoBehaviour
         
     }
 
+    public Vector3 GetRandomPoint()
+    {
+        int _block = UnityEngine.Random.Range(0, LG_Blocks.Count);
+        int _bound = UnityEngine.Random.Range(0, LG_Blocks[_block].B_bounds.Count);
+        return LG_Blocks[_block].B_bounds[_bound].B_Bounds.center + LG_Blocks[_block].B_bounds[_bound].B_Bounds.transform.position;
+    }
+
     public void GenerateLayout(LevelGen_Theme _theme)
     {
         LG_Blocks = new List<LevelGen_Block>();
@@ -40,7 +53,7 @@ public class LevelGen : MonoBehaviour
         lHolder.parent = transform;
         lHolder.localPosition = Vector3.zero;
 
-        LevelGen_Block _bridge = Instantiate(_theme.GetBlock(LevelGen_Block.blockTypeEnum.bridge, LevelGen_Block.entryTypeEnum.any), lHolder);
+        LevelGen_Block _bridge = Instantiate(_theme.GetBlock(LevelGen_Block.blockTypeEnum.bridge, LevelGen_Block.entryTypeEnum.any, Random_Seeded), lHolder);
         _bridge.transform.localPosition = Vector3.zero;
         LG_Blocks.Add(_bridge);
 
@@ -77,17 +90,17 @@ public class LevelGen : MonoBehaviour
                         }
                         break;
                     case LevelGen_Spawn.spawnTypeEnum.companion:
-                        prefab = LG_Theme.GetCompanion();
+                        prefab = LG_Theme.GetCompanion(Random_Seeded);
                         if (prefab != null)
                             GO = Instantiate(prefab, spawn.transform.position, spawn.transform.rotation, transform);
                         break;
                     case LevelGen_Spawn.spawnTypeEnum.enemy:
-                        prefab = LG_Theme.GetEnemy();
+                        prefab = LG_Theme.GetEnemy(Random_Seeded);
                         if (prefab != null)
                             GO = Instantiate(prefab, spawn.transform.position, spawn.transform.rotation, transform);
                         break;
                     case LevelGen_Spawn.spawnTypeEnum.treasure:
-                        prefab = LG_Theme.GetTreasure();
+                        prefab = LG_Theme.GetTreasure(Random_Seeded);
                         if (prefab != null)
                             GO = Instantiate(prefab, spawn.transform.position, spawn.transform.rotation, transform);
                         break;
@@ -150,7 +163,7 @@ public class LevelGen : MonoBehaviour
 
     LevelGen_Block GenerateRoom(LevelGen_Theme _theme, Transform lholder, Transform _holder, LevelGen_Door _entry)
     {
-        LevelGen_Block _corridor = Instantiate(_theme.GetBlock(LevelGen_Block.blockTypeEnum.corridor, _entry.entryType), lholder);
+        LevelGen_Block _corridor = Instantiate(_theme.GetBlock(LevelGen_Block.blockTypeEnum.corridor, _entry.entryType, Random_Seeded), lholder);
         List<LevelGen_Door> potEntries = new List<LevelGen_Door>();
         foreach (var item in _corridor.LGD_Entries)
         {
@@ -162,7 +175,7 @@ public class LevelGen : MonoBehaviour
             DestroyImmediate(_corridor.gameObject);
             return null;
         }
-        var entry = potEntries[Random.Range(0, potEntries.Count)];
+        var entry = potEntries[Random_Seeded.NextInt(0, potEntries.Count)];
 
         _holder.position = entry.transform.position;
         _holder.transform.forward = -entry.transform.forward;
