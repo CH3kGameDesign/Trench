@@ -75,9 +75,6 @@ public class PlayerController : BaseController
     public Reticle reticle;
     public RectTransform RT_hitPoint;
     public RectTransform RT_lockOnPoint;
-    public Transform T_barrelHook;
-    private GunClass gun_Equipped;
-    private GunClass[] gun_EquippedList = new GunClass[3];
 
     private bool b_radialOpen = false;
     private Coroutine C_timeScale = null;
@@ -107,6 +104,21 @@ public class PlayerController : BaseController
         public bool b_reload = false;
         public bool b_radial = false;
         public bool b_melee = false;
+
+        public bool IsInput()
+        {
+            return
+                b_sprinting ||
+                b_jumping ||
+                b_firing ||
+                b_aiming ||
+                b_interact ||
+                b_confirm ||
+                b_crouch ||
+                b_reload ||
+                b_radial ||
+                b_melee;
+        }
 
         public string[] s_inputStrings = new string[2];
     }
@@ -319,7 +331,7 @@ public class PlayerController : BaseController
         }
         else
         {
-            if (C_idleAnim == null)
+            if (C_idleAnim == null && !Inputs.IsInput())
                 C_idleAnim = StartCoroutine(Idle_Anim());
             b_isMoving = false;
             b_isSprinting = false;
@@ -571,7 +583,7 @@ public class PlayerController : BaseController
 
     void CamCollision()
     { 
-        if (b_isCrouching)
+        if (b_isCrouching || b_isSprinting)
             CamCollision(T_camHookCrouching, V3_camOffset_Crouch);
         else
             CamCollision(T_camHook, V3_camOffset);
@@ -654,7 +666,7 @@ public class PlayerController : BaseController
         if (gun_Equipped != null)
             gun_Equipped.OnUnEquip();
         gun_Equipped = gun_EquippedList[_invNum];
-        gun_Equipped.OnEquip();
+        gun_Equipped.OnEquip(this);
         Ref.I_curWeapon.sprite = gun_Equipped.sprite;
     }
 
@@ -727,7 +739,7 @@ public class PlayerController : BaseController
         while (true)
         {
             yield return new WaitForSeconds(_animWait);
-            if (RB.linearVelocity.magnitude < 0.1f)
+            if (RB.linearVelocity.magnitude < 0.1f && !Inputs.IsInput())
             {
                 A_model.SetInteger("Idle", Random.Range(0, 4));
                 A_model.Play("Idle");

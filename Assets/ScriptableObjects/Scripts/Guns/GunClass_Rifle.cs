@@ -32,10 +32,16 @@ public class GunClass_Rifle : GunClass
     {
         if (f_fireTimer <= 0 && clipAmmo < clipVariables.clipSize)
         {
-            PM_player.NMA.transform.eulerAngles = new Vector3(0, PM_player.T_camHolder.eulerAngles.y, 0);
-            Grenade GO = Instantiate(reloadGrenade, PM_player.T_barrelHook.position, PM_player.T_camHolder.rotation);
+            Transform camHolder = baseController.T_barrelHook;
+            if (b_playerGun)
+                camHolder = PM_player.T_camHolder;
+            baseController.NMA.transform.eulerAngles = new Vector3(0, camHolder.eulerAngles.y, 0);
+            Grenade GO = Instantiate(reloadGrenade, baseController.T_barrelHook.position, camHolder.rotation);
             float _damage = F_grenadeDamagePerBullet * (clipVariables.clipSize - clipAmmo);
-            GO.OnCreate(_damage, PM_player, this);
+            if (b_playerGun)
+                GO.OnCreate(_damage, PM_player, this);
+            else
+                GO.OnCreate(_damage, AC_agent, this);
             base.OnReload();
         }
     }

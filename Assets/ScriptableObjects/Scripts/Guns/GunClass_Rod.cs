@@ -18,16 +18,16 @@ public class GunClass_Rod : GunClass
     public override void OnUpdate()
     {
         if (b_aiming)
-            PM_player.RB.linearDamping = F_floatDrag;
+            baseController.RB.linearDamping = F_floatDrag;
         else
-            PM_player.RB.linearDamping = 0;
+            baseController.RB.linearDamping = 0;
 
         base.OnUpdate();
     }
     public override void OnUnEquip()
     {
         Detonate();
-        PM_player.RB.linearDamping = 0;
+        baseController.RB.linearDamping = 0;
         base.OnUnEquip();
     }
     public override void OnBullet(Bullet _bullet)

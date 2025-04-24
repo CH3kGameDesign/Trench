@@ -85,19 +85,26 @@ public class LevelGen : MonoBehaviour
                         prefab = LG_Theme.PF_Player;
                         if (prefab != null && playerSpawned == false)
                         {
-                            GO = Instantiate(prefab, spawn.transform.position, spawn.transform.rotation, transform);
+                            GO = Instantiate(prefab, spawn.transform.position, Quaternion.Euler(Vector3.zero), transform);
+                            GO.GetComponent<PlayerController>().NMA.transform.rotation = spawn.transform.rotation;
                             playerSpawned = true;
                         }
                         break;
                     case LevelGen_Spawn.spawnTypeEnum.companion:
                         prefab = LG_Theme.GetCompanion(Random_Seeded);
                         if (prefab != null)
-                            GO = Instantiate(prefab, spawn.transform.position, spawn.transform.rotation, transform);
+                        {
+                            GO = Instantiate(prefab, spawn.transform.position, Quaternion.Euler(Vector3.zero), transform);
+                            GO.GetComponent<AgentController>().NMA.transform.rotation = spawn.transform.rotation;
+                        }
                         break;
                     case LevelGen_Spawn.spawnTypeEnum.enemy:
                         prefab = LG_Theme.GetEnemy(Random_Seeded);
                         if (prefab != null)
-                            GO = Instantiate(prefab, spawn.transform.position, spawn.transform.rotation, transform);
+                        {
+                            GO = Instantiate(prefab, spawn.transform.position, Quaternion.Euler(Vector3.zero), transform);
+                            GO.GetComponent<AgentController>().NMA.transform.rotation = spawn.transform.rotation;
+                        }
                         break;
                     case LevelGen_Spawn.spawnTypeEnum.treasure:
                         prefab = LG_Theme.GetTreasure(Random_Seeded);

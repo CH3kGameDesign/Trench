@@ -14,11 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Rifle
   id: gun_Rifle
-  prefab: {fileID: 0}
+  prefab: {fileID: 2220881020268379628, guid: d9359d2c16cdc58458a2e01d315411e3, type: 3}
   bullet: {fileID: 7857619870900032349, guid: 94f26101f86c3194699d76d9df0d42af, type: 3}
   sprite: {fileID: 21300000, guid: 760affdb2aeb03c4bbae9fccc64c19fb, type: 3}
   fireVariables:
     fireRate: 0.1
+    damage: 10
+    burstAmount: 1
+    burstRate: 0.1
+    recoilCam: 0.25
+    recoilUpwards: 1
+  meleeVariables:
+    fireRate: 1
     damage: 10
     burstAmount: 1
     burstRate: 0.1
@@ -32,7 +39,11 @@ MonoBehaviour:
   reserveAmmo: 120
   b_aiming: 0
   f_fireTimer: 0
+  LM_GunRay:
+    serializedVersion: 2
+    m_Bits: 0
   PM_player: {fileID: 0}
+  A_charModel: {fileID: 0}
   fireVariablesOnAim:
     fireRate: 0.5
     damage: 10

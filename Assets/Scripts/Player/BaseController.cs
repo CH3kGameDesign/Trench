@@ -8,9 +8,14 @@ public class BaseController : MonoBehaviour
 {
     public NavMeshAgent NMA;
     public Transform T_model;
+    public Transform T_gunHook;
+    public Transform T_barrelHook;
     public Rigidbody RB;
     public RagdollManager RM_ragdoll;
     [HideInInspector] public Vehicle V_curVehicle = null;
+
+    [HideInInspector] public GunClass gun_Equipped;
+    [HideInInspector] public GunClass[] gun_EquippedList = new GunClass[3];
 
     public static gameStateEnum GameState = gameStateEnum.active;
     public enum gameStateEnum { inactive, active, dialogue, vehicle, ragdoll }

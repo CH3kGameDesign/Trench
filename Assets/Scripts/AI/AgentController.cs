@@ -24,14 +24,12 @@ public class AgentController : BaseController
 
     [Header("Combat Variables")]
     public float F_attackDistance = 20;
-    public Transform T_barrelHook;
     public List<Transform> T_targetTransforms = new List<Transform>();
     public LayerMask LM_hitScan;
-    private GunClass gun_Equipped;
     private float f_fireTimer = 0;
     private float f_burstTimer = 0;
     private int i_burstRemaining = 0;
-    private Vector3 v3_attackLocation;
+    [HideInInspector] public Vector3 V3_attackLocation;
     private float f_searchDelay = 0.2f;
     public float F_maxHealth = 100;
     private float f_curHealth = 100;
@@ -180,7 +178,11 @@ public class AgentController : BaseController
         }
         attackTarget.FollowAgent(DEBUG_TargetAgent);
 
+        if (DEBUG_EquippedGunNum < 0)
+            DEBUG_EquippedGunNum = Random.Range(0, 3);
+
         gun_Equipped = gunManager.GetGunByInt(DEBUG_EquippedGunNum, this);
+        gun_Equipped.OnEquip(this);
     }
 
     private void OnEnable()
@@ -336,7 +338,6 @@ public class AgentController : BaseController
             if (V_curVehicle != null)
             {
                 V_curVehicle.OnInteract(this);
-                transform.parent = null;
             }
         }
     }
@@ -347,7 +348,7 @@ public class AgentController : BaseController
         {
             if (_attacking)
             {
-                Quaternion _look = Quaternion.LookRotation(v3_attackLocation - NMA.transform.position);
+                Quaternion _look = Quaternion.LookRotation(V3_attackLocation - NMA.transform.position);
                 _look = Quaternion.Euler(new Vector3(0, _look.eulerAngles.y, 0));
                 NMA.transform.localRotation = Quaternion.Lerp(NMA.transform.localRotation, _look, Time.deltaTime * 6);
             }
@@ -365,7 +366,7 @@ public class AgentController : BaseController
         if (_firing)
             _input = Quaternion.Inverse(NMA.transform.localRotation) * _input;
         else
-            _input = Vector2.up * _input.magnitude;
+            _input = Vector2.ClampMagnitude(Vector2.up * _input.magnitude,1);
 
         v2_animMove = Vector2.Lerp(v2_animMove, _input, Time.deltaTime / 0.25f);
         A_model.SetFloat("posX", v2_animMove.x);
@@ -383,40 +384,28 @@ public class AgentController : BaseController
         Vector3 _tarPos;
         bool _firing = false;
         bool _startShot = false;
-        if (f_fireTimer <= 0)
+        if (gun_Equipped.f_fireTimer <= 0)
         {
-            if (attackTarget.GetTargetPos(T_barrelHook.position, LM_hitScan,out _tarPos))
+            if (gun_Equipped.clipAmmo <= 0)
+                gun_Equipped.OnReload();
+            else
             {
-                i_burstRemaining = Mathf.Max(gun_Equipped.fireVariables.burstAmount, 1);
-                f_fireTimer = gun_Equipped.fireVariables.fireRate;
-
-                v3_attackLocation = _tarPos;
-                _startShot = true;
+                if (attackTarget.GetTargetPos(T_barrelHook.position, LM_hitScan, out _tarPos))
+                {
+                    gun_Equipped.OnFire();
+                    V3_attackLocation = _tarPos;
+                    _startShot = true;
+                }
             }
         }
         else
-            _firing = true;
-
-        if (i_burstRemaining > 0)
         {
-            if (f_burstTimer <= 0)
-            {
-                if (!_startShot)
-                    if (attackTarget.GetTargetPos(T_barrelHook.position, LM_hitScan, out _tarPos))
-                        v3_attackLocation = _tarPos;
-
-                Bullet GO = Instantiate(gun_Equipped.bullet, T_barrelHook.position, T_barrelHook.rotation);
-                GO.transform.LookAt(v3_attackLocation);
-                GO.OnCreate(gun_Equipped.fireVariables.damage, this, gun_Equipped);
-
-                f_burstTimer = gun_Equipped.fireVariables.burstRate;
-                i_burstRemaining--;
-            }
+            if (!_startShot)
+                if (attackTarget.GetTargetPos(T_barrelHook.position, LM_hitScan, out _tarPos))
+                    V3_attackLocation = _tarPos;
             _firing = true;
         }
-
-        if (f_burstTimer > 0) f_burstTimer -= Time.deltaTime;
-        if (f_fireTimer > 0) f_fireTimer -= Time.deltaTime;
+        gun_Equipped.OnUpdate();
 
         return _firing;
     }

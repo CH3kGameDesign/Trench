@@ -14,10 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Rod
   id: gun_Rod
-  prefab: {fileID: 0}
+  prefab: {fileID: 7164603078148759310, guid: 488f69c6c9967dc43ab519082b3d6ffe, type: 3}
   bullet: {fileID: 3411593917391162664, guid: d7390d13c9ba5f54cae859ecd0d35d56, type: 3}
   sprite: {fileID: 21300000, guid: 01e5895c7333a544c9475e84a981ec48, type: 3}
   fireVariables:
+    fireRate: 1
+    damage: 10
+    burstAmount: 1
+    burstRate: 0.1
+    recoilCam: 0.25
+    recoilUpwards: 1
+  meleeVariables:
     fireRate: 1
     damage: 10
     burstAmount: 1
@@ -32,5 +39,9 @@ MonoBehaviour:
   reserveAmmo: 100
   b_aiming: 0
   f_fireTimer: 0
+  LM_GunRay:
+    serializedVersion: 2
+    m_Bits: 0
   PM_player: {fileID: 0}
+  A_charModel: {fileID: 0}
   F_floatDrag: 10

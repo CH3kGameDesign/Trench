@@ -29,10 +29,19 @@ public class GunClass_Rocket : GunClass
             Explosion GO = Instantiate(PF_meleeExplosion, PM_player.T_barrelHook.position, PF_meleeExplosion.transform.rotation);
             GO.OnCreate(null);
             Destroy(GO, 5);
-            PM_player.RM_ragdoll.AddSource(GO);
-            PM_player.Jump_Force(2f);
-            if (_isSprinting) PM_player.Apply_Force(PM_player.RB.transform.forward);
-            clipAmmo = 0;
+            if (b_playerGun)
+            {
+                PM_player.RM_ragdoll.AddSource(GO);
+                PM_player.Jump_Force(2f);
+                if (_isSprinting) PM_player.Apply_Force(PM_player.RB.transform.forward);
+            }
+            else
+            {
+                AC_agent.RM_ragdoll.AddSource(GO);
+                //AC_agent.Jump_Force(2f);
+                //if (_isSprinting) PM_player.Apply_Force(PM_player.RB.transform.forward);
+            }
+                clipAmmo = 0;
         }
         base.OnMelee();
     }
@@ -89,26 +98,30 @@ public class GunClass_Rocket : GunClass
 
     void UpdateLockOnGraphic()
     {
-        if (t_lockOnTarget != null)
+        if (b_playerGun)
         {
-            Vector3 _tarPos = Camera.main.WorldToScreenPoint(t_lockOnTarget.position);
-            _tarPos /= Conversation.Instance.C_canvas.scaleFactor;
+            if (t_lockOnTarget != null)
+            {
+                Vector3 _tarPos = Camera.main.WorldToScreenPoint(t_lockOnTarget.position);
+                _tarPos /= Conversation.Instance.C_canvas.scaleFactor;
 
-            PM_player.RT_lockOnPoint.anchoredPosition = _tarPos;
-            PM_player.RT_lockOnPoint.gameObject.SetActive(true);
+                PM_player.RT_lockOnPoint.anchoredPosition = _tarPos;
+                PM_player.RT_lockOnPoint.gameObject.SetActive(true);
 
-            float _rotation = 90 * (f_lockOnTimer / F_lockOnTime);
-            PM_player.RT_lockOnPoint.localEulerAngles = new Vector3(0, 0, _rotation);
+                float _rotation = 90 * (f_lockOnTimer / F_lockOnTime);
+                PM_player.RT_lockOnPoint.localEulerAngles = new Vector3(0, 0, _rotation);
+            }
+            else
+                PM_player.RT_lockOnPoint.gameObject.SetActive(false);
         }
-        else
-            PM_player.RT_lockOnPoint.gameObject.SetActive(false);
     }
 
     void EngageLockOn()
     {
         if (b_lockedOn == false)
         {
-            PM_player.RT_lockOnPoint.GetComponent<Image>().color = Color.green;
+            if (b_playerGun)
+                PM_player.RT_lockOnPoint.GetComponent<Image>().color = Color.green;
             b_lockedOn = true;
         }
     }
@@ -116,7 +129,8 @@ public class GunClass_Rocket : GunClass
     {
         if (b_lockedOn == true)
         {
-            PM_player.RT_lockOnPoint.GetComponent<Image>().color = Color.grey;
+            if (b_playerGun)
+                PM_player.RT_lockOnPoint.GetComponent<Image>().color = Color.grey;
             b_lockedOn = false;
         }
     }

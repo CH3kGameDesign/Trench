@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 [CreateAssetMenu(menuName = "Trench/AssetLists/Gun", fileName = "New Default Gun")]
 public class GunClass : ScriptableObject
@@ -8,7 +9,7 @@ public class GunClass : ScriptableObject
     public string name = "";
     public string id = "";
     [Space(10)]
-    public GameObject prefab;
+    public GunPrefab prefab;
     public Bullet bullet;
     public Sprite sprite;
     [Space(10)]
@@ -35,9 +36,16 @@ public class GunClass : ScriptableObject
     [HideInInspector]
     public PlayerController PM_player;
     [HideInInspector]
+    public AgentController AC_agent;
+    [HideInInspector]
+    public BaseController baseController;
+    [HideInInspector]
     public Animator A_charModel;
 
-    private bool b_playerGun = false;
+    private GunPrefab G_gunModel = null;
+
+    [HideInInspector]
+    public bool b_playerGun = false;
 
     public GunClass Clone(PlayerController _player)
     {
@@ -97,6 +105,7 @@ public class GunClass : ScriptableObject
     public virtual void Setup(PlayerController _player)
     {
         PM_player = _player;
+        baseController = _player;
         A_charModel = PM_player.A_model;
         T_camHolder = _player.T_camHolder;
         LM_GunRay = _player.LM_GunRay;
@@ -104,6 +113,8 @@ public class GunClass : ScriptableObject
     }
     public virtual void Setup(AgentController _agent)
     {
+        AC_agent = _agent;
+        baseController = _agent;
         b_playerGun = false;
         A_charModel = _agent.A_model;
     }
@@ -121,7 +132,8 @@ public class GunClass : ScriptableObject
         f_fireTimer = _fireVariables.fireRate;
         f_recoilCam = _fireVariables.recoilCam;
         f_recoilUpwards = _fireVariables.recoilUpwards;
-        PM_player.reticle.RotateReticle(f_fireTimer);
+        if (b_playerGun)
+            PM_player.reticle.RotateReticle(f_fireTimer);
     }
     public virtual void OnMelee(bool _isSprinting = false)
     {
@@ -138,7 +150,8 @@ public class GunClass : ScriptableObject
         if (f_fireTimer <= 0 && clipAmmo < clipVariables.clipSize)
         {
             f_fireTimer = clipVariables.reloadSpeed;
-            PM_player.reticle.ReloadReticle(f_fireTimer, this);
+            if (b_playerGun)
+                PM_player.reticle.ReloadReticle(f_fireTimer, this);
             clipAmmo = clipVariables.clipSize;
             A_charModel.Play("Reload_Rifle", 1);
         }
@@ -147,14 +160,28 @@ public class GunClass : ScriptableObject
     {
         b_aiming = _aiming;
     }
-    public virtual void OnEquip()
+    public virtual void OnEquip(BaseController baseController)
     {
-        PM_player.reticle.UpdateRoundCount(this);
-        PM_player.RT_lockOnPoint.gameObject.SetActive(false);
+        if (b_playerGun)
+        {
+            PM_player.reticle.UpdateRoundCount(this);
+            PM_player.RT_lockOnPoint.gameObject.SetActive(false);
+        }
+        if (prefab != null)
+        {
+            G_gunModel = Instantiate(prefab, baseController.T_gunHook);
+            G_gunModel.transform.localPosition = Vector3.zero;
+            G_gunModel.transform.localEulerAngles = Vector3.zero;
+        }
+        A_charModel.Play("Equip_Rifle", 1);
     }
     public virtual void OnUnEquip()
     {
-
+        if (G_gunModel != null)
+        {
+            Destroy(G_gunModel.gameObject);
+            G_gunModel = null;
+        }
     }
 
     public virtual void OnUpdate()
@@ -163,25 +190,44 @@ public class GunClass : ScriptableObject
             i_burstRemaining = 0;
         if (i_burstRemaining > 0 && f_burstTimer <= 0)
         {
-            Vector3 _tarPos;
-            Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, 100, LM_GunRay))
-                _tarPos = hit.point;
-            else
-                _tarPos = T_camHolder.GetChild(0).position + (T_camHolder.GetChild(0).forward * 100);
-
-            Bullet GO = Instantiate(bullet, PM_player.T_barrelHook.position, PM_player.T_barrelHook.rotation);
-            GO.transform.LookAt(_tarPos);
-            GO.OnCreate(fireVariables.damage, PM_player, this);
-            OnBullet(GO);
             f_burstTimer = fireVariables.burstRate;
             i_burstRemaining--;
             clipAmmo--;
-            PM_player.reticle.UpdateRoundCount(this);
 
-            T_camHolder.GetChild(0).position -= T_camHolder.forward * f_recoilCam;
-            PM_player.v3_camDir.x -= f_recoilUpwards;
+            G_gunModel.Shoot();
+
+            Vector3 _tarPos;
+            Transform _barrel;
+            if (b_playerGun)
+            {
+                _barrel = PM_player.T_barrelHook;
+                Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit, 100, LM_GunRay))
+                    _tarPos = hit.point;
+                else
+                    _tarPos = T_camHolder.GetChild(0).position + (T_camHolder.GetChild(0).forward * 100);
+            }
+            else
+            {
+                _barrel = AC_agent.T_barrelHook;
+                _tarPos = AC_agent.V3_attackLocation;
+            }
+            Bullet GO = Instantiate(bullet, _barrel.position, _barrel.rotation);
+            GO.transform.LookAt(_tarPos);
+            if (b_playerGun)
+            {
+                GO.OnCreate(fireVariables.damage, PM_player, this);
+                PM_player.reticle.UpdateRoundCount(this);
+
+                T_camHolder.GetChild(0).position -= T_camHolder.forward * f_recoilCam;
+                PM_player.v3_camDir.x -= f_recoilUpwards;
+            }
+            else
+            {
+                GO.OnCreate(fireVariables.damage, AC_agent, this);
+            }
+            OnBullet(GO);
         }
 
         if (f_burstTimer > 0) f_burstTimer -= Time.deltaTime;
