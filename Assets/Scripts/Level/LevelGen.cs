@@ -246,6 +246,7 @@ public class LevelGen : MonoBehaviour
         int roomAmt = 0;
         if (_layout.extraRoom_Amount.y > 0)
             roomAmt = Random_Seeded.NextInt(_layout.extraRoom_Amount.x, _layout.extraRoom_Amount.y);
+        bool shipGenerated = false;
         foreach (var item in LG_Blocks)
         {
             foreach (var entry in item.LGD_Entries)
@@ -261,6 +262,9 @@ public class LevelGen : MonoBehaviour
             switch (entry.entryType)
             {
                 case LevelGen_Block.entryTypeEnum.shipPark:
+                    if (shipGenerated)
+                        continue;
+                    shipGenerated = true;
                     break;
                 default:
                     if (roomAmt <= 0)
@@ -300,7 +304,10 @@ public class LevelGen : MonoBehaviour
 
     LevelGen_Block GenerateRoom(LevelGen_Theme _theme, Transform lholder, Transform _holder, LevelGen_Door _entry, LevelGen_Block.blockTypeEnum _blockType = LevelGen_Block.blockTypeEnum.corridor)
     {
-        LevelGen_Block _corridor = Instantiate(_theme.GetBlock(LevelGen_Block.blockTypeEnum.corridor, _entry.entryType, Random_Seeded), lholder);
+        LevelGen_Block _prefab = _theme.GetBlock(_blockType, _entry.entryType, Random_Seeded);
+        if (_prefab == null)
+            return null;
+        LevelGen_Block _corridor = Instantiate(_prefab, lholder);
         List<LevelGen_Door> potEntries = new List<LevelGen_Door>();
         foreach (var item in _corridor.LGD_Entries)
         {

@@ -59,6 +59,8 @@ public class LevelGen_Theme : ScriptableObject
                 }
             }
         }
+        if (_listFiltered.Count == 0)
+            return null;
         _temp = _random.NextInt(0, _listFiltered.Count);
         return _listFiltered[_temp];
     }
