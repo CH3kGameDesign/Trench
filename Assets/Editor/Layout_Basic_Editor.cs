@@ -8,24 +8,25 @@ using static UnityEngine.GraphicsBuffer;
 using System.Linq;
 using System.Web;
 using System.Runtime.InteropServices;
+using UnityEditorInternal;
 
 [CustomEditor(typeof(Layout_Basic))]
 public class Layout_Basic_Editor : Editor
 {
     Vector2 scrollPos = Vector2.zero;
+
+
     public override void OnInspectorGUI()
     {
         Layout_Basic myTarget = (Layout_Basic)target;
+        //DrawDefaultInspector();
         GUILayout.Label("Layout");
         CheckSize(myTarget);
         
-        float screenWidth = EditorGUIUtility.currentViewWidth -40;
-        float screenHeight = 1000;
-        float width = screenWidth / myTarget.data[0].d.Count;
-
         Color baseGUIColor = GUI.color;
 
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
+        EditorStyles.popup.alignment = TextAnchor.MiddleCenter;
         for (int y = 0; y < myTarget.data.Count; y++)
         {
             EditorGUILayout.BeginHorizontal();
@@ -59,9 +60,13 @@ public class Layout_Basic_Editor : Editor
             EditorGUILayout.EndHorizontal();
         }
         EditorGUILayout.EndScrollView();
+        GUILayout.Space(20);
+        GUILayout.Label("Extra Rooms");
+        myTarget.extraRoom_Amount = EditorGUILayout.Vector2IntField("Amount",myTarget.extraRoom_Amount);
         if (GUI.changed)
             SaveChanges(myTarget);
     }
+
     void roomField(Layout_Basic.block _room, Layout_Basic myTarget, int x, int y)
     {
         if (_room != null)
@@ -82,7 +87,6 @@ public class Layout_Basic_Editor : Editor
                     break;
             }
             EditorStyles.popup.fixedHeight = 50;
-            EditorStyles.popup.alignment = TextAnchor.MiddleCenter;
             EditorStyles.popup.fontStyle = FontStyle.Bold;
             Layout_Basic.roomEnum _type = (Layout_Basic.roomEnum)EditorGUILayout.EnumPopup(_room.roomtype, GUILayout.Height(50));
             EditorStyles.popup.fontStyle = FontStyle.Normal; 
@@ -319,6 +323,7 @@ public class Layout_Basic_Editor : Editor
 
     void SaveChanges(Layout_Basic myTarget)
     {
+        myTarget.UpdateRecipe();
         EditorUtility.SetDirty(myTarget);
         AssetDatabase.SaveAssetIfDirty(myTarget);
     }

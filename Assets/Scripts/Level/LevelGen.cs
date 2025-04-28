@@ -9,6 +9,7 @@ public class LevelGen : MonoBehaviour
     public uint seed = new uint();
     private Unity.Mathematics.Random Random_Seeded;
     public LevelGen_Theme LG_Theme;
+    public List<Layout_Basic> L_Layouts = new List<Layout_Basic>();
     private NavMeshSurface[] nm_Surfaces;
 
     private List<LevelGen_Block> LG_Blocks = new List<LevelGen_Block>();
@@ -30,7 +31,13 @@ public class LevelGen : MonoBehaviour
             seed = (uint)UnityEngine.Random.Range(0, int.MaxValue);
         Random_Seeded = new Unity.Mathematics.Random(seed);
         nm_Surfaces = GetComponents<NavMeshSurface>();
-        GenerateLayout(LG_Theme);
+        if (L_Layouts.Count > 0)
+        {
+            Layout_Basic _layout = L_Layouts[Random_Seeded.NextInt(L_Layouts.Count)];
+            GenerateLayout_Smart(LG_Theme, _layout);
+        }
+        else
+            GenerateLayout_Series(LG_Theme);
     }
 
     // Update is called once per frame
@@ -46,7 +53,7 @@ public class LevelGen : MonoBehaviour
         return LG_Blocks[_block].B_bounds[_bound].B_Bounds.center + LG_Blocks[_block].B_bounds[_bound].B_Bounds.transform.position;
     }
 
-    public void GenerateLayout(LevelGen_Theme _theme)
+    public void GenerateLayout_Series(LevelGen_Theme _theme)
     {
         LG_Blocks = new List<LevelGen_Block>();
         Transform lHolder = new GameObject("LayoutHolder").transform;
@@ -57,7 +64,24 @@ public class LevelGen : MonoBehaviour
         _bridge.transform.localPosition = Vector3.zero;
         LG_Blocks.Add(_bridge);
 
-        GenerateBuildings(LG_Blocks, _theme, lHolder, i_series);
+        GenerateBuildings_Series(LG_Blocks, _theme, lHolder, i_series);
+        UpdateNavMeshes();
+        SpawnObjects();
+    }
+
+    public void GenerateLayout_Smart(LevelGen_Theme _theme, Layout_Basic _layout)
+    {
+        LG_Blocks = new List<LevelGen_Block>();
+        Transform lHolder = new GameObject("LayoutHolder").transform;
+        lHolder.parent = transform;
+        lHolder.localPosition = Vector3.zero;
+
+        LevelGen_Block _firstRoom = Instantiate(_theme.GetBlock(_layout.recipe.roomType.ConvertToLevelGen(), LevelGen_Block.entryTypeEnum.any, Random_Seeded), lHolder);
+        _firstRoom.transform.localPosition = Vector3.zero;
+        LG_Blocks.Add(_firstRoom);
+        for (int i = 0; i < _layout.recipe.connectedRooms.Count; i++)
+            GenerateBuildings_Smart(_layout.recipe.connectedRooms[i], _theme, lHolder, _firstRoom, _layout.recipe.entryTypes[i]);
+        GenerateBuildings_Extra(_theme, _layout, lHolder);
         UpdateNavMeshes();
         SpawnObjects();
     }
@@ -118,7 +142,7 @@ public class LevelGen : MonoBehaviour
         }
     }
     
-    void GenerateBuildings(List<LevelGen_Block> _rooms, LevelGen_Theme _theme, Transform lHolder, int series = 3)
+    void GenerateBuildings_Series(List<LevelGen_Block> _rooms, LevelGen_Theme _theme, Transform lHolder, int series = 3)
     {
         if (series > 0)
         {
@@ -160,15 +184,121 @@ public class LevelGen : MonoBehaviour
                 }
             }
             LG_Blocks.AddRange(newRooms);
-            GenerateBuildings(newRooms, _theme, lHolder, series - 1);
+            GenerateBuildings_Series(newRooms, _theme, lHolder, series - 1);
         }
         else
         {
             UpdateNavMeshes();
         }
     }
+    void GenerateBuildings_Smart(Layout_Basic.room _room, LevelGen_Theme _theme, Transform lHolder, LevelGen_Block _parent, Layout_Basic.entryTypeEnum _entryType = Layout_Basic.entryTypeEnum.any)
+    {
+        bool _completed = false;
+        List<LevelGen_Door> _doors = new List<LevelGen_Door>();
+        foreach (var item in _parent.LGD_Entries)
+        {
+            if (item.B_connected)
+                continue;
+            if (item.entryType.CompareEntries(_entryType.ConvertToLevelGen()))
+                _doors.Add(item);
+            _doors.Shuffle(Random_Seeded);
+        }
+        foreach (var entry in _doors)
+        {
+            Transform _holder = new GameObject().transform;
+            _holder.gameObject.name = entry.entryType.ToString() + " " + entry.transform.position.ToString();
+            _holder.parent = lHolder;
 
-    LevelGen_Block GenerateRoom(LevelGen_Theme _theme, Transform lholder, Transform _holder, LevelGen_Door _entry)
+            for (int i = 0; i < i_attempts; i++)
+            {
+                LevelGen_Block _temp = GenerateRoom(_theme, lHolder, _holder, entry, _room.roomType.ConvertToLevelGen());
+                if (_temp == null)
+                    continue;
+                foreach (var bound in _temp.B_bounds)
+                    bound.B_Bounds.enabled = false;
+                Physics.SyncTransforms();
+                int _tarOverlaps = 0;
+                if (entry.entryType == LevelGen_Block.entryTypeEnum.shipPark) _tarOverlaps = 1;
+                if (CheckBounds(_temp, _tarOverlaps))
+                {
+                    DestroyImmediate(_temp.gameObject);
+                }
+                else
+                {
+                    entry.OnConnect();
+                    LG_Blocks.Add(_temp);
+                    foreach (var bound in _temp.B_bounds)
+                        bound.B_Bounds.enabled = true;
+                    for (int j = 0; j < _room.connectedRooms.Count; j++)
+                        GenerateBuildings_Smart(_room.connectedRooms[j], LG_Theme, lHolder, _temp, _room.entryTypes[j]);
+                    _completed = true;
+                    break;
+                }
+            }
+            if (_completed)
+                break;
+        }
+    }
+
+    void GenerateBuildings_Extra(LevelGen_Theme _theme, Layout_Basic _layout, Transform lHolder)
+    {
+        List<LevelGen_Door> entries = new List<LevelGen_Door>();
+        int roomAmt = 0;
+        if (_layout.extraRoom_Amount.y > 0)
+            roomAmt = Random_Seeded.NextInt(_layout.extraRoom_Amount.x, _layout.extraRoom_Amount.y);
+        foreach (var item in LG_Blocks)
+        {
+            foreach (var entry in item.LGD_Entries)
+            {
+                if (entry.B_connected)
+                    continue;
+                entries.Add(entry);
+            }
+        }
+        entries.Shuffle(Random_Seeded);
+        foreach (var entry in entries)
+        {
+            switch (entry.entryType)
+            {
+                case LevelGen_Block.entryTypeEnum.shipPark:
+                    break;
+                default:
+                    if (roomAmt <= 0)
+                        continue;
+                    roomAmt--;
+                    break;
+            }
+            Transform _holder = new GameObject().transform;
+            _holder.gameObject.name = entry.entryType.ToString() + " " + entry.transform.position.ToString();
+            _holder.parent = lHolder;
+
+            for (int i = 0; i < i_attempts; i++)
+            {
+                LevelGen_Block _temp = GenerateRoom(_theme, lHolder, _holder, entry, LevelGen_Block.blockTypeEnum.corridor);
+                if (_temp == null)
+                    continue;
+                foreach (var bound in _temp.B_bounds)
+                    bound.B_Bounds.enabled = false;
+                Physics.SyncTransforms();
+                int _tarOverlaps = 0;
+                if (entry.entryType == LevelGen_Block.entryTypeEnum.shipPark) _tarOverlaps = 1;
+                if (CheckBounds(_temp, _tarOverlaps))
+                {
+                    DestroyImmediate(_temp.gameObject);
+                }
+                else
+                {
+                    entry.OnConnect();
+                    LG_Blocks.Add(_temp);
+                    foreach (var bound in _temp.B_bounds)
+                        bound.B_Bounds.enabled = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    LevelGen_Block GenerateRoom(LevelGen_Theme _theme, Transform lholder, Transform _holder, LevelGen_Door _entry, LevelGen_Block.blockTypeEnum _blockType = LevelGen_Block.blockTypeEnum.corridor)
     {
         LevelGen_Block _corridor = Instantiate(_theme.GetBlock(LevelGen_Block.blockTypeEnum.corridor, _entry.entryType, Random_Seeded), lholder);
         List<LevelGen_Door> potEntries = new List<LevelGen_Door>();

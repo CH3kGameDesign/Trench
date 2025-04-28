@@ -89,9 +89,9 @@ MonoBehaviour:
       entryType: 0
     - type: 1
       roomtype: 0
-      entryType: 6
+      entryType: 2
     - type: 0
-      roomtype: 3
+      roomtype: 1
       entryType: 0
   - d:
     - type: 1
@@ -121,7 +121,36 @@ MonoBehaviour:
       entryType: 0
     - type: 1
       roomtype: 0
-      entryType: 0
+      entryType: 6
     - type: 0
-      roomtype: 0
+      roomtype: 3
       entryType: 0
+  recipe:
+    roomType: 1
+    connectedRooms:
+    - roomType: 3
+      connectedRooms:
+      - roomType: 3
+        connectedRooms:
+        - roomType: 3
+          connectedRooms:
+          - roomType: 3
+            connectedRooms: []
+            entryTypes: 
+          entryTypes: 06000000
+        - roomType: 2
+          connectedRooms:
+          - roomType: 3
+            connectedRooms: []
+            entryTypes: 
+          - roomType: 3
+            connectedRooms: []
+            entryTypes: 
+          entryTypes: 0600000006000000
+        - roomType: 1
+          connectedRooms: []
+          entryTypes: 
+        entryTypes: 060000000600000002000000
+      entryTypes: 06000000
+    entryTypes: 06000000
+  extraRoom_Amount: {x: 5, y: 10}
