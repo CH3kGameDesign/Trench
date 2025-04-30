@@ -3781,6 +3781,11 @@ MonoBehaviour:
   RB: {fileID: 748759331089592094}
   RM_ragdoll: {fileID: 4263329163019693297}
   V_curVehicle: {fileID: 0}
+  gun_Equipped: {fileID: 0}
+  gun_EquippedList:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   gunManager: {fileID: 11400000, guid: 1e3b59fdefa93a743beff3357901afa0, type: 2}
   Ref:
     RM_radial: {fileID: 4998445071879505069}
@@ -3803,13 +3808,13 @@ MonoBehaviour:
   V3_camOffset_Crouch: {x: 1, y: 0, z: -1.5}
   LM_CameraRay:
     serializedVersion: 2
-    m_Bits: 65
+    m_Bits: 16449
   LM_TerrainRay:
     serializedVersion: 2
-    m_Bits: 577
+    m_Bits: 16960
   LM_GunRay:
     serializedVersion: 2
-    m_Bits: 2753
+    m_Bits: 19137
   F_moveSpeed: 3
   F_sprintModifier: 3
   F_jumpForce: 5

@@ -62,6 +62,21 @@ public static class CKUtil
                 return LevelGen_Block.blockTypeEnum.hangar;
             case Layout_Basic.roomEnum.corridor:
                 return LevelGen_Block.blockTypeEnum.corridor;
+
+
+            case Layout_Basic.roomEnum.deadEnd:
+                return LevelGen_Block.blockTypeEnum.deadend;
+            case Layout_Basic.roomEnum.engine:
+                return LevelGen_Block.blockTypeEnum.engine;
+            case Layout_Basic.roomEnum.foodHall:
+                return LevelGen_Block.blockTypeEnum.foodhall;
+            case Layout_Basic.roomEnum.crewQuarters:
+                return LevelGen_Block.blockTypeEnum.crewQuarters;
+            case Layout_Basic.roomEnum.captain:
+                return LevelGen_Block.blockTypeEnum.captain;
+            case Layout_Basic.roomEnum.vault:
+                return LevelGen_Block.blockTypeEnum.vault;
+
             default:
                 return LevelGen_Block.blockTypeEnum.corridor;
         }

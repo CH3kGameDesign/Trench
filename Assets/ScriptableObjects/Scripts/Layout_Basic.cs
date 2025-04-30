@@ -10,6 +10,8 @@ public class Layout_Basic : ScriptableObject
     public List<blockColumn> data = new List<blockColumn>();
     public room recipe = new room();
 
+    public int totalRoomAmount = 0;
+
     public Vector2Int extraRoom_Amount = Vector2Int.zero;
 
     [System.Serializable]
@@ -49,6 +51,12 @@ public class Layout_Basic : ScriptableObject
         [InspectorName("Room/Bridge")] bridge,
         [InspectorName("Room/Hangar")] hangar,
         [InspectorName("Room/Corridor")] corridor,
+        [InspectorName("Room/DeadEnd")] deadEnd,
+        [InspectorName("Room/Engine")] engine,
+        [InspectorName("Room/FoodHall")] foodHall,
+        [InspectorName("Room/CrewQuarters")] crewQuarters,
+        [InspectorName("Room/CaptainsQuarters")] captain,
+        [InspectorName("Room/Vault")] vault,
 
         [InspectorName("Add/Above")] addAbove,
         [InspectorName("Add/Below")] addBelow,
@@ -88,6 +96,7 @@ public class Layout_Basic : ScriptableObject
         {
             checkedRooms = new List<Vector2Int>();
             AddRoom(firstRoom);
+            totalRoomAmount = checkedRooms.Count;
         }
     }
     public void AddRoom(Vector2Int _gridPos, room _parent = null, entryTypeEnum _entry = entryTypeEnum.any)

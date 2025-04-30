@@ -8,6 +8,13 @@ public class LevelGen_Theme : ScriptableObject
     public List<LevelGen_Block> Corridors = new List<LevelGen_Block>();
     public List<LevelGen_Block> Hangars = new List<LevelGen_Block>();
     public List<LevelGen_Block> Bridges = new List<LevelGen_Block>();
+    public List<LevelGen_Block> DeadEnds = new List<LevelGen_Block>();
+    public List<LevelGen_Block> Engines = new List<LevelGen_Block>();
+    public List<LevelGen_Block> FoodHalls = new List<LevelGen_Block>();
+    public List<LevelGen_Block> CrewQuarters = new List<LevelGen_Block>();
+    public List<LevelGen_Block> CaptainQuaters = new List<LevelGen_Block>();
+    public List<LevelGen_Block> Vaults = new List<LevelGen_Block>();
+    public List<LevelGen_Block> Ships = new List<LevelGen_Block>();
 
     public List<GameObject> PF_Treasure = new List<GameObject>();
     public List<GameObject> PF_Enemies = new List<GameObject>();
@@ -34,6 +41,13 @@ public class LevelGen_Theme : ScriptableObject
             case LevelGen_Block.blockTypeEnum.corridor: return GetBlockFromList(Corridors, _entryType, _random);
             case LevelGen_Block.blockTypeEnum.bridge:   return GetBlockFromList(Bridges, _entryType, _random);
             case LevelGen_Block.blockTypeEnum.hangar:   return GetBlockFromList(Hangars, _entryType, _random);
+            case LevelGen_Block.blockTypeEnum.deadend: return GetBlockFromList(DeadEnds, _entryType, _random);
+            case LevelGen_Block.blockTypeEnum.engine: return GetBlockFromList(Engines, _entryType, _random);
+            case LevelGen_Block.blockTypeEnum.foodhall: return GetBlockFromList(FoodHalls, _entryType, _random);
+            case LevelGen_Block.blockTypeEnum.crewQuarters: return GetBlockFromList(CrewQuarters, _entryType, _random);
+            case LevelGen_Block.blockTypeEnum.captain: return GetBlockFromList(CaptainQuaters, _entryType, _random);
+            case LevelGen_Block.blockTypeEnum.vault: return GetBlockFromList(Vaults, _entryType, _random);
+            case LevelGen_Block.blockTypeEnum.ship: return GetBlockFromList(Ships, _entryType, _random);
             default:
                 break;
         }

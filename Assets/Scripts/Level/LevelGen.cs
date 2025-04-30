@@ -34,7 +34,7 @@ public class LevelGen : MonoBehaviour
         if (L_Layouts.Count > 0)
         {
             Layout_Basic _layout = L_Layouts[Random_Seeded.NextInt(L_Layouts.Count)];
-            GenerateLayout_Smart(LG_Theme, _layout);
+            StartCoroutine(GenerateLayout_Smart(LG_Theme, _layout));
         }
         else
             GenerateLayout_Series(LG_Theme);
@@ -69,7 +69,7 @@ public class LevelGen : MonoBehaviour
         SpawnObjects();
     }
 
-    public void GenerateLayout_Smart(LevelGen_Theme _theme, Layout_Basic _layout)
+    public IEnumerator GenerateLayout_Smart(LevelGen_Theme _theme, Layout_Basic _layout)
     {
         LG_Blocks = new List<LevelGen_Block>();
         Transform lHolder = new GameObject("LayoutHolder").transform;
@@ -81,9 +81,19 @@ public class LevelGen : MonoBehaviour
         LG_Blocks.Add(_firstRoom);
         for (int i = 0; i < _layout.recipe.connectedRooms.Count; i++)
             GenerateBuildings_Smart(_layout.recipe.connectedRooms[i], _theme, lHolder, _firstRoom, _layout.recipe.entryTypes[i]);
-        GenerateBuildings_Extra(_theme, _layout, lHolder);
-        UpdateNavMeshes();
-        SpawnObjects();
+        if (LG_Blocks.Count < _layout.totalRoomAmount)
+        {
+            yield return new WaitForEndOfFrame();
+            Debug.Log("Retry Generation");
+            GameObject.Destroy(lHolder.gameObject);
+            StartCoroutine(GenerateLayout_Smart(_theme, _layout));
+        }
+        else
+        {
+            GenerateBuildings_Extra(_theme, _layout, lHolder);
+            UpdateNavMeshes();
+            SpawnObjects();
+        }
     }
 
     public void UpdateNavMeshes()
@@ -247,6 +257,7 @@ public class LevelGen : MonoBehaviour
         if (_layout.extraRoom_Amount.y > 0)
             roomAmt = Random_Seeded.NextInt(_layout.extraRoom_Amount.x, _layout.extraRoom_Amount.y);
         bool shipGenerated = false;
+        LevelGen_Block.blockTypeEnum _type = LevelGen_Block.blockTypeEnum.deadend;
         foreach (var item in LG_Blocks)
         {
             foreach (var entry in item.LGD_Entries)
@@ -265,6 +276,7 @@ public class LevelGen : MonoBehaviour
                     if (shipGenerated)
                         continue;
                     shipGenerated = true;
+                    _type = LevelGen_Block.blockTypeEnum.ship;
                     break;
                 default:
                     if (roomAmt <= 0)
@@ -278,7 +290,7 @@ public class LevelGen : MonoBehaviour
 
             for (int i = 0; i < i_attempts; i++)
             {
-                LevelGen_Block _temp = GenerateRoom(_theme, lHolder, _holder, entry, LevelGen_Block.blockTypeEnum.corridor);
+                LevelGen_Block _temp = GenerateRoom(_theme, lHolder, _holder, entry, _type);
                 if (_temp == null)
                     continue;
                 foreach (var bound in _temp.B_bounds)

@@ -38,7 +38,7 @@ MonoBehaviour:
       entryType: 0
     - type: 1
       roomtype: 0
-      entryType: 6
+      entryType: 2
     - type: 2
       roomtype: 0
       entryType: 0
@@ -57,7 +57,7 @@ MonoBehaviour:
       entryType: 0
     - type: 1
       roomtype: 0
-      entryType: 0
+      entryType: 6
     - type: 0
       roomtype: 0
       entryType: 0
@@ -91,7 +91,7 @@ MonoBehaviour:
       roomtype: 0
       entryType: 6
     - type: 0
-      roomtype: 1
+      roomtype: 3
       entryType: 0
   - d:
     - type: 1
@@ -147,10 +147,11 @@ MonoBehaviour:
             connectedRooms: []
             entryTypes: 
           entryTypes: 0600000006000000
-        - roomType: 1
+        - roomType: 3
           connectedRooms: []
           entryTypes: 
         entryTypes: 060000000600000006000000
       entryTypes: 06000000
-    entryTypes: 06000000
-  extraRoom_Amount: {x: 0, y: 0}
+    entryTypes: 02000000
+  totalRoomAmount: 9
+  extraRoom_Amount: {x: 5, y: 10}

@@ -5,7 +5,7 @@ using UnityEngine;
 public class LevelGen_Block : MonoBehaviour
 {
     public blockTypeEnum BlockType = blockTypeEnum.corridor;
-    public enum blockTypeEnum { corridor, bridge, hangar }
+    public enum blockTypeEnum { corridor, bridge, hangar, deadend, engine, foodhall, crewQuarters, captain, vault, ship }
 
     public List<Transform> T_architecture = new List<Transform>();
     public List<LevelGen_Bounds> B_bounds = new List<LevelGen_Bounds>();
