@@ -10,8 +10,7 @@ public class LevelGen_Door : LevelGen_Object
     // Start is called before the first frame update
     void Awake()
     {
-        if (!B_connected)
-            openDoor(false);
+
     }
 
     // Update is called once per frame
@@ -24,6 +23,10 @@ public class LevelGen_Door : LevelGen_Object
     {
         B_connected = true;
         openDoor(true);
+    }
+    public void Set()
+    {
+        openDoor(B_connected);
     }
 
     public void openDoor(bool open = true)

@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.AI.Navigation;
 using Unity.Mathematics;
+using static UnityEditor.Progress;
+using static Layout_Basic;
+using static UnityEngine.EventSystems.EventTrigger;
+using UnityEngine.WSA;
 
 public class LevelGen : MonoBehaviour
 {
@@ -65,6 +69,7 @@ public class LevelGen : MonoBehaviour
         LG_Blocks.Add(_bridge);
 
         GenerateBuildings_Series(LG_Blocks, _theme, lHolder, i_series);
+        SetDoors();
         UpdateNavMeshes();
         SpawnObjects();
     }
@@ -76,11 +81,7 @@ public class LevelGen : MonoBehaviour
         lHolder.parent = transform;
         lHolder.localPosition = Vector3.zero;
 
-        LevelGen_Block _firstRoom = Instantiate(_theme.GetBlock(_layout.recipe.roomType.ConvertToLevelGen(), LevelGen_Block.entryTypeEnum.any, Random_Seeded), lHolder);
-        _firstRoom.transform.localPosition = Vector3.zero;
-        LG_Blocks.Add(_firstRoom);
-        for (int i = 0; i < _layout.recipe.connectedRooms.Count; i++)
-            GenerateBuildings_Smart(_layout.recipe.connectedRooms[i], _theme, lHolder, _firstRoom, _layout.recipe.entryTypes[i]);
+        GenerateBuildings_Smart_FirstRoom(_layout.recipe, _theme, lHolder);
         if (LG_Blocks.Count < _layout.totalRoomAmount)
         {
             yield return new WaitForEndOfFrame();
@@ -91,8 +92,20 @@ public class LevelGen : MonoBehaviour
         else
         {
             GenerateBuildings_Extra(_theme, _layout, lHolder);
+            SetDoors();
             UpdateNavMeshes();
             SpawnObjects();
+        }
+    }
+
+    void SetDoors()
+    {
+        foreach (var item in LG_Blocks)
+        {
+            foreach (var entry in item.LGD_Entries)
+            {
+                entry.Set();
+            }
         }
     }
 
@@ -200,6 +213,23 @@ public class LevelGen : MonoBehaviour
         {
             UpdateNavMeshes();
         }
+    }
+    void GenerateBuildings_Smart_FirstRoom(Layout_Basic.room _room, LevelGen_Theme _theme, Transform lHolder)
+    {
+        Transform _holder = new GameObject().transform;
+        _holder.gameObject.name = "First Room " + lHolder.position.ToString();
+        _holder.parent = lHolder;
+        _holder.localPosition = Vector3.zero;
+
+        LevelGen_Block _prefab = _theme.GetBlock(_room.roomType.ConvertToLevelGen(), LevelGen_Block.entryTypeEnum.any, Random_Seeded);
+        LevelGen_Block _temp = Instantiate(_prefab, _holder);
+        _temp.transform.localPosition = Vector3.zero;
+
+        LG_Blocks.Add(_temp);
+        foreach (var bound in _temp.B_bounds)
+            bound.B_Bounds.enabled = true;
+        for (int j = 0; j < _room.connectedRooms.Count; j++)
+            GenerateBuildings_Smart(_room.connectedRooms[j], LG_Theme, lHolder, _temp, _room.entryTypes[j]);
     }
     void GenerateBuildings_Smart(Layout_Basic.room _room, LevelGen_Theme _theme, Transform lHolder, LevelGen_Block _parent, Layout_Basic.entryTypeEnum _entryType = Layout_Basic.entryTypeEnum.any)
     {
