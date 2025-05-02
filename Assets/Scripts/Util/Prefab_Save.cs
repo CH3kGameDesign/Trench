@@ -58,7 +58,9 @@ public class Prefab_Save : MonoBehaviour
                 GameObject _object = holder.transform.GetChild(i).gameObject;
                 filePath = root + "/" + _object.name + ".prefab";
                 bool prefabSuccess;
-                PrefabUtility.SaveAsPrefabAsset(_object, filePath, out prefabSuccess);
+                GameObject GO = PrefabUtility.SaveAsPrefabAsset(_object, filePath, out prefabSuccess);
+                GO.transform.localPosition = Vector3.zero;
+                GO.transform.localEulerAngles = Vector3.zero;
                 if (prefabSuccess == true)
                     Debug.Log("Prefab was saved successfully");
                 else
