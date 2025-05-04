@@ -6,6 +6,8 @@ public class LevelGen_Door : LevelGen_Object
 {
     public LevelGen_Block.entryTypeEnum entryType = LevelGen_Block.entryTypeEnum.singleDoor;
     public GameObject G_door;
+    public GameObject G_frame;
+    public bool B_showFrame = true;
     [HideInInspector] public bool B_connected = false;
     // Start is called before the first frame update
     void Awake()
@@ -51,5 +53,8 @@ public class LevelGen_Door : LevelGen_Object
         Gizmos.color = new Color(1, 1, 0, 0.4f);
         Gizmos.DrawCube(Vector3.zero, Vector3.one);
         Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
+
+        if (G_frame != null)
+            G_frame.SetActive(B_showFrame);
     }
 }

@@ -5,6 +5,10 @@ using UnityEngine;
 [CreateAssetMenu(fileName ="New LevelGen Theme", menuName = "Trench/LevelGen/Theme")]
 public class LevelGen_Theme : ScriptableObject
 {
+    [Header("Layouts")]
+    public List<Layout_Basic> Layouts = new List<Layout_Basic>();
+    [Space(10)]
+    [Header("Rooms")]
     public List<LevelGen_Block> Corridors = new List<LevelGen_Block>();
     public List<LevelGen_Block> Hangars = new List<LevelGen_Block>();
     public List<LevelGen_Block> Bridges = new List<LevelGen_Block>();
@@ -15,7 +19,8 @@ public class LevelGen_Theme : ScriptableObject
     public List<LevelGen_Block> CaptainQuaters = new List<LevelGen_Block>();
     public List<LevelGen_Block> Vaults = new List<LevelGen_Block>();
     public List<LevelGen_Block> Ships = new List<LevelGen_Block>();
-
+    [Space(10)]
+    [Header("Spawns")]
     public List<GameObject> PF_Treasure = new List<GameObject>();
     public List<GameObject> PF_Enemies = new List<GameObject>();
     public List<GameObject> PF_Companions = new List<GameObject>();
@@ -102,5 +107,13 @@ public class LevelGen_Theme : ScriptableObject
             return null;
         int ran = _random.NextInt(0, PF_Treasure.Count);
         return PF_Treasure[ran];
+    }
+
+    public Layout_Basic GetLayout_Basic(Unity.Mathematics.Random _random)
+    {
+        if (Layouts.Count == 0)
+            return null;
+        int ran = _random.NextInt(0, Layouts.Count);
+        return Layouts[ran];
     }
 }
