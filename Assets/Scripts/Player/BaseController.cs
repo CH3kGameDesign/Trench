@@ -38,7 +38,15 @@ public class BaseController : MonoBehaviour
     {
         GameState = _state;
     }
-    public virtual void PickUp(Treasure _treasure)
+    public virtual void Pickup_Treasure(Treasure _treasure)
+    {
+
+    }
+    public virtual void Update_Objectives()
+    {
+
+    }
+    public virtual void Update_Objectives(Objective_Type _type, int _amt)
     {
 
     }

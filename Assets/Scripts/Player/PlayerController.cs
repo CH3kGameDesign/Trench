@@ -22,6 +22,8 @@ public class PlayerController : BaseController
         public TextMeshProUGUI TM_healthText;
         public Image I_curWeapon;
 
+        public ObjectiveHUD HUD_objective;
+
         public Transform T_backPivot;
     }
 
@@ -152,6 +154,7 @@ public class PlayerController : BaseController
         NMA.updateRotation = false;
         Setup_Radial();
         Setup_InteractStrings();
+        Update_Objectives();
     }
 
     void Setup_InteractStrings()
@@ -168,6 +171,27 @@ public class PlayerController : BaseController
     {
         Ref.RM_radial.Setup(new int[] { 3, 4, 5 });
         Update_Radial();
+    }
+
+    public override void Update_Objectives()
+    {
+        Ref.HUD_objective.UpdateObjectives();
+        base.Update_Objectives();
+    }
+
+    public override void Update_Objectives(Objective_Type _type, int _amt)
+    {
+        bool _affected = false;
+        foreach (var item in SaveData.objectives)
+        {
+            if (item._type == _type)
+            {
+                item.amt += _amt;
+                _affected = true;
+            }
+        }
+        if (_affected)
+            Update_Objectives();
     }
 
     void Update_Radial()
@@ -387,13 +411,18 @@ public class PlayerController : BaseController
         }
     }
 
-    public override void PickUp(Treasure _treasure)
+    public override void Pickup_Treasure(Treasure _treasure)
     {
         if (T_equippedTreasure == null)
         {
             T_equippedTreasure = _treasure;
             _treasure.OnPickUp(this);
         }    
+    }
+
+    public void Pickup_Resource(Resource.resourceClass _resource)
+    {
+        
     }
 
     IEnumerator InteractCoyote ()

@@ -1,0 +1,101 @@
+using UnityEngine;
+using System.Collections.Generic;
+using System;
+
+#if UNITY_EDITOR
+using System.IO;
+using UnityEditor;
+#endif
+
+[CreateAssetMenu(fileName = "New Objective List", menuName = "Trench/Objective/List")]
+public class Objective : ScriptableObject
+{
+    public static Objective Instance;
+    public List<objectiveClass> list = new List<objectiveClass>();
+    [System.Serializable]
+    public class objectiveClass
+    {
+        public Objective_Type _type;
+        [HideInInspector] public objectiveType type;
+        [HideInInspector] public int amt = 0;
+        public int total = 0;
+        public string GetString()
+        {
+            string _temp = "<b>" + amt.ToString() + "/" + total.ToString() + "</b> " + type.description;
+            return _temp;
+        }
+        public objectiveClass Clone(Objective _objective)
+        {
+            objectiveClass _temp = new objectiveClass();
+            _temp._type = _type;
+            _temp.type = _objective.GetObjectiveType(_type);
+            _temp.amt = 0;
+            _temp.total = total;
+            return _temp;
+        }
+    }
+    public List<objectiveType> types = new List<objectiveType>();
+    [System.Serializable]
+    public class objectiveType
+    {
+        public string _id;
+        public string description;
+        public Sprite image;
+    }
+    public objectiveClass GetObjective_Random()
+    {
+        int _id = UnityEngine.Random.Range(0, list.Count);
+        return list[_id].Clone(this);
+    }
+
+    public objectiveType GetObjectiveType(Objective_Type _type)
+    {
+        string _id = _type.ToString().Replace('_','/');
+        foreach (var item in types)
+        {
+            if (_id == item._id)
+                return item;
+        }
+        Debug.LogError("Couldn't find Objective ID: " + _id);
+        return null;
+    }
+
+#if UNITY_EDITOR
+    [ContextMenu("Tools/GenerateEnum")]
+    public void GenerateEnum()
+    {
+        string enumName = "Objective_Type";
+        List<string> enumEntries = new List<string>();
+        List<objectiveType> typeEntries = new List<objectiveType>();
+        foreach (var item in types)
+        {
+            if (!enumEntries.Contains(item._id))
+            {
+                enumEntries.Add(item._id);
+                typeEntries.Add(item);
+            }
+            else
+                Debug.LogError("Duplicate ID: " + item._id);
+        }
+        string filePathAndName = "Assets/Scripts/Enums/" + enumName + ".cs"; //The folder Scripts/Enums/ is expected to exist
+
+        using (StreamWriter streamWriter = new StreamWriter(filePathAndName))
+        {
+            streamWriter.WriteLine("using System.ComponentModel;");
+            streamWriter.WriteLine("using UnityEngine;");
+            streamWriter.WriteLine("public enum " + enumName);
+            streamWriter.WriteLine("{");
+            for (int i = 0; i < typeEntries.Count; i++)
+            {
+                streamWriter.WriteLine(
+                    "	"  + "[Description (\""+ typeEntries[i].description +"\")]" +
+                    "	" + "[InspectorName (\"" + typeEntries[i]._id + "\")]" +
+                    "	" + typeEntries[i]._id.Replace('/','_') + ","
+                    );
+            }
+            streamWriter.WriteLine("}");
+        }
+        AssetDatabase.Refresh();
+    }
+#endif
+}

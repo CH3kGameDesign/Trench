@@ -32,7 +32,7 @@ public class Treasure : Interactable
 
     public override void OnInteract(BaseController _player)
     {
-        _player.PickUp(this);
+        _player.Pickup_Treasure(this);
     }
 
     public void OnPickUp(PlayerController _player)

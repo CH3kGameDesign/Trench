@@ -475,6 +475,7 @@ public class AgentController : BaseController
                 Relationship.groupClass _group = Relationship.Instance.GetGroupFromEnum(item);
                 _group.relationship.hostile += 10;
             }
+            _bullet.con_Player.Update_Objectives(Objective_Type.Kill_Any, 1);
         }
         else
         {
@@ -482,6 +483,7 @@ public class AgentController : BaseController
                 _bullet.con_Agent.TargetDead();
         }
 
+        Resource.CreateResourceObject(transform.position, Resource_Type.Carved_Wood_Knotted);
         state = stateEnum.ragdoll;
         RM_ragdoll.EnableRigidbodies(true);
         GroundedUpdate(false);

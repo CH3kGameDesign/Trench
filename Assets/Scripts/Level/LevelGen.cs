@@ -12,7 +12,10 @@ public class LevelGen : MonoBehaviour
 {
     public uint seed = new uint();
     private Unity.Mathematics.Random Random_Seeded;
-    public LevelGen_Theme LG_Theme;
+
+    public Themes themeHolder;
+    [HideInInspector] public LevelGen_Theme LG_Theme;
+
     private NavMeshSurface[] nm_Surfaces;
 
     private List<LevelGen_Block> LG_Blocks = new List<LevelGen_Block>();
@@ -34,6 +37,8 @@ public class LevelGen : MonoBehaviour
             seed = (uint)UnityEngine.Random.Range(0, int.MaxValue);
         Random_Seeded = new Unity.Mathematics.Random(seed);
         nm_Surfaces = GetComponents<NavMeshSurface>();
+
+        LG_Theme = themeHolder.GetTheme(SaveData.themeCurrent);
         if (LG_Theme.Layouts.Count > 0)
         {
             Layout_Basic _layout = LG_Theme.GetLayout_Basic(Random_Seeded);
