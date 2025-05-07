@@ -57,6 +57,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  b_alive: 1
   gunManager: {fileID: 11400000, guid: 1e3b59fdefa93a743beff3357901afa0, type: 2}
   fieldOfView: {fileID: 6328522580476208218}
   S_characterID: 
@@ -86,6 +87,14 @@ MonoBehaviour:
   V3_attackLocation: {x: 0, y: 0, z: 0}
   F_maxHealth: 100
   A_model: {fileID: 7364725358455803264}
+  ResourceDrop:
+    list:
+    - _type: 0
+      _chance: 100
+    - _type: 0
+      _chance: 50
+    - _type: 1
+      _chance: 50
   DEBUG_EquippedGunNum: -1
   DEBUG_FollowPlayerImmediately: 0
   DEBUG_TargetAgent: {fileID: 0}

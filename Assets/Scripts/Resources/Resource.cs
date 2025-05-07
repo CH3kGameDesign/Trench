@@ -14,6 +14,39 @@ public class Resource : ScriptableObject
     public static Resource Instance;
     public Pickup_Object PF_ResourcePrefab;
     [System.Serializable]
+    public class resourceDrop
+    {
+        public List<resourceDrop_Single> list = new List<resourceDrop_Single>();
+
+        public List<Resource_Type> GetDrops()
+        {
+            List<Resource_Type> _temp = new List<Resource_Type>();
+            foreach (var item in list)
+            {
+                if (UnityEngine.Random.Range(0f, 1f) <= item._chance)
+                    _temp.Add(item._type);
+            }
+
+            return _temp;
+        }
+
+        public void Drop(Vector3 _pos, Transform _parent = null)
+        {
+            foreach (var item in GetDrops())
+            {
+                CreateResourceObject(_pos, item, _parent);
+            }
+        }
+    }
+
+    [System.Serializable]
+    public class resourceDrop_Single
+    {
+        public Resource_Type _type;
+        [Range(0,100)] public float _chance = 100;
+    }
+
+    [System.Serializable]
     public class resourceClass
     {
         public Resource_Type _type;
@@ -51,7 +84,7 @@ public class Resource : ScriptableObject
                 _temp.type = _resource.GetResourceType(_type);
             else
                 _temp.type = Instance.GetResourceType(_type);
-            _temp.amt = 0;
+            _temp.amt = amt;
             return _temp;
         }
     }

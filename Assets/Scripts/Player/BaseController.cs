@@ -17,6 +17,8 @@ public class BaseController : MonoBehaviour
     [HideInInspector] public GunClass gun_Equipped;
     [HideInInspector] public GunClass[] gun_EquippedList = new GunClass[3];
 
+    [HideInInspector] public bool b_alive = true;
+
     public static gameStateEnum GameState = gameStateEnum.active;
     public enum gameStateEnum { inactive, active, dialogue, vehicle, ragdoll }
     public virtual void Start()
@@ -47,6 +49,10 @@ public class BaseController : MonoBehaviour
 
     }
     public virtual void Update_Objectives(Objective_Type _type, int _amt)
+    {
+
+    }
+    public virtual void Update_Objectives(Objective_Type _type, Resource_Type _resource, int _amt)
     {
 
     }

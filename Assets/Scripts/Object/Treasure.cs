@@ -44,13 +44,15 @@ public class Treasure : Interactable
         transform.localRotation = _rot;
 
         RB_rigidbody.isKinematic = true;
-        gameObject.layer = i_heldLayer;
+        //gameObject.layer = i_heldLayer;
+        C_collider.enabled = false;
     }
     public void OnDrop(PlayerController _player, bool _isSprinting = false)
     {
         transform.parent = null;
         RB_rigidbody.isKinematic = false;
-        gameObject.layer = i_droppedLayer;
+        //gameObject.layer = i_droppedLayer;
+        C_collider.enabled = true;
 
         StartCoroutine(OnThrown(_player, _isSprinting ? 1f : 2f));
     }

@@ -8,7 +8,8 @@ public class Themes : ScriptableObject
     [Header("Themes")]
     public LevelGen_Theme theme_Default;
     public LevelGen_Theme theme_SpaceStation;
-    public enum themeEnum { _default, spaceStation};
+    public LevelGen_Theme theme_Ship;
+    public enum themeEnum { _default, spaceStation, ship};
 
 
     public LevelGen_Theme GetTheme (themeEnum _theme)
@@ -17,6 +18,7 @@ public class Themes : ScriptableObject
         {
             case themeEnum._default:        return theme_Default;
             case themeEnum.spaceStation:    return theme_SpaceStation;
+            case themeEnum.ship:            return theme_Ship;
             default:                        return theme_Default;
         }
     }

@@ -16,12 +16,20 @@ public class Objective : ScriptableObject
     public class objectiveClass
     {
         public Objective_Type _type;
+        public Resource_Type _resource;
         [HideInInspector] public objectiveType type;
+        [HideInInspector] public Resource.resourceType resource = null;
         [HideInInspector] public int amt = 0;
         public int total = 0;
         public string GetString()
         {
             string _temp = "<b>" + amt.ToString() + "/" + total.ToString() + "</b> " + type.description;
+            if (_type == Objective_Type.Collect_Resource)
+            {
+                if (resource == null)
+                    resource = Resource.GetResourceType_Static(_resource);
+                _temp += "<b>" + resource.name + "</b> ";
+            }
             return _temp;
         }
         public objectiveClass Clone(Objective _objective)
@@ -29,6 +37,8 @@ public class Objective : ScriptableObject
             objectiveClass _temp = new objectiveClass();
             _temp._type = _type;
             _temp.type = _objective.GetObjectiveType(_type);
+            _temp._resource = _resource;
+            _temp.resource = Resource.GetResourceType_Static(_resource);
             _temp.amt = 0;
             _temp.total = total;
             return _temp;

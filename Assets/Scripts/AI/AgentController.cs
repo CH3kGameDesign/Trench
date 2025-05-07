@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using static Resource;
 using static UnityEditor.Experimental.GraphView.GraphView;
 using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
@@ -38,6 +39,9 @@ public class AgentController : BaseController
     [Header("Animations")]
     public Animator A_model;
     private Vector2 v2_animMove = Vector2.zero;
+
+    [Header("Loot Table")]
+    public Resource.resourceDrop ResourceDrop = new Resource.resourceDrop();
 
     [Header("Debug Variables")]
     public int DEBUG_EquippedGunNum = 0;
@@ -417,6 +421,9 @@ public class AgentController : BaseController
 
     public override void OnHit(GunManager.bulletClass _bullet)
     {
+        if (!b_alive)
+            return;
+
         if (_bullet.B_player)
         {
             if (C_character != null)
@@ -483,11 +490,12 @@ public class AgentController : BaseController
                 _bullet.con_Agent.TargetDead();
         }
 
-        Resource.CreateResourceObject(transform.position, Resource_Type.Carved_Wood_Knotted);
+        ResourceDrop.Drop(T_model.position);
         state = stateEnum.ragdoll;
         RM_ragdoll.EnableRigidbodies(true);
         GroundedUpdate(false);
         A_model.enabled = false;
+        b_alive = false;
         //gameObject.SetActive(false);
     }
 

@@ -193,6 +193,20 @@ public class PlayerController : BaseController
         if (_affected)
             Update_Objectives();
     }
+    public override void Update_Objectives(Objective_Type _type, Resource_Type _resource, int _amt)
+    {
+        bool _affected = false;
+        foreach (var item in SaveData.objectives)
+        {
+            if (item._type == _type && item._resource == _resource)
+            {
+                item.amt += _amt;
+                _affected = true;
+            }
+        }
+        if (_affected)
+            Update_Objectives();
+    }
 
     void Update_Radial()
     {
@@ -422,7 +436,20 @@ public class PlayerController : BaseController
 
     public void Pickup_Resource(Resource.resourceClass _resource)
     {
-        
+        Update_Objectives(Objective_Type.Collect_Resource, _resource._type, _resource.amt);
+
+        bool _collected = false;
+        foreach (var item in SaveData.resources)
+        {
+            if (item._type == _resource._type)
+            {
+                _collected = true;
+                item.amt += _resource.amt;
+                break;
+            }
+        }
+        if (!_collected)
+            SaveData.resources.Add(_resource.Clone());
     }
 
     IEnumerator InteractCoyote ()

@@ -45,7 +45,7 @@ public class Pickup_Object : MonoBehaviour
         Vector3 startPos = transform.localPosition;
         Vector3 movement = Random.insideUnitCircle;
             movement.z = movement.y;
-            movement.y = 0.5f;
+            movement.y = 0;
         float height = 2f;
         Vector3 curPos;
         TR_trailRenderer.enabled = true;

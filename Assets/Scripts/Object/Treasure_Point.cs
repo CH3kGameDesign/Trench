@@ -49,6 +49,8 @@ public class Treasure_Point : MonoBehaviour
             if (!t_treasure.Contains(_temp))
             {
                 t_treasure.Add(_temp);
+                PlayerController.Instance.Update_Objectives(Objective_Type.Collect_Value, _temp.I_value);
+                other.gameObject.SetActive(false);
                 UpdatePoints();
             }
         }

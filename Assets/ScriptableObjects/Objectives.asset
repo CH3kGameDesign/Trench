@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   list:
   - _type: 0
+    _resource: 0
     type:
       _id: 
       description: 
@@ -21,20 +22,15 @@ MonoBehaviour:
     amt: 0
     total: 5
   - _type: 0
+    _resource: 0
     type:
       _id: 
       description: 
       image: {fileID: 0}
     amt: 0
     total: 10
-  - _type: 0
-    type:
-      _id: 
-      description: 
-      image: {fileID: 0}
-    amt: 0
-    total: 15
   - _type: 1
+    _resource: 0
     type:
       _id: 
       description: 
@@ -42,19 +38,29 @@ MonoBehaviour:
     amt: 0
     total: 100
   - _type: 1
+    _resource: 0
     type:
       _id: 
       description: 
       image: {fileID: 0}
     amt: 0
     total: 300
-  - _type: 1
+  - _type: 2
+    _resource: 0
     type:
       _id: 
       description: 
       image: {fileID: 0}
     amt: 0
-    total: 500
+    total: 2
+  - _type: 2
+    _resource: 0
+    type:
+      _id: 
+      description: 
+      image: {fileID: 0}
+    amt: 0
+    total: 4
   types:
   - _id: Kill/Any
     description: Defeat Enemies
@@ -62,3 +68,6 @@ MonoBehaviour:
   - _id: Collect/Value
     description: Collect Money via Treasure
     image: {fileID: 21300000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
+  - _id: Collect/Resource
+    description: 'Collect '
+    image: {fileID: 21300000, guid: 299ba41030d7a36409e6380e9317c890, type: 3}
