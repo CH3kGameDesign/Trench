@@ -6,7 +6,7 @@ using UnityEngine;
 {
     public virtual string Type() { return "Unassigned"; }
 
-    public seatClass[] Seats = new seatClass[0];
+    public List<seatClass> Seats = new List<seatClass>();
     public Transform T_camHook;
     public Vector3 V3_camOffset = new Vector3(0, 0.5f, -6);
     [HideInInspector] public List<int> SeatInUse = new List<int>();
@@ -23,7 +23,7 @@ using UnityEngine;
 
     public override void OnInteract(BaseController _player)
     {
-        for (int i = 0; i < Seats.Length; i++)
+        for (int i = 0; i < Seats.Count; i++)
         { 
             if (Seats[i].BC_agent == _player)
             {
@@ -110,7 +110,7 @@ using UnityEngine;
 
     int Seat_GetOpen()
     {
-        for (int i = 0; i < Seats.Length; i++)
+        for (int i = 0; i < Seats.Count; i++)
         {
             if (Seats[i].BC_agent == null)
                 return i;
@@ -119,7 +119,7 @@ using UnityEngine;
     }
     public virtual seatClass GetSeat(BaseController _player)
     {
-        for (int i = 0; i < Seats.Length; i++)
+        for (int i = 0; i < Seats.Count; i++)
         {
             if (Seats[i].BC_agent == _player)
                 return Seats[i];
@@ -128,7 +128,7 @@ using UnityEngine;
     }
     public virtual seatTypeEnum GetSeatType(BaseController _player)
     {
-        for (int i = 0; i < Seats.Length; i++)
+        for (int i = 0; i < Seats.Count; i++)
         {
             if (Seats[i].BC_agent == _player)
                 return Seats[i].seatType;

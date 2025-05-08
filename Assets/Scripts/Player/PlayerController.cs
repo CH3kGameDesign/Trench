@@ -6,6 +6,7 @@ using UnityEngine.AI;
 using UnityEngine.InputSystem;
 using TMPro;
 using Unity.Collections;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class PlayerController : BaseController
 {
@@ -155,6 +156,8 @@ public class PlayerController : BaseController
         Setup_Radial();
         Setup_InteractStrings();
         Update_Objectives();
+
+        GameState = gameStateEnum.active;
     }
 
     void Setup_InteractStrings()
@@ -298,7 +301,7 @@ public class PlayerController : BaseController
     void FixedUpdate_Vehicle()
     {
         CamMovement();
-        CamCollision(V_curVehicle.T_camHook, V_curVehicle.V3_camOffset, false);
+        CamCollision(V_curVehicle.T_camHook, V_curVehicle.V3_camOffset, true, true);
     }
 
     void FixedUpdate_Active()
@@ -644,7 +647,7 @@ public class PlayerController : BaseController
         else
             CamCollision(T_camHook, V3_camOffset);
     }
-    void CamCollision(Transform _camHook, Vector3 _camOffset, bool _canAim = true)
+    void CamCollision(Transform _camHook, Vector3 _camOffset, bool _canAim = true, bool _inVehicle = false)
     {
         if (Inputs.b_aiming && _canAim)
         {
@@ -656,9 +659,14 @@ public class PlayerController : BaseController
         {
             gun_Equipped.OnAim(false);
             T_camHolder.position = Vector3.Slerp(T_camHolder.position, _camHook.position, Time.deltaTime * F_camLatSpeed);
-            RaycastHit hit;
-            if (Physics.SphereCast(T_camHolder.position, f_camRadius, T_camHolder.rotation * _camOffset, out hit, _camOffset.magnitude, LM_CameraRay))
-                T_camHolder.GetChild(0).localPosition = _camOffset.normalized * hit.distance;
+            if (!_inVehicle)
+            {
+                RaycastHit hit;
+                if (Physics.SphereCast(T_camHolder.position, f_camRadius, T_camHolder.rotation * _camOffset, out hit, _camOffset.magnitude, LM_CameraRay))
+                    T_camHolder.GetChild(0).localPosition = _camOffset.normalized * hit.distance;
+                else
+                    T_camHolder.GetChild(0).localPosition = Vector3.Slerp(T_camHolder.GetChild(0).localPosition, _camOffset, Time.deltaTime * F_camLatSpeed);
+            }
             else
                 T_camHolder.GetChild(0).localPosition = Vector3.Slerp(T_camHolder.GetChild(0).localPosition, _camOffset, Time.deltaTime * F_camLatSpeed);
         }

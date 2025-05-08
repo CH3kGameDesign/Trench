@@ -7,11 +7,14 @@ using static UnityEditor.Progress;
 using static Layout_Basic;
 using static UnityEngine.EventSystems.EventTrigger;
 using UnityEngine.WSA;
+using static Themes;
 
 public class LevelGen : MonoBehaviour
 {
     public uint seed = new uint();
     private Unity.Mathematics.Random Random_Seeded;
+
+    [SerializeField] private holderTypesClass holderTypes = new holderTypesClass();
 
     public Themes themeHolder;
     [HideInInspector] public LevelGen_Theme LG_Theme;
@@ -25,6 +28,13 @@ public class LevelGen : MonoBehaviour
     private int i_series = 2;
     private int i_attempts = 10;
 
+    [System.Serializable]
+    private class holderTypesClass
+    {
+        public GameObject layoutHolder_Default;
+        public GameObject layoutHolder_Ship;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,7 +46,6 @@ public class LevelGen : MonoBehaviour
         if (seed == uint.MinValue)
             seed = (uint)UnityEngine.Random.Range(0, int.MaxValue);
         Random_Seeded = new Unity.Mathematics.Random(seed);
-        nm_Surfaces = GetComponents<NavMeshSurface>();
 
         LG_Theme = themeHolder.GetTheme(SaveData.themeCurrent);
         if (LG_Theme.Layouts.Count > 0)
@@ -64,9 +73,10 @@ public class LevelGen : MonoBehaviour
     public void GenerateLayout_Series(LevelGen_Theme _theme)
     {
         LG_Blocks = new List<LevelGen_Block>();
-        Transform lHolder = new GameObject("LayoutHolder").transform;
+        Transform lHolder = Instantiate(GetHolderTypePrefab(SaveData.themeCurrent)).transform;
         lHolder.parent = transform;
         lHolder.localPosition = Vector3.zero;
+        nm_Surfaces = lHolder.GetComponents<NavMeshSurface>();
 
         LevelGen_Block _bridge = Instantiate(_theme.GetBlock(LevelGen_Block.blockTypeEnum.bridge, LevelGen_Block.entryTypeEnum.any, Random_Seeded), lHolder);
         _bridge.transform.localPosition = Vector3.zero;
@@ -81,9 +91,10 @@ public class LevelGen : MonoBehaviour
     public IEnumerator GenerateLayout_Smart(LevelGen_Theme _theme, Layout_Basic _layout)
     {
         LG_Blocks = new List<LevelGen_Block>();
-        Transform lHolder = new GameObject("LayoutHolder").transform;
+        Transform lHolder = Instantiate(GetHolderTypePrefab(SaveData.themeCurrent)).transform;
         lHolder.parent = transform;
         lHolder.localPosition = Vector3.zero;
+        nm_Surfaces = lHolder.GetComponents<NavMeshSurface>();
 
         GenerateBuildings_Smart_FirstRoom(_layout.recipe, _theme, lHolder);
         if (LG_Blocks.Count < _layout.totalRoomAmount)
@@ -99,6 +110,26 @@ public class LevelGen : MonoBehaviour
             SetDoors();
             UpdateNavMeshes();
             SpawnObjects();
+            SetupVehicle(_theme, _layout, lHolder);
+        }
+    }
+
+    void SetupVehicle(LevelGen_Theme _theme, Layout_Basic _layout, Transform lHolder)
+    {
+        if (SaveData.themeCurrent == themeEnum.ship)
+        {
+            Ship _ship = lHolder.GetComponent<Ship>();
+            Vector3 offset = Vector3.zero;
+            foreach (var item in LG_Blocks)
+            {
+                foreach (var bound in item.B_bounds)
+                {
+                    offset += bound.B_Bounds.center;
+                    offset += bound.transform.position;
+                }
+            }
+            offset /= LG_Blocks.Count;
+            _ship.T_camHook.position = offset;
         }
     }
 
@@ -168,7 +199,15 @@ public class LevelGen : MonoBehaviour
             }
         }
     }
-    
+    GameObject GetHolderTypePrefab(themeEnum _theme)
+    {
+        switch (_theme)
+        { 
+            case themeEnum.ship:    return holderTypes.layoutHolder_Ship;
+            default:                return holderTypes.layoutHolder_Default;
+        }
+    }
+
     void GenerateBuildings_Series(List<LevelGen_Block> _rooms, LevelGen_Theme _theme, Transform lHolder, int series = 3)
     {
         if (series > 0)
