@@ -1,15 +1,24 @@
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class ShipWheel : Interactable
 {
     private Ship s_Ship;
     public bool DEBUG_dropShip = true;
-    public override void OnInteract(BaseController _player)
-    {
-        if (DEBUG_dropShip) { DEBUG_DropShip(); return; }
+    public Themes.themeEnum DEBUG_themeToLoad = Themes.themeEnum.ship;
 
+    private void Start()
+    {
+        if (!DEBUG_dropShip)
+        {
+            ShipSet();
+        }
+    }
+
+    void ShipSet()
+    {
         if (s_Ship == null)
         {
             try
@@ -22,21 +31,19 @@ public class ShipWheel : Interactable
                 return;
             }
         }
-        GetComponentInParent<Ship>().OnInteract(_player);
+    }
+    public override void OnInteract(BaseController _player)
+    {
+        if (DEBUG_dropShip) { DEBUG_DropShip(); return; }
+
+        ShipSet();
+        s_Ship.OnInteract(_player);
 
         base.OnInteract(_player);
     }
     void DEBUG_DropShip()
     {
-        switch (SaveData.themeCurrent)
-        {
-            case Themes.themeEnum.spaceStation:
-                SaveData.themeCurrent = Themes.themeEnum._default;
-                break;
-            default:
-                SaveData.themeCurrent = Themes.themeEnum.spaceStation;
-                break;
-        }
+        SaveData.themeCurrent = DEBUG_themeToLoad;
         SceneManager.LoadScene(0);
     }
 }

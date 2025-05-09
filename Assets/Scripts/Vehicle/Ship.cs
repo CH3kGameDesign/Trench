@@ -27,6 +27,12 @@ public class Ship : Vehicle
     [Range(0.1f, 5f)]
     public float steeringSpeed = 0.5f; // How fast the steering wheel turns.
     [Space(10)]
+    [Range(-90f, 0f)]
+    public float downXLimit = -40f;
+    [Range(0f, 90f)]
+    public float upXLimit = 40f;
+
+    [Space(10)]
     [Range(1, 10)]
     public int brakeMultiplier = 6; // The strength of the wheel brakes.
     [Range(1, 10)]
@@ -205,11 +211,11 @@ public class Ship : Vehicle
 
             if (_temp.Inputs.v2_inputDir.x < 0)
             {
-
+                Rotate(_temp.Inputs.v2_inputDir.x);
             }
             if (_temp.Inputs.v2_inputDir.x > 0)
             {
-
+                Rotate(_temp.Inputs.v2_inputDir.x);
             }
             if (_temp.Inputs.b_jumping)
             {
@@ -267,7 +273,10 @@ public class Ship : Vehicle
 
     void Update_Rotation(PlayerController _player)
     {
-        Quaternion _target = _player.C_camera.transform.rotation * Quaternion.Inverse(T_pilotSeat.rotation);
+        Vector3 _tarRot = _player.v3_camDir;
+        _tarRot.x = Mathf.Clamp(_tarRot.x, downXLimit, upXLimit);
+        Quaternion _target = Quaternion.Euler(_tarRot) * Quaternion.Euler(_rotate);
+        _target *= Quaternion.Inverse(T_pilotSeat.rotation);
         _target =  _target * transform.rotation;
         Quaternion _angle = Quaternion.Slerp(transform.rotation, _target, Time.deltaTime * steeringSpeed);
         transform.rotation = _angle;
@@ -430,6 +439,15 @@ public class Ship : Vehicle
 
             }
         }
+    }
+
+    private Vector3 _rotate = Vector3.zero;
+    public void Rotate(float _input)
+    {
+        /*
+        float _temp = _rotate.z - _input * 360 * steeringSpeed * Time.deltaTime;
+        _rotate.z = _temp;
+        */
     }
 
     //The following function set the motor torque to 0 (in case the user is not pressing either W or S).

@@ -5,7 +5,7 @@ public class ShipSeat : MonoBehaviour
     public Vehicle.seatClass seat;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
         try
         {

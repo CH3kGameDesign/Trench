@@ -187,6 +187,24 @@ public class AgentController : BaseController
 
         gun_Equipped = gunManager.GetGunByInt(DEBUG_EquippedGunNum, this);
         gun_Equipped.OnEquip(this);
+        base.Start();
+    }
+
+    void NavSurface_Update()
+    {
+        if (!b_grounded)
+        {
+            RaycastHit hit;
+            if (Physics.SphereCast(NMA.transform.position, 0.2f, Vector3.down, out hit, 1f, LM_TerrainRay))
+            {
+                NavMeshHit navHit;
+                if (NavMesh.SamplePosition(NMA.transform.position, out navHit, 2f, -1))
+                {
+                    T_surface_Update(NMA.navMeshOwner.GetComponent<Transform>());
+                    b_grounded = true;
+                }
+            }
+        }
     }
 
     private void OnEnable()
@@ -221,6 +239,8 @@ public class AgentController : BaseController
                 break;
         }
         AnimationUpdate(b_firing);
+        NavSurface_Update();
+        base.Update();
     }
 
     private IEnumerator UpdateIsFriendly()
@@ -273,7 +293,7 @@ public class AgentController : BaseController
             return;
         //PLACEHOLDER
         if (!NMA.hasPath || NMA.velocity.sqrMagnitude == 0f)
-            SetDestination(NMA.navMeshOwner.GetComponent<LevelGen>().GetRandomPoint());
+            SetDestination(NMA.navMeshOwner.GetComponentInParent<LevelGen>().GetRandomPoint());
     }
 
     void FindTarget()

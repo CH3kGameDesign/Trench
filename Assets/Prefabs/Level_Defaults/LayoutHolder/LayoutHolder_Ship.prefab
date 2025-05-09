@@ -78,7 +78,7 @@ MonoBehaviour:
   S_interactName: <N/A>
   Seats: []
   T_camHook: {fileID: 1327722245234219121}
-  V3_camOffset: {x: 0, y: 0, z: -16}
+  V3_camOffset: {x: 0, y: 6, z: -16}
   SeatInUse: 
   T_pilotSeat: {fileID: 0}
   maxSpeed: 190
@@ -86,6 +86,8 @@ MonoBehaviour:
   accelerationMultiplier: 8
   maxSteeringAngle: 27
   steeringSpeed: 1
+  downXLimit: -40
+  upXLimit: 40
   brakeMultiplier: 6
   decelerationMultiplier: 4
   handbrakeDriftMultiplier: 5

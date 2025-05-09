@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 using TMPro;
 using Unity.Collections;
 using static UnityEditor.Experimental.GraphView.GraphView;
+using Unity.VisualScripting;
 
 public class PlayerController : BaseController
 {
@@ -43,7 +44,6 @@ public class PlayerController : BaseController
     public Vector3 V3_camOffset_Crouch = new Vector3(1f, 0.125f, -1.5f);
     private float f_camRadius = 0.15f;
     public LayerMask LM_CameraRay;
-    public LayerMask LM_TerrainRay;
     public LayerMask LM_GunRay;
 
     [Header("Movement Values")]
@@ -56,7 +56,6 @@ public class PlayerController : BaseController
     private Vector3 v3_moveDir;
     private Vector3 v3_lastNavPos;
     private Vector3 v3_modelLocalPos = Vector3.zero;
-    private bool b_grounded = true;
     private bool b_isMoving = false;
     private bool b_isSprinting = false;
     private bool b_isCrouching = false;
@@ -158,6 +157,7 @@ public class PlayerController : BaseController
         Update_Objectives();
 
         GameState = gameStateEnum.active;
+        base.Start();
     }
 
     void Setup_InteractStrings()
@@ -247,9 +247,10 @@ public class PlayerController : BaseController
         }
         Inputs.b_interact = false;
         Inputs.b_confirm = false;
+        base.Update();
     }
 
-    private void FixedUpdate()
+    public override void FixedUpdate()
     {
         switch (GameState)
         {
@@ -266,6 +267,7 @@ public class PlayerController : BaseController
             default:
                 break;
         }
+        base.FixedUpdate();
     }
 
     void Update_Active()
@@ -342,6 +344,8 @@ public class PlayerController : BaseController
         {
             Vector3 _tarPos = new Vector3(Inputs.v2_inputDir.x, 0, Inputs.v2_inputDir.y);
             v3_moveDir = Quaternion.Euler(0, v3_camDir.y, 0) * _tarPos;
+            if (T_surface != null)
+                v3_moveDir = Vector3.ProjectOnPlane(v3_moveDir, T_surface.up);
             b_isMoving = true;
 
             if (b_grounded)
@@ -493,6 +497,7 @@ public class PlayerController : BaseController
                         Vector3 _pos = navHit.position;
                         _pos.y = NMA.transform.position.y;
                         NMA.Warp(_pos);
+                        T_surface_Update(NMA.navMeshOwner.GetComponent<Transform>());
                     }
                     StartCoroutine(MoveModel(_modelPos));
                 }
@@ -580,7 +585,7 @@ public class PlayerController : BaseController
     bool CheckStandingRoom()
     {
         RaycastHit hit;
-        if (Physics.SphereCast(NMA.transform.position - (Vector3.up * 0.5f), 0.4f, Vector3.up, out hit, 1.2f, LM_TerrainRay))
+        if (Physics.SphereCast(NMA.transform.position - (Local_Up() * 0.5f), 0.4f, Local_Up(), out hit, 1.2f, LM_TerrainRay))
             return false;
         return true;
     }
@@ -617,13 +622,23 @@ public class PlayerController : BaseController
     {
         if (Inputs.b_aiming || Inputs.b_firing)
         {
-            NMA.transform.eulerAngles = new Vector3(0, T_camHolder.eulerAngles.y, 0);
+            Vector3 _temp = NMA.transform.localEulerAngles;
+            _temp.y = v3_camDir.y;
+            NMA.transform.localEulerAngles = _temp;
         }
         else if (b_isMoving)
         {
-            Quaternion lookRot = Quaternion.LookRotation(v3_moveDir, Vector3.up);
+            Quaternion lookRot = Quaternion.LookRotation(v3_moveDir, Local_Up());
             NMA.transform.localRotation = Quaternion.Lerp(NMA.transform.localRotation, lookRot, Time.deltaTime * 4);
         }
+    }
+
+    Vector3 Local_Up()
+    {
+        if (T_surface != null)
+            return T_surface.up;
+        else
+            return Vector3.up;
     }
 
     void CamMovement()

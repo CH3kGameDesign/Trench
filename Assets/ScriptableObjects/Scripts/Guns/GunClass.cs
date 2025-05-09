@@ -229,7 +229,6 @@ public class GunClass : ScriptableObject
             }
             OnBullet(GO);
         }
-
         if (f_burstTimer > 0) f_burstTimer -= Time.deltaTime;
         if (f_fireTimer > 0) f_fireTimer -= Time.deltaTime;
     }

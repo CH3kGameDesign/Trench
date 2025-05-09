@@ -13,22 +13,58 @@ public class BaseController : MonoBehaviour
     public Rigidbody RB;
     public RagdollManager RM_ragdoll;
     [HideInInspector] public Vehicle V_curVehicle = null;
+     public Transform T_surface = null;
+    private Vector3 v3_surfacePos;
+    public LayerMask LM_TerrainRay;
 
     [HideInInspector] public GunClass gun_Equipped;
     [HideInInspector] public GunClass[] gun_EquippedList = new GunClass[3];
 
     [HideInInspector] public bool b_alive = true;
+    [HideInInspector] public bool b_grounded = false;
 
     public static gameStateEnum GameState = gameStateEnum.active;
     public enum gameStateEnum { inactive, active, dialogue, vehicle, ragdoll }
     public virtual void Start()
     {
-        
+
     }
 
     public virtual void Update()
     {
-        
+
+    }
+
+    public virtual void FixedUpdate()
+    {
+        UpdateParentPosition();
+    }
+
+    bool onSurface = false;
+    public void UpdateParentPosition()
+    {
+        if (T_surface != null && V_curVehicle == null)
+        {
+            if (onSurface)
+            {
+                NMA.Move(T_surface.position - v3_surfacePos);
+                RB.transform.position += T_surface.position - v3_surfacePos;
+            }
+            T_surface_Update();
+        }
+        else
+            onSurface = false;
+    }
+    public void T_surface_Update()
+    {
+        v3_surfacePos = T_surface.position;
+        onSurface = true;
+    }
+    public void T_surface_Update(Transform _temp)
+    {
+        T_surface = _temp;
+        v3_surfacePos = _temp.position;
+        onSurface = true;
     }
 
     public virtual void OnHit(GunManager.bulletClass _bullet)
