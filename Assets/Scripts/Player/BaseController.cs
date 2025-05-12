@@ -12,8 +12,9 @@ public class BaseController : MonoBehaviour
     public Transform T_barrelHook;
     public Rigidbody RB;
     public RagdollManager RM_ragdoll;
+    public AgentAudioHolder AH_agentAudioHolder;
     [HideInInspector] public Vehicle V_curVehicle = null;
-     public Transform T_surface = null;
+    [HideInInspector] public Transform T_surface = null;
     private Vector3 v3_surfacePos;
     public LayerMask LM_TerrainRay;
 

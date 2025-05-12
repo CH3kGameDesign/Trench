@@ -13,6 +13,8 @@ public class GunClass : ScriptableObject
     public Bullet bullet;
     public Sprite sprite;
     [Space(10)]
+    public audioClipClass audioClips = new audioClipClass();
+    [Space(10)]
     public fireClass fireVariables;
     public fireClass meleeVariables;
     public clipClass clipVariables;
@@ -47,6 +49,15 @@ public class GunClass : ScriptableObject
     [HideInInspector]
     public bool b_playerGun = false;
 
+    [System.Serializable]
+    public class audioClipClass
+    {
+        public AudioClip[] fire = new AudioClip[0];
+        public AudioClip[] melee = new AudioClip[0];
+        public AudioClip[] reload = new AudioClip[0];
+        public AudioClip[] equip = new AudioClip[0];
+    }
+
     public GunClass Clone(PlayerController _player)
     {
         GunClass _temp = Clone();
@@ -76,6 +87,8 @@ public class GunClass : ScriptableObject
         _temp.fireVariables = fireVariables;
         _temp.meleeVariables = meleeVariables;
         _temp.clipVariables = clipVariables;
+
+        _temp.audioClips = audioClips;
 
         _temp.clipAmmo = clipVariables.clipSize;
         _temp.reserveAmmo = clipVariables.clipSize * (clipVariables.clipAmount - 1);
@@ -143,6 +156,7 @@ public class GunClass : ScriptableObject
             PM_player.reticle.UpdateRoundCount(this);
             PM_player.reticle.RotateReticle(f_fireTimer);
             A_charModel.Play("Melee_Rifle", 1);
+            baseController.AH_agentAudioHolder.Play(AgentAudioHolder.type.melee);
         }
     }
     public virtual void OnReload()
@@ -154,6 +168,7 @@ public class GunClass : ScriptableObject
                 PM_player.reticle.ReloadReticle(f_fireTimer, this);
             clipAmmo = clipVariables.clipSize;
             A_charModel.Play("Reload_Rifle", 1);
+            baseController.AH_agentAudioHolder.Play(AgentAudioHolder.type.reload);
         }
     }
     public virtual void OnAim(bool _aiming)
@@ -174,6 +189,7 @@ public class GunClass : ScriptableObject
             G_gunModel.transform.localEulerAngles = Vector3.zero;
         }
         A_charModel.Play("Equip_Rifle", 1);
+        baseController.AH_agentAudioHolder.Play(AgentAudioHolder.type.equip);
     }
     public virtual void OnUnEquip()
     {
@@ -236,6 +252,7 @@ public class GunClass : ScriptableObject
     public virtual void OnBullet(Bullet _bullet)
     {
         A_charModel.Play("Fire_Rifle", 1);
+        baseController.AH_agentAudioHolder.Play(AgentAudioHolder.type.fire);
     }
 
     public virtual void OnHit(Bullet _bullet)

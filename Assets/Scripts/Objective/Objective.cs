@@ -21,6 +21,7 @@ public class Objective : ScriptableObject
         [HideInInspector] public Resource.resourceType resource = null;
         [HideInInspector] public int amt = 0;
         public int total = 0;
+        [HideInInspector] public bool completed = false;
         public string GetString()
         {
             string _temp = "<b>" + amt.ToString() + "/" + total.ToString() + "</b> " + type.description;
@@ -41,6 +42,7 @@ public class Objective : ScriptableObject
             _temp.resource = Resource.GetResourceType_Static(_resource);
             _temp.amt = 0;
             _temp.total = total;
+            _temp.completed = false;
             return _temp;
         }
     }

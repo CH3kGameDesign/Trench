@@ -146,6 +146,23 @@ public class RadialMenu : MonoBehaviour
         UpdateSelected();
     }
 
+    void Set_selChild(int sel)
+    {
+        if (sel != Values.i_selChild)
+        {
+            Values.i_selChild = sel;
+            PlayerController.Instance.AH_agentAudioHolder.Play(AgentAudioHolder.type.radialTick);
+        }
+    }
+    void Set_selSubChild(int sel)
+    {
+        if (sel != Values.i_selSubChild)
+        {
+            Values.i_selSubChild = sel;
+            PlayerController.Instance.AH_agentAudioHolder.Play(AgentAudioHolder.type.radialSubTick);
+        }
+    }
+
     void UpdateSelected()
     {
         Vector2 pos = Ref.RT_cursor.anchoredPosition;
@@ -162,7 +179,7 @@ public class RadialMenu : MonoBehaviour
                 {
                     int sel = Mathf.RoundToInt(rot);
                     if (sel == Values.i_childAmt) sel = 0;
-                    Values.i_selChild = sel;
+                    Set_selChild(sel);
                 }
             }
             else
@@ -183,21 +200,21 @@ public class RadialMenu : MonoBehaviour
                     int sel = Mathf.RoundToInt(rot);
                     if (sel == Ref.rt_radialItems_Sub[Values.i_selChild].Length * _subGroupDivisor) Values.i_selSubChild = 0;
                     else if (sel < Ref.rt_radialItems_Sub[Values.i_selChild].Length)
-                        Values.i_selSubChild = sel;
+                        Set_selSubChild(sel);
                     else if (sel == Ref.rt_radialItems_Sub[Values.i_selChild].Length)
-                        Values.i_selSubChild = Ref.rt_radialItems_Sub[Values.i_selChild].Length - 1;
+                        Set_selSubChild(Ref.rt_radialItems_Sub[Values.i_selChild].Length - 1);
                     else if (sel < (Ref.rt_radialItems_Sub[Values.i_selChild].Length * _subGroupDivisor) - 1)
-                        Values.i_selSubChild = 0;
+                        Set_selSubChild(0);
                     else
                     {
-                        Values.i_selSubChild = -1;
+                        Set_selSubChild(-1);
                     }
                 }
                 else
-                    Values.i_selSubChild = -1;
+                    Set_selSubChild(-1);
             }
         }
-        else Values.i_selChild = -1;
+        else Set_selChild(-1);
         DisplaySelected();
     }
     void DisplaySelected()

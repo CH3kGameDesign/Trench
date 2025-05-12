@@ -30,6 +30,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4335778392909311225}
+  - {fileID: 9114098155741728520}
   - {fileID: 9016980258862573656}
   - {fileID: 7099420960327278248}
   - {fileID: 8049359384667994759}
@@ -90,6 +91,7 @@ MonoBehaviour:
   T_barrelHook: {fileID: 7313828478690311588}
   RB: {fileID: 7125570264134322029}
   RM_ragdoll: {fileID: 8332344335361575136}
+  AH_agentAudioHolder: {fileID: 1794054542864498538}
   V_curVehicle: {fileID: 0}
   T_surface: {fileID: 0}
   LM_TerrainRay:
@@ -1125,6 +1127,79 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1001 &4884044151039787595
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3340136924810737307}
+    m_Modifications:
+    - target: {fileID: 1360566406015104942, guid: edfa89894496ca74b8781d924634f180, type: 3}
+      propertyPath: m_Name
+      value: PF_AgentAudioController
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448531398152310083, guid: edfa89894496ca74b8781d924634f180, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448531398152310083, guid: edfa89894496ca74b8781d924634f180, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448531398152310083, guid: edfa89894496ca74b8781d924634f180, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448531398152310083, guid: edfa89894496ca74b8781d924634f180, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448531398152310083, guid: edfa89894496ca74b8781d924634f180, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448531398152310083, guid: edfa89894496ca74b8781d924634f180, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448531398152310083, guid: edfa89894496ca74b8781d924634f180, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448531398152310083, guid: edfa89894496ca74b8781d924634f180, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448531398152310083, guid: edfa89894496ca74b8781d924634f180, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448531398152310083, guid: edfa89894496ca74b8781d924634f180, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: edfa89894496ca74b8781d924634f180, type: 3}
+--- !u!114 &1794054542864498538 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6566916066760473889, guid: edfa89894496ca74b8781d924634f180, type: 3}
+  m_PrefabInstance: {fileID: 4884044151039787595}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76526135d5a99b247a5ddfb1fc8500c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &9114098155741728520 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4448531398152310083, guid: edfa89894496ca74b8781d924634f180, type: 3}
+  m_PrefabInstance: {fileID: 4884044151039787595}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8464453755668032022
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1197,6 +1272,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7263901104897168492, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
+      propertyPath: AudioHolder
+      value: 
+      objectReference: {fileID: 1794054542864498538}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:

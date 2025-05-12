@@ -25,11 +25,6 @@ public class ObjectiveHUD : MonoBehaviour
             if (i < _amt)
             {
                 UpdateObjective(SaveData.objectives[i], Objectives[i]);
-                if (SaveData.objectives[i].amt >= SaveData.objectives[i].total)
-                {
-                    //CompleteObjective(SaveData.objectives[i]);
-                    //return;
-                }
             }
             else
                 Objectives[i].gameObject.SetActive(false);
@@ -37,11 +32,15 @@ public class ObjectiveHUD : MonoBehaviour
     }    
     void UpdateObjective(Objective.objectiveClass _obj, ObjectiveHUDChild _child)
     {
+        if (_obj.amt >= _obj.total && !_obj.completed)
+        {
+            CompleteObjective(_obj);
+        }
         _child.gameObject.SetActive(true);
         _child.TM_description.text = _obj.GetString();
         _child.I_sprite.sprite = _obj.type.image;
 
-        if (_obj.amt >= _obj.total)
+        if (_obj.completed)
         {
             _child.I_background.color = new Color(0.3f, 0.8f, 0.3f);
         }
@@ -53,7 +52,7 @@ public class ObjectiveHUD : MonoBehaviour
 
     void CompleteObjective(Objective.objectiveClass _obj)
     {
-        SaveData.objectives.Remove(_obj);
-        UpdateObjectives();
+        _obj.completed = true;
+        PlayerController.Instance.AH_agentAudioHolder.Play(AgentAudioHolder.type.objectiveComplete);
     }
 }

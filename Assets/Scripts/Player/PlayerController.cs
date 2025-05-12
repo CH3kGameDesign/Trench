@@ -191,6 +191,7 @@ public class PlayerController : BaseController
             {
                 item.amt += _amt;
                 _affected = true;
+                AH_agentAudioHolder.Play(AgentAudioHolder.type.objectiveTick);
             }
         }
         if (_affected)
@@ -205,6 +206,7 @@ public class PlayerController : BaseController
             {
                 item.amt += _amt;
                 _affected = true;
+                AH_agentAudioHolder.Play(AgentAudioHolder.type.objectiveTick);
             }
         }
         if (_affected)
@@ -438,6 +440,7 @@ public class PlayerController : BaseController
         {
             T_equippedTreasure = _treasure;
             _treasure.OnPickUp(this);
+            AH_agentAudioHolder.Play(AgentAudioHolder.type.pickup);
         }    
     }
 
@@ -457,6 +460,7 @@ public class PlayerController : BaseController
         }
         if (!_collected)
             SaveData.resources.Add(_resource.Clone());
+        AH_agentAudioHolder.Play(AgentAudioHolder.type.pickupSmall);
     }
 
     IEnumerator InteractCoyote ()
@@ -474,6 +478,7 @@ public class PlayerController : BaseController
             if (Inputs.b_jumping && f_jumpTimer <= 0)
             {
                 A_model.Play("Jump");
+                AH_agentAudioHolder.Play(AgentAudioHolder.type.jump);
                 if (C_idleAnim != null)
                 {
                     StopCoroutine(C_idleAnim);
@@ -500,6 +505,7 @@ public class PlayerController : BaseController
                         T_surface_Update(NMA.navMeshOwner.GetComponent<Transform>());
                     }
                     StartCoroutine(MoveModel(_modelPos));
+                    AH_agentAudioHolder.Play(AgentAudioHolder.type.land);
                 }
             }
         }
@@ -534,7 +540,10 @@ public class PlayerController : BaseController
         {
             NavMesh_SwitchAgentID(i_crouchingNavID);
             if (b_grounded)
+            {
                 b_isCrouching = true;
+                AH_agentAudioHolder.Play(AgentAudioHolder.type.crouch);
+            }
         }
         if (!Inputs.b_crouch && i_currentNavID != i_humanoidNavID)
         {
@@ -545,6 +554,7 @@ public class PlayerController : BaseController
                 v3_modelLocalPos = Vector3.zero;
                 T_model.localPosition = v3_modelLocalPos;
                 b_isCrouching = false;
+                AH_agentAudioHolder.Play(AgentAudioHolder.type.stand);
             }
         }
         if (!b_grounded)
@@ -567,6 +577,7 @@ public class PlayerController : BaseController
                 Ref.RM_radial.Show();
                 b_radialOpen = true;
                 SetTimeScale(0.1f);
+                AH_agentAudioHolder.Play(AgentAudioHolder.type.radial);
             }
             if (Inputs.b_isGamepad)
                 Ref.RM_radial.MoveCursor_Gamepad(Inputs.v2_camInputDir);
@@ -579,6 +590,7 @@ public class PlayerController : BaseController
             Ref.RM_radial.Confirm();
             b_radialOpen = false;
             SetTimeScale(1f);
+            AH_agentAudioHolder.Stop(AgentAudioHolder.type.radial);
         }
     }
 
@@ -700,6 +712,7 @@ public class PlayerController : BaseController
             {
                 T_equippedTreasure.OnDrop(this, b_isSprinting);
                 T_equippedTreasure = null;
+                AH_agentAudioHolder.Play(AgentAudioHolder.type.throww);
             }
         }
         gun_Equipped.OnUpdate();
@@ -738,6 +751,8 @@ public class PlayerController : BaseController
 
         if (f_curHealth <= 0)
             OnDeath();
+        else
+            AH_agentAudioHolder.Play(AgentAudioHolder.type.hurt);
     }
 
     public void Gun_Equip(int _invNum)
@@ -747,6 +762,8 @@ public class PlayerController : BaseController
         gun_Equipped = gun_EquippedList[_invNum];
         gun_Equipped.OnEquip(this);
         Ref.I_curWeapon.sprite = gun_Equipped.sprite;
+
+        AH_agentAudioHolder.Gun_Equip(gun_Equipped);
     }
 
     void OnDeath()
@@ -756,6 +773,8 @@ public class PlayerController : BaseController
         RM_ragdoll.EnableRigidbodies(true);
         A_model.enabled = false;
         Invoke(nameof(Restart), 3f);
+
+        AH_agentAudioHolder.Play(AgentAudioHolder.type.death);
     }
 
     void Restart()

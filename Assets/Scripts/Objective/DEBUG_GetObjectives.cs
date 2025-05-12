@@ -14,6 +14,8 @@ public class DEBUG_GetObjectives : Interactable
         }
         SaveData.objectives = _objectives;
         _player.Update_Objectives();
+
+        _player.AH_agentAudioHolder.Play(AgentAudioHolder.type.objectiveGain);
         base.OnInteract(_player);
     }
 }
