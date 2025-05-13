@@ -147,6 +147,11 @@ public class GunClass : ScriptableObject
         f_recoilUpwards = _fireVariables.recoilUpwards;
         if (b_playerGun)
             PM_player.reticle.RotateReticle(f_fireTimer);
+
+        if (b_playerGun)
+            MusicHandler.AdjustVolume(MusicHandler.typeEnum.guitar, _fireVariables.fireRate / 4);
+        else
+            MusicHandler.AdjustVolume(MusicHandler.typeEnum.bass, _fireVariables.fireRate / 8);
     }
     public virtual void OnMelee(bool _isSprinting = false)
     {
@@ -157,6 +162,11 @@ public class GunClass : ScriptableObject
             PM_player.reticle.RotateReticle(f_fireTimer);
             A_charModel.Play("Melee_Rifle", 1);
             baseController.AH_agentAudioHolder.Play(AgentAudioHolder.type.melee);
+
+            if (b_playerGun)
+                MusicHandler.AdjustVolume(MusicHandler.typeEnum.guitar, meleeVariables.fireRate / 4);
+            else
+                MusicHandler.AdjustVolume(MusicHandler.typeEnum.bass, meleeVariables.fireRate / 8);
         }
     }
     public virtual void OnReload()

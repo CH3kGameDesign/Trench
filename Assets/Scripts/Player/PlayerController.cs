@@ -354,13 +354,15 @@ public class PlayerController : BaseController
             {
                 if (Inputs.b_sprinting && !Inputs.b_crouch)
                 {
-                    _tarPos = new Vector3(Inputs.v2_inputDir.x/2, 0, 1);
+                    _tarPos = new Vector3(Inputs.v2_inputDir.x / 2, 0, 1);
                     v3_moveDir = Quaternion.Euler(0, v3_camDir.y, 0) * _tarPos;
                     v3_moveDir *= F_sprintModifier;
-                    b_isSprinting = true;
+                    SprintStart();
                 }
                 else
-                    b_isSprinting = false;
+                {
+                    SprintStop();
+                }
 
                 v3_moveDir *= F_moveSpeed;
 
@@ -381,8 +383,25 @@ public class PlayerController : BaseController
             if (C_idleAnim == null && !Inputs.IsInput())
                 C_idleAnim = StartCoroutine(Idle_Anim());
             b_isMoving = false;
-            b_isSprinting = false;
+            SprintStop();
         }
+    }
+
+    void SprintStart()
+    {
+        if (b_isSprinting)
+            return;
+        AH_agentAudioHolder.Play(AgentAudioHolder.type.sprint);
+        MusicHandler.SetVolume(MusicHandler.typeEnum.drums, 1);
+        b_isSprinting = true;
+    }
+    void SprintStop()
+    {
+        if (!b_isSprinting)
+            return;
+        AH_agentAudioHolder.Stop(AgentAudioHolder.type.sprint);
+        MusicHandler.SetVolume(MusicHandler.typeEnum.drums, 0);
+        b_isSprinting = false;
     }
 
     void AerialMovement()
@@ -461,6 +480,7 @@ public class PlayerController : BaseController
         if (!_collected)
             SaveData.resources.Add(_resource.Clone());
         AH_agentAudioHolder.Play(AgentAudioHolder.type.pickupSmall);
+        MusicHandler.AdjustVolume(MusicHandler.typeEnum.synth, 0.1f);
     }
 
     IEnumerator InteractCoyote ()
@@ -543,6 +563,7 @@ public class PlayerController : BaseController
             {
                 b_isCrouching = true;
                 AH_agentAudioHolder.Play(AgentAudioHolder.type.crouch);
+                MusicHandler.Muffle(true);
             }
         }
         if (!Inputs.b_crouch && i_currentNavID != i_humanoidNavID)
@@ -555,6 +576,7 @@ public class PlayerController : BaseController
                 T_model.localPosition = v3_modelLocalPos;
                 b_isCrouching = false;
                 AH_agentAudioHolder.Play(AgentAudioHolder.type.stand);
+                MusicHandler.Muffle(false);
             }
         }
         if (!b_grounded)

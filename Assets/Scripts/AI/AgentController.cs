@@ -488,6 +488,8 @@ public class AgentController : BaseController
         f_curHealth -= _bullet.F_damage;
         if (f_curHealth <= 0)
             OnDeath(_bullet);
+        else
+            AH_agentAudioHolder.Play(AgentAudioHolder.type.hurt);
     }
 
     void OnDeath(GunManager.bulletClass _bullet)
@@ -516,6 +518,8 @@ public class AgentController : BaseController
         GroundedUpdate(false);
         A_model.enabled = false;
         b_alive = false;
+        AH_agentAudioHolder.Play(AgentAudioHolder.type.death);
+        MusicHandler.AdjustVolume(MusicHandler.typeEnum.brass, 0.5f);
         //gameObject.SetActive(false);
     }
 

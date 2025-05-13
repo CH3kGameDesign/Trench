@@ -17,6 +17,7 @@ public class Treasure : Interactable
     private int i_droppedLayer = 7;
     private int i_heldLayer = 2;
 
+    private Coroutine heldCoroutine;
 
     // Start is called before the first frame update
     void Start()
@@ -46,6 +47,10 @@ public class Treasure : Interactable
         RB_rigidbody.isKinematic = true;
         //gameObject.layer = i_heldLayer;
         C_collider.enabled = false;
+
+        if (heldCoroutine != null)
+            StopCoroutine(heldCoroutine);
+        heldCoroutine = StartCoroutine(WhileHeld(_player));
     }
     public void OnDrop(PlayerController _player, bool _isSprinting = false)
     {
@@ -55,6 +60,8 @@ public class Treasure : Interactable
         C_collider.enabled = true;
 
         StartCoroutine(OnThrown(_player, _isSprinting ? 1f : 2f));
+        if (heldCoroutine != null)
+            StopCoroutine(heldCoroutine);
     }
 
     IEnumerator OnThrown(PlayerController _player, float _mult)
@@ -65,5 +72,13 @@ public class Treasure : Interactable
         C_collider.excludeLayers = LM_thrownIgnoreLayers;
         yield return new WaitForSeconds(0.5f);
         C_collider.excludeLayers = new LayerMask();
+    }
+    IEnumerator WhileHeld(PlayerController _player)
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(0.5f);
+            MusicHandler.AdjustVolume(MusicHandler.typeEnum.synth, 0.1f);
+        }
     }
 }
