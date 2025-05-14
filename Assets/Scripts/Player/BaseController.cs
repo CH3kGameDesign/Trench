@@ -17,6 +17,9 @@ public class BaseController : MonoBehaviour
     [HideInInspector] public Transform T_surface = null;
     private Vector3 v3_surfacePos;
     public LayerMask LM_TerrainRay;
+    [Header("Combat Variables")]
+    public float F_maxHealth = 100;
+    [HideInInspector] public float F_curHealth = 100;
 
     [HideInInspector] public GunClass gun_Equipped;
     [HideInInspector] public GunClass[] gun_EquippedList = new GunClass[3];
@@ -71,6 +74,11 @@ public class BaseController : MonoBehaviour
     public virtual void OnHit(GunManager.bulletClass _bullet)
     {
         
+    }
+
+    public virtual void OnHeal(float _amt)
+    {
+
     }
 
     public virtual void GameState_Change(gameStateEnum _state)

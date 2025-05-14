@@ -11,8 +11,9 @@ public class Pickup_Object : MonoBehaviour
     public AnimCurve A_height;
 
     private Resource.resourceClass _Resource;
+    private Consumable.consumableClass _Consumable;
     private pickupEnum _PickUpType = pickupEnum.none;
-    private enum pickupEnum { none, resource};
+    private enum pickupEnum { none, resource, consumable};
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
@@ -22,6 +23,9 @@ public class Pickup_Object : MonoBehaviour
             {
                 case pickupEnum.resource:
                     other.GetComponentInParent<PlayerController>().Pickup_Resource(_Resource);
+                    break;
+                case pickupEnum.consumable:
+                    other.GetComponentInParent<PlayerController>().Pickup_Consumable(_Consumable);
                     break;
                 default:
                     break;
@@ -35,6 +39,14 @@ public class Pickup_Object : MonoBehaviour
         _PickUpType = pickupEnum.resource;
         _Resource = Resource.resourceClass.Create(_type);
         GameObject GO = Instantiate(_Resource.GetType().model, T_modelHolder);
+        GO.transform.localPosition = Vector3.zero;
+        StartCoroutine(Spawn());
+    }
+    public void Setup(Consumable_Type _type)
+    {
+        _PickUpType = pickupEnum.consumable;
+        _Consumable = Consumable.consumableClass.Create(_type);
+        GameObject GO = Instantiate(_Consumable.GetType().model, T_modelHolder);
         GO.transform.localPosition = Vector3.zero;
         StartCoroutine(Spawn());
     }

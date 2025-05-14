@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class RadialMenu : MonoBehaviour
 {
@@ -83,6 +84,39 @@ public class RadialMenu : MonoBehaviour
         for (int i = 0; i < Mathf.Min(_gunList.Length, Ref.rt_radialItems_Sub[0].Length); i++)
         {
             Ref.rt_radialItems_Sub[0][i].GetChild(0).GetComponent<Image>().sprite = _gunList[i].sprite;
+        }
+    }
+    public void Setup_Consumables(List<Consumable.consumableClass> _consumables)
+    {
+        int _first = 999;
+        Color _trans = new Color(1, 1, 1, 0.3f);
+
+        for (int i = 0; i < Mathf.Min(_consumables.Count, Ref.rt_radialItems_Sub[1].Length); i++)
+        {
+            Ref.rt_radialItems_Sub[1][i].GetChild(0).GetComponent<Image>().sprite = _consumables[i].GetType().image;
+            Ref.rt_radialItems_Sub[1][i].GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = _consumables[i].amt.ToString();
+
+            if (_consumables[i].amt > 0)
+            {
+                Ref.rt_radialItems_Sub[1][i].GetChild(0).GetComponent<Image>().color = Color.white;
+                Ref.rt_radialItems_Sub[1][i].GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().color = Color.white;
+                _first = Mathf.Min(i, _first);
+            }
+            else
+            {
+                Ref.rt_radialItems_Sub[1][i].GetChild(0).GetComponent<Image>().color = _trans;
+                Ref.rt_radialItems_Sub[1][i].GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().color = _trans;
+            }
+        }
+        if (_first < _consumables.Count)
+        {
+            Ref.rt_radialItems[1].GetChild(0).GetComponent<Image>().sprite = _consumables[_first].GetType().image;
+            Ref.rt_radialItems[1].GetChild(0).GetComponent<Image>().color = Color.white;
+        }
+        else if (_consumables.Count > 0)
+        {
+            Ref.rt_radialItems[1].GetChild(0).GetComponent<Image>().sprite = _consumables[0].GetType().image;
+            Ref.rt_radialItems[1].GetChild(0).GetComponent<Image>().color = _trans;
         }
     }
 
@@ -252,6 +286,11 @@ public class RadialMenu : MonoBehaviour
         {
             if (Values.i_selSubChild >= 0)
                 PlayerController.Instance.Gun_Equip(Values.i_selSubChild);
-        }    
+        }
+        else if (Values.i_selChild == 1)
+        {
+            if (Values.i_selSubChild >= 0)
+                PlayerController.Instance.Consumable_Use(SaveData.consumables[Values.i_selSubChild]);
+        }
     }
 }

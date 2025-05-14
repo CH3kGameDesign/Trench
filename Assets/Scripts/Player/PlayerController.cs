@@ -71,9 +71,7 @@ public class PlayerController : BaseController
     public Animator A_model;
     private Vector2 v2_animMove = Vector2.zero;
 
-    [Header("Combat Variables")]
-    public float F_maxHealth = 100;
-    private float f_curHealth = 100;
+    [Header("Combat Refs")]
     public Reticle reticle;
     public RectTransform RT_hitPoint;
     public RectTransform RT_lockOnPoint;
@@ -136,10 +134,10 @@ public class PlayerController : BaseController
 
     public override void Start()
     {
-        f_curHealth = F_maxHealth;
+        F_curHealth = F_maxHealth;
         Ref.S_healthSlider.maxValue = F_maxHealth;
-        Ref.S_healthSlider.value = f_curHealth;
-        Ref.TM_healthText.text = f_curHealth.ToString();
+        Ref.S_healthSlider.value = F_curHealth;
+        Ref.TM_healthText.text = F_curHealth.ToString();
         v3_camDir = T_camHolder.localEulerAngles;
         v3_camDir.z = 0;
         SetNavIDs();
@@ -152,6 +150,7 @@ public class PlayerController : BaseController
         reticle.UpdateRoundCount(gun_Equipped);
 
         NMA.updateRotation = false;
+        Setup_Consumables();
         Setup_Radial();
         Setup_InteractStrings();
         Update_Objectives();
@@ -170,9 +169,16 @@ public class PlayerController : BaseController
         Inputs.s_inputStrings = _temp;
     }
 
+    void Setup_Consumables()
+    {
+        SaveData.consumables = new List<Consumable.consumableClass>();
+        SaveData.consumables.Add(Consumable.consumableClass.Create(Consumable_Type.Potion_Health, 1));
+        SaveData.consumables.Add(Consumable.consumableClass.Create(Consumable_Type.Potion_Revive, 1));
+    }
+
     void Setup_Radial()
     {
-        Ref.RM_radial.Setup(new int[] { 3, 4, 5 });
+        Ref.RM_radial.Setup(new int[] { 3, 2, 5 });
         Update_Radial();
     }
 
@@ -216,6 +222,7 @@ public class PlayerController : BaseController
     void Update_Radial()
     {
         Ref.RM_radial.Setup_Guns(gun_Equipped, gun_EquippedList);
+        Ref.RM_radial.Setup_Consumables(SaveData.consumables);
     }
 
     void SetNavIDs()
@@ -479,6 +486,24 @@ public class PlayerController : BaseController
         }
         if (!_collected)
             SaveData.resources.Add(_resource.Clone());
+        AH_agentAudioHolder.Play(AgentAudioHolder.type.pickupSmall);
+        MusicHandler.AdjustVolume(MusicHandler.typeEnum.synth, 0.1f);
+    }
+
+    public void Pickup_Consumable(Consumable.consumableClass _consumable)
+    {
+        bool _collected = false;
+        foreach (var item in SaveData.consumables)
+        {
+            if (item._type == _consumable._type)
+            {
+                _collected = true;
+                item.amt += _consumable.amt;
+                break;
+            }
+        }
+        if (!_collected)
+            SaveData.consumables.Add(_consumable.Clone());
         AH_agentAudioHolder.Play(AgentAudioHolder.type.pickupSmall);
         MusicHandler.AdjustVolume(MusicHandler.typeEnum.synth, 0.1f);
     }
@@ -766,15 +791,24 @@ public class PlayerController : BaseController
     {
         if (_bullet.B_player && !_bullet.D_damageType.isSelfHittable())
             return;
-        f_curHealth -= _bullet.F_damage;
+        F_curHealth -= _bullet.F_damage;
 
         if (C_updateHealth != null) StopCoroutine(C_updateHealth);
-        C_updateHealth = StartCoroutine(Health_Update(f_curHealth));
+        C_updateHealth = StartCoroutine(Health_Update(F_curHealth));
 
-        if (f_curHealth <= 0)
+        if (F_curHealth <= 0)
             OnDeath();
         else
             AH_agentAudioHolder.Play(AgentAudioHolder.type.hurt);
+    }
+    public override void OnHeal(float _amt)
+    {
+        F_curHealth = Mathf.Clamp(F_curHealth + _amt, 0, F_maxHealth);
+
+        if (C_updateHealth != null) StopCoroutine(C_updateHealth);
+        C_updateHealth = StartCoroutine(Health_Update(F_curHealth));
+
+        base.OnHeal(_amt);
     }
 
     public void Gun_Equip(int _invNum)
@@ -786,6 +820,16 @@ public class PlayerController : BaseController
         Ref.I_curWeapon.sprite = gun_Equipped.sprite;
 
         AH_agentAudioHolder.Gun_Equip(gun_Equipped);
+    }
+
+    public void Consumable_Use(Consumable.consumableClass _consumable)
+    {
+        if (_consumable.amt <= 0)
+            return;
+        if (Consumable.Use(this, _consumable))
+        {
+
+        }
     }
 
     void OnDeath()

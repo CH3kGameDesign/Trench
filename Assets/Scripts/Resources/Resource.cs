@@ -105,7 +105,7 @@ public class Resource : ScriptableObject
             if (_id == item._id)
                 return item;
         }
-        Debug.LogError("Couldn't find Objective ID: " + _id);
+        Debug.LogError("Couldn't find Resource ID: " + _id);
         return null;
     }
     public resourceType GetResourceType(Resource_Type _type)
@@ -116,7 +116,7 @@ public class Resource : ScriptableObject
             if (_id == item._id)
                 return item;
         }
-        Debug.LogError("Couldn't find Objective ID: " + _id);
+        Debug.LogError("Couldn't find Resource ID: " + _id);
         return null;
     }
 

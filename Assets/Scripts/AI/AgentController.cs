@@ -32,8 +32,6 @@ public class AgentController : BaseController
     private int i_burstRemaining = 0;
     [HideInInspector] public Vector3 V3_attackLocation;
     private float f_searchDelay = 0.2f;
-    public float F_maxHealth = 100;
-    private float f_curHealth = 100;
     private bool b_firing = false;
 
     [Header("Animations")]
@@ -485,8 +483,8 @@ public class AgentController : BaseController
             }
         }
 
-        f_curHealth -= _bullet.F_damage;
-        if (f_curHealth <= 0)
+        F_curHealth -= _bullet.F_damage;
+        if (F_curHealth <= 0)
             OnDeath(_bullet);
         else
             AH_agentAudioHolder.Play(AgentAudioHolder.type.hurt);
