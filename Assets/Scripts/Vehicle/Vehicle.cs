@@ -135,4 +135,14 @@ using UnityEngine;
         }
         return seatTypeEnum.none;
     }
+
+    public bool hasDriver()
+    {
+        foreach (var seat in SeatInUse)
+        {
+            if (Seats[seat].seatType == seatTypeEnum.driver)
+                return true;
+        }
+        return false;
+    }
 }

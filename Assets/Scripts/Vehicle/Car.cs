@@ -284,6 +284,19 @@ public class Car : Vehicle
             }
         }
     }
+
+    public override void OnEnter(BaseController _player)
+    {
+        if (useSounds && hasDriver())
+            carEngineSound.Play();
+        base.OnEnter(_player);
+    }
+    public override void OnExit(int _num)
+    {
+        if (useSounds && !hasDriver())
+            carEngineSound.Stop();
+        base.OnExit(_num);
+    }
     // Update is called once per frame
     public override void Update()
     {
