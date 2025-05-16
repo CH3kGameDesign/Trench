@@ -216,7 +216,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -348,7 +348,7 @@ AudioSource:
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
-  Loop: 1
+  Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -524,7 +524,7 @@ AudioSource:
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
-  Loop: 1
+  Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -841,7 +841,7 @@ AudioSource:
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
-  Loop: 1
+  Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -1031,7 +1031,7 @@ AudioSource:
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
-  Loop: 1
+  Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -1232,7 +1232,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -1443,7 +1443,7 @@ AudioSource:
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
-  Loop: 1
+  Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -1714,7 +1714,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -1879,6 +1879,13 @@ MonoBehaviour:
   - {fileID: 24500006, guid: 1feee4dd0f0fb9748a6ae1b4e5af2b62, type: 2}
   - {fileID: 7713372357767302532, guid: 1feee4dd0f0fb9748a6ae1b4e5af2b62, type: 2}
   - {fileID: -6546475996511884468, guid: 1feee4dd0f0fb9748a6ae1b4e5af2b62, type: 2}
+  songList:
+  - ambientLofi: {fileID: 8300000, guid: 84bf0e92e719abc459556502a05da592, type: 3}
+    drums: {fileID: 0}
+    synth: {fileID: 8300000, guid: 891575af841f49c489ed4b58f300ebf2, type: 3}
+    guitar: {fileID: 8300000, guid: 9011c3e74589785469afff5655e7fff9, type: 3}
+    bass: {fileID: 8300000, guid: a81b0a7af3c6bf543b52470f26a8cfde, type: 3}
+    brass: {fileID: 0}
 --- !u!1 &1861640334
 GameObject:
   m_ObjectHideFlags: 0
@@ -1926,7 +1933,7 @@ AudioSource:
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
-  Loop: 1
+  Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0

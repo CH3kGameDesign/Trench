@@ -5,6 +5,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName ="New LevelGen Theme", menuName = "Trench/LevelGen/Theme")]
 public class LevelGen_Theme : ScriptableObject
 {
+    [Header("Playlist")]
+    public Playlist playlist;
     [Header("Layouts")]
     public List<Layout_Basic> Layouts = new List<Layout_Basic>();
     [Space(10)]

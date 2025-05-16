@@ -132,4 +132,13 @@ public static class CKUtil
             ts[r] = tmp;
         }
     }
+    public static T GetRandom<T>(this IList<T> ts)
+    {
+        return ts.GetRandom(new Unity.Mathematics.Random());
+    }
+    public static T GetRandom<T>(this IList<T> ts, Unity.Mathematics.Random Random_Seeded)
+    {
+        int _ran = Random_Seeded.NextInt(0, ts.Count);
+        return ts[_ran];
+    }
 }

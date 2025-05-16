@@ -52,6 +52,7 @@ public class LevelGen : MonoBehaviour
         {
             Layout_Basic _layout = LG_Theme.GetLayout_Basic(Random_Seeded);
             StartCoroutine(GenerateLayout_Smart(LG_Theme, _layout));
+            MusicHandler.Instance.SetupPlaylist(LG_Theme.playlist);
         }
         else
             GenerateLayout_Series(LG_Theme);

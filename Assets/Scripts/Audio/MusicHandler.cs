@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using static UnityEditor.ShaderData;
 using UnityEngine.Audio;
+using static Playlist;
 
 public class MusicHandler : MonoBehaviour
 {
@@ -13,6 +14,11 @@ public class MusicHandler : MonoBehaviour
     [Space(10)]
     public AudioMixer MixerGroup;
     public AudioMixerSnapshot[] MixerSnapshots;
+
+    public List<song> songList = new List<song>();
+    private int songCounter = 0;
+    private Coroutine queue = null;
+
     public enum typeEnum { 
         ambientLofi, drums, synth, guitar, bass, brass, 
         ambientClutter, ambientNoise, heartbeat
@@ -36,6 +42,8 @@ public class MusicHandler : MonoBehaviour
             guitar.Play();
             bass.Play();
             brass.Play();
+
+            QueueNext(GetLength());
         }
         public void Stop()
         {
@@ -54,6 +62,18 @@ public class MusicHandler : MonoBehaviour
             guitar.ReduceCheck();
             bass.ReduceCheck();
             brass.ReduceCheck();
+        }
+        public float GetLength()
+        {
+            float[] _time = { 
+                ambientLofi.GetLength(),
+                drums.GetLength(),
+                synth.GetLength(),
+                guitar.GetLength(),
+                bass.GetLength(),
+                brass.GetLength()
+            };
+            return Mathf.Max(_time);
         }
     }
     [System.Serializable]
@@ -136,6 +156,12 @@ public class MusicHandler : MonoBehaviour
             }
             SetVolume(_tarVolume);
         }
+        public float GetLength()
+        {
+            if (source.clip != null)
+                return source.clip.length;
+            return 0;
+        }
     }
     private void Awake()
     {
@@ -146,7 +172,6 @@ public class MusicHandler : MonoBehaviour
     void Start()
     {
         SetStartVolumes();
-        Segments.Play();
     }
 
     void SetStartVolumes()
@@ -161,6 +186,36 @@ public class MusicHandler : MonoBehaviour
         Misc.ambientClutter.SetVolume(0, 0);
         Misc.ambientNoise.SetVolume(0, 0);
         Misc.heartbeat.SetVolume(0, 0);
+    }
+    public void SetupPlaylist(Playlist _playlist)
+    {
+        if (_playlist != null)
+        {
+            songList = _playlist.GetSongList();
+            Misc.ambientClutter.source.clip = _playlist.GetAmbience(typeEnum.ambientClutter);
+            Misc.ambientNoise.source.clip = _playlist.GetAmbience(typeEnum.ambientNoise);
+            Misc.heartbeat.source.clip = _playlist.GetAmbience(typeEnum.heartbeat);
+        }
+        Segments.Play();
+    }
+    public void NextSong()
+    {
+        songCounter = (songCounter+1)%songList.Count;
+        SetSong();
+    }
+    public void SetSong()
+    {
+        if (songList.Count > 0)
+        {
+            song _song = songList[songCounter];
+            Segments.ambientLofi.source.clip = _song.ambientLofi;
+            Segments.drums.source.clip = _song.drums;
+            Segments.synth.source.clip = _song.synth;
+            Segments.guitar.source.clip = _song.guitar;
+            Segments.bass.source.clip = _song.bass;
+            Segments.brass.source.clip = _song.brass;
+            Segments.Play();
+        }
     }
 
     // Update is called once per frame
@@ -212,5 +267,18 @@ public class MusicHandler : MonoBehaviour
             case typeEnum.heartbeat: return Misc.heartbeat;
             default: return null;
         }
+    }
+    public static void QueueNext(float _time)
+    {
+        if (_time <= 0)
+            return;
+        if (Instance.queue != null)
+            Instance.StopCoroutine(Instance.queue);
+        Instance.queue = Instance.StartCoroutine(Instance.QueueNext_Coroutine(_time));
+    }
+    IEnumerator QueueNext_Coroutine(float _time)
+    {
+        yield return new WaitForSeconds(_time);
+        NextSong();
     }
 }
