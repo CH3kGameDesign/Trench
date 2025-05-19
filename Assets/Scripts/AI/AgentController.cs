@@ -309,7 +309,7 @@ public class AgentController : BaseController
                     if (state == stateEnum.patrol)
                     {
                         state = stateEnum.hunt;
-                        Conversation.Instance.StartMessage("MSG_Found_001", T_messageHook);
+                        Conversation.Instance.StartMessage(ConversationID.MSG_Found_001, T_messageHook);
                     }
                     break;
                 }
@@ -323,7 +323,7 @@ public class AgentController : BaseController
                     if (state == stateEnum.patrol)
                     {
                         state = stateEnum.hunt;
-                        Conversation.Instance.StartMessage("MSG_Found_001", T_messageHook);
+                        Conversation.Instance.StartMessage(ConversationID.MSG_Found_001, T_messageHook);
                     }
                     break;
                 }
@@ -461,10 +461,10 @@ public class AgentController : BaseController
                 if (state == stateEnum.patrol)
                 {
                     state = stateEnum.hunt;
-                    Conversation.Instance.StartMessage("MSG_Attacked_001", T_messageHook);
+                    Conversation.Instance.StartMessage(ConversationID.MSG_Attacked_001, T_messageHook);
                 }
                 else if (b_friendly)
-                    Conversation.Instance.StartMessage("MSG_Betray_001", T_messageHook);
+                    Conversation.Instance.StartMessage(ConversationID.MSG_Betray_001, T_messageHook);
             }
         }
         else
@@ -477,7 +477,7 @@ public class AgentController : BaseController
                     if (state == stateEnum.patrol)
                     {
                         state = stateEnum.hunt;
-                        Conversation.Instance.StartMessage("MSG_Attacked_001", T_messageHook);
+                        Conversation.Instance.StartMessage(ConversationID.MSG_Attacked_001, T_messageHook);
                     }
                 }
             }

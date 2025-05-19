@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Trench/AssetLists/ConversationManager", fileName = "New Conversation Manager")]
@@ -56,4 +58,58 @@ public class ConversationManager : ScriptableObject
         _convo = null;
         return false;
     }
+
+    public bool GetConversation(ConversationID _type, out conversationClass _convo)
+    {
+        string _id = _type.ToString().Replace('_', '/');
+        foreach (var item in list)
+        {
+            if (_id == item.id)
+            {
+                _convo = item;
+                return true;
+            }
+        }
+        Debug.LogError("Couldn't find Conversation ID: " + _id);
+        _convo = null;
+        return false;
+    }
+
+#if UNITY_EDITOR
+    [ContextMenu("Tools/GenerateEnum")]
+    public void GenerateEnum()
+    {
+        string enumName = "ConversationID";
+        List<string> enumEntries = new List<string>();
+        List<conversationClass> typeEntries = new List<conversationClass>();
+        foreach (var item in list)
+        {
+            if (!enumEntries.Contains(item.id))
+            {
+                enumEntries.Add(item.id);
+                typeEntries.Add(item);
+            }
+            else
+                Debug.LogError("Duplicate ID: " + item.id);
+        }
+        string filePathAndName = "Assets/Scripts/Enums/" + enumName + ".cs"; //The folder Scripts/Enums/ is expected to exist
+
+        using (StreamWriter streamWriter = new StreamWriter(filePathAndName))
+        {
+            streamWriter.WriteLine("using System.ComponentModel;");
+            streamWriter.WriteLine("using UnityEngine;");
+            streamWriter.WriteLine("public enum " + enumName);
+            streamWriter.WriteLine("{");
+            for (int i = 0; i < typeEntries.Count; i++)
+            {
+                streamWriter.WriteLine(
+                    "	" + "[InspectorName (\"" + typeEntries[i].id + "\")]" +
+                    "	" + typeEntries[i].id.Replace('/', '_') + ","
+                    );
+            }
+            streamWriter.WriteLine("}");
+        }
+        AssetDatabase.Refresh();
+    }
+#endif
 }

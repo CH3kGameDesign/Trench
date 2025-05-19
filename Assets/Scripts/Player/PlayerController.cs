@@ -436,7 +436,7 @@ public class PlayerController : BaseController
                 {
                     I_curInteractable = _interact;
                     int _controlScheme = Inputs.b_isGamepad ? 1 : 0;
-                    string _temp = I_curInteractable.S_interactName.ToString_Input(Inputs.s_inputStrings[_controlScheme]);
+                    string _temp = I_curInteractable.S_interactName.ToString_Input(Inputs.s_inputStrings[_controlScheme], _interact.I_type);
                     Ref.TM_interactText.gameObject.SetActive(true);
                     Ref.TM_interactText.text = _temp;
 

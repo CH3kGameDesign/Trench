@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Conversation Manager
   m_EditorClassIdentifier: 
   list:
-  - id: DEBUG_001
+  - id: CNV/DEBUG/001
     strings:
     - speaker: 
       english: Well Howdy Stranger
@@ -27,7 +27,7 @@ MonoBehaviour:
       speed: 0.1
     singleUse: 0
     used: 0
-  - id: MSG_Break_001
+  - id: MSG/Break/001
     strings:
     - speaker: Chowder
       english: Hey we're trying to be quiet here!
@@ -41,7 +41,7 @@ MonoBehaviour:
       speed: 0.04
     singleUse: 0
     used: 0
-  - id: MSG_Betray_001
+  - id: MSG/Betray/001
     strings:
     - speaker: Chowder
       english: Oh you are so dead
@@ -60,7 +60,7 @@ MonoBehaviour:
       speed: 0.04
     singleUse: 0
     used: 0
-  - id: MSG_Found_001
+  - id: MSG/Found/001
     strings:
     - speaker: Mance
       english: Found the Intruder!
@@ -74,7 +74,7 @@ MonoBehaviour:
       speed: 0.04
     singleUse: 0
     used: 0
-  - id: MSG_Attacked_001
+  - id: MSG/Attacked/001
     strings:
     - speaker: Mance
       english: Under attack!
@@ -83,6 +83,15 @@ MonoBehaviour:
       speed: 0.04
     - speaker: Mance
       english: Send Help!
+      spanish: 
+      japanese: 
+      speed: 0.04
+    singleUse: 0
+    used: 0
+  - id: CNV/Tavern/Hello
+    strings:
+    - speaker: Greggori
+      english: Welcome back Stranger! What can Greggori do for you?
       spanish: 
       japanese: 
       speed: 0.04

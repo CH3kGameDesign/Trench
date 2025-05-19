@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ConversationEvent : MonoBehaviour
 {
-    public string eventID = "";
+    public ConversationID eventID;
     public void ApplyEffect()
     {
         Conversation _conversation = Conversation.Instance;

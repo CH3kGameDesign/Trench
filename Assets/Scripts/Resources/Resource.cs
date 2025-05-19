@@ -99,14 +99,7 @@ public class Resource : ScriptableObject
     }
     public static resourceType GetResourceType_Static(Resource_Type _type)
     {
-        string _id = _type.ToString().Replace('_', '/');
-        foreach (var item in Instance.types)
-        {
-            if (_id == item._id)
-                return item;
-        }
-        Debug.LogError("Couldn't find Resource ID: " + _id);
-        return null;
+        return Instance.GetResourceType(_type);
     }
     public resourceType GetResourceType(Resource_Type _type)
     {

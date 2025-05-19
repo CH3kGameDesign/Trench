@@ -12,12 +12,12 @@ public static class CKUtil
         return _temp;
     }
 
-    public static string ToString_Input(this string _interactable, string _input)
+    public static string ToString_Input(this string _interactable, string _input, Interactable.enumType _type = Interactable.enumType.interact)
     {
-        string _temp = "Press ";
-        _temp += _input;
-        _temp += " to interact with ";
-        _temp += _interactable;
+
+        string _temp = Interactable.interactText[(int)_type];
+        _temp = _temp.Replace("[0]", _input);
+        _temp = _temp.Replace("[1]", _interactable);
         return _temp;
     }
 
@@ -134,11 +134,21 @@ public static class CKUtil
     }
     public static T GetRandom<T>(this IList<T> ts)
     {
-        return ts.GetRandom(new Unity.Mathematics.Random());
+        if (ts.Count == 0)
+        {
+            Debug.LogWarning("List Empty");
+            return default(T);
+        }
+        return ts.GetRandom(new Unity.Mathematics.Random(0x6E624EB7u));
     }
     public static T GetRandom<T>(this IList<T> ts, Unity.Mathematics.Random Random_Seeded)
     {
         int _ran = Random_Seeded.NextInt(0, ts.Count);
         return ts[_ran];
+    }
+
+    public static void PlayClip(this Animator _anim, string _name)
+    {
+        _anim.Play(_name);
     }
 }

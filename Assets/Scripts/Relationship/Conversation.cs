@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using Unity.VisualScripting;
+using UnityEngine.Rendering;
 
 public class Conversation : MonoBehaviour
 {
@@ -10,12 +12,23 @@ public class Conversation : MonoBehaviour
     public static Conversation Instance;
     public ConversationManager C_Manager;
 
-    [Header("Object References")]
-    public GameObject G_dialogueHolder;
+    [Header("Conversation References")]
+    public CanvasGroup CG_dialogueHolder;
+    public RectTransform RT_speakerMover;
     public TextMeshProUGUI TM_speaker;
     public TextMeshProUGUI TM_dialogue;
+    public TextMeshProUGUI[] TM_dialogueChoices;
     public Canvas C_canvas;
+    public Volume V_dialogueVolume;
 
+    public Image I_Speaker_L;
+    public Image I_Speaker_R;
+    public Animator A_speaker_L;
+    public Animator A_speaker_R;
+
+
+    [Header("Banter References")]
+    public CanvasGroup CG_banterHolder;
     public TextMeshProUGUI TM_messages;
 
     public RectTransform RT_messageHolder;
@@ -34,11 +47,11 @@ public class Conversation : MonoBehaviour
         public float F_lifetime;
         public string GetString()
         {
-            string _temp = "<color=#" + ColorUtility.ToHtmlStringRGBA(C_speakerColor) + ">";
+            string _temp = "<color=#" + UnityEngine.ColorUtility.ToHtmlStringRGBA(C_speakerColor) + ">";
             _temp += S_speakerString;
             _temp += "</color>" + "<br>";
 
-            _temp += "<color=#" + ColorUtility.ToHtmlStringRGBA(C_curColor) +">";
+            _temp += "<color=#" + UnityEngine.ColorUtility.ToHtmlStringRGBA(C_curColor) +">";
             _temp += S_curString;
             _temp += "</color>" + "<br>";
             return _temp;
@@ -71,7 +84,7 @@ public class Conversation : MonoBehaviour
         TM_messages.text = _temp;
     }
 
-    public void StartMessage(string _dialogueID, Transform _hook)
+    public void StartMessage(ConversationID _dialogueID, Transform _hook)
     {
         ConversationManager.conversationClass _convo;
         foreach (var item in M_activeMessages)
@@ -79,7 +92,7 @@ public class Conversation : MonoBehaviour
             if (item.T_Hook == _hook)
                 return;
         }
-        if (C_Manager.GetConversationByID(_dialogueID, out _convo))
+        if (C_Manager.GetConversation(_dialogueID, out _convo))
         {
             MessageClass _temp = new MessageClass();
             int _num = Random.Range(0, _convo.strings.Count);
@@ -94,12 +107,16 @@ public class Conversation : MonoBehaviour
         }
     }
 
-    public void StartDialogue(string _dialogueID)
+    public void StartDialogue(ConversationID _dialogueID)
     {
         ConversationManager.conversationClass _convo;
-        if (C_Manager.GetConversationByID(_dialogueID, out _convo))
+        if (C_Manager.GetConversation(_dialogueID, out _convo))
         {
-            G_dialogueHolder.SetActive(true);
+            StartCoroutine(Fade(CG_dialogueHolder, true));
+            StartCoroutine(Fade(V_dialogueVolume, true));
+            StartCoroutine(Fade(CG_banterHolder, false));
+            A_speaker_L.PlayClip("Transition_Inactive");
+            A_speaker_R.PlayClip("Transition_New");
             PlayerController.GameState = PlayerController.gameStateEnum.dialogue;
             curCoversation = _convo;
             i_convoStep = 0;
@@ -117,11 +134,14 @@ public class Conversation : MonoBehaviour
                 if (i_convoStep < curCoversation.strings.Count - 1)
                 {
                     i_convoStep++;
+                    A_speaker_R.PlayClip("Transition_New");
                     TypeMessage();
                 }
                 else
                 {
-                    G_dialogueHolder.SetActive(false);
+                    StartCoroutine(Fade(CG_dialogueHolder, false));
+                    StartCoroutine(Fade(V_dialogueVolume, false));
+                    StartCoroutine(Fade(CG_banterHolder, true));
                     PlayerController.GameState = PlayerController.gameStateEnum.active;
                 }
             }
@@ -203,6 +223,7 @@ public class Conversation : MonoBehaviour
             FollowObject(_holder, _target);
             yield return new WaitForEndOfFrame();
         }
+        _message.S_curString = _text;
         _timer = 0;
         while (_timer < 1)
         {
@@ -246,5 +267,42 @@ public class Conversation : MonoBehaviour
         _holder.anchoredPosition = _tarPos;
     }
 
-    
+    IEnumerator Fade(CanvasGroup _canvas, bool _fadeIn = true, float _speed = 0.1f)
+    {
+        if (_fadeIn || _canvas.gameObject.activeSelf)
+        {
+            _canvas.gameObject.SetActive(true);
+            float _timer = 0f;
+            float _start = _fadeIn ? 0f : 1f;
+            float _end = _fadeIn ? 1f : 0f;
+            while (_timer < 1f)
+            {
+                _canvas.alpha = Mathf.Lerp(_start, _end, _timer);
+                yield return new WaitForEndOfFrame();
+                _timer += Time.deltaTime / _speed;
+            }
+            _canvas.alpha = _end;
+            if (!_fadeIn)
+                _canvas.gameObject.SetActive(false);
+        }
+    }
+    IEnumerator Fade(Volume _volume, bool _fadeIn = true, float _speed = 0.1f)
+    {
+        if (_fadeIn || _volume.gameObject.activeSelf)
+        {
+            _volume.gameObject.SetActive(true);
+            float _timer = 0f;
+            float _start = _fadeIn ? 0f : 1f;
+            float _end = _fadeIn ? 1f : 0f;
+            while (_timer < 1f)
+            {
+                _volume.weight = Mathf.Lerp(_start, _end, _timer);
+                yield return new WaitForEndOfFrame();
+                _timer += Time.deltaTime / _speed;
+            }
+            _volume.weight = _end;
+            if (!_fadeIn)
+                _volume.gameObject.SetActive(false);
+        }
+    }
 }
