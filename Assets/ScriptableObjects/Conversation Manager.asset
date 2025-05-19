@@ -12,88 +12,161 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f68d4cd0fe1d6df46ab7e0b3d4d8eaf9, type: 3}
   m_Name: Conversation Manager
   m_EditorClassIdentifier: 
-  list:
-  - id: CNV/DEBUG/001
+  dialogueList:
+  - id: Dialogue/Tavern/Hello/001
     strings:
-    - speaker: 
-      english: Well Howdy Stranger
-      spanish: Peace weirdo
-      japanese: Hola and heya
+    - speaker: 2
+      english: Welcome Back Stranger! How can Gregori help you today?
+      spanish: 
+      japanese: 
       speed: 0.04
-    - speaker: 
-      english: Surprise This is English, real slow English
-      spanish: Surprise This is Spanish, real slow Spanish
-      japanese: Surprise This is Japanese, real slow Japanese
-      speed: 0.1
-    singleUse: 0
-    used: 0
-  - id: MSG/Break/001
+      emotion: 0
+      leftSide: 0
+      other: 4
+    response:
+    - english: More Objectives please mate
+      spanish: More Objectives please mate
+      japanese: More Objectives please mate
+      type: 1
+      _followUp: 1
+      eventID: 
+    - english: Welp See ya then!
+      spanish: Welp See ya then!
+      japanese: Welp See ya then!
+      type: 0
+      _followUp: 0
+      eventID: 
+  - id: Dialogue/Tavern/GetObjectives/001
     strings:
-    - speaker: Chowder
-      english: Hey we're trying to be quiet here!
+    - speaker: 2
+      english: Happy hunting Stranger!
       spanish: 
       japanese: 
       speed: 0.04
-    - speaker: Chowder
-      english: Brilliant, make everyone hate us
-      spanish: 
-      japanese: 
-      speed: 0.04
-    singleUse: 0
-    used: 0
-  - id: MSG/Betray/001
+      emotion: 1
+      leftSide: 0
+      other: 4
+    response: []
+  - id: Dialogue/DEBUG/001
     strings:
-    - speaker: Chowder
-      english: Oh you are so dead
-      spanish: 
-      japanese: 
+    - speaker: 0
+      english: This is Mickey speaking
+      spanish: This is Mickey with an A speaking
+      japanese: This is Mickey with a B speaking
       speed: 0.04
-    - speaker: Chowder
-      english: Et tu Brutus
-      spanish: 
-      japanese: 
-      speed: 0.04
-    - speaker: Chowder
-      english: Bullets are meant for the enemy you ass
-      spanish: 
-      japanese: 
-      speed: 0.04
-    singleUse: 0
-    used: 0
-  - id: MSG/Found/001
+      emotion: 0
+      leftSide: 0
+      other: 0
+    - speaker: 0
+      english: Really slowly
+      spanish: So slowly
+      japanese: Painfully slow
+      speed: 0.4
+      emotion: 0
+      leftSide: 0
+      other: 0
+    response: []
+  - id: Dialogue/DEBUG/001
     strings:
-    - speaker: Mance
-      english: Found the Intruder!
-      spanish: 
-      japanese: 
+    - speaker: 0
+      english: This is Mickey speaking
+      spanish: This is Mickey with an A speaking
+      japanese: This is Mickey with a B speaking
       speed: 0.04
-    - speaker: Mance
-      english: I've got someone here!
-      spanish: 
-      japanese: 
-      speed: 0.04
-    singleUse: 0
-    used: 0
-  - id: MSG/Attacked/001
+      emotion: 0
+      leftSide: 0
+      other: 0
+    - speaker: 0
+      english: Really slowly
+      spanish: So slowly
+      japanese: Painfully slow
+      speed: 0.4
+      emotion: 0
+      leftSide: 0
+      other: 0
+    response: []
+  banterList:
+  - id: Banter/Found/001
     strings:
-    - speaker: Mance
-      english: Under attack!
+    - speaker: 3
+      english: They're over there!
       spanish: 
       japanese: 
       speed: 0.04
-    - speaker: Mance
-      english: Send Help!
+    - speaker: 3
+      english: Intruder Spotted!
       spanish: 
       japanese: 
       speed: 0.04
-    singleUse: 0
-    used: 0
-  - id: CNV/Tavern/Hello
+  - id: Banter/Attacked/001
     strings:
-    - speaker: Greggori
-      english: Welcome back Stranger! What can Greggori do for you?
+    - speaker: 3
+      english: Under fire!
       spanish: 
       japanese: 
       speed: 0.04
-    singleUse: 0
-    used: 0
+    - speaker: 3
+      english: I need backup!
+      spanish: 
+      japanese: 
+      speed: 0.04
+  - id: Banter/Break/001
+    strings:
+    - speaker: 1
+      english: Fuck I thought we were going in quietly!
+      spanish: 
+      japanese: 
+      speed: 0.04
+    - speaker: 1
+      english: Well there goes the element of surprise
+      spanish: 
+      japanese: 
+      speed: 0.04
+  - id: Banter/Betray/001
+    strings:
+    - speaker: 1
+      english: Shoot at the enemies you ass!
+      spanish: 
+      japanese: 
+      speed: 0.04
+    - speaker: 1
+      english: Hey! Friendly fire dickwad!
+      spanish: 
+      japanese: 
+      speed: 0.04
+  characterList:
+  - id: DEBUG/Placeholder
+    name: ???
+    emotion:
+      neutral: {fileID: 0}
+      happy: {fileID: 0}
+      angry: {fileID: 0}
+      sad: {fileID: 0}
+  - id: Companion/Mance
+    name: Mance
+    emotion:
+      neutral: {fileID: 0}
+      happy: {fileID: 0}
+      angry: {fileID: 0}
+      sad: {fileID: 0}
+  - id: NPC/Gregori
+    name: Gregori
+    emotion:
+      neutral: {fileID: 0}
+      happy: {fileID: 0}
+      angry: {fileID: 0}
+      sad: {fileID: 0}
+  - id: Faction/Lido/Common
+    name: Henchman
+    emotion:
+      neutral: {fileID: 0}
+      happy: {fileID: 0}
+      angry: {fileID: 0}
+      sad: {fileID: 0}
+  - id: Player
+    name: Player
+    emotion:
+      neutral: {fileID: 0}
+      happy: {fileID: 0}
+      angry: {fileID: 0}
+      sad: {fileID: 0}

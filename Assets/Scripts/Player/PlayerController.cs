@@ -248,6 +248,10 @@ public class PlayerController : BaseController
                 Update_Dialogue();
                 AnimationEnd();
                 break;
+            case gameStateEnum.dialogueResponse:
+                Update_DialogueResponse();
+                AnimationEnd();
+                break;
             case gameStateEnum.vehicle:
                 Update_Vehicle();
                 break;
@@ -301,6 +305,10 @@ public class PlayerController : BaseController
     void Update_Dialogue()
     {
         DialogueInput();
+    }
+    void Update_DialogueResponse()
+    {
+        DialogueResponseInput();
     }
 
     void Update_Vehicle()
@@ -784,6 +792,13 @@ public class PlayerController : BaseController
         if (Inputs.b_confirm)
         {
             Conversation.Instance.NextLine();
+        }
+    }
+    void DialogueResponseInput()
+    {
+        if (Inputs.b_confirm)
+        {
+            Conversation.Instance.EndConversation();
         }
     }
 

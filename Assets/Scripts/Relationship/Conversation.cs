@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine.UI;
 using Unity.VisualScripting;
 using UnityEngine.Rendering;
+using Unity.VisualScripting.FullSerializer;
 
 public class Conversation : MonoBehaviour
 {
@@ -59,7 +60,7 @@ public class Conversation : MonoBehaviour
     }
 
 
-    private ConversationManager.conversationClass curCoversation;
+    private ConversationManager.dialogueClass curConversation;
     private int i_convoStep = 0;
 
     private Coroutine C_typing;
@@ -86,7 +87,7 @@ public class Conversation : MonoBehaviour
 
     public void StartMessage(ConversationID _dialogueID, Transform _hook)
     {
-        ConversationManager.conversationClass _convo;
+        ConversationManager.banterClass _convo;
         foreach (var item in M_activeMessages)
         {
             if (item.T_Hook == _hook)
@@ -99,7 +100,7 @@ public class Conversation : MonoBehaviour
             _temp.S_Message = _convo.strings[_num];
             _temp.T_Hook = _hook;
             _temp.C_curColor = new Color(1, 1, 1, 0.8f);
-            _temp.S_speakerString = _convo.strings[_num].speaker;
+            _temp.S_speakerString = _convo.strings[_num].GetName();
             _temp.C_speakerColor = new Color(0.75f, 0.75f, 1f, 0.8f);
             _temp.F_lifetime = 3f;
             M_activeMessages.Add(_temp);
@@ -109,16 +110,17 @@ public class Conversation : MonoBehaviour
 
     public void StartDialogue(ConversationID _dialogueID)
     {
-        ConversationManager.conversationClass _convo;
+        ConversationManager.dialogueClass _convo;
         if (C_Manager.GetConversation(_dialogueID, out _convo))
         {
+            HideDialogueChoices();
             StartCoroutine(Fade(CG_dialogueHolder, true));
             StartCoroutine(Fade(V_dialogueVolume, true));
             StartCoroutine(Fade(CG_banterHolder, false));
             A_speaker_L.PlayClip("Transition_Inactive");
             A_speaker_R.PlayClip("Transition_New");
             PlayerController.GameState = PlayerController.gameStateEnum.dialogue;
-            curCoversation = _convo;
+            curConversation = _convo;
             i_convoStep = 0;
             TypeMessage();
         }
@@ -129,9 +131,9 @@ public class Conversation : MonoBehaviour
             b_typing = false;
         else
         {
-            if (curCoversation != null)
+            if (curConversation != null)
             {
-                if (i_convoStep < curCoversation.strings.Count - 1)
+                if (i_convoStep < curConversation.strings.Count - 1)
                 {
                     i_convoStep++;
                     A_speaker_R.PlayClip("Transition_New");
@@ -139,15 +141,46 @@ public class Conversation : MonoBehaviour
                 }
                 else
                 {
-                    StartCoroutine(Fade(CG_dialogueHolder, false));
-                    StartCoroutine(Fade(V_dialogueVolume, false));
-                    StartCoroutine(Fade(CG_banterHolder, true));
-                    PlayerController.GameState = PlayerController.gameStateEnum.active;
+                    if (curConversation.response.Count > 0)
+                    {
+                        Vector2 _pos = RT_speakerMover.anchoredPosition;
+                        _pos.y = 250;
+                        RT_speakerMover.anchoredPosition = _pos;
+                        for (int i = 0; i < TM_dialogueChoices.Length; i++)
+                        {
+                            if (i >= curConversation.response.Count)
+                                TM_dialogueChoices[i].gameObject.SetActive(false);
+                            else
+                            {
+                                TM_dialogueChoices[i].gameObject.SetActive(true);
+                                TM_dialogueChoices[i].text = curConversation.response[i].GetString();
+                            }
+                            PlayerController.GameState = PlayerController.gameStateEnum.dialogueResponse;
+                        }
+                    }
+                    else
+                        EndConversation();
                 }
             }
         }
     }
 
+    void HideDialogueChoices()
+    {
+        for (int i = 0; i < TM_dialogueChoices.Length; i++)
+            TM_dialogueChoices[i].gameObject.SetActive(false);
+        Vector2 _pos = RT_speakerMover.anchoredPosition;
+        _pos.y = 0;
+        RT_speakerMover.anchoredPosition = _pos;
+    }
+
+    public void EndConversation()
+    {
+        StartCoroutine(Fade(CG_dialogueHolder, false));
+        StartCoroutine(Fade(V_dialogueVolume, false));
+        StartCoroutine(Fade(CG_banterHolder, true));
+        PlayerController.GameState = PlayerController.gameStateEnum.active;
+    }
     void TypeMessage()
     {
         if (C_typing != null)
@@ -158,8 +191,8 @@ public class Conversation : MonoBehaviour
     IEnumerator TypeMessage_Coroutine()
     {
         float _timer = 0;
-        float _delay = curCoversation.strings[i_convoStep].speed;
-        string _string = curCoversation.strings[i_convoStep].GetString();
+        float _delay = curConversation.strings[i_convoStep].speed;
+        string _string = curConversation.strings[i_convoStep].GetString();
         int _stringLength = 0;
         b_typing = true;
         while (b_typing)
