@@ -33,7 +33,6 @@ public class ConversationManager : ScriptableObject
     public class stringClass
     {
         public CharacterID speaker;
-        private characterClass character = null;
         [Space(10)]
 
         public string english = "";
@@ -49,9 +48,7 @@ public class ConversationManager : ScriptableObject
 
         public characterClass GetSpeaker()
         {
-            if (character == null)
-                character = Instance.GetCharacter(speaker);
-            return character;
+            return Instance.GetCharacter(speaker);
         }
 
         public string GetString()
@@ -71,7 +68,21 @@ public class ConversationManager : ScriptableObject
         [Space(10)]
         public emotionEnum emotion;
         public bool leftSide = false;
+        [Space(10)]
         public CharacterID other = CharacterID.Player;
+        public emotionEnum otherEmotion;
+        public Sprite GetFace(bool _speaker)
+        {
+            characterClass _char;
+            emotionEnum _emotion;
+            if (_speaker)   { _char = Instance.GetCharacter(speaker); _emotion = emotion; }
+            else            { _char = Instance.GetCharacter(other); _emotion = otherEmotion; }
+            return _char.emotion.Get(_emotion);
+        }
+        public characterClass GetListener()
+        {
+            return Instance.GetCharacter(other);
+        }
     }
     public enum responseEnum { nothing, followUp, unityEvent}
     [System.Serializable]

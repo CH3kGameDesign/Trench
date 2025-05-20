@@ -794,12 +794,19 @@ public class PlayerController : BaseController
             Conversation.Instance.NextLine();
         }
     }
+
     void DialogueResponseInput()
     {
         if (Inputs.b_confirm)
         {
-            Conversation.Instance.EndConversation();
+            Conversation.Instance.ConfirmDialogueChoice();
+            gun_Equipped.f_fireTimer = 0.4f;
         }
+
+        if (Inputs.v2_inputDir.y > 0.1f)
+            Conversation.Instance.MoveDialogueChoice(-1);
+        if (Inputs.v2_inputDir.y < -0.1f)
+            Conversation.Instance.MoveDialogueChoice(1);
     }
 
     public override void OnHit(GunManager.bulletClass _bullet)

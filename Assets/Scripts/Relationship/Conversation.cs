@@ -1,11 +1,14 @@
+using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
-using UnityEngine.UI;
 using Unity.VisualScripting;
-using UnityEngine.Rendering;
 using Unity.VisualScripting.FullSerializer;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 public class Conversation : MonoBehaviour
 {
@@ -19,6 +22,7 @@ public class Conversation : MonoBehaviour
     public TextMeshProUGUI TM_speaker;
     public TextMeshProUGUI TM_dialogue;
     public TextMeshProUGUI[] TM_dialogueChoices;
+    public Animator[] A_dialogueBouncers;
     public Canvas C_canvas;
     public Volume V_dialogueVolume;
 
@@ -26,7 +30,12 @@ public class Conversation : MonoBehaviour
     public Image I_Speaker_R;
     public Animator A_speaker_L;
     public Animator A_speaker_R;
+    [Space(10)]
+    public Animator A_bouncer;
 
+    private int i_dialogueChoice = 0;
+    public float F_choiceMoveSpeed = 0.2f;
+    private float f_choiceMoveTimer = 0;
 
     [Header("Banter References")]
     public CanvasGroup CG_banterHolder;
@@ -58,7 +67,31 @@ public class Conversation : MonoBehaviour
             return _temp;
         }
     }
+    [Header("Audio References")]
+    public AudioSource AS_audioSource;
+    public AudioSource AS_audioBabbleSource;
+    public _audioClips audioClips = new _audioClips();
 
+    [System.Serializable]
+    public class _audioClips
+    {
+        public AudioClip showDialogue;
+        public AudioClip skipDialogue;
+        public AudioClip nextDialogue;
+        [Space(10)]
+        public AudioClip nextChoice;
+        public AudioClip confirmChoice;
+        [Space(10)]
+        public AudioClip[] babble;
+    }
+    public enum audioEnum { 
+        showDialogue, 
+        skipDialogue, 
+        nextDialogue, 
+        nextChoice, 
+        confirmChoice,
+        babble
+    };
 
     private ConversationManager.dialogueClass curConversation;
     private int i_convoStep = 0;
@@ -75,6 +108,14 @@ public class Conversation : MonoBehaviour
     private void Update()
     {
         UpdateMessageText();
+
+        ChoiceMoveTimer();
+    }
+
+    void ChoiceMoveTimer()
+    {
+        if (f_choiceMoveTimer >= 0)
+            f_choiceMoveTimer -= Time.deltaTime;
     }
 
     void UpdateMessageText()
@@ -96,7 +137,7 @@ public class Conversation : MonoBehaviour
         if (C_Manager.GetConversation(_dialogueID, out _convo))
         {
             MessageClass _temp = new MessageClass();
-            int _num = Random.Range(0, _convo.strings.Count);
+            int _num = UnityEngine.Random.Range(0, _convo.strings.Count);
             _temp.S_Message = _convo.strings[_num];
             _temp.T_Hook = _hook;
             _temp.C_curColor = new Color(1, 1, 1, 0.8f);
@@ -113,13 +154,20 @@ public class Conversation : MonoBehaviour
         ConversationManager.dialogueClass _convo;
         if (C_Manager.GetConversation(_dialogueID, out _convo))
         {
-            HideDialogueChoices();
-            StartCoroutine(Fade(CG_dialogueHolder, true));
-            StartCoroutine(Fade(V_dialogueVolume, true));
-            StartCoroutine(Fade(CG_banterHolder, false));
+            if (PlayerController.GameState != PlayerController.gameStateEnum.dialogue &&
+                PlayerController.GameState != PlayerController.gameStateEnum.dialogueResponse)
+            {
+                PlayAudio(audioEnum.showDialogue);
+                StartCoroutine(Fade(CG_dialogueHolder, true));
+                StartCoroutine(Fade(V_dialogueVolume, true));
+                StartCoroutine(Fade(CG_banterHolder, false));
+                HideDialogueChoices(true);
+            }
+            else
+                HideDialogueChoices(false);
+            PlayerController.GameState = PlayerController.gameStateEnum.dialogue;
             A_speaker_L.PlayClip("Transition_Inactive");
             A_speaker_R.PlayClip("Transition_New");
-            PlayerController.GameState = PlayerController.gameStateEnum.dialogue;
             curConversation = _convo;
             i_convoStep = 0;
             TypeMessage();
@@ -128,9 +176,13 @@ public class Conversation : MonoBehaviour
     public void NextLine()
     {
         if (C_typing != null)
+        {
+            PlayAudio(audioEnum.skipDialogue);
             b_typing = false;
+        }
         else
         {
+            PlayAudio(audioEnum.nextDialogue);
             if (curConversation != null)
             {
                 if (i_convoStep < curConversation.strings.Count - 1)
@@ -142,22 +194,7 @@ public class Conversation : MonoBehaviour
                 else
                 {
                     if (curConversation.response.Count > 0)
-                    {
-                        Vector2 _pos = RT_speakerMover.anchoredPosition;
-                        _pos.y = 250;
-                        RT_speakerMover.anchoredPosition = _pos;
-                        for (int i = 0; i < TM_dialogueChoices.Length; i++)
-                        {
-                            if (i >= curConversation.response.Count)
-                                TM_dialogueChoices[i].gameObject.SetActive(false);
-                            else
-                            {
-                                TM_dialogueChoices[i].gameObject.SetActive(true);
-                                TM_dialogueChoices[i].text = curConversation.response[i].GetString();
-                            }
-                            PlayerController.GameState = PlayerController.gameStateEnum.dialogueResponse;
-                        }
-                    }
+                        ShowDialogueChoices();
                     else
                         EndConversation();
                 }
@@ -165,16 +202,90 @@ public class Conversation : MonoBehaviour
         }
     }
 
-    void HideDialogueChoices()
+    void ShowDialogueChoices()
+    {
+        PlayerController.GameState = PlayerController.gameStateEnum.dialogueResponse;
+        A_speaker_L.PlayClip("Transition_New");
+        A_speaker_R.PlayClip("Transition_Inactive");
+        A_bouncer.Play("Idle_Hidden");
+        RT_speakerMover.DOAnchorPosY(250, 0.4f);
+
+        i_dialogueChoice = 0;
+        for (int i = 0; i < TM_dialogueChoices.Length; i++)
+        {
+            if (i >= curConversation.response.Count)
+                TM_dialogueChoices[i].gameObject.SetActive(false);
+            else
+            {
+                TM_dialogueChoices[i].gameObject.SetActive(true);
+                StartCoroutine(TypeMessage_Coroutine(TM_dialogueChoices[i], curConversation.response[i].GetString()));
+            }
+
+            A_dialogueBouncers[i].gameObject.SetActive(i == i_dialogueChoice);
+        }
+        UpdateDialogueChoices();
+    }
+
+    void HideDialogueChoices(bool _instant = false)
     {
         for (int i = 0; i < TM_dialogueChoices.Length; i++)
             TM_dialogueChoices[i].gameObject.SetActive(false);
-        Vector2 _pos = RT_speakerMover.anchoredPosition;
-        _pos.y = 0;
-        RT_speakerMover.anchoredPosition = _pos;
+        if (_instant)
+            RT_speakerMover.DOAnchorPosY(0, 0f);
+        else
+            RT_speakerMover.DOAnchorPosY(0, 0.4f);
     }
 
-    public void EndConversation()
+    public void MoveDialogueChoice(int _dir)
+    {
+        if (f_choiceMoveTimer < 0)
+        {
+            f_choiceMoveTimer = F_choiceMoveSpeed;
+            PlayAudio(audioEnum.nextChoice);
+
+            i_dialogueChoice += _dir;
+            i_dialogueChoice = Mathf.Clamp(i_dialogueChoice, 0, curConversation.response.Count - 1);
+            UpdateDialogueChoices();
+        }
+    }
+
+    void UpdateDialogueChoices()
+    {
+        int _min = Mathf.Min(TM_dialogueChoices.Length, curConversation.response.Count);
+        Vector2 sizeMin = TM_dialogueChoices[0].rectTransform.sizeDelta;
+            sizeMin.y = 40;
+        Vector2 sizeMax = sizeMin;
+            sizeMax.y = 60;
+        for (int i = 0; i < _min; i++)
+        {
+            if (i == i_dialogueChoice)
+                TM_dialogueChoices[i].rectTransform.DOSizeDelta(sizeMax,0.2f);
+            else
+                TM_dialogueChoices[i].rectTransform.DOSizeDelta(sizeMin, 0.2f);
+
+            A_dialogueBouncers[i].gameObject.SetActive(i == i_dialogueChoice);
+        }
+    }
+    public void ConfirmDialogueChoice()
+    {
+        PlayAudio(audioEnum.confirmChoice);
+        ConversationManager.responseClass _resp = curConversation.response[i_dialogueChoice];
+        switch (_resp.type)
+        {
+            case ConversationManager.responseEnum.nothing:
+                EndConversation();
+                break;
+            case ConversationManager.responseEnum.followUp:
+                StartDialogue(_resp._followUp);
+                break;
+            case ConversationManager.responseEnum.unityEvent:
+                EndConversation();
+                break;
+            default:
+                break;
+        }
+    }
+    void EndConversation()
     {
         StartCoroutine(Fade(CG_dialogueHolder, false));
         StartCoroutine(Fade(V_dialogueVolume, false));
@@ -185,37 +296,48 @@ public class Conversation : MonoBehaviour
     {
         if (C_typing != null)
             StopCoroutine(C_typing);
-        C_typing = StartCoroutine(TypeMessage_Coroutine());
+        ConversationManager.dStringClass _string = curConversation.strings[i_convoStep];
+
+        Image _speaker;
+        Image _listener;
+        if (_string.leftSide)   { _speaker = I_Speaker_L; _listener = I_Speaker_R; }
+        else                    { _speaker = I_Speaker_R; _listener = I_Speaker_L; }
+        _speaker.sprite = _string.GetFace(true);
+        _listener.sprite = _string.GetFace(false);
+        C_typing = StartCoroutine(TypeMessage_Coroutine(TM_dialogue, _string.GetString(), _string.speed, true));
     }
 
-    IEnumerator TypeMessage_Coroutine()
+    IEnumerator TypeMessage_Coroutine(TextMeshProUGUI _TM, string _string, float _delay = 0.02f, bool mainMessage = false)
     {
         float _timer = 0;
-        float _delay = curConversation.strings[i_convoStep].speed;
-        string _string = curConversation.strings[i_convoStep].GetString();
         int _stringLength = 0;
-        b_typing = true;
-        while (b_typing)
+        if (mainMessage)
+        {
+            b_typing = true;
+            A_bouncer.Play("Transition_Skipper");
+        }
+        while (_stringLength < _string.Length)
         {
             if (_timer <= 0)
             {
+                PlayAudio(audioEnum.babble);
                 _stringLength++;
-                if (_stringLength < _string.Length)
-                {
-                    TM_dialogue.text = _string.Substring(0, _stringLength);
-                }
-                else
-                {
-                    b_typing = false;
-                    break;
-                }
+                    _TM.text = _string.Substring(0, _stringLength);
                 _timer = _delay;
             }
-            _timer -= Time.deltaTime;
             yield return new WaitForEndOfFrame();
+            _timer -= Time.deltaTime;
+
+            if (mainMessage && !b_typing)
+                break;
         }
-        TM_dialogue.text = _string;
-        C_typing = null;
+        _TM.text = _string;
+        if (mainMessage)
+        {
+            b_typing = false;
+            C_typing = null;
+            A_bouncer.Play("Transition_Bouncer");
+        }
     }
     IEnumerator TypeMessage_Coroutine(MessageClass _message)
     {
@@ -299,7 +421,37 @@ public class Conversation : MonoBehaviour
         _tarPos.y = Mathf.Clamp(_tarPos.y, _yBounds.x, _yBounds.y);
         _holder.anchoredPosition = _tarPos;
     }
-
+    
+    void PlayAudio(audioEnum _enum)
+    {
+        AudioSource _audioSource = AS_audioSource;
+        switch (_enum)
+        {
+            case audioEnum.showDialogue:
+                _audioSource.clip = audioClips.showDialogue;
+                break;
+            case audioEnum.skipDialogue:
+                _audioSource.clip = audioClips.skipDialogue;
+                break;
+            case audioEnum.nextDialogue:
+                _audioSource.clip = audioClips.nextDialogue;
+                break;
+            case audioEnum.nextChoice:
+                _audioSource.clip = audioClips.nextChoice;
+                break;
+            case audioEnum.confirmChoice:
+                _audioSource.clip = audioClips.confirmChoice;
+                break;
+            case audioEnum.babble:
+                _audioSource = AS_audioBabbleSource;
+                _audioSource.clip = audioClips.babble.GetRandom();
+                break;
+            default:
+                break;
+        }
+        _audioSource.pitch = UnityEngine.Random.Range(0.95f, 1.05f);
+        _audioSource.Play();
+    }
     IEnumerator Fade(CanvasGroup _canvas, bool _fadeIn = true, float _speed = 0.1f)
     {
         if (_fadeIn || _canvas.gameObject.activeSelf)
