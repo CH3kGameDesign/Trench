@@ -196,7 +196,9 @@ public class Conversation : MonoBehaviour
                     if (curConversation.response.Count > 0)
                         ShowDialogueChoices();
                     else
-                        EndConversation();
+                    {
+                        ApplyFollowUp(curConversation.followUp);
+                    }
                 }
             }
         }
@@ -269,22 +271,40 @@ public class Conversation : MonoBehaviour
     public void ConfirmDialogueChoice()
     {
         PlayAudio(audioEnum.confirmChoice);
-        ConversationManager.responseClass _resp = curConversation.response[i_dialogueChoice];
+        ApplyFollowUp(curConversation.response[i_dialogueChoice].followUp);
+    }
+    public void ApplyFollowUp(ConversationManager.followUpClass _resp)
+    {
         switch (_resp.type)
         {
             case ConversationManager.responseEnum.nothing:
                 EndConversation();
                 break;
-            case ConversationManager.responseEnum.followUp:
-                StartDialogue(_resp._followUp);
+            case ConversationManager.responseEnum.dialogue:
+                StartDialogue(_resp._convo);
                 break;
             case ConversationManager.responseEnum.unityEvent:
-                EndConversation();
+                ApplyUnityEvent(_resp._event);
                 break;
             default:
                 break;
         }
     }
+
+    public void ApplyUnityEvent(string _event)
+    {
+        switch (_event)
+        {
+            case "NewObjectives":
+                Objective.Instance.NewObjectives();
+                EndConversation();
+                break;
+            default:
+                EndConversation();
+                break;
+        }
+    }
+
     void EndConversation()
     {
         StartCoroutine(Fade(CG_dialogueHolder, false));

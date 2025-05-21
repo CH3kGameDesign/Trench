@@ -15,11 +15,11 @@ public class Ship : Vehicle
     [Space(20)]
     //[Header("CAR SETUP")]
     [Space(10)]
-    [Range(20, 190)]
+    [Range(100, 1000)]
     public int maxSpeed = 90; //The maximum speed that the car can reach in km/h.
-    [Range(10, 120)]
+    [Range(100, 1000)]
     public int maxReverseSpeed = 45; //The maximum speed that the car can reach while going on reverse in km/h.
-    [Range(1, 10)]
+    [Range(1, 100)]
     public int accelerationMultiplier = 2; // How fast the car can accelerate. 1 is a slow acceleration and 10 is the fastest.
     [Space(10)]
     [Range(10, 45)]
@@ -123,6 +123,8 @@ public class Ship : Vehicle
     float RLWextremumSlip;
     WheelFrictionCurve RRwheelFriction;
     float RRWextremumSlip;
+
+    [HideInInspector] public List<Space_LandingSpot> landingSpots = new List<Space_LandingSpot>();
 
     // Start is called before the first frame update
     void Start()
@@ -243,6 +245,19 @@ public class Ship : Vehicle
             Update_Rotation(_temp);
         }
     }
+    public override void OnEnter(BaseController _player)
+    {
+        if (useSounds && hasDriver())
+            carEngineSound.Play();
+        base.OnEnter(_player);
+    }
+    public override void OnExit(int _num)
+    {
+        if (useSounds && !hasDriver())
+            carEngineSound.Stop();
+        base.OnExit(_num);
+    }
+
     // Update is called once per frame
     public override void Update()
     {
@@ -314,7 +329,7 @@ public class Ship : Vehicle
             {
                 if (carEngineSound != null)
                 {
-                    float engineSoundPitch = initialCarEngineSoundPitch + (Mathf.Abs(carRigidbody.linearVelocity.magnitude) / 25f);
+                    float engineSoundPitch = initialCarEngineSoundPitch + (Mathf.Abs(carRigidbody.linearVelocity.magnitude) / maxSpeed);
                     carEngineSound.pitch = engineSoundPitch;
                 }
                 if ((isDrifting) || (isTractionLocked && Mathf.Abs(carSpeed) > 12f))
@@ -356,7 +371,7 @@ public class Ship : Vehicle
     {
         //If the forces aplied to the rigidbody in the 'x' asis are greater than
         //3f, it means that the car is losing traction, then the car will start emitting particle systems.
-        if (Mathf.Abs(localVelocityX) > 2.5f)
+        if (Mathf.Abs(localVelocityX) > 50f)
         {
             isDrifting = true;
             DriftCarPS();
@@ -375,12 +390,12 @@ public class Ship : Vehicle
         //If the car is going backwards, then apply brakes in order to avoid strange
         //behaviours. If the local velocity in the 'z' axis is less than -1f, then it
         //is safe to apply positive torque to go forward.
-        if (localVelocityZ < -1f)
-        {
-            Brakes();
-        }
-        else
-        {
+        //if (localVelocityZ < -1f)
+        //{
+        //    Brakes();
+        //}
+        //else
+        //{
             if (Mathf.RoundToInt(carSpeed) < maxSpeed)
             {
                 //Apply positive torque in all wheels to go forward if maxSpeed has not been reached.
@@ -393,7 +408,7 @@ public class Ship : Vehicle
                 // could be a bit higher than expected.
 
             }
-        }
+        //}
     }
 
     // This method apply negative torque to the wheels in order to go backwards.
@@ -420,12 +435,12 @@ public class Ship : Vehicle
         //If the car is still going forward, then apply brakes in order to avoid strange
         //behaviours. If the local velocity in the 'z' axis is greater than 1f, then it
         //is safe to apply negative torque to go reverse.
-        if (localVelocityZ > 1f)
-        {
-            Brakes();
-        }
-        else
-        {
+        //if (localVelocityZ > 1f)
+       // {
+       //     Brakes();
+        //}
+        //else
+        //{
             if (Mathf.Abs(Mathf.RoundToInt(carSpeed)) < maxReverseSpeed)
             {
                 //Apply negative torque in all wheels to go in reverse if maxReverseSpeed has not been reached.
@@ -438,7 +453,7 @@ public class Ship : Vehicle
                 // could be a bit higher than expected.
 
             }
-        }
+        //}
     }
 
     private Vector3 _rotate = Vector3.zero;
@@ -630,8 +645,6 @@ public class Ship : Vehicle
         // car's grip.
         if (FLwheelFriction.extremumSlip > FLWextremumSlip)
         {
-
-
             Invoke("RecoverTraction", Time.deltaTime);
 
         }
@@ -643,4 +656,8 @@ public class Ship : Vehicle
         }
     }
 
+    public void UpdateInteractText()
+    {
+
+    }
 }

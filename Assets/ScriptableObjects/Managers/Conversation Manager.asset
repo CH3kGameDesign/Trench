@@ -28,21 +28,28 @@ MonoBehaviour:
     - english: More Objectives please mate
       spanish: More Objectives please mate
       japanese: More Objectives please mate
-      type: 1
-      _followUp: 1
-      eventID: 
+      followUp:
+        type: 1
+        _convo: 1
+        _event: 
     - english: Welp See ya then!
       spanish: Welp See ya then!
       japanese: Welp See ya then!
-      type: 0
-      _followUp: 0
-      eventID: 
+      followUp:
+        type: 0
+        _convo: 0
+        _event: 
     - english: Byea
       spanish: Byeb
       japanese: Byec
+      followUp:
+        type: 0
+        _convo: 0
+        _event: 
+    followUp:
       type: 0
-      _followUp: 0
-      eventID: 
+      _convo: 0
+      _event: 
   - id: Dialogue/Tavern/GetObjectives/001
     strings:
     - speaker: 2
@@ -55,6 +62,10 @@ MonoBehaviour:
       other: 4
       otherEmotion: 0
     response: []
+    followUp:
+      type: 2
+      _convo: 0
+      _event: NewObjectives
   - id: Dialogue/DEBUG/001
     strings:
     - speaker: 0
@@ -76,27 +87,10 @@ MonoBehaviour:
       other: 0
       otherEmotion: 0
     response: []
-  - id: Dialogue/DEBUG/001
-    strings:
-    - speaker: 0
-      english: This is Mickey speaking
-      spanish: This is Mickey with an A speaking
-      japanese: This is Mickey with a B speaking
-      speed: 0.04
-      emotion: 0
-      leftSide: 0
-      other: 0
-      otherEmotion: 0
-    - speaker: 0
-      english: Really slowly
-      spanish: So slowly
-      japanese: Painfully slow
-      speed: 0.4
-      emotion: 0
-      leftSide: 0
-      other: 0
-      otherEmotion: 0
-    response: []
+    followUp:
+      type: 0
+      _convo: 0
+      _event: 
   banterList:
   - id: Banter/Found/001
     strings:

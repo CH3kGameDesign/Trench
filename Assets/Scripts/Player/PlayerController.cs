@@ -124,6 +124,7 @@ public class PlayerController : BaseController
     }
 
     [HideInInspector] public Interactable I_curInteractable = null;
+    [HideInInspector] public Space_LandingSpot I_curLandingSpot = null;
 
     void Awake()
     {
@@ -150,6 +151,7 @@ public class PlayerController : BaseController
         reticle.UpdateRoundCount(gun_Equipped);
 
         NMA.updateRotation = false;
+        Setup_Camera();
         Setup_Consumables();
         Setup_Radial();
         Setup_InteractStrings();
@@ -164,7 +166,9 @@ public class PlayerController : BaseController
         PlayerInput playerInput = GetComponent<PlayerInput>();
         string[] _temp = {
             playerInput.actions.FindAction("Interact").GetBindingDisplayString(0).Remove(0,6),
-            playerInput.actions.FindAction("Interact").GetBindingDisplayString(1)
+            playerInput.actions.FindAction("Interact").GetBindingDisplayString(1),
+            playerInput.actions.FindAction("Jump").GetBindingDisplayString(0),
+            playerInput.actions.FindAction("Jump").GetBindingDisplayString(1),
         };
         Inputs.s_inputStrings = _temp;
     }
@@ -174,6 +178,12 @@ public class PlayerController : BaseController
         SaveData.consumables = new List<Consumable.consumableClass>();
         SaveData.consumables.Add(Consumable.consumableClass.Create(Consumable_Type.Potion_Health, 1));
         SaveData.consumables.Add(Consumable.consumableClass.Create(Consumable_Type.Potion_Revive, 1));
+    }
+
+    void Setup_Camera()
+    {
+        v3_camDir.y = T_model.eulerAngles.y;
+        T_camHolder.transform.rotation = Quaternion.Euler(v3_camDir);
     }
 
     void Setup_Radial()
@@ -314,7 +324,7 @@ public class PlayerController : BaseController
     void Update_Vehicle()
     {
         V_curVehicle.OnUpdate(this);
-
+        LandingHandler();
         if (Inputs.b_interact) V_curVehicle.OnInteract(this);
     }
     void FixedUpdate_Vehicle()
@@ -468,6 +478,39 @@ public class PlayerController : BaseController
         }
     }
 
+    void LandingHandler()
+    {
+        if (V_curVehicle.Type() == "Ship")
+        {
+            Ship _ship = V_curVehicle as Ship;
+            if (_ship.landingSpots.Count > 0)
+            {
+                if (C_interactCoyote != null) { StopCoroutine(C_interactCoyote); C_interactCoyote = null; }
+
+                Space_LandingSpot _landingSpot = _ship.landingSpots[0];
+                if (_landingSpot != I_curLandingSpot)
+                {
+                    I_curLandingSpot = _landingSpot;
+                    int _controlScheme = Inputs.b_isGamepad ? 3 : 2;
+                    string _temp = _landingSpot.landingName.ToString_Input(Inputs.s_inputStrings[_controlScheme], Interactable.enumType.landing);
+                    Ref.TM_interactText.gameObject.SetActive(true);
+                    Ref.TM_interactText.text = _temp;
+                }
+
+                if (C_interactCoyote == null)
+                    C_interactCoyote = StartCoroutine(LandingCoyote());
+
+                if (I_curLandingSpot != null)
+                {
+                    if (Inputs.b_jumping)
+                    {
+                        I_curLandingSpot.Land(this);
+                    }
+                }
+            }
+        }
+    }
+
     public override void Pickup_Treasure(Treasure _treasure)
     {
         if (T_equippedTreasure == null)
@@ -523,7 +566,14 @@ public class PlayerController : BaseController
         I_curInteractable = null;
         C_interactCoyote = null;
     }
-    
+    IEnumerator LandingCoyote()
+    {
+        yield return new WaitForSecondsRealtime(0.2f);
+        Ref.TM_interactText.gameObject.SetActive(false);
+        I_curLandingSpot = null;
+        C_interactCoyote = null;
+    }
+
     void JumpHandler()
     {
         if (b_grounded)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http.Headers;
 using UnityEditor;
+using UnityEditor.Rendering;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Trench/AssetLists/ConversationManager", fileName = "New Conversation Manager")]
@@ -23,6 +24,7 @@ public class ConversationManager : ScriptableObject
     {
         public List<dStringClass> strings = new List<dStringClass>();
         public List<responseClass> response = new List<responseClass>();
+        public followUpClass followUp;
     }
     [System.Serializable]
     public class banterClass : conversationClass
@@ -84,7 +86,7 @@ public class ConversationManager : ScriptableObject
             return Instance.GetCharacter(other);
         }
     }
-    public enum responseEnum { nothing, followUp, unityEvent}
+    public enum responseEnum { nothing, dialogue, unityEvent}
     [System.Serializable]
     public class responseClass
     {
@@ -101,9 +103,14 @@ public class ConversationManager : ScriptableObject
                 default: return english;
             }
         }
+        public followUpClass followUp;
+    }
+    [System.Serializable]
+    public class followUpClass
+    {
         public responseEnum type = responseEnum.nothing;
-        public ConversationID _followUp;
-        public string eventID = "";
+        public ConversationID _convo;
+        public string _event = "";
     }
     public List<characterClass> characterList = new List<characterClass>();
     [System.Serializable]

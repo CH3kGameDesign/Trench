@@ -23,6 +23,8 @@ public class LevelGen : MonoBehaviour
 
     private List<LevelGen_Block> LG_Blocks = new List<LevelGen_Block>();
 
+    public SpaceGenerator spaceGenerator;
+
     public LayerMask LM_mask;
 
     private int i_series = 2;
@@ -93,8 +95,10 @@ public class LevelGen : MonoBehaviour
     {
         LG_Blocks = new List<LevelGen_Block>();
         Transform lHolder = Instantiate(GetHolderTypePrefab(SaveData.themeCurrent)).transform;
+        
         lHolder.parent = transform;
-        lHolder.localPosition = Vector3.zero;
+        UpdatePosition(lHolder);
+
         nm_Surfaces = lHolder.GetComponents<NavMeshSurface>();
 
         GenerateBuildings_Smart_FirstRoom(_layout.recipe, _theme, lHolder);
@@ -113,6 +117,20 @@ public class LevelGen : MonoBehaviour
             SpawnObjects();
             SetupVehicle(_theme, _layout, lHolder);
         }
+    }
+
+    void UpdatePosition(Transform lHolder)
+    {
+        if (SaveData.themeCurrent == themeEnum.ship)
+        {
+            Vector3 pos;
+            if (spaceGenerator.GetExitPos(out pos, SaveData.lastLandingSpot))
+                lHolder.position = pos;
+            else
+                lHolder.localPosition = Vector3.zero;
+        }
+        else
+            lHolder.localPosition = Vector3.zero;
     }
 
     void SetupVehicle(LevelGen_Theme _theme, Layout_Basic _layout, Transform lHolder)

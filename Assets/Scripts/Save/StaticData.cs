@@ -6,6 +6,7 @@ public class StaticData : MonoBehaviour
     public Objective _Objective;
     public Consumable _Consumable;
     public ConversationManager _ConversationManager;
+    public SpaceManager _SpaceManager;
 
     public void Awake()
     {
@@ -13,5 +14,6 @@ public class StaticData : MonoBehaviour
         if (Objective.Instance == null) Objective.Instance = _Objective;
         if (Consumable.Instance == null) Consumable.Instance = _Consumable;
         if (ConversationManager.Instance == null) ConversationManager.Instance = _ConversationManager;
+        if (SpaceManager.Instance == null) SpaceManager.Instance = _SpaceManager;
     }
 }

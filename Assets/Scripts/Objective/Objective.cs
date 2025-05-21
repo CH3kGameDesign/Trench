@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using static UnityEditor.Experimental.GraphView.GraphView;
+
 
 #if UNITY_EDITOR
 using System.IO;
@@ -70,6 +72,20 @@ public class Objective : ScriptableObject
         }
         Debug.LogError("Couldn't find Objective ID: " + _id);
         return null;
+    }
+
+    public void NewObjectives()
+    {
+        List<Objective.objectiveClass> _objectives = new List<Objective.objectiveClass>();
+        for (int i = 0; i < 3; i++)
+        {
+            Objective.objectiveClass _temp = GetObjective_Random();
+            _objectives.Add(_temp);
+        }
+        SaveData.objectives = _objectives;
+        PlayerController.Instance.Update_Objectives();
+
+        PlayerController.Instance.AH_agentAudioHolder.Play(AgentAudioHolder.type.objectiveGain);
     }
 
 #if UNITY_EDITOR
