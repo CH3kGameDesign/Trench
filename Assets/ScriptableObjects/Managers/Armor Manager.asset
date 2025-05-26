@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e9ed650b1c30fd4689a13913c3d48ed, type: 3}
+  m_Name: Armor Manager
+  m_EditorClassIdentifier: 
+  PF_ArmorOptionPrefab: {fileID: 4611847558388120823, guid: 948a131715d820649902cd416e429efb, type: 3}
+  helmets:
+  - _id: Helmet/Empty
+    name: None
+    image: {fileID: 21300000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
+    modelHelmet: {fileID: 0}
+  - _id: Helmet/Basic
+    name: Basic
+    image: {fileID: 21300000, guid: 760affdb2aeb03c4bbae9fccc64c19fb, type: 3}
+    modelHelmet: {fileID: 6827022911036299193, guid: 3e3f164aed5ac8546ae1ffe496620c75, type: 3}
+  - _id: Helmet/DayDreamer
+    name: Day Dreamer
+    image: {fileID: 21300000, guid: 31d5c220e24d4b14f8af325bbcc10ac7, type: 3}
+    modelHelmet: {fileID: 7989375529088540196, guid: ec1c2b538f86c5f44953cd4e6eb1a97b, type: 3}
+  - _id: Helmet/RangeFinder
+    name: Range Finder
+    image: {fileID: 21300000, guid: 01e5895c7333a544c9475e84a981ec48, type: 3}
+    modelHelmet: {fileID: 365944370717396022, guid: 11be7b4c24c833c43b1135f92303c518, type: 3}
+  - _id: Helmet/Shaved
+    name: Shaved
+    image: {fileID: 21300000, guid: 6671513537e579947aea3bef53b4e58e, type: 3}
+    modelHelmet: {fileID: 7715631469731849979, guid: 725733e8d7cb12f4194c74936ae23c55, type: 3}
+  chests:
+  - _id: Chest/Empty
+    name: None
+    image: {fileID: 21300000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
+    modelChest: {fileID: 0}
+    modelBelt: {fileID: 0}
+  - _id: Chest/Basic
+    name: Basic
+    image: {fileID: 21300000, guid: 760affdb2aeb03c4bbae9fccc64c19fb, type: 3}
+    modelChest: {fileID: 6889230632462997232, guid: 0a41a614245e11e4fb9dfc2af3c824a8, type: 3}
+    modelBelt: {fileID: 4108750470630767989, guid: 7704739c9c75f6144825e4685367c7d5, type: 3}
+  arms:
+  - _id: Arm/Empty
+    name: None
+    image: {fileID: 21300000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
+    modelArm: {fileID: 0}
+    modelWrist: {fileID: 0}
+  - _id: Arm/Basic
+    name: Basic
+    image: {fileID: 21300000, guid: 760affdb2aeb03c4bbae9fccc64c19fb, type: 3}
+    modelArm: {fileID: 1721140395219804839, guid: 34f5615aca44ac445b41f99d3c065364, type: 3}
+    modelWrist: {fileID: 931920005928250288, guid: 206b4544bb64e964d81cabfe4a910805, type: 3}
+  legs:
+  - _id: Leg/Empty
+    name: None
+    image: {fileID: 21300000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
+    modelKnee: {fileID: 0}
+    modelShin: {fileID: 0}
+    modelFoot: {fileID: 0}
+  - _id: Leg/Basic
+    name: Basic
+    image: {fileID: 21300000, guid: 760affdb2aeb03c4bbae9fccc64c19fb, type: 3}
+    modelKnee: {fileID: 5126623940152383960, guid: 44574eca456c32f43867308e1e1f2ba5, type: 3}
+    modelShin: {fileID: 2353897761478084946, guid: 778087c49101c9644820f9ccc72e36dd, type: 3}
+    modelFoot: {fileID: 1512659033437603453, guid: 2526686113faec54d9376fb63933d164, type: 3}

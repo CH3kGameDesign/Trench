@@ -42,7 +42,8 @@ public class Conversation : MonoBehaviour
     public TextMeshProUGUI TM_messages;
 
     public RectTransform RT_messageHolder;
-    public RectTransform PF_messagePrefab;
+    public SS_MessageObject PF_messagePrefab;
+    public Sprite S_messageSprite;
     public List<MessageClass> M_activeMessages = new List<MessageClass>();
 
     public class MessageClass
@@ -361,8 +362,9 @@ public class Conversation : MonoBehaviour
     }
     IEnumerator TypeMessage_Coroutine(MessageClass _message)
     {
-        RectTransform _holder = GameObject.Instantiate(PF_messagePrefab, RT_messageHolder);
         Transform _target = _message.T_Hook;
+        SS_MessageObject _holder = GameObject.Instantiate(PF_messagePrefab, RT_messageHolder);
+        _holder.Setup(S_messageSprite, _target, C_canvas, false);
         float _lifetime = _message.F_lifetime;
         float _timer = 0;
         float _delay = _message.S_Message.speed;
@@ -395,7 +397,6 @@ public class Conversation : MonoBehaviour
                 _timer = _delay;
             }
             _timer -= Time.deltaTime;
-            FollowObject(_holder, _target);
             yield return new WaitForEndOfFrame();
         }
         _message.S_curString = _text;
@@ -403,7 +404,6 @@ public class Conversation : MonoBehaviour
         while (_timer < 1)
         {
             _timer += Time.deltaTime / _lifetime;
-            FollowObject(_holder, _target);
             yield return new WaitForEndOfFrame();
         }
         _timer = 0;
@@ -412,7 +412,6 @@ public class Conversation : MonoBehaviour
             _message.C_speakerColor = Color.Lerp(_startColorSpeaker, _endColorSpeaker, _timer);
             _message.C_curColor = Color.Lerp(_startColor, _endColor, _timer);
             _timer += Time.deltaTime / 0.5f;
-            FollowObject(_holder, _target);
             yield return new WaitForEndOfFrame();
         }
         Message_RemoveWithTarget(_target);
@@ -427,20 +426,7 @@ public class Conversation : MonoBehaviour
                 break;
             }
     }
-    void FollowObject(RectTransform _holder, Transform _target)
-    {
-        Vector3 _tarPos = Camera.main.WorldToScreenPoint(_target.position);
-
-        _tarPos /= C_canvas.scaleFactor;
-
-        Vector2 _size = _holder.sizeDelta / 2;
-        Vector2 _xBounds = new Vector2(_size.x, (Screen.width / C_canvas.scaleFactor) - _size.x);
-        Vector2 _yBounds = new Vector2(_size.y, (Screen.height / C_canvas.scaleFactor) - _size.y);
-
-        _tarPos.x = Mathf.Clamp(_tarPos.x, _xBounds.x, _xBounds.y);
-        _tarPos.y = Mathf.Clamp(_tarPos.y, _yBounds.x, _yBounds.y);
-        _holder.anchoredPosition = _tarPos;
-    }
+    
     
     void PlayAudio(audioEnum _enum)
     {

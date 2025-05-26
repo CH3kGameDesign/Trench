@@ -12,6 +12,27 @@ public static class CKUtil
         return _temp;
     }
 
+    public static string ToString_Distance(this float _value)
+    {
+        string _temp;
+        if (_value > 600)
+        {
+            _temp = (Mathf.Floor(_value / 10) / 100).ToString();
+            _temp += "km";
+        }
+        else if (_value > 60)
+        {
+            _temp = (Mathf.Floor(_value / 10) * 10).ToString();
+            _temp += "m";
+        }
+        else
+        {
+            _temp = (Mathf.Floor(_value)).ToString();
+            _temp += "m";
+        }
+        return _temp;
+    }
+
     public static string ToString_Input(this string _interactable, string _input, Interactable.enumType _type = Interactable.enumType.interact)
     {
 
@@ -150,5 +171,47 @@ public static class CKUtil
     public static void PlayClip(this Animator _anim, string _name)
     {
         _anim.Play(_name);
+    }
+
+    public static void FollowObject(this RectTransform _holder, Canvas C_canvas, Transform _target)
+    {
+        Vector3 _tarPos = Camera.main.WorldToScreenPoint(_target.position);
+
+        _tarPos /= C_canvas.scaleFactor;
+
+        Vector2 _size = _holder.sizeDelta / 2;
+        Vector2 _xBounds = new Vector2(_size.x, (Screen.width / C_canvas.scaleFactor) - _size.x);
+        Vector2 _yBounds = new Vector2(_size.y, (Screen.height / C_canvas.scaleFactor) - _size.y);
+
+        _tarPos.x = Mathf.Clamp(_tarPos.x, _xBounds.x, _xBounds.y);
+        _tarPos.y = Mathf.Clamp(_tarPos.y, _yBounds.x, _yBounds.y);
+
+
+        if(_tarPos.z < 0)
+        {
+            Vector2 _checker = _tarPos;
+            _checker.x = 1 - Mathf.Abs(_checker.x / (Screen.width / 2) - 1);
+            _checker.y = 1 - Mathf.Abs(_checker.y / (Screen.height / 2) - 1);
+            if (_checker.x >= _checker.y)
+            {
+                if (_tarPos.x > Screen.width / 2) _tarPos.x = _xBounds.y;
+                else _tarPos.x = _xBounds.x;
+            }
+            else
+            {
+                if (_tarPos.y > Screen.height / 2) _tarPos.y = _yBounds.y;
+                else _tarPos.y = _yBounds.x;
+            }
+        }
+
+        _holder.anchoredPosition = _tarPos;
+    }
+    public static void DeleteChildren (this Transform _transform, bool _immediate = false)
+    {
+        for (int i = _transform.childCount - 1; i >= 0; i--)
+        {
+            if (_immediate) GameObject.DestroyImmediate(_transform.GetChild(i).gameObject);
+            else GameObject.Destroy(_transform.GetChild(i).gameObject);
+        }
     }
 }

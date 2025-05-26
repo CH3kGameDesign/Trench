@@ -8,6 +8,10 @@ public class Space_LandingSpot : MonoBehaviour
 
     public Transform exitTransform;
 
+    public SS_MessageObject PF_message;
+    public Sprite S_sprite;
+    private SS_MessageObject _activeMessage;
+
     public void OnTriggerEnter(Collider other)
     {
         Vehicle_SubCollider _col;
@@ -38,5 +42,21 @@ public class Space_LandingSpot : MonoBehaviour
         SaveData.lastLandingSpot = landingID;
         SaveData.themeCurrent = _theme;
         SceneManager.LoadScene(0);
+    }
+
+    void Start()
+    {
+        SetupMessage();
+    }
+    void SetupMessage()
+    {
+        Canvas _canvas = Conversation.Instance.C_canvas;
+        RectTransform _holder = Conversation.Instance.RT_messageHolder;
+        _activeMessage = Instantiate(PF_message, _holder);
+        _activeMessage.Setup(S_sprite, transform, _canvas, true);
+    }
+    private void OnDestroy()
+    {
+        Destroy(_activeMessage.gameObject);
     }
 }

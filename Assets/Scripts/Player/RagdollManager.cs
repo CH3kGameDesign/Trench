@@ -8,6 +8,7 @@ public class RagdollManager : MonoBehaviour
     public Transform[] T_transforms = new Transform[0];
     public Rigidbody[] RB_rigidbodies = new Rigidbody[0];
     public Collider[] C_colliders = new Collider[0];
+    public Transform[] T_armorPoints = new Transform[0];
     public BaseController BaseController;
 
     private List<DamageSource> PrevDamageSpurces = new List<DamageSource>();

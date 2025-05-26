@@ -126,6 +126,7 @@ public class PlayerController : BaseController
     [HideInInspector] public Interactable I_curInteractable = null;
     [HideInInspector] public Space_LandingSpot I_curLandingSpot = null;
 
+
     void Awake()
     {
         Instance = this;
@@ -156,6 +157,8 @@ public class PlayerController : BaseController
         Setup_Radial();
         Setup_InteractStrings();
         Update_Objectives();
+
+        ArmorManager.EquipArmor_Static(RM_ragdoll, SaveData.equippedArmor);
 
         GameState = gameStateEnum.active;
         base.Start();
@@ -295,16 +298,11 @@ public class PlayerController : BaseController
 
     void Update_Active()
     {
-        Movement();
-        JumpHandler();
-        CrouchHandler();
         ModelRotate();
         AnimationUpdate();
 
         InteractHandler();
 
-        CamMovement();
-        CamCollision();
 
         FireManager();
         ReloadHandler();
@@ -335,7 +333,12 @@ public class PlayerController : BaseController
 
     void FixedUpdate_Active()
     {
+        Movement();
+        JumpHandler();
+        CrouchHandler();
         AerialMovement();
+        CamMovement();
+        CamCollision();
     }
 
     void AnimationUpdate()
@@ -613,7 +616,7 @@ public class PlayerController : BaseController
             }
         }
         if (f_jumpTimer > 0)
-            f_jumpTimer -= Time.deltaTime;
+            f_jumpTimer -= Time.fixedDeltaTime;
     }
     public void Jump_Force(float _forceMultiplier = 1)
     {
@@ -691,12 +694,16 @@ public class PlayerController : BaseController
         }
         else if (b_radialOpen)
         {
-            Ref.RM_radial.Hide();
             Ref.RM_radial.Confirm();
-            b_radialOpen = false;
-            SetTimeScale(1f);
-            AH_agentAudioHolder.Stop(AgentAudioHolder.type.radial);
+            CloseRadial();
         }
+    }
+    void CloseRadial()
+    {
+        Ref.RM_radial.Hide();
+        b_radialOpen = false;
+        SetTimeScale(1f);
+        AH_agentAudioHolder.Stop(AgentAudioHolder.type.radial);
     }
 
     bool CheckStandingRoom()
@@ -911,6 +918,7 @@ public class PlayerController : BaseController
         RM_ragdoll.EnableRigidbodies(true);
         A_model.enabled = false;
         Invoke(nameof(Restart), 3f);
+        CloseRadial();
 
         AH_agentAudioHolder.Play(AgentAudioHolder.type.death);
     }
@@ -997,8 +1005,13 @@ public class PlayerController : BaseController
     public void Input_Reload(InputAction.CallbackContext cxt) { Inputs.b_reload = Input_GetPressed(cxt); }
     public void Input_Radial(InputAction.CallbackContext cxt) { Inputs.b_radial = Input_GetPressed(cxt); }
     public void Input_Melee(InputAction.CallbackContext cxt) { Inputs.b_melee = Input_GetPressed(cxt); }
+    public void Input_Menu(InputAction.CallbackContext cxt) { MainMenu.Instance.Menu_Tapped(); }
 
-    public void Input_ChangedInput(PlayerInput input) { Inputs.b_isGamepad = input.currentControlScheme == "Gamepad"; }
+    public void Input_ChangedInput(PlayerInput input)
+    {
+        Inputs.b_isGamepad = input.currentControlScheme == "Gamepad";
+        MainMenu.Instance.GamepadSwitch();
+    }
 
     bool Input_GetPressed(InputAction.CallbackContext cxt)
     {
