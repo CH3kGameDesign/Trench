@@ -589,6 +589,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5409112812644882984}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8574004451708327022
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2296568051925554971}
+  m_Layer: 11
+  m_Name: Cam_ArmorEquipHook
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2296568051925554971
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8574004451708327022}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: 0, y: 0.8333333, z: 2.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5286100758049851119}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1001 &5680932337014104324
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1784,6 +1815,9 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: bf6965db94003934dae88d13247dafe9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2296568051925554971}
     - targetCorrespondingSourceObject: {fileID: 5472622940992281205, guid: bf6965db94003934dae88d13247dafe9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3084585539770704914}
@@ -2117,6 +2151,11 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   ignoreDamageType: 
+--- !u!137 &1033819419569506346 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -4571605982943762130, guid: bf6965db94003934dae88d13247dafe9, type: 3}
+  m_PrefabInstance: {fileID: 5680932337014104324}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1087787460142809789 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4741763956638393273, guid: bf6965db94003934dae88d13247dafe9, type: 3}
@@ -2489,6 +2528,7 @@ MonoBehaviour:
   - {fileID: 600936960112068483}
   - {fileID: 6556103875311640843}
   BaseController: {fileID: 0}
+  MR_skinnedMeshRenderer: {fileID: 1033819419569506346}
 --- !u!114 &7263901104897168492
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2636,6 +2676,11 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   ignoreDamageType: 
+--- !u!4 &5286100758049851119 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: bf6965db94003934dae88d13247dafe9, type: 3}
+  m_PrefabInstance: {fileID: 5680932337014104324}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5318141750674925754 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8711249884731782722, guid: bf6965db94003934dae88d13247dafe9, type: 3}

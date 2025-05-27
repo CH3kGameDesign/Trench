@@ -159,9 +159,9 @@ public class Conversation : MonoBehaviour
                 PlayerController.GameState != PlayerController.gameStateEnum.dialogueResponse)
             {
                 PlayAudio(audioEnum.showDialogue);
-                StartCoroutine(Fade(CG_dialogueHolder, true));
-                StartCoroutine(Fade(V_dialogueVolume, true));
-                StartCoroutine(Fade(CG_banterHolder, false));
+                StartCoroutine(CG_dialogueHolder.Fade(true));
+                StartCoroutine(V_dialogueVolume.Fade(true));
+                StartCoroutine(CG_banterHolder.Fade(false));
                 HideDialogueChoices(true);
             }
             else
@@ -308,9 +308,9 @@ public class Conversation : MonoBehaviour
 
     void EndConversation()
     {
-        StartCoroutine(Fade(CG_dialogueHolder, false));
-        StartCoroutine(Fade(V_dialogueVolume, false));
-        StartCoroutine(Fade(CG_banterHolder, true));
+        StartCoroutine(CG_dialogueHolder.Fade(false));
+        StartCoroutine(V_dialogueVolume.Fade(false));
+        StartCoroutine(CG_banterHolder.Fade(true));
         PlayerController.GameState = PlayerController.gameStateEnum.active;
     }
     void TypeMessage()
@@ -457,43 +457,5 @@ public class Conversation : MonoBehaviour
         }
         _audioSource.pitch = UnityEngine.Random.Range(0.95f, 1.05f);
         _audioSource.Play();
-    }
-    IEnumerator Fade(CanvasGroup _canvas, bool _fadeIn = true, float _speed = 0.1f)
-    {
-        if (_fadeIn || _canvas.gameObject.activeSelf)
-        {
-            _canvas.gameObject.SetActive(true);
-            float _timer = 0f;
-            float _start = _fadeIn ? 0f : 1f;
-            float _end = _fadeIn ? 1f : 0f;
-            while (_timer < 1f)
-            {
-                _canvas.alpha = Mathf.Lerp(_start, _end, _timer);
-                yield return new WaitForEndOfFrame();
-                _timer += Time.deltaTime / _speed;
-            }
-            _canvas.alpha = _end;
-            if (!_fadeIn)
-                _canvas.gameObject.SetActive(false);
-        }
-    }
-    IEnumerator Fade(Volume _volume, bool _fadeIn = true, float _speed = 0.1f)
-    {
-        if (_fadeIn || _volume.gameObject.activeSelf)
-        {
-            _volume.gameObject.SetActive(true);
-            float _timer = 0f;
-            float _start = _fadeIn ? 0f : 1f;
-            float _end = _fadeIn ? 1f : 0f;
-            while (_timer < 1f)
-            {
-                _volume.weight = Mathf.Lerp(_start, _end, _timer);
-                yield return new WaitForEndOfFrame();
-                _timer += Time.deltaTime / _speed;
-            }
-            _volume.weight = _end;
-            if (!_fadeIn)
-                _volume.gameObject.SetActive(false);
-        }
     }
 }

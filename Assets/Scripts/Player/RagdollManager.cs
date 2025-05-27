@@ -11,6 +11,8 @@ public class RagdollManager : MonoBehaviour
     public Transform[] T_armorPoints = new Transform[0];
     public BaseController BaseController;
 
+    public SkinnedMeshRenderer MR_skinnedMeshRenderer;
+
     private List<DamageSource> PrevDamageSpurces = new List<DamageSource>();
     // Start is called before the first frame update
     void Start()

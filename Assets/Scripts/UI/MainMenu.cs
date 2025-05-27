@@ -2,6 +2,10 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.Events;
+using System;
+using System.Runtime.CompilerServices;
+using UnityEngine.Rendering;
 
 public class MainMenu : MonoBehaviour
 {
@@ -10,7 +14,14 @@ public class MainMenu : MonoBehaviour
     public customizeRefClass customize;
     public panelRefClass load;
 
+    public Volume V_postProcess;
+    public AnimCurve AC_smooth;
+
     private panelRefClass _current = null;
+
+    private Vector3 v3_camLastLocalPos;
+    private Vector3 v3_camMenuLocalPos;
+    private Quaternion q_camLastLocalRot;
 
     [System.Serializable]
     public class panelRefClass
@@ -46,6 +57,9 @@ public class MainMenu : MonoBehaviour
     }
     public void SwitchTo(panelRefClass GO)
     {
+        if (_current == customize)
+            CustomizeSetup_Close();
+
         _current = GO;
         main._anim.SetBool("Open", main == GO);
         customize._anim.SetBool("Open", customize == GO);
@@ -84,6 +98,15 @@ public class MainMenu : MonoBehaviour
     private BaseController.gameStateEnum _prevGameState;
     public void Open()
     {
+        v3_camLastLocalPos = PlayerController.Instance.T_camHolder.GetChild(0).localPosition;
+        q_camLastLocalRot = PlayerController.Instance.T_camHolder.GetChild(0).localRotation;
+
+        v3_camMenuLocalPos = v3_camLastLocalPos;
+        v3_camMenuLocalPos.x = -v3_camMenuLocalPos.x;
+        StartCoroutine(PlayerController.Instance.T_camHolder.GetChild(0).Move(v3_camMenuLocalPos, q_camLastLocalRot, true, 0.4f, AC_smooth));
+
+        StartCoroutine(V_postProcess.Fade(true));
+
         main._anim.Play("Open");
         SwitchTo(main);
         Time.timeScale = 0;
@@ -99,18 +122,15 @@ public class MainMenu : MonoBehaviour
     {
         main._anim.Play("Close");
         SwitchTo(main);
-        Time.timeScale = 1;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
-        PlayerController.Instance.GameState_Change(_prevGameState);
-
-        menuOpen = false;
+        StartCoroutine(PlayerController.Instance.T_camHolder.GetChild(0).Move(v3_camLastLocalPos, q_camLastLocalRot, true, 0.2f, AC_smooth, CloseFinish));
+        StartCoroutine(V_postProcess.Fade(false));
     }
 
     public void CustomizeButton()
     {
         SwitchTo(customize);
+        Transform _pivot = PlayerController.Instance.T_camHookArmorEquip;
+        StartCoroutine(PlayerController.Instance.T_camHolder.GetChild(0).Move(_pivot.position, _pivot.rotation, false, 0.4f, AC_smooth));
     }
 
     public void CustomizeSetup_Helmet()
@@ -148,17 +168,28 @@ public class MainMenu : MonoBehaviour
         ArmorManager.Instance.CreateLegUI(customize.G_subOptions.transform);
         GamepadSwitch();
     }
+    public void CustomizeSetup_Materials()
+    {
+        CustomizeShow();
+        customize.I_armorType = 5;
+        ArmorManager.Instance.CreateMaterialUI(customize.G_subOptions.transform);
+        GamepadSwitch();
+    }
     public void CustomizeSetup_Back()
     {
         if (customize.G_listOptions.activeInHierarchy)
             BackButton();
         else
         {
-            customize.G_listOptions.SetActive(true);
-            customize.G_subOptions.SetActive(false);
-            customize.G_subOptions.transform.DeleteChildren();
-            GamepadSwitch(true);
+            CustomizeSetup_Close();
         }
+    }
+    void CustomizeSetup_Close()
+    {
+        customize.G_listOptions.SetActive(true);
+        customize.G_subOptions.SetActive(false);
+        customize.G_subOptions.transform.DeleteChildren();
+        GamepadSwitch(true);
     }
     void CustomizeShow()
     {
@@ -179,6 +210,7 @@ public class MainMenu : MonoBehaviour
     public void BackButton()
     {
         SwitchTo(main);
+        StartCoroutine(PlayerController.Instance.T_camHolder.GetChild(0).Move(v3_camMenuLocalPos, q_camLastLocalRot, true, 0.4f, AC_smooth));
     }
 
     void ButtonHit()
@@ -196,6 +228,18 @@ public class MainMenu : MonoBehaviour
             else
                 EventSystem.current.SetSelectedGameObject(_current.DefaultButton(_back));
         }
+    }
+
+    
+    void CloseFinish()
+    {
+        Time.timeScale = 1;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        PlayerController.Instance.GameState_Change(_prevGameState);
+
+        menuOpen = false;
     }
 
     public void Quit()

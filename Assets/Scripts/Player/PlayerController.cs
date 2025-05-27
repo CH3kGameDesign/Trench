@@ -39,12 +39,14 @@ public class PlayerController : BaseController
     public Transform T_camHook;
     public Transform T_camHookAiming;
     public Transform T_camHookCrouching;
+    public Transform T_camHookArmorEquip;
     [HideInInspector] public Vector3 v3_camDir;
     public Vector3 V3_camOffset = new Vector3(2,0.25f,-5);
     public Vector3 V3_camOffset_Crouch = new Vector3(1f, 0.125f, -1.5f);
     private float f_camRadius = 0.15f;
     public LayerMask LM_CameraRay;
     public LayerMask LM_GunRay;
+    public LayerMask LM_AutoAimRay;
 
     [Header("Movement Values")]
     public float F_moveSpeed = 5;
@@ -775,8 +777,14 @@ public class PlayerController : BaseController
             else                        _mult *= F_camRotSpeed;
             v3_camDir += new Vector3(-Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0) * _mult;
             v3_camDir.x = Mathf.Clamp(v3_camDir.x, -80, 80);
+            AutoAim();
         }
         T_camHolder.transform.rotation = Quaternion.Slerp(T_camHolder.transform.rotation, Quaternion.Euler(v3_camDir), Time.deltaTime * 10);
+    }
+
+    void AutoAim()
+    {
+        RaycastHit hit;
     }
 
     void CamCollision()
@@ -1005,7 +1013,7 @@ public class PlayerController : BaseController
     public void Input_Reload(InputAction.CallbackContext cxt) { Inputs.b_reload = Input_GetPressed(cxt); }
     public void Input_Radial(InputAction.CallbackContext cxt) { Inputs.b_radial = Input_GetPressed(cxt); }
     public void Input_Melee(InputAction.CallbackContext cxt) { Inputs.b_melee = Input_GetPressed(cxt); }
-    public void Input_Menu(InputAction.CallbackContext cxt) { MainMenu.Instance.Menu_Tapped(); }
+    public void Input_Menu(InputAction.CallbackContext cxt) { if (cxt.phase == InputActionPhase.Started) MainMenu.Instance.Menu_Tapped(); }
 
     public void Input_ChangedInput(PlayerInput input)
     {

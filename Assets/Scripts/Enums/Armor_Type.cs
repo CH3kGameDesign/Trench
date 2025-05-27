@@ -13,4 +13,8 @@ public enum Armor_Type
 	[Description ("Basic")]	[InspectorName ("Arm/Basic")]	Arm_Basic,
 	[Description ("None")]	[InspectorName ("Leg/Empty")]	Leg_Empty,
 	[Description ("Basic")]	[InspectorName ("Leg/Basic")]	Leg_Basic,
+	[Description ("Black")]	[InspectorName ("Material/Black")]	Material_Black,
+	[Description ("Green")]	[InspectorName ("Material/Green")]	Material_Green,
+	[Description ("Orange")]	[InspectorName ("Material/Orange")]	Material_Orange,
+	[Description ("Red")]	[InspectorName ("Material/Red")]	Material_Red,
 }

@@ -3264,6 +3264,7 @@ MonoBehaviour:
   T_camHook: {fileID: 7467930127889466643}
   T_camHookAiming: {fileID: 1954637966226827164}
   T_camHookCrouching: {fileID: 1671237484117994005}
+  T_camHookArmorEquip: {fileID: 2459185222516070684}
   v3_camDir: {x: 0, y: 0, z: 0}
   V3_camOffset: {x: 1.4, y: 0.25, z: -3}
   V3_camOffset_Crouch: {x: 1, y: 0, z: -1.5}
@@ -3273,6 +3274,9 @@ MonoBehaviour:
   LM_GunRay:
     serializedVersion: 2
     m_Bits: 19137
+  LM_AutoAimRay:
+    serializedVersion: 2
+    m_Bits: 2048
   F_moveSpeed: 3
   F_sprintModifier: 3
   F_jumpForce: 5
@@ -6422,6 +6426,42 @@ PrefabInstance:
       propertyPath: BaseController
       value: 
       objectReference: {fileID: 668208048646576681}
+    - target: {fileID: 2296568051925554971, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2296568051925554971, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2296568051925554971, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2296568051925554971, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.00000029802322
+      objectReference: {fileID: 0}
+    - target: {fileID: 2296568051925554971, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.000000106317856
+      objectReference: {fileID: 0}
+    - target: {fileID: 2296568051925554971, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2296568051925554971, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.000000009496183
+      objectReference: {fileID: 0}
+    - target: {fileID: 2296568051925554971, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2296568051925554971, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4762503887113182293, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
       propertyPath: m_Name
       value: PF_Mannequin
@@ -6493,6 +6533,11 @@ Transform:
 --- !u!4 &1954637966226827164 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2801115033856928155, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
+  m_PrefabInstance: {fileID: 4467513206947794439}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2459185222516070684 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2296568051925554971, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
   m_PrefabInstance: {fileID: 4467513206947794439}
   m_PrefabAsset: {fileID: 0}
 --- !u!95 &2469071982578930322 stripped

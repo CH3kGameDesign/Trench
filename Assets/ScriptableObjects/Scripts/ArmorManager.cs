@@ -97,11 +97,21 @@ public class ArmorManager : ScriptableObject
             if (modelFoot != null) Instantiate(modelFoot, _RM.T_armorPoints[12]);
         }
     }
+    [System.Serializable]
+    public class MaterialClass : ArmorClass
+    {
+        public Material modelMaterial;
+        public override void Equip(RagdollManager _RM, bool _left = true)
+        {
+            _RM.MR_skinnedMeshRenderer.material = modelMaterial;
+        }
+    }
     public ArmorOptionButton PF_ArmorOptionPrefab;
     public List<HelmetClass> helmets = new List<HelmetClass>();
     public List<ChestClass> chests = new List<ChestClass>();
     public List<ArmClass> arms = new List<ArmClass>();
     public List<LegClass> legs = new List<LegClass>();
+    public List<MaterialClass> materials = new List<MaterialClass>();
     public static ArmorClass GetArmorType_Static(Armor_Type _type)
     {
         return Instance.GetArmorType(_type);
@@ -125,6 +135,11 @@ public class ArmorManager : ScriptableObject
                 return item;
         }
         foreach (var item in legs)
+        {
+            if (_id == item._id)
+                return item;
+        }
+        foreach (var item in materials)
         {
             if (_id == item._id)
                 return item;
@@ -184,6 +199,14 @@ public class ArmorManager : ScriptableObject
             AOB.Setup(item);
         }
     }
+    public void CreateMaterialUI(Transform _holder)
+    {
+        foreach (var item in materials)
+        {
+            ArmorOptionButton AOB = Instantiate(PF_ArmorOptionPrefab, _holder);
+            AOB.Setup(item);
+        }
+    }
 
 #if UNITY_EDITOR
     [ContextMenu("Tools/GenerateEnum")]
@@ -223,6 +246,16 @@ public class ArmorManager : ScriptableObject
                 Debug.LogError("Duplicate ID: " + item._id);
         }
         foreach (var item in legs)
+        {
+            if (!enumEntries.Contains(item._id))
+            {
+                enumEntries.Add(item._id);
+                typeEntries.Add(item);
+            }
+            else
+                Debug.LogError("Duplicate ID: " + item._id);
+        }
+        foreach (var item in materials)
         {
             if (!enumEntries.Contains(item._id))
             {

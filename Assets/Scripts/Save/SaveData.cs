@@ -14,7 +14,8 @@ public static class SaveData
         Armor_Type.Chest_Basic,
         Armor_Type.Arm_Basic,
         Armor_Type.Arm_Basic,
-        Armor_Type.Leg_Basic
+        Armor_Type.Leg_Basic,
+        Armor_Type.Material_Black
     };
 
     public static string lastLandingSpot = "tavern";
