@@ -34,6 +34,7 @@ public class PlayerController : BaseController
     public float F_camRotSpeed = 240f;
     public float F_camAimRotSpeed = 80f;
     public float F_camSprintRotSpeed = 80f;
+    private float f_camDistance = 5;
     public Camera C_camera;
     public Transform T_camHolder;
     public Transform T_camHook;
@@ -144,6 +145,7 @@ public class PlayerController : BaseController
         Ref.TM_healthText.text = F_curHealth.ToString();
         v3_camDir = T_camHolder.localEulerAngles;
         v3_camDir.z = 0;
+        f_camDistance = V3_camOffset.magnitude;
         SetNavIDs();
 
         for (int i = 0; i < Mathf.Min(DEBUG_EquippedGunNum.Length, gun_EquippedList.Length); i++)
@@ -751,11 +753,16 @@ public class PlayerController : BaseController
             Vector3 _temp = NMA.transform.localEulerAngles;
             _temp.y = v3_camDir.y;
             NMA.transform.localEulerAngles = _temp;
+            RM_ragdoll.Aiming(true);
         }
-        else if (b_isMoving)
+        else
         {
-            Quaternion lookRot = Quaternion.LookRotation(v3_moveDir, Local_Up());
-            NMA.transform.localRotation = Quaternion.Lerp(NMA.transform.localRotation, lookRot, Time.deltaTime * 4);
+            RM_ragdoll.Aiming(false);
+            if (b_isMoving)
+            {
+                Quaternion lookRot = Quaternion.LookRotation(v3_moveDir, Local_Up());
+                NMA.transform.localRotation = Quaternion.Lerp(NMA.transform.localRotation, lookRot, Time.deltaTime * 4);
+            }
         }
     }
 
@@ -810,9 +817,15 @@ public class PlayerController : BaseController
             {
                 RaycastHit hit;
                 if (Physics.SphereCast(T_camHolder.position, f_camRadius, T_camHolder.rotation * _camOffset, out hit, _camOffset.magnitude, LM_CameraRay))
-                    T_camHolder.GetChild(0).localPosition = _camOffset.normalized * hit.distance;
+                {
+                    f_camDistance = hit.distance;
+                    T_camHolder.GetChild(0).localPosition = _camOffset.normalized * f_camDistance;
+                }
                 else
+                {
+                    f_camDistance = V3_camOffset.magnitude;
                     T_camHolder.GetChild(0).localPosition = Vector3.Slerp(T_camHolder.GetChild(0).localPosition, _camOffset, Time.deltaTime * F_camLatSpeed);
+                }
             }
             else
                 T_camHolder.GetChild(0).localPosition = Vector3.Slerp(T_camHolder.GetChild(0).localPosition, _camOffset, Time.deltaTime * F_camLatSpeed);
@@ -841,8 +854,9 @@ public class PlayerController : BaseController
     void Update_HitPoint()
     {
         RaycastHit hit;
-        if (Physics.SphereCast(Camera.main.transform.position, 0.2f, Camera.main.transform.forward, out hit, 100, LM_GunRay))
+        if (Physics.SphereCast(Camera.main.transform.position + (Camera.main.transform.forward * f_camDistance), 0.2f, Camera.main.transform.forward, out hit, 100, LM_GunRay))
         {
+            T_aimPoint.position = hit.point;
             Vector3 _tarPos = Camera.main.WorldToScreenPoint(hit.point);
             _tarPos /= Conversation.Instance.C_canvas.scaleFactor;
 

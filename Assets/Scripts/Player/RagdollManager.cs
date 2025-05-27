@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 public class RagdollManager : MonoBehaviour
 {
@@ -12,6 +13,10 @@ public class RagdollManager : MonoBehaviour
     public BaseController BaseController;
 
     public SkinnedMeshRenderer MR_skinnedMeshRenderer;
+    public Rig R_aimRig;
+
+    [HideInInspector] public bool _rigActive = false;
+    private float f_timeTilChange = 0;
 
     private List<DamageSource> PrevDamageSpurces = new List<DamageSource>();
     // Start is called before the first frame update
@@ -19,6 +24,12 @@ public class RagdollManager : MonoBehaviour
     {
         if (DisableOnStart)
             EnableRigidbodies(false);
+        R_aimRig.weight = 0;
+    }
+    private void Update()
+    {
+        if (f_timeTilChange > 0)
+            f_timeTilChange -= Time.deltaTime;
     }
     public void EnableRigidbodies(bool _enable)
     {
@@ -63,5 +74,20 @@ public class RagdollManager : MonoBehaviour
     {
         if (PrevDamageSpurces.Count > 1)
             PrevDamageSpurces.RemoveAt(0);
+    }
+    public void Aiming(bool _aim)
+    {
+        if (f_timeTilChange <= 0)
+        {
+            if (_aim != _rigActive)
+            {
+                if (_aim)
+                    f_timeTilChange = 2f;
+                _rigActive = _aim;
+                StartCoroutine(R_aimRig.Fade(_aim, _aim ? 0.02f : 0.25f));
+            }
+        }
+        else if (_aim && _rigActive)
+            f_timeTilChange = Mathf.Max(f_timeTilChange, 2f);
     }
 }

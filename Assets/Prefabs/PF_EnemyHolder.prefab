@@ -49,6 +49,7 @@ MonoBehaviour:
   T_model: {fileID: 4132479939592027811}
   T_gunHook: {fileID: 2991855455887746037}
   T_barrelHook: {fileID: 6818042537794097237}
+  T_aimPoint: {fileID: 5999376663082378056}
   RB: {fileID: 642101389629788198}
   RM_ragdoll: {fileID: 9177568694328849379}
   AH_agentAudioHolder: {fileID: 7773844298950623271}
@@ -57,6 +58,8 @@ MonoBehaviour:
   LM_TerrainRay:
     serializedVersion: 2
     m_Bits: 16960
+  F_maxHealth: 100
+  F_curHealth: 100
   gun_Equipped: {fileID: 0}
   gun_EquippedList:
   - {fileID: 0}
@@ -91,7 +94,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 16385
   V3_attackLocation: {x: 0, y: 0, z: 0}
-  F_maxHealth: 100
   A_model: {fileID: 7364725358455803264}
   ResourceDrop:
     list:
@@ -1295,6 +1297,11 @@ PrefabInstance:
 --- !u!4 &3518699326684272634 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5286100758049851119, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
+  m_PrefabInstance: {fileID: 8757512004829188373}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &5999376663082378056 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3083557876361015901, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
   m_PrefabInstance: {fileID: 8757512004829188373}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &6230565689564479012 stripped

@@ -237,7 +237,7 @@ public class GunClass : ScriptableObject
             else
             {
                 _barrel = AC_agent.T_barrelHook;
-                _tarPos = AC_agent.V3_attackLocation;
+                _tarPos = AC_agent.T_aimPoint.position;
             }
             Bullet GO = Instantiate(bullet, _barrel.position, _barrel.rotation);
             GO.transform.LookAt(_tarPos);

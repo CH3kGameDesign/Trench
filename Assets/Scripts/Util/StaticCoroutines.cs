@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Rendering;
+using UnityEngine.Animations.Rigging;
 
 public static class StaticCoroutines
 {
@@ -42,6 +43,19 @@ public static class StaticCoroutines
             if (!_fadeIn)
                 _volume.gameObject.SetActive(false);
         }
+    }
+    public static IEnumerator Fade(this Rig _rig, bool _fadeIn = true, float _speed = 0.1f)
+    {
+        float _timer = 0f;
+        float _start = _fadeIn ? 0f : 1f;
+        float _end = _fadeIn ? 1f : 0f;
+        while (_timer < 1f)
+        {
+            _rig.weight = Mathf.Lerp(_start, _end, _timer);
+            yield return new WaitForEndOfFrame();
+            _timer += Time.unscaledDeltaTime / _speed;
+        }
+        _rig.weight = _end;
     }
 
     public static IEnumerator Move(this Transform _target, Vector3 _tarPos, Quaternion _tarRot, bool _local, float _speed = 0.4f, AnimCurve _anim = null, UnityAction _action = null)

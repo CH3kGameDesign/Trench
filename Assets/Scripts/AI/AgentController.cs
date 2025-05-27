@@ -30,7 +30,6 @@ public class AgentController : BaseController
     private float f_fireTimer = 0;
     private float f_burstTimer = 0;
     private int i_burstRemaining = 0;
-    [HideInInspector] public Vector3 V3_attackLocation;
     private float f_searchDelay = 0.2f;
     private bool b_firing = false;
 
@@ -368,9 +367,10 @@ public class AgentController : BaseController
     {
         if (V_curVehicle == null)
         {
+            RM_ragdoll.Aiming(_attacking);
             if (_attacking)
             {
-                Quaternion _look = Quaternion.LookRotation(V3_attackLocation - NMA.transform.position);
+                Quaternion _look = Quaternion.LookRotation(T_aimPoint.position - NMA.transform.position);
                 _look = Quaternion.Euler(new Vector3(0, _look.eulerAngles.y, 0));
                 NMA.transform.localRotation = Quaternion.Lerp(NMA.transform.localRotation, _look, Time.deltaTime * 6);
             }
@@ -415,7 +415,7 @@ public class AgentController : BaseController
                 if (attackTarget.GetTargetPos(T_barrelHook.position, LM_hitScan, out _tarPos))
                 {
                     gun_Equipped.OnFire();
-                    V3_attackLocation = _tarPos;
+                    T_aimPoint.position = _tarPos;
                     _startShot = true;
                 }
             }
@@ -424,7 +424,7 @@ public class AgentController : BaseController
         {
             if (!_startShot)
                 if (attackTarget.GetTargetPos(T_barrelHook.position, LM_hitScan, out _tarPos))
-                    V3_attackLocation = _tarPos;
+                    T_aimPoint.position = _tarPos;
             _firing = true;
         }
         gun_Equipped.OnUpdate();

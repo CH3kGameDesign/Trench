@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using static PlayerController;
 
 public class BaseController : MonoBehaviour
 {
@@ -10,6 +9,7 @@ public class BaseController : MonoBehaviour
     public Transform T_model;
     public Transform T_gunHook;
     public Transform T_barrelHook;
+    public Transform T_aimPoint;
     public Rigidbody RB;
     public RagdollManager RM_ragdoll;
     public AgentAudioHolder AH_agentAudioHolder;
