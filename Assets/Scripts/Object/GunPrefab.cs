@@ -5,6 +5,9 @@ public class GunPrefab : MonoBehaviour
     public Transform T_barrelHook;
     public ParticleSystem PS_muzzleFire;
 
+    public Transform T_secondHandPoint;
+    public Transform T_secondElbowPoint;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

@@ -197,6 +197,9 @@ public class GunClass : ScriptableObject
             G_gunModel = Instantiate(prefab, baseController.T_gunHook);
             G_gunModel.transform.localPosition = Vector3.zero;
             G_gunModel.transform.localEulerAngles = Vector3.zero;
+
+            baseController.RM_ragdoll.T_secondHand.position = G_gunModel.T_secondHandPoint.position;
+            baseController.RM_ragdoll.T_secondElbow.position = G_gunModel.T_secondElbowPoint.position;
         }
         A_charModel.Play("Equip_Rifle", 1);
         baseController.AH_agentAudioHolder.Play(AgentAudioHolder.type.equip);
@@ -224,21 +227,8 @@ public class GunClass : ScriptableObject
 
             Vector3 _tarPos;
             Transform _barrel;
-            if (b_playerGun)
-            {
-                _barrel = PM_player.T_barrelHook;
-                Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-                RaycastHit hit;
-                if (Physics.Raycast(ray, out hit, 100, LM_GunRay))
-                    _tarPos = hit.point;
-                else
-                    _tarPos = T_camHolder.GetChild(0).position + (T_camHolder.GetChild(0).forward * 100);
-            }
-            else
-            {
-                _barrel = AC_agent.T_barrelHook;
-                _tarPos = AC_agent.T_aimPoint.position;
-            }
+            _barrel = baseController.T_barrelHook;
+            _tarPos = baseController.T_aimPoint.position;
             Bullet GO = Instantiate(bullet, _barrel.position, _barrel.rotation);
             GO.transform.LookAt(_tarPos);
             if (b_playerGun)

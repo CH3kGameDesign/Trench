@@ -133,7 +133,6 @@ MonoBehaviour:
   LM_hitScan:
     serializedVersion: 2
     m_Bits: 16385
-  V3_attackLocation: {x: 0, y: 0, z: 0}
   A_model: {fileID: 7695503518489228931}
   ResourceDrop:
     list:
@@ -371,7 +370,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &9074333999712861589
 Transform:
   m_ObjectHideFlags: 0
@@ -402,7 +401,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3132704015643848612}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
@@ -699,6 +698,7 @@ MonoBehaviour:
   edgeResolveIterations: 1
   edgeDstThreshold: 0.5
   maskCutawayDst: 0.1
+  B_showViewMesh: 0
   viewMeshFilter: {fileID: 392354524362144345}
 --- !u!136 &8949253357783398663
 CapsuleCollider:

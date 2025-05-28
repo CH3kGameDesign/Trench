@@ -14,6 +14,8 @@ public class RagdollManager : MonoBehaviour
 
     public SkinnedMeshRenderer MR_skinnedMeshRenderer;
     public Rig R_aimRig;
+    public Transform T_secondHand;
+    public Transform T_secondElbow;
 
     [HideInInspector] public bool _rigActive = false;
     private float f_timeTilChange = 0;

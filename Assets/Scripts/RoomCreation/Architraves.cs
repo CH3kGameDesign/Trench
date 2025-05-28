@@ -2,22 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Architraves : MonoBehaviour
+[CreateAssetMenu(menuName = "Trench/AssetLists/Architraves", fileName = "New Architrave List")]
+public class Architraves : ScriptableObject
 {
-    public List<GameObject> skirting = new List<GameObject>();
-    public List<GameObject> cornices = new List<GameObject>();
+    public List<LineRenderer> skirting = new List<LineRenderer>();
+    public List<LineRenderer> cornices = new List<LineRenderer>();
 
     public Material defaultMaterial;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

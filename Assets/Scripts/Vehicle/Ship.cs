@@ -202,7 +202,10 @@ public class Ship : Vehicle
             {
                 CancelInvoke("DecelerateCar");
                 deceleratingCar = false;
-                GoForward(_temp.Inputs.v2_inputDir.y);
+                float _mult = 1;
+                if (_temp.Inputs.b_sprinting)
+                    _mult = 2;
+                GoForward(_temp.Inputs.v2_inputDir.y * _mult);
             }
             if (_temp.Inputs.v2_inputDir.y < 0)
             {

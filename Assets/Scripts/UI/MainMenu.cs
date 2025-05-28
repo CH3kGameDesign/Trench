@@ -6,6 +6,7 @@ using UnityEngine.Events;
 using System;
 using System.Runtime.CompilerServices;
 using UnityEngine.Rendering;
+using UnityEngine.InputSystem;
 
 public class MainMenu : MonoBehaviour
 {
@@ -86,7 +87,7 @@ public class MainMenu : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void Menu_Tapped()
@@ -98,6 +99,7 @@ public class MainMenu : MonoBehaviour
     private BaseController.gameStateEnum _prevGameState;
     public void Open()
     {
+        menuOpen = true;
         v3_camLastLocalPos = PlayerController.Instance.T_camHolder.GetChild(0).localPosition;
         q_camLastLocalRot = PlayerController.Instance.T_camHolder.GetChild(0).localRotation;
 
@@ -110,13 +112,10 @@ public class MainMenu : MonoBehaviour
         main._anim.Play("Open");
         SwitchTo(main);
         Time.timeScale = 0;
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
 
         _prevGameState = PlayerController.GameState;
-        PlayerController.Instance.GameState_Change(BaseController.gameStateEnum.inactive);
+        PlayerController.Instance.GameState_Change(BaseController.gameStateEnum.menu);
 
-        menuOpen = true;
     }
     public void Close()
     {
@@ -175,15 +174,6 @@ public class MainMenu : MonoBehaviour
         ArmorManager.Instance.CreateMaterialUI(customize.G_subOptions.transform);
         GamepadSwitch();
     }
-    public void CustomizeSetup_Back()
-    {
-        if (customize.G_listOptions.activeInHierarchy)
-            BackButton();
-        else
-        {
-            CustomizeSetup_Close();
-        }
-    }
     void CustomizeSetup_Close()
     {
         customize.G_listOptions.SetActive(true);
@@ -209,8 +199,13 @@ public class MainMenu : MonoBehaviour
     }
     public void BackButton()
     {
-        SwitchTo(main);
-        StartCoroutine(PlayerController.Instance.T_camHolder.GetChild(0).Move(v3_camMenuLocalPos, q_camLastLocalRot, true, 0.4f, AC_smooth));
+        if (customize.G_subOptions.activeInHierarchy)
+            CustomizeSetup_Close();
+        else
+        {
+            SwitchTo(main);
+            StartCoroutine(PlayerController.Instance.T_camHolder.GetChild(0).Move(v3_camMenuLocalPos, q_camLastLocalRot, true, 0.4f, AC_smooth));
+        }
     }
 
     void ButtonHit()
@@ -220,13 +215,21 @@ public class MainMenu : MonoBehaviour
     }
     public void GamepadSwitch(bool _back = false)
     {
-        EventSystem.current.UpdateModules();
         if (menuOpen)
         {
+            EventSystem.current.UpdateModules();
             if (!PlayerController.Instance.Inputs.b_isGamepad)
+            {
                 EventSystem.current.SetSelectedGameObject(null);
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
             else
+            {
                 EventSystem.current.SetSelectedGameObject(_current.DefaultButton(_back));
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
         }
     }
 

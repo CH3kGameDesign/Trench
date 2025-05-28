@@ -21,6 +21,7 @@ public class FieldOfView : MonoBehaviour
 
 	public float maskCutawayDst = .1f;
 
+	public bool B_showViewMesh = false;
 	public MeshFilter viewMeshFilter;
 	Mesh viewMesh;
 
@@ -29,6 +30,8 @@ public class FieldOfView : MonoBehaviour
 		viewMesh = new Mesh();
 		viewMesh.name = "View Mesh";
 		viewMeshFilter.mesh = viewMesh;
+
+		viewMeshFilter.gameObject.SetActive(B_showViewMesh);
 
 		StartCoroutine("FindTargetsWithDelay", .2f);
 	}
@@ -40,13 +43,14 @@ public class FieldOfView : MonoBehaviour
 		{
 			yield return new WaitForSeconds(delay);
 			FindVisibleTargets();
-		}
+        }
 	}
 
 	void LateUpdate()
-	{
-		DrawFieldOfView();
-	}
+    {
+		if (B_showViewMesh)
+			DrawFieldOfView();
+    }
 
 	void FindVisibleTargets()
 	{

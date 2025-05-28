@@ -13,8 +13,6 @@ public class RoomUpdater : MonoBehaviour
     public MeshCollider meshCollider;
 
     public GameObject arrow;
-    public GameObject length;
-    public GameObject angle;
 
     public Architraves architraves;
 
@@ -119,7 +117,7 @@ public class RoomUpdater : MonoBehaviour
             if (k >= GetComponent<MeshFilter>().mesh.vertices.Length)
                 k = 0;
 
-            GameObject wallActive = Instantiate(architraves.skirting[0], walls[j].mesh.vertices[0] + walls[j].transform.position, transform.rotation);
+            GameObject wallActive = Instantiate(architraves.skirting[0], walls[j].mesh.vertices[0] + walls[j].transform.position, transform.rotation).gameObject;
             wallActive.transform.LookAt(walls[j].mesh.vertices[3] + walls[j].transform.position);
             wallActive.transform.localEulerAngles -= new Vector3(0, 90, 0);
             wallActive.AddComponent<MeshFilter>();
@@ -127,37 +125,37 @@ public class RoomUpdater : MonoBehaviour
 
             cornices.Add(wallActive);
 
-            Vector3[] tempVerts = new Vector3[architraves.skirting[0].GetComponent<LineRenderer>().positionCount * 2];
-            for (int i = 0; i < architraves.skirting[0].GetComponent<LineRenderer>().positionCount; i++)
+            Vector3[] tempVerts = new Vector3[architraves.skirting[0].positionCount * 2];
+            for (int i = 0; i < architraves.skirting[0].positionCount; i++)
             {
-                tempVerts[i] = architraves.skirting[0].GetComponent<LineRenderer>().GetPosition(i);
+                tempVerts[i] = architraves.skirting[0].GetPosition(i);
             }
 
             float dist = Vector2.Distance(new Vector2(walls[j].mesh.vertices[0].x, walls[j].mesh.vertices[0].z), new Vector2(walls[j].mesh.vertices[3].x, walls[j].mesh.vertices[3].z));
-            for (int i = 0; i < architraves.skirting[0].GetComponent<LineRenderer>().positionCount; i++)
+            for (int i = 0; i < architraves.skirting[0].positionCount; i++)
             {
-                tempVerts[i + architraves.skirting[0].GetComponent<LineRenderer>().positionCount] = architraves.skirting[0].GetComponent<LineRenderer>().GetPosition(i) + (Vector3.right * dist);
+                tempVerts[i + architraves.skirting[0].positionCount] = architraves.skirting[0].GetPosition(i) + (Vector3.right * dist);
             }
-            Vector2[] tempUV = new Vector2[architraves.skirting[0].GetComponent<LineRenderer>().positionCount * 2];
+            Vector2[] tempUV = new Vector2[architraves.skirting[0].positionCount * 2];
             for (int i = 0; i < tempUV.Length; i++)
             {
                 Vector3 temp = tempVerts[i];
                 tempUV[i] = new Vector2(temp.x + temp.z, temp.y);
             }
 
-            int[] tempTris = new int[(architraves.skirting[0].GetComponent<LineRenderer>().positionCount - 1) * 6];
+            int[] tempTris = new int[(architraves.skirting[0].positionCount - 1) * 6];
 
-            for (int i = 0; i < architraves.skirting[0].GetComponent<LineRenderer>().positionCount - 1; i++)
+            for (int i = 0; i < architraves.skirting[0].positionCount - 1; i++)
             {
                 tempTris[i * 6] = i;
                 tempTris[(i * 6) + 1] = i + 1;
-                tempTris[(i * 6) + 2] = architraves.skirting[0].GetComponent<LineRenderer>().positionCount + i;
+                tempTris[(i * 6) + 2] = architraves.skirting[0].positionCount + i;
 
                 //Debug.Log(i + "," + (i + 1) + "," + (cornice.GetComponent<LineRenderer>().positionCount + i));
 
                 tempTris[(i * 6) + 3] = i + 1;
-                tempTris[(i * 6) + 4] = architraves.skirting[0].GetComponent<LineRenderer>().positionCount + i + 1;
-                tempTris[(i * 6) + 5] = architraves.skirting[0].GetComponent<LineRenderer>().positionCount + i;
+                tempTris[(i * 6) + 4] = architraves.skirting[0].positionCount + i + 1;
+                tempTris[(i * 6) + 5] = architraves.skirting[0].positionCount + i;
                 //Debug.Log((i + 1) + "," + (cornice.GetComponent<LineRenderer>().positionCount + i + 1) + "," + (cornice.GetComponent<LineRenderer>().positionCount + i));
             }
             wallActive.GetComponent<MeshFilter>().mesh.vertices = tempVerts;
@@ -183,7 +181,7 @@ public class RoomUpdater : MonoBehaviour
             if (k >= GetComponent<MeshFilter>().mesh.vertices.Length)
                 k = 0;
 
-            GameObject wallActive = Instantiate(architraves.cornices[0], GetComponent<MeshFilter>().mesh.vertices[j] + transform.position, transform.rotation);
+            GameObject wallActive = Instantiate(architraves.cornices[0], GetComponent<MeshFilter>().mesh.vertices[j] + transform.position, transform.rotation).gameObject;
             wallActive.transform.LookAt(GetComponent<MeshFilter>().mesh.vertices[k] + transform.position);
             wallActive.transform.localEulerAngles -= new Vector3(0, 90, 0);
             wallActive.AddComponent<MeshFilter>();
@@ -191,37 +189,37 @@ public class RoomUpdater : MonoBehaviour
 
             cornices.Add(wallActive);
 
-            Vector3[] tempVerts = new Vector3[architraves.cornices[0].GetComponent<LineRenderer>().positionCount * 2];
-            for (int i = 0; i < architraves.cornices[0].GetComponent<LineRenderer>().positionCount; i++)
+            Vector3[] tempVerts = new Vector3[architraves.cornices[0].positionCount * 2];
+            for (int i = 0; i < architraves.cornices[0].positionCount; i++)
             {
-                tempVerts[i] = architraves.cornices[0].GetComponent<LineRenderer>().GetPosition(i) + new Vector3(0, walls[j].height,0);
+                tempVerts[i] = architraves.cornices[0].GetPosition(i) + new Vector3(0, walls[j].height,0);
             }
 
             float dist = Vector2.Distance(new Vector2(GetComponent<MeshFilter>().mesh.vertices[j].x, GetComponent<MeshFilter>().mesh.vertices[j].z), new Vector2(GetComponent<MeshFilter>().mesh.vertices[k].x, GetComponent<MeshFilter>().mesh.vertices[k].z));
-            for (int i = 0; i < architraves.cornices[0].GetComponent<LineRenderer>().positionCount; i++)
+            for (int i = 0; i < architraves.cornices[0].positionCount; i++)
             {
-                tempVerts[i + architraves.cornices[0].GetComponent<LineRenderer>().positionCount] = architraves.cornices[0].GetComponent<LineRenderer>().GetPosition(i) + (Vector3.right * dist) + new Vector3(0, walls[j].height, 0);
+                tempVerts[i + architraves.cornices[0].positionCount] = architraves.cornices[0].GetPosition(i) + (Vector3.right * dist) + new Vector3(0, walls[j].height, 0);
             }
-            Vector2[] tempUV = new Vector2[architraves.cornices[0].GetComponent<LineRenderer>().positionCount * 2];
+            Vector2[] tempUV = new Vector2[architraves.cornices[0].positionCount * 2];
             for (int i = 0; i < tempUV.Length; i++)
             {
                 Vector3 temp = tempVerts[i];
                 tempUV[i] = new Vector2(temp.x + temp.z, temp.y);
             }
 
-            int[] tempTris = new int[(architraves.cornices[0].GetComponent<LineRenderer>().positionCount - 1) * 6];
+            int[] tempTris = new int[(architraves.cornices[0].positionCount - 1) * 6];
 
-            for (int i = 0; i < architraves.cornices[0].GetComponent<LineRenderer>().positionCount - 1; i++)
+            for (int i = 0; i < architraves.cornices[0].positionCount - 1; i++)
             {
                 tempTris[i * 6] = i;
                 tempTris[(i * 6) + 1] = i + 1;
-                tempTris[(i * 6) + 2] = architraves.cornices[0].GetComponent<LineRenderer>().positionCount + i;
+                tempTris[(i * 6) + 2] = architraves.cornices[0].positionCount + i;
 
                 //Debug.Log(i + "," + (i + 1) + "," + (cornice.GetComponent<LineRenderer>().positionCount + i));
 
                 tempTris[(i * 6) + 3] = i + 1;
-                tempTris[(i * 6) + 4] = architraves.cornices[0].GetComponent<LineRenderer>().positionCount + i + 1;
-                tempTris[(i * 6) + 5] = architraves.cornices[0].GetComponent<LineRenderer>().positionCount + i;
+                tempTris[(i * 6) + 4] = architraves.cornices[0].positionCount + i + 1;
+                tempTris[(i * 6) + 5] = architraves.cornices[0].positionCount + i;
                 //Debug.Log((i + 1) + "," + (cornice.GetComponent<LineRenderer>().positionCount + i + 1) + "," + (cornice.GetComponent<LineRenderer>().positionCount + i));
             }
             wallActive.GetComponent<MeshFilter>().mesh.vertices = tempVerts;

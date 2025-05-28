@@ -27,9 +27,6 @@ public class AgentController : BaseController
     public float F_attackDistance = 20;
     public List<Transform> T_targetTransforms = new List<Transform>();
     public LayerMask LM_hitScan;
-    private float f_fireTimer = 0;
-    private float f_burstTimer = 0;
-    private int i_burstRemaining = 0;
     private float f_searchDelay = 0.2f;
     private bool b_firing = false;
 

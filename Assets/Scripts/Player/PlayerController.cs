@@ -1,13 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.AI;
-using UnityEngine.InputSystem;
 using TMPro;
 using Unity.Collections;
-using static UnityEditor.Experimental.GraphView.GraphView;
 using Unity.VisualScripting;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using static UnityEditor.Experimental.GraphView.GraphView;
+using static UnityEngine.GraphicsBuffer;
 
 public class PlayerController : BaseController
 {
@@ -34,6 +36,7 @@ public class PlayerController : BaseController
     public float F_camRotSpeed = 240f;
     public float F_camAimRotSpeed = 80f;
     public float F_camSprintRotSpeed = 80f;
+
     private float f_camDistance = 5;
     public Camera C_camera;
     public Transform T_camHolder;
@@ -78,6 +81,7 @@ public class PlayerController : BaseController
     public Reticle reticle;
     public RectTransform RT_hitPoint;
     public RectTransform RT_lockOnPoint;
+    public float F_autoAimAngle = 20f;
 
     private bool b_radialOpen = false;
     private Coroutine C_timeScale = null;
@@ -782,16 +786,37 @@ public class PlayerController : BaseController
             if (Inputs.b_aiming)        _mult *= F_camAimRotSpeed;
             else if (b_isSprinting)     _mult *= F_camSprintRotSpeed;
             else                        _mult *= F_camRotSpeed;
+            if (AutoAim()) _mult *= 0.5f;
             v3_camDir += new Vector3(-Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0) * _mult;
             v3_camDir.x = Mathf.Clamp(v3_camDir.x, -80, 80);
-            AutoAim();
         }
-        T_camHolder.transform.rotation = Quaternion.Slerp(T_camHolder.transform.rotation, Quaternion.Euler(v3_camDir), Time.deltaTime * 10);
+            T_camHolder.transform.rotation = Quaternion.Lerp(T_camHolder.transform.rotation, Quaternion.Euler(v3_camDir), Time.deltaTime * 10);
     }
 
-    void AutoAim()
+    bool AutoAim()
     {
-        RaycastHit hit;
+        RaycastHit[] hits = Physics.SphereCastAll(Camera.main.transform.position + (Camera.main.transform.forward * (f_camDistance + 0.5f)), 0.2f, Camera.main.transform.forward, 100, LM_AutoAimRay);
+        foreach (var item in hits)
+        {
+            Vector3 dirToTarget = (item.point - Camera.main.transform.position).normalized;
+            if (Vector3.Angle(Camera.main.transform.forward, dirToTarget) < F_autoAimAngle / 2)
+            {
+                float dstToTarget = Vector3.Distance(item.point, Camera.main.transform.position);
+                if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, LM_CameraRay))
+                {
+                    /*
+                    float _mult = Inputs.b_aiming ? 0.5f : 1f;
+                    Vector3 dirToIntended = (item.transform.position - Camera.main.transform.position).normalized;
+                    Vector3 angle = Vector3.zero;
+                    angle.y = Mathf.Atan2(dirToIntended.x, dirToIntended.z) * Mathf.Rad2Deg;
+                    angle.x = Mathf.Atan2(dirToIntended.y, Mathf.Abs(dirToIntended.z) + Mathf.Abs(dirToIntended.x)) * Mathf.Rad2Deg;
+                    v3_camDir = Vector3.Lerp(v3_camDir, angle, Time.deltaTime * _mult);
+                    */
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     void CamCollision()
@@ -854,7 +879,7 @@ public class PlayerController : BaseController
     void Update_HitPoint()
     {
         RaycastHit hit;
-        if (Physics.SphereCast(Camera.main.transform.position + (Camera.main.transform.forward * f_camDistance), 0.2f, Camera.main.transform.forward, out hit, 100, LM_GunRay))
+        if (Physics.SphereCast(Camera.main.transform.position + (Camera.main.transform.forward * (f_camDistance + 0.5f)), 0.2f, Camera.main.transform.forward, out hit, 100, LM_GunRay))
         {
             T_aimPoint.position = hit.point;
             Vector3 _tarPos = Camera.main.WorldToScreenPoint(hit.point);
@@ -863,7 +888,10 @@ public class PlayerController : BaseController
             RT_hitPoint.anchoredPosition = _tarPos;
         }
         else
+        {
             RT_hitPoint.anchoredPosition = new Vector2(Screen.width / 2, Screen.height / 2) / Conversation.Instance.C_canvas.scaleFactor;
+            T_aimPoint.position = Camera.main.transform.position + (Camera.main.transform.forward * (f_camDistance + 100.5f));
+        }
     }
 
     void DialogueInput()
@@ -1016,7 +1044,6 @@ public class PlayerController : BaseController
     #region Input Actions
     public void Input_Movement(InputAction.CallbackContext cxt) { Inputs.v2_inputDir = Input_GetVector2(cxt); }
     public void Input_CamMovement(InputAction.CallbackContext cxt) { Inputs.v2_camInputDir = Input_GetVector2(cxt); }
-
     public void Input_Sprint(InputAction.CallbackContext cxt) { Inputs.b_sprinting = Input_GetPressed(cxt); }
     public void Input_Fire(InputAction.CallbackContext cxt) { Inputs.b_firing = Input_GetPressed(cxt); }
     public void Input_Aim(InputAction.CallbackContext cxt) { Inputs.b_aiming = Input_GetPressed(cxt); }
@@ -1028,6 +1055,12 @@ public class PlayerController : BaseController
     public void Input_Radial(InputAction.CallbackContext cxt) { Inputs.b_radial = Input_GetPressed(cxt); }
     public void Input_Melee(InputAction.CallbackContext cxt) { Inputs.b_melee = Input_GetPressed(cxt); }
     public void Input_Menu(InputAction.CallbackContext cxt) { if (cxt.phase == InputActionPhase.Started) MainMenu.Instance.Menu_Tapped(); }
+    public void Input_Back(InputAction.CallbackContext cxt)
+    {
+        if (cxt.phase == InputActionPhase.Started)
+            if (GameState == gameStateEnum.menu)
+                MainMenu.Instance.BackButton();
+    }
 
     public void Input_ChangedInput(PlayerInput input)
     {

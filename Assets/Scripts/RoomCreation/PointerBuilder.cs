@@ -36,32 +36,14 @@ public class PointerBuilder : MonoBehaviour
 
     private Vector3 firstClickPos;
 
-    public GameObject buttonPrefab;
-
-    public Transform gridButtonHolder;
-    public Transform heightButtonHolder;
-
     public GameObject arrow;
-    public GameObject length;
-    public GameObject angle;
 
-    public GameObject placeObject;
-
-    public GameObject placeHolder;
 
     public TextMeshProUGUI drawModeText;
-
+    
     public Architraves architraves;
 
 
-    public GameObject FurnitureMenu;
-
-    public Transform[] furnitureTabs;
-    public GameObject[] furnitureIcons;
-
-    public GameObject furniturePreview;
-
-    public TextMeshProUGUI tabTitle;
 
 
     // Start is called before the first frame update
@@ -88,7 +70,7 @@ public class PointerBuilder : MonoBehaviour
             {
                 switch (hit.transform.gameObject.layer)
                 {
-                    case 8:
+                    case 6:
                         drawMode = privateDrawMode;
 
                         switch (drawMode)
@@ -136,8 +118,6 @@ public class PointerBuilder : MonoBehaviour
                                 GO.GetComponent<RoomUpdater>().mf = GO.GetComponent<MeshFilter>();
                                 GO.GetComponent<RoomUpdater>().floor = GO.transform;
                                 GO.GetComponent<RoomUpdater>().arrow = arrow;
-                                GO.GetComponent<RoomUpdater>().length = length;
-                                GO.GetComponent<RoomUpdater>().angle = angle;
 
                                 GO.GetComponent<RoomUpdater>().architraves = architraves;
 
@@ -165,8 +145,6 @@ public class PointerBuilder : MonoBehaviour
                                     GO1.GetComponent<RoomUpdater>().mf = GO1.GetComponent<MeshFilter>();
                                     GO1.GetComponent<RoomUpdater>().floor = GO1.transform;
                                     GO1.GetComponent<RoomUpdater>().arrow = arrow;
-                                    GO1.GetComponent<RoomUpdater>().length = length;
-                                    GO1.GetComponent<RoomUpdater>().angle = angle;
 
                                     GO1.GetComponent<RoomUpdater>().architraves = architraves;
 
@@ -220,7 +198,7 @@ public class PointerBuilder : MonoBehaviour
                         }
 
                         break;
-                    case 9:
+                    case 7:
                         if (drawMode == drawModes.wall || drawMode == drawModes.arrow)
                         {
                             drawMode = drawModes.wall;
@@ -408,9 +386,9 @@ public class PointerBuilder : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit,1000, gridMask))
         {
-            Vector3Int vecInt = new Vector3Int(Mathf.RoundToInt(hit.point.x / (gridSize/100)), 0, Mathf.RoundToInt(hit.point.z / (gridSize / 100)));
+            Vector3Int vecInt = new Vector3Int(Mathf.RoundToInt(hit.point.x / gridSize), 0, Mathf.RoundToInt(hit.point.z / gridSize));
             Vector3 tempVec = vecInt;
-            tempVec *= (gridSize / 100);
+            tempVec *= gridSize;
             tempVec = new Vector3(tempVec.x, hit.point.y, tempVec.z);
             return tempVec;
         }
@@ -423,9 +401,9 @@ public class PointerBuilder : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit, 1000))
         {
-            Vector3Int vecInt = new Vector3Int(Mathf.RoundToInt(hit.point.x / (gridSize / 100)), 0, Mathf.RoundToInt(hit.point.z / (gridSize / 100)));
+            Vector3Int vecInt = new Vector3Int(Mathf.RoundToInt(hit.point.x / gridSize), 0, Mathf.RoundToInt(hit.point.z / gridSize));
             Vector3 tempVec = vecInt;
-            tempVec *= (gridSize / 100);
+            tempVec *= gridSize;
             tempVec = new Vector3(tempVec.x, height/100, tempVec.z);
             return tempVec;
         }
@@ -538,19 +516,15 @@ public class PointerBuilder : MonoBehaviour
         {
             case 0:
                 privateDrawMode = drawModes.square;
-                FurnitureMenu.SetActive(false);
                 break;
             case 1:
                 privateDrawMode = drawModes.point;
-                FurnitureMenu.SetActive(false);
                 break;
             case 2:
                 privateDrawMode = drawModes.placeNew;
-                FurnitureMenu.SetActive(true);
                 break;
             case 3:
                 privateDrawMode = drawModes.wall;
-                FurnitureMenu.SetActive(false);
                 break;
             default:
                 break;

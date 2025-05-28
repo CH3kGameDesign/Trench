@@ -3286,6 +3286,7 @@ MonoBehaviour:
   reticle: {fileID: 7354741345240833276}
   RT_hitPoint: {fileID: 860483062731045553}
   RT_lockOnPoint: {fileID: 954023447039251729}
+  F_autoAimAngle: 20
   T_equippedTreasure: {fileID: 0}
   DEBUG_EquippedGunNum: 000000000100000002000000
   I_curInteractable: {fileID: 0}
@@ -3535,6 +3536,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 98c2226e-c44b-4642-861a-c6ea764c4e52
     m_ActionName: 'Base/Menu[/Keyboard/escape,/XInputControllerWindows/start]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 668208048646576681}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: Input_Back
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 698df57b-b9ec-4653-bab5-632d6f2df0a5
+    m_ActionName: 'Base/Back[/XInputControllerWindows/buttonEast]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Base

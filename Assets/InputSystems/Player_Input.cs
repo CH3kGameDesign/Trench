@@ -207,6 +207,15 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Back"",
+                    ""type"": ""Button"",
+                    ""id"": ""698df57b-b9ec-4653-bab5-632d6f2df0a5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -671,6 +680,17 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""action"": ""Menu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6926fe66-378b-4eab-aca6-50b7a2bf1fdd"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""Back"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -720,6 +740,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
         m_Base_RadialMenu = m_Base.FindAction("RadialMenu", throwIfNotFound: true);
         m_Base_Melee = m_Base.FindAction("Melee", throwIfNotFound: true);
         m_Base_Menu = m_Base.FindAction("Menu", throwIfNotFound: true);
+        m_Base_Back = m_Base.FindAction("Back", throwIfNotFound: true);
     }
 
     ~@Player_Input()
@@ -813,6 +834,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
     private readonly InputAction m_Base_RadialMenu;
     private readonly InputAction m_Base_Melee;
     private readonly InputAction m_Base_Menu;
+    private readonly InputAction m_Base_Back;
     /// <summary>
     /// Provides access to input actions defined in input action map "Base".
     /// </summary>
@@ -876,6 +898,10 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Base/Menu".
         /// </summary>
         public InputAction @Menu => m_Wrapper.m_Base_Menu;
+        /// <summary>
+        /// Provides access to the underlying input action "Base/Back".
+        /// </summary>
+        public InputAction @Back => m_Wrapper.m_Base_Back;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -941,6 +967,9 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
             @Menu.started += instance.OnMenu;
             @Menu.performed += instance.OnMenu;
             @Menu.canceled += instance.OnMenu;
+            @Back.started += instance.OnBack;
+            @Back.performed += instance.OnBack;
+            @Back.canceled += instance.OnBack;
         }
 
         /// <summary>
@@ -991,6 +1020,9 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
             @Menu.started -= instance.OnMenu;
             @Menu.performed -= instance.OnMenu;
             @Menu.canceled -= instance.OnMenu;
+            @Back.started -= instance.OnBack;
+            @Back.performed -= instance.OnBack;
+            @Back.canceled -= instance.OnBack;
         }
 
         /// <summary>
@@ -1148,5 +1180,12 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMenu(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Back" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnBack(InputAction.CallbackContext context);
     }
 }

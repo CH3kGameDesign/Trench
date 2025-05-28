@@ -28,7 +28,7 @@ public class BaseController : MonoBehaviour
     [HideInInspector] public bool b_grounded = false;
 
     public static gameStateEnum GameState = gameStateEnum.active;
-    public enum gameStateEnum { inactive, active, dialogue, vehicle, ragdoll, dialogueResponse }
+    public enum gameStateEnum { inactive, active, dialogue, vehicle, ragdoll, dialogueResponse, menu }
     public virtual void Start()
     {
 
