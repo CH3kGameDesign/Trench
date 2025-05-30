@@ -81,7 +81,17 @@ public class PlayerController : BaseController
     public Reticle reticle;
     public RectTransform RT_hitPoint;
     public RectTransform RT_lockOnPoint;
-    public float F_autoAimAngle = 20f;
+
+    public autoAimClass autoAim = new autoAimClass();
+    [System.Serializable]
+    public class autoAimClass
+    {
+        public bool _active = true;
+        public float F_autoAimAngle = 20f;
+        [Range(0.1f, 1)] public float slowMultiplier = 0.5f;
+        public Vector2 hipDriftMultiplier = Vector2.zero;
+        public Vector2 aimDriftMultiplier = Vector2.zero;
+    }
 
     private bool b_radialOpen = false;
     private Coroutine C_timeScale = null;
@@ -786,8 +796,18 @@ public class PlayerController : BaseController
             if (Inputs.b_aiming)        _mult *= F_camAimRotSpeed;
             else if (b_isSprinting)     _mult *= F_camSprintRotSpeed;
             else                        _mult *= F_camRotSpeed;
-            if (AutoAim()) _mult *= 0.5f;
+            if (AutoAim()) _mult *= autoAim.slowMultiplier;
             v3_camDir += new Vector3(-Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0) * _mult;
+            if (v3_camDir.y > 180)
+            {
+                v3_camDir.y -= 360;
+                T_camHolder.transform.eulerAngles += new Vector3(0, -360, 0);
+            }
+            if (v3_camDir.y < -180)
+            {
+                v3_camDir.y += 360;
+                T_camHolder.transform.eulerAngles += new Vector3(0, 360, 0);
+            }
             v3_camDir.x = Mathf.Clamp(v3_camDir.x, -80, 80);
         }
             T_camHolder.transform.rotation = Quaternion.Lerp(T_camHolder.transform.rotation, Quaternion.Euler(v3_camDir), Time.deltaTime * 10);
@@ -795,22 +815,43 @@ public class PlayerController : BaseController
 
     bool AutoAim()
     {
-        RaycastHit[] hits = Physics.SphereCastAll(Camera.main.transform.position + (Camera.main.transform.forward * (f_camDistance + 0.5f)), 0.2f, Camera.main.transform.forward, 100, LM_AutoAimRay);
+        RaycastHit[] hits = Physics.SphereCastAll(Camera.main.transform.position + (Camera.main.transform.forward * (f_camDistance + 0.5f)), 1f, Camera.main.transform.forward, 100, LM_AutoAimRay);
         foreach (var item in hits)
         {
             Vector3 dirToTarget = (item.point - Camera.main.transform.position).normalized;
-            if (Vector3.Angle(Camera.main.transform.forward, dirToTarget) < F_autoAimAngle / 2)
+            if (Vector3.Angle(Camera.main.transform.forward, dirToTarget) < autoAim.F_autoAimAngle / 2)
             {
                 float dstToTarget = Vector3.Distance(item.point, Camera.main.transform.position);
-                if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, LM_CameraRay))
+                if (!Physics.Raycast(Camera.main.transform.position, dirToTarget, dstToTarget, LM_CameraRay))
                 {
-                    /*
-                    float _mult = Inputs.b_aiming ? 0.5f : 1f;
+                    HitObject HO;
+                    if (item.rigidbody.TryGetComponent<HitObject>(out HO))
+                    {
+                        AgentController AC;
+                        if(HO.RM_ragdollManager.GetAgentController(out AC))
+                        {
+                            if (AC.b_friendly || !AC.b_alive)
+                                continue;
+                        }
+                    }
+                    Vector2 _mult = Inputs.b_aiming ? autoAim.aimDriftMultiplier : autoAim.hipDriftMultiplier;
                     Vector3 dirToIntended = (item.transform.position - Camera.main.transform.position).normalized;
                     Vector3 angle = Vector3.zero;
-                    angle.y = Mathf.Atan2(dirToIntended.x, dirToIntended.z) * Mathf.Rad2Deg;
-                    angle.x = Mathf.Atan2(dirToIntended.y, Mathf.Abs(dirToIntended.z) + Mathf.Abs(dirToIntended.x)) * Mathf.Rad2Deg;
-                    v3_camDir = Vector3.Lerp(v3_camDir, angle, Time.deltaTime * _mult);
+                    if (_mult.x > 0)
+                    {
+                        angle.y = Mathf.Atan2(dirToIntended.x, dirToIntended.z) * Mathf.Rad2Deg;
+                        float dif = angle.y - v3_camDir.y;
+                        bool point = (dif > 0 && Inputs.v2_camInputDir.x >= 0) || (dif < 0 && Inputs.v2_camInputDir.x <= 0);
+                        if (point)
+                            v3_camDir.y = Mathf.Lerp(v3_camDir.y, angle.y, Time.deltaTime * _mult.x);
+                    }
+                    /*
+                    if (_mult.y > 0)
+                    {
+                        angle.x = Mathf.Atan2(dirToIntended.y, dirToIntended.x) * Mathf.Rad2Deg;
+                        //Debug.Log("Angle.x = " + angle.x.ToString() + "\nCam.x = " + v3_camDir.x);
+                        v3_camDir.x = Mathf.Lerp(v3_camDir.x, angle.x, Time.deltaTime * _mult.y);
+                    }
                     */
                     return true;
                 }

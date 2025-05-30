@@ -17,6 +17,8 @@ public class HitObject : MonoBehaviour
     public List<damageTypeEnum> ignoreDamageType = new List<damageTypeEnum>();
     public enum damageTypeEnum { all, bullet, fire, explosive};
 
+    public RagdollManager RM_ragdollManager;
+
     private void Start()
     {
         f_health = I_maxHealth;

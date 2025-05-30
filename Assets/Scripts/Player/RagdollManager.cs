@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
@@ -11,6 +12,7 @@ public class RagdollManager : MonoBehaviour
     public Collider[] C_colliders = new Collider[0];
     public Transform[] T_armorPoints = new Transform[0];
     public BaseController BaseController;
+    [HideInInspector] public bool agentController = false;
 
     public SkinnedMeshRenderer MR_skinnedMeshRenderer;
     public Rig R_aimRig;
@@ -24,6 +26,7 @@ public class RagdollManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        agentController = BaseController is AgentController;
         if (DisableOnStart)
             EnableRigidbodies(false);
         R_aimRig.weight = 0;
@@ -91,5 +94,15 @@ public class RagdollManager : MonoBehaviour
         }
         else if (_aim && _rigActive)
             f_timeTilChange = Mathf.Max(f_timeTilChange, 2f);
+    }
+    public bool GetAgentController(out AgentController _controller)
+    {
+        if (agentController)
+        {
+            _controller = BaseController as AgentController;
+            return true;
+        }
+        _controller = null;
+        return false;
     }
 }

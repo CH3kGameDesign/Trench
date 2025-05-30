@@ -20,7 +20,7 @@ public class AgentController : BaseController
     public string S_characterID;
     [HideInInspector] public Relationship.characterClass C_character = null;
     public List<Relationship.groupEnum> G_backupGroups = new List<Relationship.groupEnum>();
-    private bool b_friendly = true;
+    [HideInInspector] public bool b_friendly = true;
     public Transform T_messageHook;
 
     [Header("Combat Variables")]
