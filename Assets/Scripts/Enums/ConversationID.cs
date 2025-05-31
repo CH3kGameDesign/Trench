@@ -8,5 +8,6 @@ public enum ConversationID
 	[InspectorName ("Banter/Found/001")]	Banter_Found_001,
 	[InspectorName ("Banter/Attacked/001")]	Banter_Attacked_001,
 	[InspectorName ("Banter/Break/001")]	Banter_Break_001,
+	[InspectorName ("Banter/FriendlyFire/001")]	Banter_FriendlyFire_001,
 	[InspectorName ("Banter/Betray/001")]	Banter_Betray_001,
 }

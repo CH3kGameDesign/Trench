@@ -767,16 +767,17 @@ public class PlayerController : BaseController
     
     void ModelRotate()
     {
+        Vector3 _temp = NMA.transform.localEulerAngles;
+        _temp.y = v3_camDir.y;
         if (Inputs.b_aiming || Inputs.b_firing)
         {
-            Vector3 _temp = NMA.transform.localEulerAngles;
-            _temp.y = v3_camDir.y;
             NMA.transform.localEulerAngles = _temp;
             RM_ragdoll.Aiming(true);
         }
         else
         {
-            RM_ragdoll.Aiming(false);
+            float f = Quaternion.Angle(NMA.transform.localRotation, Quaternion.Euler(_temp));
+            RM_ragdoll.Aiming(false, f > 90);
             if (b_isMoving)
             {
                 Quaternion lookRot = Quaternion.LookRotation(v3_moveDir, Local_Up());
@@ -977,7 +978,7 @@ public class PlayerController : BaseController
         {
             AH_agentAudioHolder.Play(AgentAudioHolder.type.hurt);
         }
-        float _scale = Mathf.Clamp(Mathf.Pow((F_curHealth / F_maxHealth) * 2, 2), 0, 0.5f);
+        float _scale = Mathf.Clamp(Mathf.Pow((F_curHealth / F_maxHealth), 2) * 2, 0, 1);
         Ref.hurtFace.SetMaskScale(_scale, 0.05f);
     }
     public override void OnHeal(float _amt)
@@ -987,7 +988,7 @@ public class PlayerController : BaseController
         if (C_updateHealth != null) StopCoroutine(C_updateHealth);
         C_updateHealth = StartCoroutine(Health_Update(F_curHealth));
 
-        float _scale = Mathf.Clamp(Mathf.Pow((F_curHealth / F_maxHealth) * 2, 2), 0, 0.5f);
+        float _scale = Mathf.Clamp(Mathf.Pow((F_curHealth / F_maxHealth), 2) * 2, 0, 1);
         Ref.hurtFace.SetMaskScale(_scale, 0.05f);
 
         base.OnHeal(_amt);

@@ -52,6 +52,8 @@ public class Conversation : MonoBehaviour
         public string S_speakerString;
         public string S_curString;
 
+        public ConversationID _id;
+
         public Color C_speakerColor = Color.black;
         public Color C_curColor = Color.black;
         public Transform T_Hook;
@@ -132,7 +134,7 @@ public class Conversation : MonoBehaviour
         ConversationManager.banterClass _convo;
         foreach (var item in M_activeMessages)
         {
-            if (item.T_Hook == _hook)
+            if (item.T_Hook == _hook && _dialogueID == item._id)
                 return;
         }
         if (C_Manager.GetConversation(_dialogueID, out _convo))
@@ -140,6 +142,7 @@ public class Conversation : MonoBehaviour
             MessageClass _temp = new MessageClass();
             int _num = UnityEngine.Random.Range(0, _convo.strings.Count);
             _temp.S_Message = _convo.strings[_num];
+            _temp._id = _dialogueID;
             _temp.T_Hook = _hook;
             _temp.C_curColor = new Color(1, 1, 1, 0.8f);
             _temp.S_speakerString = _convo.strings[_num].GetName();

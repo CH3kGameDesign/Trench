@@ -80,14 +80,16 @@ public class RagdollManager : MonoBehaviour
         if (PrevDamageSpurces.Count > 1)
             PrevDamageSpurces.RemoveAt(0);
     }
-    public void Aiming(bool _aim)
+    public void Aiming(bool _aim, bool _force = false)
     {
-        if (f_timeTilChange <= 0)
+        if (f_timeTilChange <= 0 || _force)
         {
             if (_aim != _rigActive)
             {
                 if (_aim)
                     f_timeTilChange = 2f;
+                else
+                    f_timeTilChange = 0f;
                 _rigActive = _aim;
                 StartCoroutine(R_aimRig.Fade(_aim, _aim ? 0.02f : 0.25f));
             }

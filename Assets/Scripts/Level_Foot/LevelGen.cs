@@ -193,6 +193,7 @@ public class LevelGen : MonoBehaviour
                         break;
                     case LevelGen_Spawn.spawnTypeEnum.companion:
                         prefab = LG_Theme.GetCompanion(Random_Seeded);
+                        Random_Seeded.NextInt();
                         if (prefab != null)
                         {
                             GO = Instantiate(prefab, spawn.transform.position, Quaternion.Euler(Vector3.zero), transform);
@@ -201,6 +202,7 @@ public class LevelGen : MonoBehaviour
                         break;
                     case LevelGen_Spawn.spawnTypeEnum.enemy:
                         prefab = LG_Theme.GetEnemy(Random_Seeded);
+                        Random_Seeded.NextInt();
                         if (prefab != null)
                         {
                             GO = Instantiate(prefab, spawn.transform.position, Quaternion.Euler(Vector3.zero), transform);
@@ -209,6 +211,7 @@ public class LevelGen : MonoBehaviour
                         break;
                     case LevelGen_Spawn.spawnTypeEnum.treasure:
                         prefab = LG_Theme.GetTreasure(Random_Seeded);
+                        Random_Seeded.NextInt();
                         if (prefab != null)
                             GO = Instantiate(prefab, spawn.transform.position, spawn.transform.rotation, transform);
                         break;

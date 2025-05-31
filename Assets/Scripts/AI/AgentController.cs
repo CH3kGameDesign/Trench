@@ -463,6 +463,8 @@ public class AgentController : BaseController
                 else if (b_friendly)
                     Conversation.Instance.StartMessage(ConversationID.Banter_Betray_001, T_messageHook);
             }
+            else if (b_friendly)
+                Conversation.Instance.StartMessage(ConversationID.Banter_FriendlyFire_001, T_messageHook);
         }
         else
         {

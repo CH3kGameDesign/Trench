@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7197547650496893999}
   - component: {fileID: 4076457481858739809}
   m_Layer: 3
-  m_Name: PF_EnemyHolder
+  m_Name: PF_EnemyHolderSmall
   m_TagString: Character
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -58,7 +58,7 @@ MonoBehaviour:
   LM_TerrainRay:
     serializedVersion: 2
     m_Bits: 16960
-  F_maxHealth: 100
+  F_maxHealth: 50
   F_curHealth: 100
   gun_Equipped: {fileID: 0}
   gun_EquippedList:
@@ -69,7 +69,7 @@ MonoBehaviour:
   b_grounded: 0
   gunManager: {fileID: 11400000, guid: 1e3b59fdefa93a743beff3357901afa0, type: 2}
   fieldOfView: {fileID: 6328522580476208218}
-  S_characterID: 
+  S_characterID: Lido_Police
   C_character:
     name: 
     id: 
@@ -87,6 +87,7 @@ MonoBehaviour:
       loud: 0
       quiet: 0
   G_backupGroups: 01000000
+  b_friendly: 1
   T_messageHook: {fileID: 3737595237735131386}
   F_attackDistance: 20
   T_targetTransforms: []
@@ -683,7 +684,7 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6822896586392946825}
   m_Enabled: 1
-  m_AgentTypeID: 0
+  m_AgentTypeID: -1372625422
   m_Radius: 0.5
   m_Speed: 3
   m_Acceleration: 8
@@ -1220,15 +1221,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5286100758049851119, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.2
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 5286100758049851119, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.2
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 5286100758049851119, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1.2
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 5286100758049851119, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
       propertyPath: m_LocalPosition.x
