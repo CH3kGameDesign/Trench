@@ -204,9 +204,16 @@ public class Ship : Vehicle
                 deceleratingCar = false;
                 float _mult = 1;
                 if (_temp.Inputs.b_sprinting)
+                {
                     _mult = 2;
+                    _temp.Ref.speedLines.SetMaskActive(true);
+                }
+                else
+                    _temp.Ref.speedLines.SetMaskActive(false);
                 GoForward(_temp.Inputs.v2_inputDir.y * _mult);
             }
+            else
+                _temp.Ref.speedLines.SetMaskActive(false);
             if (_temp.Inputs.v2_inputDir.y < 0)
             {
                 CancelInvoke("DecelerateCar");

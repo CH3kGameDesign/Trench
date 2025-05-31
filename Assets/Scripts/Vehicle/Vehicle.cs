@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -69,6 +70,7 @@ using UnityEngine;
         {
             SeatInUse.Add(_seat);
             Seats[_seat].BC_agent = _player;
+            Seats[_seat].BC_agent.EnterExit_Vehicle(true, this);
             Seats[_seat].BC_agent.V_curVehicle = this;
             Seats[_seat].BC_agent.GameState_Change(BaseController.gameStateEnum.vehicle);
             Seat_AttachPlayer(Seats[_seat]);
@@ -103,6 +105,7 @@ using UnityEngine;
     {
         SeatInUse.Remove(_num);
         Seat_DetachPlayer(Seats[_num]);
+        Seats[_num].BC_agent.EnterExit_Vehicle(false, this);
         Seats[_num].BC_agent.GameState_Change(BaseController.gameStateEnum.active);
         Seats[_num].BC_agent.V_curVehicle = null;
         Seats[_num].BC_agent = null;

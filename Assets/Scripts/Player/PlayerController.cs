@@ -29,6 +29,9 @@ public class PlayerController : BaseController
         public ObjectiveHUD HUD_objective;
 
         public Transform T_backPivot;
+
+        public SpeedLines speedLines;
+        public SpeedLines hurtFace;
     }
 
     [Header ("Camera Values")]
@@ -440,6 +443,7 @@ public class PlayerController : BaseController
         AH_agentAudioHolder.Play(AgentAudioHolder.type.sprint);
         MusicHandler.SetVolume(MusicHandler.typeEnum.drums, 1);
         b_isSprinting = true;
+        Ref.speedLines.SetMaskActive(true);
     }
     void SprintStop()
     {
@@ -448,6 +452,7 @@ public class PlayerController : BaseController
         AH_agentAudioHolder.Stop(AgentAudioHolder.type.sprint);
         MusicHandler.SetVolume(MusicHandler.typeEnum.drums, 0);
         b_isSprinting = false;
+        Ref.speedLines.SetMaskActive(false);
     }
 
     void AerialMovement()
@@ -969,7 +974,11 @@ public class PlayerController : BaseController
         if (F_curHealth <= 0)
             OnDeath();
         else
+        {
             AH_agentAudioHolder.Play(AgentAudioHolder.type.hurt);
+        }
+        float _scale = Mathf.Clamp(Mathf.Pow((F_curHealth / F_maxHealth) * 2, 2), 0, 0.5f);
+        Ref.hurtFace.SetMaskScale(_scale, 0.05f);
     }
     public override void OnHeal(float _amt)
     {
@@ -977,6 +986,9 @@ public class PlayerController : BaseController
 
         if (C_updateHealth != null) StopCoroutine(C_updateHealth);
         C_updateHealth = StartCoroutine(Health_Update(F_curHealth));
+
+        float _scale = Mathf.Clamp(Mathf.Pow((F_curHealth / F_maxHealth) * 2, 2), 0, 0.5f);
+        Ref.hurtFace.SetMaskScale(_scale, 0.05f);
 
         base.OnHeal(_amt);
     }
@@ -1011,6 +1023,7 @@ public class PlayerController : BaseController
         Invoke(nameof(Restart), 3f);
         CloseRadial();
 
+        Ref.speedLines.SetMaskActive(false);
         AH_agentAudioHolder.Play(AgentAudioHolder.type.death);
     }
 
@@ -1026,6 +1039,10 @@ public class PlayerController : BaseController
         C_timeScale = StartCoroutine(TimeScale(_scale));
     }
 
+    public override void EnterExit_Vehicle(bool _enter, Vehicle _vehicle)
+    {
+        Ref.speedLines.SetMaskActive(false);
+    }
 
     IEnumerator TimeScale (float _scale)
     {

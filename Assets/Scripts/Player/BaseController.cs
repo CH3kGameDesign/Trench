@@ -101,4 +101,8 @@ public class BaseController : MonoBehaviour
     {
 
     }
+    public virtual void EnterExit_Vehicle(bool _enter, Vehicle _vehicle)
+    {
+
+    }
 }
