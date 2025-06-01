@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
+using static UnityEditor.Progress;
 
 public class RoomUpdater : MonoBehaviour
 {
@@ -35,6 +36,9 @@ public class RoomUpdater : MonoBehaviour
         public MeshCollider meshCollider;
         public GameObject arrow;
     }
+
+    public GameObject upArrow;
+    public GameObject downArrow;
 
     public List<wall> walls = new List<wall>();
 
@@ -73,7 +77,8 @@ public class RoomUpdater : MonoBehaviour
 
     public void ShowArrows()
     {
-        //boxCollider.enabled = false;
+        GameObject GO;
+        //Wall Arrow
         foreach (var item in walls)
         {
             if (item.arrow != null)
@@ -81,12 +86,30 @@ public class RoomUpdater : MonoBehaviour
                 GameObject.Destroy(item.arrow);
                 item.arrow = null;
             }
-            //item.boxCollider.enabled = false;
-            GameObject GO = Instantiate(arrow, item.transform.position, item.transform.rotation, item.transform);
+            GO = Instantiate(arrow, item.transform.position, item.transform.rotation, item.transform);
             GO.transform.LookAt(item.transform.position + new Vector3(item.mf.mesh.vertices[0].x, 0, item.mf.mesh.vertices[0].z));
             GO.transform.localEulerAngles += new Vector3(0, -90, 0);
             item.arrow = GO;
         }
+        //Up Arrow
+        if (upArrow != null)
+        {
+            GameObject.Destroy(upArrow);
+            upArrow = null;
+        }
+        Vector3 height = new Vector3(0, walls[0].height, 0);
+        GO = Instantiate(arrow, mf.transform.position + height, mf.transform.rotation, mf.transform);
+        GO.transform.localEulerAngles = new Vector3(90, 0, 0);
+        upArrow = GO;
+        //Down Arrow
+        if (downArrow != null)
+        {
+            GameObject.Destroy(upArrow);
+            downArrow = null;
+        }
+        GO = Instantiate(arrow, mf.transform.position, mf.transform.rotation, mf.transform);
+        GO.transform.localEulerAngles = new Vector3(-90, 0, 0);
+        downArrow = GO;
         UpdateArchitraves();
     }
 

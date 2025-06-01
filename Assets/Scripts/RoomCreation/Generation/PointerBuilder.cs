@@ -44,8 +44,6 @@ public class PointerBuilder : MonoBehaviour
     public Architraves architraves;
 
 
-
-
     // Start is called before the first frame update
     void Start()
     {
@@ -62,6 +60,7 @@ public class PointerBuilder : MonoBehaviour
             if (Physics.Raycast(ray, out hit, 1000, arrowMask))
             {
                 activeArrow = hit.transform;
+                activeArrow.localScale = Vector3.one * 1.1f;
                 firstClickPos = GetPos();
                 drawMode = drawModes.arrow;
                 return;
@@ -198,16 +197,13 @@ public class PointerBuilder : MonoBehaviour
                         }
 
                         break;
-                    case 7:
-                        if (drawMode == drawModes.wall || drawMode == drawModes.arrow)
-                        {
-                            drawMode = drawModes.wall;
-                            Transform activeWallTemp = GetWall();
-                            if (activeWallTemp != activeWall && activeWall != null)
-                                activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
-                            activeWall = activeWallTemp;
-                            activeWall.GetComponentInParent<RoomUpdater>().ShowArrows();
-                        }
+                    case 14:
+                        drawMode = drawModes.wall;
+                        Transform activeWallTemp = GetWall();
+                        if (activeWallTemp != activeWall && activeWall != null)
+                            activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
+                        activeWall = activeWallTemp;
+                        activeWall.GetComponentInParent<RoomUpdater>().ShowArrows();
                         break;
                     default:
                         break;
@@ -248,34 +244,38 @@ public class PointerBuilder : MonoBehaviour
                 drawModeText.text = "DRAW MODE: Arrow";
                 if (Input.GetMouseButton(0))
                 {
+                    RoomUpdater RM = activeWall.GetComponentInParent<RoomUpdater>();
                     Vector3 temp = GetPos();
                     temp = new Vector3(temp.x, firstClickPos.y, temp.z);
-                    foreach (var item in activeWall.GetComponentInParent<RoomUpdater>().walls)
+                    Vector3 changeFinal = temp - firstClickPos;
+                    changeFinal = ClampPoint(changeFinal, activeArrow.up * -1, activeArrow.up * 1);
+
+                    RM.transform.position += changeFinal / 2;
+                    if (RM.upArrow == activeArrow.parent.gameObject)
                     {
 
+                    }
+                    foreach (var item in RM.walls)
+                    {
                         if (item.arrow == activeArrow.parent.gameObject)
                         {
-                            Vector3 changeFinal = temp - firstClickPos;
-                            changeFinal = ClampPoint(changeFinal, activeArrow.right * -10, activeArrow.right * 10);
-                            //changeFinal = new Vector3(changeFinal.x * Mathf.Abs(activeArrow.forward.z), 0, changeFinal.z * Mathf.Abs(activeArrow.forward.x));
-                            //changeFinal = new Vector3(-activeArrow.forward.z, 0, activeArrow.forward.x) * (changeFinal.x + changeFinal.z);
-                            activeWall.GetComponentInParent<RoomUpdater>().transform.position += changeFinal / 2;
-                            for (int i = 0; i < activeWall.GetComponentInParent<RoomUpdater>().vertPos.Length; i++)
+                            for (int i = 0; i < RM.vertPos.Length; i++)
                             {
                                 if (i == item.verts.x || i == item.verts.y)
-                                    activeWall.GetComponentInParent<RoomUpdater>().vertPos[i] += changeFinal / 2;
+                                    RM.vertPos[i] += changeFinal / 2;
                                 else
-                                    activeWall.GetComponentInParent<RoomUpdater>().vertPos[i] -= changeFinal / 2;
+                                    RM.vertPos[i] -= changeFinal / 2;
                             }
                             break;
                         }
                     }
-                    activeWall.GetComponentInParent<RoomUpdater>().UpdateMeshes();
+                    RM.UpdateMeshes();
                     firstClickPos = temp;
                 }
                 if (Input.GetMouseButtonUp(0))
                 {
                     activeWall.GetComponentInParent<RoomUpdater>().ShowArrows();
+                    activeArrow.localScale = Vector3.one;
                 }
                 break;
             default:
