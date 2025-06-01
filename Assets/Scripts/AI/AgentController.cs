@@ -4,8 +4,6 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using static Resource;
-using static UnityEditor.Experimental.GraphView.GraphView;
-using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 
 public class AgentController : BaseController

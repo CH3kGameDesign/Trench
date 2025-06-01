@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http.Headers;
-using UnityEditor;
-using UnityEditor.Rendering;
 using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 [CreateAssetMenu(menuName = "Trench/AssetLists/ConversationManager", fileName = "New Conversation Manager")]
 public class ConversationManager : ScriptableObject

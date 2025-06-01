@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-using static UnityEditor.Progress;
 using static Consumable;
 
 #if UNITY_EDITOR

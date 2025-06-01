@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.AI.Navigation;
 using Unity.Mathematics;
-using static UnityEditor.Progress;
 using static Layout_Basic;
 using static UnityEngine.EventSystems.EventTrigger;
-using UnityEngine.WSA;
 using static Themes;
 
 public class LevelGen : MonoBehaviour

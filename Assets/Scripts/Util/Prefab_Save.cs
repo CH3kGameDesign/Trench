@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using System.IO;
-using UnityEngine.WSA;
 
 public class Prefab_Save : MonoBehaviour
 {
@@ -21,7 +20,7 @@ public class Prefab_Save : MonoBehaviour
     {
         
     }
-
+#if UNITY_EDITOR
     public void SavePrefabs()
     {
         string root;
@@ -68,4 +67,5 @@ public class Prefab_Save : MonoBehaviour
             }
         }
     }
+#endif
 }
