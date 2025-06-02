@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -166,6 +167,18 @@ public static class CKUtil
     {
         int _ran = Random_Seeded.NextInt(0, ts.Count);
         return ts[_ran];
+    }
+
+    public static T[] Reverse<T>(this T[] ts)
+    {
+        T[] _temp = new T[ts.Length];
+        int j = ts.Length - 1;
+        for (int i = 0; i < ts.Length; i++)
+        {
+            _temp[i] = ts[j];
+            j--;
+        }
+        return _temp;
     }
 
     public static void PlayClip(this Animator _anim, string _name)

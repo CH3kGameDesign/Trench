@@ -9,9 +9,11 @@ public class RoomUpdater : MonoBehaviour
     public string roomName;
     public Transform floor;
     public MeshFilter mf;
+    public MeshFilter mf_Ceiling;
 
     public BoxCollider boxCollider;
     public MeshCollider meshCollider;
+    public MeshCollider meshCollider_Ceiling;
 
     public GameObject arrow;
 
@@ -26,6 +28,7 @@ public class RoomUpdater : MonoBehaviour
             new Vector3(0,0,1),
             new Vector3(1,0,1)
         };
+    public List<wall> walls = new List<wall>();
     public class wall
     {
         public Transform transform;
@@ -40,7 +43,7 @@ public class RoomUpdater : MonoBehaviour
     public GameObject upArrow;
     public GameObject downArrow;
 
-    public List<wall> walls = new List<wall>();
+    public float height = 1;
 
     public List<GameObject> cornices = new List<GameObject>();
     // Start is called before the first frame update
@@ -58,6 +61,7 @@ public class RoomUpdater : MonoBehaviour
     public void UpdateMeshes()
     {
         UpdateFloor();
+        UpdateCeiling();
 
         for (int i = 0; i < walls.Count; i++)
             UpdateWall(walls[i]);
@@ -73,6 +77,21 @@ public class RoomUpdater : MonoBehaviour
         mf.mesh.uv = temp;
         mf.mesh.RecalculateBounds();
         meshCollider.sharedMesh = mf.mesh;
+        //boxCollider.size = new Vector3(Mathf.Abs(vertPos[0].x - vertPos[3].x), 0.01f, Mathf.Abs(vertPos[0].z - vertPos[3].z));
+    }
+
+    public void UpdateCeiling()
+    {
+        mf_Ceiling.transform.localPosition = Vector3.up * height;
+        mf_Ceiling.mesh.vertices = vertPos.Reverse();
+
+        Vector2[] temp = new Vector2[mf_Ceiling.mesh.vertices.Length];
+        for (int i = 0; i < temp.Length; i++)
+            temp[i] = new Vector2(mf_Ceiling.mesh.vertices[i].x, mf_Ceiling.mesh.vertices[i].z);
+        mf_Ceiling.mesh.uv = temp;
+        mf_Ceiling.mesh.RecalculateNormals();
+        mf_Ceiling.mesh.RecalculateBounds();
+        meshCollider_Ceiling.sharedMesh = mf.mesh;
         //boxCollider.size = new Vector3(Mathf.Abs(vertPos[0].x - vertPos[3].x), 0.01f, Mathf.Abs(vertPos[0].z - vertPos[3].z));
     }
 
@@ -98,8 +117,8 @@ public class RoomUpdater : MonoBehaviour
             GameObject.Destroy(upArrow);
             upArrow = null;
         }
-        Vector3 height = new Vector3(0, walls[0].height, 0);
-        GO = Instantiate(arrow, mf.transform.position + height, mf.transform.rotation, mf.transform);
+        Vector3 _height = new Vector3(0, height, 0);
+        GO = Instantiate(arrow, mf.transform.position + _height, mf.transform.rotation, mf.transform);
         GO.name = "UpArrow";
         GO.transform.localEulerAngles = new Vector3(90, 0, 0);
         upArrow = GO;

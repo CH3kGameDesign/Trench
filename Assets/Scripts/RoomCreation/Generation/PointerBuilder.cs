@@ -113,16 +113,25 @@ public class PointerBuilder : MonoBehaviour
                                 //meshTemp.uv = meshTemp2.uv;
                                 //meshTemp.triangles = meshTemp2.triangles;
                                 activeSquare = GO.transform;
-                                GO.AddComponent<RoomUpdater>();
-                                GO.GetComponent<RoomUpdater>().roomName = GO.name;
-                                GO.GetComponent<RoomUpdater>().mf = GO.GetComponent<MeshFilter>();
-                                GO.GetComponent<RoomUpdater>().floor = GO.transform;
-                                GO.GetComponent<RoomUpdater>().arrow = arrow;
+                                RoomUpdater RM = GO.AddComponent<RoomUpdater>();
+                                RM.roomName = GO.name;
+                                RM.mf = GO.GetComponent<MeshFilter>();
+                                RM.floor = GO.transform;
+                                RM.arrow = arrow;
 
-                                GO.GetComponent<RoomUpdater>().architraves = architraves;
+                                RM.height = 3;
 
-                                GO.GetComponent<RoomUpdater>().boxCollider = GO.GetComponent<BoxCollider>();
-                                GO.GetComponent<RoomUpdater>().meshCollider = GO.GetComponent<MeshCollider>();
+                                RM.architraves = architraves;
+
+                                RM.boxCollider = GO.GetComponent<BoxCollider>();
+                                RM.meshCollider = GO.GetComponent<MeshCollider>();
+
+                                GameObject GO2 = Instantiate(squarePrefab, activeSquare);
+                                RM.mf_Ceiling = GO2.GetComponent<MeshFilter>();
+                                RM.meshCollider_Ceiling = GO2.GetComponent<MeshCollider>();
+
+                                GO2.GetComponent<MeshFilter>().mesh = tempMesh;
+                                GO2.GetComponent<MeshCollider>().sharedMesh = tempMesh;
                                 AddWalls(GO.GetComponent<RoomUpdater>());
                                 break;
                             case drawModes.point:
@@ -291,6 +300,7 @@ public class PointerBuilder : MonoBehaviour
             {
                 item.height += change;
             }
+            RM.height += change;
             return;
         }
         if (RM.downArrow == activeArrow.parent.gameObject)
@@ -300,6 +310,7 @@ public class PointerBuilder : MonoBehaviour
             {
                 item.height -= change;
             }
+            RM.height -= change;
             RM.transform.position += changeFinal;
             return;
         }
