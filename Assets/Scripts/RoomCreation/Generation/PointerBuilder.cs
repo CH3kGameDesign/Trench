@@ -63,6 +63,7 @@ public class PointerBuilder : MonoBehaviour
                 activeArrow.localScale = Vector3.one * 1.1f;
                 firstClickPos = GetPos();
                 drawMode = drawModes.arrow;
+                FocusGrid(activeArrow);
                 return;
             }
             if (Physics.Raycast(ray, out hit, 1000))
@@ -222,11 +223,10 @@ public class PointerBuilder : MonoBehaviour
                 }
                 if (Input.GetMouseButtonUp(0) && activeSquare != null)
                 {
-                    if (activeSquare.localScale.x < 0.1f || activeSquare.localScale.y < 0.1f)
-                    {
+                    //if (activeSquare.localScale.x < 0.1f || activeSquare.localScale.y < 0.1f)
+                    //    GameObject.Destroy(activeSquare.gameObject);
+                    if (firstClickPos == GetPos())
                         GameObject.Destroy(activeSquare.gameObject);
-
-                    }
                     activeSquare = null;
                 }
                 break;
@@ -242,46 +242,82 @@ public class PointerBuilder : MonoBehaviour
                 break;
             case drawModes.arrow:
                 drawModeText.text = "DRAW MODE: Arrow";
-                if (Input.GetMouseButton(0))
+                if (activeArrow != null)
                 {
-                    RoomUpdater RM = activeWall.GetComponentInParent<RoomUpdater>();
-                    Vector3 temp = GetPos();
-                    temp = new Vector3(temp.x, firstClickPos.y, temp.z);
-                    Vector3 changeFinal = temp - firstClickPos;
-                    changeFinal = ClampPoint(changeFinal, activeArrow.up * -1, activeArrow.up * 1);
-
-                    RM.transform.position += changeFinal / 2;
-                    if (RM.upArrow == activeArrow.parent.gameObject)
+                    if (Input.GetMouseButton(0))
                     {
+                        RoomUpdater RM = activeWall.GetComponentInParent<RoomUpdater>();
+                        Vector3 temp = GetPos();
+                        //temp = new Vector3(temp.x, firstClickPos.y, temp.z);
+                        Vector3 changeFinal = temp - firstClickPos;
+                        changeFinal = ClampPoint(changeFinal, activeArrow.up * -1, activeArrow.up * 1);
+                        ArrowMove(RM, changeFinal);
 
+                        RM.UpdateMeshes();
+                        firstClickPos = temp;
                     }
-                    foreach (var item in RM.walls)
+                    if (Input.GetMouseButtonUp(0))
                     {
-                        if (item.arrow == activeArrow.parent.gameObject)
-                        {
-                            for (int i = 0; i < RM.vertPos.Length; i++)
-                            {
-                                if (i == item.verts.x || i == item.verts.y)
-                                    RM.vertPos[i] += changeFinal / 2;
-                                else
-                                    RM.vertPos[i] -= changeFinal / 2;
-                            }
-                            break;
-                        }
+                        activeWall.GetComponentInParent<RoomUpdater>().ShowArrows();
+                        activeArrow.localScale = Vector3.one;
                     }
-                    RM.UpdateMeshes();
-                    firstClickPos = temp;
-                }
-                if (Input.GetMouseButtonUp(0))
-                {
-                    activeWall.GetComponentInParent<RoomUpdater>().ShowArrows();
-                    activeArrow.localScale = Vector3.one;
                 }
                 break;
             default:
                 break;
         }
+        if (Input.GetMouseButtonUp(0))
+            UnfocusGrid();
+    }
 
+    void FocusGrid(Transform pos)
+    {
+        grid.position = pos.position;
+        grid.LookAt(Camera.main.transform);
+        grid.up = grid.forward;
+    }
+    void UnfocusGrid()
+    {
+        grid.rotation = new Quaternion();
+        grid.position = new Vector3(0, height, 0);
+    }
+
+    void ArrowMove(RoomUpdater RM, Vector3 changeFinal)
+    {
+        if (RM.upArrow == activeArrow.parent.gameObject)
+        {
+            float change = changeFinal.y;
+            foreach (var item in RM.walls)
+            {
+                item.height += change;
+            }
+            return;
+        }
+        if (RM.downArrow == activeArrow.parent.gameObject)
+        {
+            float change = changeFinal.y;
+            foreach (var item in RM.walls)
+            {
+                item.height -= change;
+            }
+            RM.transform.position += changeFinal;
+            return;
+        }
+        foreach (var item in RM.walls)
+        {
+            if (item.arrow == activeArrow.parent.gameObject)
+            {
+                RM.transform.position += changeFinal / 2;
+                for (int i = 0; i < RM.vertPos.Length; i++)
+                {
+                    if (i == item.verts.x || i == item.verts.y)
+                        RM.vertPos[i] += changeFinal / 2;
+                    else
+                        RM.vertPos[i] -= changeFinal / 2;
+                }
+                return;
+            }
+        }
     }
 
     public static Vector3 ClampPoint(Vector3 point, Vector3 segmentStart, Vector3 segmentEnd)
@@ -386,10 +422,11 @@ public class PointerBuilder : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit,1000, gridMask))
         {
-            Vector3Int vecInt = new Vector3Int(Mathf.RoundToInt(hit.point.x / gridSize), 0, Mathf.RoundToInt(hit.point.z / gridSize));
-            Vector3 tempVec = vecInt;
+            //Vector3Int vecInt = new Vector3Int(Mathf.RoundToInt(hit.point.x / gridSize), 0, Mathf.RoundToInt(hit.point.z / gridSize));
+            //Vector3 tempVec = vecInt;
+            Vector3 tempVec = new Vector3Int(Mathf.RoundToInt(hit.point.x / gridSize), Mathf.RoundToInt(hit.point.y / gridSize), Mathf.RoundToInt(hit.point.z / gridSize));
             tempVec *= gridSize;
-            tempVec = new Vector3(tempVec.x, hit.point.y, tempVec.z);
+            //tempVec = new Vector3(tempVec.x, tempVec.y, tempVec.z);
             return tempVec;
         }
         return new Vector3(0,40400,0);

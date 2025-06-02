@@ -61,6 +61,7 @@ public class RoomUpdater : MonoBehaviour
 
         for (int i = 0; i < walls.Count; i++)
             UpdateWall(walls[i]);
+        UpdateArchitraves();
     }
     
     public void UpdateFloor()
@@ -99,18 +100,19 @@ public class RoomUpdater : MonoBehaviour
         }
         Vector3 height = new Vector3(0, walls[0].height, 0);
         GO = Instantiate(arrow, mf.transform.position + height, mf.transform.rotation, mf.transform);
+        GO.name = "UpArrow";
         GO.transform.localEulerAngles = new Vector3(90, 0, 0);
         upArrow = GO;
         //Down Arrow
         if (downArrow != null)
         {
-            GameObject.Destroy(upArrow);
+            GameObject.Destroy(downArrow);
             downArrow = null;
         }
         GO = Instantiate(arrow, mf.transform.position, mf.transform.rotation, mf.transform);
+        GO.name = "DownArrow";
         GO.transform.localEulerAngles = new Vector3(-90, 0, 0);
         downArrow = GO;
-        UpdateArchitraves();
     }
 
     public void UpdateArchitraves()
@@ -140,11 +142,13 @@ public class RoomUpdater : MonoBehaviour
             if (k >= GetComponent<MeshFilter>().mesh.vertices.Length)
                 k = 0;
 
-            GameObject wallActive = Instantiate(architraves.skirting[0], walls[j].mesh.vertices[0] + walls[j].transform.position, transform.rotation).gameObject;
-            wallActive.transform.LookAt(walls[j].mesh.vertices[3] + walls[j].transform.position);
+            GameObject wallActive = new GameObject("Skirting:" + j.ToString());
+            wallActive.transform.position = walls[j].mesh.vertices[0] + walls[j].transform.position;
+            wallActive.transform.parent = transform;
+            wallActive.transform.LookAt(walls[j].mesh.vertices[1] + walls[j].transform.position);
             wallActive.transform.localEulerAngles -= new Vector3(0, 90, 0);
-            wallActive.AddComponent<MeshFilter>();
-            wallActive.AddComponent<MeshRenderer>();
+            MeshFilter MF = wallActive.AddComponent<MeshFilter>();
+            MeshRenderer MR = wallActive.AddComponent<MeshRenderer>();
 
             cornices.Add(wallActive);
 
@@ -181,14 +185,14 @@ public class RoomUpdater : MonoBehaviour
                 tempTris[(i * 6) + 5] = architraves.skirting[0].positionCount + i;
                 //Debug.Log((i + 1) + "," + (cornice.GetComponent<LineRenderer>().positionCount + i + 1) + "," + (cornice.GetComponent<LineRenderer>().positionCount + i));
             }
-            wallActive.GetComponent<MeshFilter>().mesh.vertices = tempVerts;
-            wallActive.GetComponent<MeshFilter>().mesh.uv = tempUV;
-            wallActive.GetComponent<MeshFilter>().mesh.triangles = tempTris;
+            MF.mesh.vertices = tempVerts;
+            MF.mesh.uv = tempUV;
+            MF.mesh.triangles = tempTris;
 
-            wallActive.GetComponent<MeshRenderer>().material = architraves.defaultMaterial;
+            MR.material = architraves.defaultMaterial;
 
-            wallActive.GetComponent<MeshFilter>().mesh.RecalculateNormals();
-            wallActive.GetComponent<MeshFilter>().mesh.RecalculateBounds();
+            MF.mesh.RecalculateNormals();
+            MF.mesh.RecalculateBounds();
 
             //wallActive.meshCollider.sharedMesh = wallActive.mf.mesh;
             //wallActive.boxCollider.size = new Vector3(Mathf.Abs(vertPos[wallActive.verts.x].x - vertPos[wallActive.verts.y].x), wallActive.height, Mathf.Abs(vertPos[wallActive.verts.x].z - vertPos[wallActive.verts.y].z));
@@ -204,11 +208,13 @@ public class RoomUpdater : MonoBehaviour
             if (k >= GetComponent<MeshFilter>().mesh.vertices.Length)
                 k = 0;
 
-            GameObject wallActive = Instantiate(architraves.cornices[0], GetComponent<MeshFilter>().mesh.vertices[j] + transform.position, transform.rotation).gameObject;
+            GameObject wallActive = new GameObject("Cornice:" + j.ToString());
+            wallActive.transform.position = GetComponent<MeshFilter>().mesh.vertices[j] + transform.position;
+            wallActive.transform.parent = transform;
             wallActive.transform.LookAt(GetComponent<MeshFilter>().mesh.vertices[k] + transform.position);
             wallActive.transform.localEulerAngles -= new Vector3(0, 90, 0);
-            wallActive.AddComponent<MeshFilter>();
-            wallActive.AddComponent<MeshRenderer>();
+            MeshFilter MF = wallActive.AddComponent<MeshFilter>();
+            MeshRenderer MR = wallActive.AddComponent<MeshRenderer>();
 
             cornices.Add(wallActive);
 
@@ -245,14 +251,14 @@ public class RoomUpdater : MonoBehaviour
                 tempTris[(i * 6) + 5] = architraves.cornices[0].positionCount + i;
                 //Debug.Log((i + 1) + "," + (cornice.GetComponent<LineRenderer>().positionCount + i + 1) + "," + (cornice.GetComponent<LineRenderer>().positionCount + i));
             }
-            wallActive.GetComponent<MeshFilter>().mesh.vertices = tempVerts;
-            wallActive.GetComponent<MeshFilter>().mesh.uv = tempUV;
-            wallActive.GetComponent<MeshFilter>().mesh.triangles = tempTris;
+            MF.mesh.vertices = tempVerts;
+            MF.mesh.uv = tempUV;
+            MF.mesh.triangles = tempTris;
 
-            wallActive.GetComponent<MeshRenderer>().material = architraves.defaultMaterial;
+            MR.material = architraves.defaultMaterial;
 
-            wallActive.GetComponent<MeshFilter>().mesh.RecalculateNormals();
-            wallActive.GetComponent<MeshFilter>().mesh.RecalculateBounds();
+            MF.mesh.RecalculateNormals();
+            MF.mesh.RecalculateBounds();
 
             //wallActive.meshCollider.sharedMesh = wallActive.mf.mesh;
             //wallActive.boxCollider.size = new Vector3(Mathf.Abs(vertPos[wallActive.verts.x].x - vertPos[wallActive.verts.y].x), wallActive.height, Mathf.Abs(vertPos[wallActive.verts.x].z - vertPos[wallActive.verts.y].z));
@@ -270,7 +276,16 @@ public class RoomUpdater : MonoBehaviour
                 GameObject.Destroy(item.arrow);
                 item.arrow = null;
             }
-           
+        }
+        if (upArrow != null)
+        {
+            GameObject.Destroy(upArrow);
+            upArrow = null;
+        }
+        if (downArrow != null)
+        {
+            GameObject.Destroy(downArrow);
+            downArrow = null;
         }
     }
 
