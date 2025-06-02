@@ -8,6 +8,8 @@ public class RagdollManager : MonoBehaviour
 {
     public bool DisableOnStart = true;
     public Transform[] T_transforms = new Transform[0];
+    private Vector3[] v3_pos = new Vector3[0];
+    private Quaternion[] q_rot = new Quaternion[0];
     public Rigidbody[] RB_rigidbodies = new Rigidbody[0];
     public Collider[] C_colliders = new Collider[0];
     public Transform[] T_armorPoints = new Transform[0];
@@ -30,6 +32,25 @@ public class RagdollManager : MonoBehaviour
         if (DisableOnStart)
             EnableRigidbodies(false);
         R_aimRig.weight = 0;
+        UpdateBaseTransforms();
+    }
+    void UpdateBaseTransforms()
+    {
+        v3_pos = new Vector3[T_transforms.Length];
+        q_rot = new Quaternion[T_transforms.Length];
+        for (int i = 0; i < T_transforms.Length; i++)
+        {
+            v3_pos[i] = T_transforms[i].localPosition;
+            q_rot[i] = T_transforms[i].localRotation;
+        }
+    }
+    public void ApplyBaseTransforms()
+    {
+        for (int i = 0; i < T_transforms.Length; i++)
+        {
+            T_transforms[i].localPosition = v3_pos[i];
+            T_transforms[i].localRotation = q_rot[i];
+        }
     }
     private void Update()
     {

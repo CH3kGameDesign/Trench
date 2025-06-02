@@ -89,7 +89,25 @@ public class BaseController : MonoBehaviour
     {
 
     }
+    public virtual void PickedUp(PlayerController _pc)
+    {
+        RM_ragdoll.EnableColliders(false);
+        RM_ragdoll.EnableRigidbodies(false);
+        RM_ragdoll.transform.position = _pc.Ref.T_backPivot.position;
+        RM_ragdoll.T_transforms[0].position = _pc.Ref.T_backPivot.position;
+        RM_ragdoll.transform.parent = _pc.Ref.T_backPivot;
+    }
+    public void OnDrop(PlayerController _player, bool _isSprinting = false)
+    {
+        RM_ragdoll.transform.parent = T_model;
+        RM_ragdoll.EnableColliders(true);
+        RM_ragdoll.EnableRigidbodies(true);
+    }
     public virtual void Update_Objectives()
+    {
+
+    }
+    public virtual void Revive()
     {
 
     }

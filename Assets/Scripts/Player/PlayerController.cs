@@ -101,6 +101,7 @@ public class PlayerController : BaseController
     private Coroutine C_updateHealth = null;
     private Coroutine C_idleAnim = null;
 
+    [HideInInspector] public BaseController BC_equippedController = null;
     [HideInInspector] public Treasure T_equippedTreasure = null;
 
     [Header("Debug Variables")]
@@ -143,6 +144,7 @@ public class PlayerController : BaseController
     }
 
     [HideInInspector] public Interactable I_curInteractable = null;
+    [HideInInspector] public BaseController BC_curBaseController = null;
     [HideInInspector] public Space_LandingSpot I_curLandingSpot = null;
 
 
@@ -486,6 +488,25 @@ public class PlayerController : BaseController
                     _foundObject = true;
                 }
             }
+            if (!_foundObject)
+            {
+                if (_hit.collider.gameObject.layer == 11)
+                {
+                    if (C_interactCoyote != null) { StopCoroutine(C_interactCoyote); C_interactCoyote = null; }
+
+                    BaseController _bc = _hit.collider.GetComponent<HitObject>().RM_ragdollManager.BaseController;
+                    if (_bc != BC_curBaseController && _bc.F_curHealth <= 0)
+                    {
+                        BC_curBaseController = _bc;
+                        int _controlScheme = Inputs.b_isGamepad ? 1 : 0;
+                        string _temp = _bc.name.ToString_Input(Inputs.s_inputStrings[_controlScheme], Interactable.enumType.interact);
+                        Ref.TM_interactText.gameObject.SetActive(true);
+                        Ref.TM_interactText.text = _temp;
+
+                        _foundObject = true;
+                    }
+                }
+            }
         }
         if (!_foundObject)
         {
@@ -499,6 +520,14 @@ public class PlayerController : BaseController
             if (Inputs.b_interact)
             {
                 I_curInteractable.OnInteract(this);
+            }
+        }
+        if (BC_curBaseController != null)
+        {
+            if (Inputs.b_interact)
+            {
+                BC_curBaseController.PickedUp(this);
+                BC_equippedController = BC_curBaseController;
             }
         }
     }
@@ -589,6 +618,7 @@ public class PlayerController : BaseController
         yield return new WaitForSecondsRealtime(0.2f);
         Ref.TM_interactText.gameObject.SetActive(false);
         I_curInteractable = null;
+        BC_curBaseController = null;
         C_interactCoyote = null;
     }
     IEnumerator LandingCoyote()
@@ -916,6 +946,12 @@ public class PlayerController : BaseController
             {
                 T_equippedTreasure.OnDrop(this, b_isSprinting);
                 T_equippedTreasure = null;
+                AH_agentAudioHolder.Play(AgentAudioHolder.type.throww);
+            }
+            if (BC_equippedController != null)
+            {
+                BC_equippedController.OnDrop(this, b_isSprinting);
+                BC_equippedController = null;
                 AH_agentAudioHolder.Play(AgentAudioHolder.type.throww);
             }
         }

@@ -21,7 +21,8 @@ public class Treasure : Interactable
     // Start is called before the first frame update
     void Start()
     {
-        TM_valueText.text = I_value.ToString_Currency();
+        if (TM_valueText != null)
+            TM_valueText.text = I_value.ToString_Currency();
     }
 
     // Update is called once per frame

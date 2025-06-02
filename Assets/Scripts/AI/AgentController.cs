@@ -506,7 +506,6 @@ public class AgentController : BaseController
             if (_bullet.con_Agent != null)
                 _bullet.con_Agent.TargetDead();
         }
-
         ResourceDrop.Drop(T_model.position);
         state = stateEnum.ragdoll;
         RM_ragdoll.EnableRigidbodies(true);
@@ -527,6 +526,33 @@ public class AgentController : BaseController
     {
         Relationship.meterClass _temp = GetRelationship();
         return (_temp.hostile > _temp.friendly);
+    }
+
+    public override void Revive()
+    {
+        F_curHealth = F_maxHealth / 2;
+        state = stateEnum.protect;
+
+        RM_ragdoll.transform.position = RM_ragdoll.T_transforms[0].position;
+        //RM_ragdoll.T_transforms[0].localPosition = Vector3.zero;
+        RB.transform.position = RM_ragdoll.transform.position;
+        RM_ragdoll.transform.localPosition = Vector3.down;
+        RM_ragdoll.transform.localRotation = new Quaternion();
+
+        RM_ragdoll.EnableRigidbodies(false);
+
+        NavMeshHit navHit;
+        if (NavMesh.SamplePosition(NMA.transform.position, out navHit, 2f, -1))
+        {
+            Vector3 _pos = navHit.position;
+            _pos.y = NMA.transform.position.y;
+            NMA.Warp(_pos);
+            T_surface_Update(NMA.navMeshOwner.GetComponent<Transform>());
+        }
+        GroundedUpdate(true);
+        RM_ragdoll.ApplyBaseTransforms();
+        A_model.enabled = true;
+        b_alive = true;
     }
 
     Relationship.meterClass GetRelationship()

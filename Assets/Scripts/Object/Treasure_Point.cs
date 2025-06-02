@@ -54,6 +54,29 @@ public class Treasure_Point : MonoBehaviour
                 UpdatePoints();
             }
         }
+        HitObject _HO;
+        if (other.TryGetComponent<HitObject>(out _HO))
+        {
+            if (_HO.RM_ragdollManager != null)
+            {
+                RagdollManager RM = _HO.RM_ragdollManager;
+                if (RM.BaseController.F_curHealth <= 0)
+                {
+                    if (RM.BaseController is PlayerController)
+                    {
+                        RM.BaseController.Revive();
+                    }
+                    else
+                    {
+                        AgentController AC = (AgentController)RM.BaseController;
+                        if (AC.b_friendly)
+                        {
+                            RM.BaseController.Revive();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void OnTriggerExit(Collider other)
