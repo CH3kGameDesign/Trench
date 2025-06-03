@@ -66,7 +66,6 @@ public class ArmorManager : ScriptableObject
         {
             return new Transform[]
                 {
-                    _RM.T_armorPoints[1],
                     _RM.T_armorPoints[2]
                 };
         }
@@ -156,7 +155,6 @@ public class ArmorManager : ScriptableObject
             return new Transform[]
                 {
                     _RM.T_armorPoints[0],
-                    _RM.T_armorPoints[1],
                     _RM.T_armorPoints[2]
                 };
         }

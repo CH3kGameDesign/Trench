@@ -314,6 +314,14 @@ public class PointerBuilder : MonoBehaviour
             RM.transform.position += changeFinal;
             return;
         }
+        for (int i = 0; i < RM.moveArrows.Length; i++)
+        {
+            if (RM.moveArrows[i] == activeArrow.parent.gameObject)
+            {
+                RM.transform.position += changeFinal;
+                return;
+            }
+        }
         foreach (var item in RM.walls)
         {
             if (item.arrow == activeArrow.parent.gameObject)

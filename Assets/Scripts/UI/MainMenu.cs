@@ -200,7 +200,6 @@ public class MainMenu : MonoBehaviour
         foreach (Transform t in _points)
         {
             GameObject GO = GameObject.Instantiate(PF_equipParticle, t.position, t.rotation);
-            Destroy(GO, 5);
         }
     }
 

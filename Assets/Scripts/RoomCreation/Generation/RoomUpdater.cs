@@ -41,6 +41,7 @@ public class RoomUpdater : MonoBehaviour
 
     public GameObject upArrow;
     public GameObject downArrow;
+    public GameObject[] moveArrows = new GameObject[0];
 
     public float height = 1;
 
@@ -96,41 +97,42 @@ public class RoomUpdater : MonoBehaviour
 
     public void ShowArrows()
     {
+        HideArrows();
         GameObject GO;
         //Wall Arrow
         foreach (var item in walls)
         {
-            if (item.arrow != null)
-            {
-                GameObject.Destroy(item.arrow);
-                item.arrow = null;
-            }
             GO = Instantiate(arrow, item.transform.position, item.transform.rotation, item.transform);
             GO.transform.LookAt(item.transform.position + new Vector3(item.mf.mesh.vertices[0].x, 0, item.mf.mesh.vertices[0].z));
             GO.transform.localEulerAngles += new Vector3(0, -90, 0);
             item.arrow = GO;
         }
         //Up Arrow
-        if (upArrow != null)
-        {
-            GameObject.Destroy(upArrow);
-            upArrow = null;
-        }
         Vector3 _height = new Vector3(0, height, 0);
         GO = Instantiate(arrow, mf.transform.position + _height, mf.transform.rotation, mf.transform);
         GO.name = "UpArrow";
         GO.transform.localEulerAngles = new Vector3(90, 0, 0);
         upArrow = GO;
         //Down Arrow
-        if (downArrow != null)
-        {
-            GameObject.Destroy(downArrow);
-            downArrow = null;
-        }
         GO = Instantiate(arrow, mf.transform.position, mf.transform.rotation, mf.transform);
         GO.name = "DownArrow";
         GO.transform.localEulerAngles = new Vector3(-90, 0, 0);
         downArrow = GO;
+        //Move Arrows
+        moveArrows = new GameObject[3];
+        string[] names = new string[] { "MoveUpArrow", "MoveForwardArrow", "MoveRightArrow"};
+        Vector3[] dir = new Vector3[] { -Vector3.up, -Vector3.forward, -Vector3.right };
+        Color[] color = new Color[] { Color.green, Color.blue, Color.red };
+        for (int i = 0; i < 3; i++)
+        {
+            GO = Instantiate(arrow, mf.transform.position + (_height)/2, mf.transform.rotation, mf.transform);
+            GO.transform.localScale = Vector3.one * 0.5f;
+            GO.name = names[i];
+            GO.transform.forward = dir[i];
+            GO.transform.GetChild(0).GetComponent<MeshRenderer>().material.SetColor("_LitColor", color[i]);
+
+            moveArrows[i] = GO;
+        }
     }
 
     public void UpdateArchitraves()
@@ -305,6 +307,9 @@ public class RoomUpdater : MonoBehaviour
             GameObject.Destroy(downArrow);
             downArrow = null;
         }
+        foreach (var item in moveArrows)
+            GameObject.Destroy(item);
+        moveArrows = new GameObject[0];
     }
 
     public void UpdateWall(wall wallActive)
