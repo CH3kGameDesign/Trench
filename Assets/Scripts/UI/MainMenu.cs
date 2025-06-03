@@ -24,6 +24,8 @@ public class MainMenu : MonoBehaviour
     private Vector3 v3_camMenuLocalPos;
     private Quaternion q_camLastLocalRot;
 
+    public GameObject PF_equipParticle;
+
     [System.Serializable]
     public class panelRefClass
     {
@@ -191,6 +193,15 @@ public class MainMenu : MonoBehaviour
     {
         SaveData.equippedArmor[customize.I_armorType] = _armor._enum();
         _armor.Equip(PlayerController.Instance.RM_ragdoll, customize.I_armorType != 3);
+        EquipParticles(_armor.Hooks(PlayerController.Instance.RM_ragdoll));
+    }
+    void EquipParticles(Transform[] _points)
+    {
+        foreach (Transform t in _points)
+        {
+            GameObject GO = GameObject.Instantiate(PF_equipParticle, t.position, t.rotation);
+            Destroy(GO, 5);
+        }
     }
 
     public void LoadButton()

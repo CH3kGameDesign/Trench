@@ -27,6 +27,10 @@ public class ArmorManager : ScriptableObject
             Debug.LogError("Can't find Armor_Type Enum:" +  _string);
             return Armor_Type.Helmet_Empty;
         }
+        public virtual Transform[] Hooks(RagdollManager _RM, bool _left = true)
+        {
+            return new Transform[0];
+        }
     }
     [System.Serializable]
     public class HelmetClass : ArmorClass
@@ -37,6 +41,13 @@ public class ArmorManager : ScriptableObject
         {
             _RM.T_armorPoints[0].DeleteChildren();
             if (modelHelmet != null) Instantiate(modelHelmet, _RM.T_armorPoints[0]);
+        }
+        public override Transform[] Hooks(RagdollManager _RM, bool _left = true)
+        {
+            return new Transform[]
+                {
+                    _RM.T_armorPoints[0]
+                };
         }
     }
     [System.Serializable]
@@ -50,6 +61,14 @@ public class ArmorManager : ScriptableObject
             _RM.T_armorPoints[2].DeleteChildren();
             if (modelChest != null) Instantiate(modelChest, _RM.T_armorPoints[1]);
             if (modelBelt != null) Instantiate(modelBelt, _RM.T_armorPoints[2]);
+        }
+        public override Transform[] Hooks(RagdollManager _RM, bool _left = true)
+        {
+            return new Transform[]
+                {
+                    _RM.T_armorPoints[1],
+                    _RM.T_armorPoints[2]
+                };
         }
     }
     [System.Serializable]
@@ -74,6 +93,21 @@ public class ArmorManager : ScriptableObject
                 if (modelWrist != null) Instantiate(modelWrist, _RM.T_armorPoints[6]);
             }
         }
+        public override Transform[] Hooks(RagdollManager _RM, bool _left = true)
+        {
+            if (_left)
+                return new Transform[]
+                    {
+                        _RM.T_armorPoints[3],
+                        _RM.T_armorPoints[4]
+                    };
+            else
+                return new Transform[]
+                    {
+                        _RM.T_armorPoints[5],
+                        _RM.T_armorPoints[6]
+                    };
+        }
     }
     [System.Serializable]
     public class LegClass : ArmorClass
@@ -96,6 +130,18 @@ public class ArmorManager : ScriptableObject
             if (modelShin != null) Instantiate(modelShin, _RM.T_armorPoints[11]);
             if (modelFoot != null) Instantiate(modelFoot, _RM.T_armorPoints[12]);
         }
+        public override Transform[] Hooks(RagdollManager _RM, bool _left = true)
+        {
+            return new Transform[]
+                {
+                    _RM.T_armorPoints[7],
+                    _RM.T_armorPoints[8],
+                    _RM.T_armorPoints[9],
+                    _RM.T_armorPoints[10],
+                    _RM.T_armorPoints[11],
+                    _RM.T_armorPoints[12]
+                };
+        }
     }
     [System.Serializable]
     public class MaterialClass : ArmorClass
@@ -104,6 +150,15 @@ public class ArmorManager : ScriptableObject
         public override void Equip(RagdollManager _RM, bool _left = true)
         {
             _RM.MR_skinnedMeshRenderer.material = modelMaterial;
+        }
+        public override Transform[] Hooks(RagdollManager _RM, bool _left = true)
+        {
+            return new Transform[]
+                {
+                    _RM.T_armorPoints[0],
+                    _RM.T_armorPoints[1],
+                    _RM.T_armorPoints[2]
+                };
         }
     }
     public ArmorOptionButton PF_ArmorOptionPrefab;

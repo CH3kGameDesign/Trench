@@ -440,7 +440,7 @@ public class AgentController : BaseController
         if (_bullet.B_player)
         {
             if (C_character != null)
-                C_character.soloRelationship.hostile += 1;
+                C_character.soloRelationship.chaotic += 1;
             else
             {
                 List<Relationship.groupEnum> _groups = G_backupGroups;
@@ -497,7 +497,7 @@ public class AgentController : BaseController
             foreach (var item in _groups)
             {
                 Relationship.groupClass _group = Relationship.Instance.GetGroupFromEnum(item);
-                _group.relationship.hostile += 10;
+                _group.relationship.chaotic += 10;
             }
             _bullet.con_Player.Update_Objectives(Objective_Type.Kill_Any, 1);
         }
@@ -510,6 +510,7 @@ public class AgentController : BaseController
         state = stateEnum.ragdoll;
         RM_ragdoll.EnableRigidbodies(true);
         GroundedUpdate(false);
+        RM_ragdoll.R_aimRig.weight = 0;
         A_model.enabled = false;
         b_alive = false;
         AH_agentAudioHolder.Play(AgentAudioHolder.type.death);

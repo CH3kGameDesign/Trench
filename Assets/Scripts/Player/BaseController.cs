@@ -27,6 +27,7 @@ public class BaseController : MonoBehaviour
     [HideInInspector] public bool b_alive = true;
     [HideInInspector] public bool b_grounded = false;
 
+
     public static gameStateEnum GameState = gameStateEnum.active;
     public enum gameStateEnum { inactive, active, dialogue, vehicle, ragdoll, dialogueResponse, menu }
     public virtual void Start()
@@ -91,18 +92,19 @@ public class BaseController : MonoBehaviour
     }
     public virtual void PickedUp(PlayerController _pc)
     {
-        RM_ragdoll.EnableColliders(false);
-        RM_ragdoll.EnableRigidbodies(false);
-        RM_ragdoll.transform.position = _pc.Ref.T_backPivot.position;
-        RM_ragdoll.T_transforms[0].position = _pc.Ref.T_backPivot.position;
-        RM_ragdoll.transform.parent = _pc.Ref.T_backPivot;
+        RM_ragdoll.Attach(_pc.RM_ragdoll.RB_backJoint);
     }
     public void OnDrop(PlayerController _player, bool _isSprinting = false)
     {
-        RM_ragdoll.transform.parent = T_model;
-        RM_ragdoll.EnableColliders(true);
-        RM_ragdoll.EnableRigidbodies(true);
+        RM_ragdoll.Detach();
+        Vector3 _forceDir = _player.C_camera.transform.forward;
+        _forceDir += _player.C_camera.transform.up * 0.5f;
+        float _mult = _isSprinting ? 2 : 1;
+        RM_ragdoll.RB_backJoint.AddForce(_forceDir * 400 * _mult, ForceMode.Impulse);
     }
+
+
+
     public virtual void Update_Objectives()
     {
 

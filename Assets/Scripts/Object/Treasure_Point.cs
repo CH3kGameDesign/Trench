@@ -9,12 +9,14 @@ public class Treasure_Point : MonoBehaviour
     public Transform T_sizeChanger;
     [HideInInspector] public int I_totalValue = 0;
     private List<Treasure> t_treasure = new List<Treasure>();
+    private List<AgentController> ac_collected = new List<AgentController>();
 
     public sizeClass sizeUp = new sizeClass();
     public sizeClass sizeDown = new sizeClass();
 
     private Color C_baseColor = Color.white;
     private Coroutine _sizeCoroutine;
+    public GameObject PF_respawnParticles;
 
     [System.Serializable]
     public class sizeClass
@@ -36,6 +38,8 @@ public class Treasure_Point : MonoBehaviour
         int _value = 0;
         foreach (var item in t_treasure)
             _value += item.I_value;
+        foreach (var item in ac_collected)
+            _value += 50;
         if (_sizeCoroutine != null)
             StopCoroutine(_sizeCoroutine);
         _sizeCoroutine = StartCoroutine(C_ValueChange(_value));
@@ -64,19 +68,36 @@ public class Treasure_Point : MonoBehaviour
                 {
                     if (RM.BaseController is PlayerController)
                     {
-                        RM.BaseController.Revive();
+                        Revive(RM.BaseController);
                     }
                     else
                     {
                         AgentController AC = (AgentController)RM.BaseController;
                         if (AC.b_friendly)
                         {
-                            RM.BaseController.Revive();
+                            Revive(AC);
+                        }
+                        else
+                        {
+                            if (!ac_collected.Contains(AC))
+                            {
+                                ac_collected.Add(AC);
+                                PlayerController.Instance.Update_Objectives(Objective_Type.Collect_Value, 50);
+                                AC.gameObject.SetActive(false);
+                                UpdatePoints();
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    void Revive(BaseController bc)
+    {
+        bc.Revive();
+        GameObject GO = Instantiate(PF_respawnParticles, bc.RM_ragdoll.RB_backJoint.position, PF_respawnParticles.transform.rotation);
+        Destroy(GO, 5);
     }
 
     private void OnTriggerExit(Collider other)

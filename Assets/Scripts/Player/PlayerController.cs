@@ -526,6 +526,7 @@ public class PlayerController : BaseController
         {
             if (Inputs.b_interact)
             {
+                Drop();
                 BC_curBaseController.PickedUp(this);
                 BC_equippedController = BC_curBaseController;
             }
@@ -567,12 +568,10 @@ public class PlayerController : BaseController
 
     public override void Pickup_Treasure(Treasure _treasure)
     {
-        if (T_equippedTreasure == null)
-        {
-            T_equippedTreasure = _treasure;
-            _treasure.OnPickUp(this);
-            AH_agentAudioHolder.Play(AgentAudioHolder.type.pickup);
-        }    
+        Drop();
+        T_equippedTreasure = _treasure;
+        _treasure.OnPickUp(this);
+        AH_agentAudioHolder.Play(AgentAudioHolder.type.pickup);
     }
 
     public void Pickup_Resource(Resource.resourceClass _resource)
@@ -942,20 +941,25 @@ public class PlayerController : BaseController
         {
             gun_Equipped.OnMelee(b_isSprinting);
 
-            if (T_equippedTreasure != null)
-            {
-                T_equippedTreasure.OnDrop(this, b_isSprinting);
-                T_equippedTreasure = null;
-                AH_agentAudioHolder.Play(AgentAudioHolder.type.throww);
-            }
-            if (BC_equippedController != null)
-            {
-                BC_equippedController.OnDrop(this, b_isSprinting);
-                BC_equippedController = null;
-                AH_agentAudioHolder.Play(AgentAudioHolder.type.throww);
-            }
+            Drop();
         }
         gun_Equipped.OnUpdate();
+    }
+
+    void Drop()
+    {
+        if (T_equippedTreasure != null)
+        {
+            T_equippedTreasure.OnDrop(this, b_isSprinting);
+            T_equippedTreasure = null;
+            AH_agentAudioHolder.Play(AgentAudioHolder.type.throww);
+        }
+        if (BC_equippedController != null)
+        {
+            BC_equippedController.OnDrop(this, b_isSprinting);
+            BC_equippedController = null;
+            AH_agentAudioHolder.Play(AgentAudioHolder.type.throww);
+        }
     }
 
     void Update_HitPoint()

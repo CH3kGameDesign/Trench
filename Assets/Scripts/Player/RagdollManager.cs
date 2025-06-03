@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
@@ -20,6 +21,11 @@ public class RagdollManager : MonoBehaviour
     public Rig R_aimRig;
     public Transform T_secondHand;
     public Transform T_secondElbow;
+
+    public Rigidbody RB_backJoint;
+    private FixedJoint FJ_backJoint;
+
+    public LayerMask LM_ignoreLayersThrown;
 
     [HideInInspector] public bool _rigActive = false;
     private float f_timeTilChange = 0;
@@ -101,6 +107,47 @@ public class RagdollManager : MonoBehaviour
         if (PrevDamageSpurces.Count > 1)
             PrevDamageSpurces.RemoveAt(0);
     }
+
+    public void Attach(Rigidbody _target)
+    {
+        EnableColliders(false);
+        EnableRigidbodies(true);
+        if (FJ_backJoint != null)
+        {
+            Destroy(FJ_backJoint);
+            FJ_backJoint = null;
+        }
+        RB_backJoint.transform.position = _target.position + (-_target.transform.forward * 0.25f);
+        RB_backJoint.transform.rotation = _target.transform.rotation;
+        RB_backJoint.transform.eulerAngles += new Vector3(0, 180, 0);
+        FJ_backJoint = RB_backJoint.AddComponent<FixedJoint>();
+        FJ_backJoint.connectedBody = _target;
+    }
+    public void Detach()
+    {
+        if (FJ_backJoint != null)
+        {
+            Destroy(FJ_backJoint);
+            FJ_backJoint = null;
+        }
+
+        foreach (var item in C_colliders)
+            item.excludeLayers = LM_ignoreLayersThrown;
+
+        EnableColliders(true);
+        EnableRigidbodies(true);
+
+        StartCoroutine(Detach_Delay());
+    }
+
+    IEnumerator Detach_Delay()
+    {
+        yield return new WaitForSeconds(1f);
+        foreach (var item in C_colliders)
+            item.excludeLayers = new LayerMask();
+    }
+
+
     public void Aiming(bool _aim, bool _force = false)
     {
         if (f_timeTilChange <= 0 || _force)

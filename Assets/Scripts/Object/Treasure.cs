@@ -70,7 +70,7 @@ public class Treasure : Interactable
         _forceDir += _player.C_camera.transform.up * 0.5f;
         RB_rigidbody.AddForce(_forceDir * F_throwForce * _mult, ForceMode.Impulse);
         C_collider.excludeLayers = LM_thrownIgnoreLayers;
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1f);
         C_collider.excludeLayers = new LayerMask();
     }
     IEnumerator WhileHeld(PlayerController _player)
