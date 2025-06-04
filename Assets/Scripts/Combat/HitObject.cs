@@ -10,6 +10,8 @@ public class HitObject : MonoBehaviour
     public float I_maxHealth = 10;
     private float f_health = 10;
 
+    public GameObject PF_hitParticles;
+
     public UnityEvent<GunManager.bulletClass, DamageSource> UE_OnHit;
     public UnityEvent<GunManager.bulletClass, DamageSource> UE_OnDestroy;
 

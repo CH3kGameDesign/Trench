@@ -42,7 +42,6 @@ public class ShipWheel : Interactable
     }
     void DEBUG_DropShip()
     {
-        SaveData.themeCurrent = DEBUG_themeToLoad;
-        SceneManager.LoadScene(0);
+        LevelGen_Holder.LoadTheme(DEBUG_themeToLoad);
     }
 }

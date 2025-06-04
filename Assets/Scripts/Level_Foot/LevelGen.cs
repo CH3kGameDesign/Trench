@@ -449,4 +449,17 @@ public class LevelGen : MonoBehaviour
         }
         return false;
     }
+
+    public int GetCollectedValue()
+    {
+        int _value = 0;
+        foreach (var block in LG_Blocks)
+        {
+            foreach (var point in block.TP_TreasurePoints)
+            {
+                _value += Mathf.Max(0, point.I_value);
+            }
+        }
+        return _value;
+    }
 }

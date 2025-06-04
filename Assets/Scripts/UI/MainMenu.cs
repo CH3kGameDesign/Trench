@@ -7,11 +7,12 @@ using System;
 using System.Runtime.CompilerServices;
 using UnityEngine.Rendering;
 using UnityEngine.InputSystem;
+using TMPro;
 
 public class MainMenu : MonoBehaviour
 {
     public static MainMenu Instance;
-    public panelRefClass main;
+    public mainRefClass main;
     public customizeRefClass customize;
     public panelRefClass load;
 
@@ -38,6 +39,15 @@ public class MainMenu : MonoBehaviour
             if (_back)
                 return _backButton.gameObject;
             return _defaultButton.gameObject;
+        }
+    }
+    [System.Serializable]
+    public class mainRefClass : panelRefClass
+    {
+        public TextMeshProUGUI TM_currency;
+        public void UpdateCurrency(int amt)
+        {
+            TM_currency.text = amt.ToString_Currency();
         }
     }
 
@@ -102,6 +112,7 @@ public class MainMenu : MonoBehaviour
     public void Open()
     {
         menuOpen = true;
+        main.UpdateCurrency(SaveData.i_currency);
         v3_camLastLocalPos = PlayerController.Instance.T_camHolder.GetChild(0).localPosition;
         q_camLastLocalRot = PlayerController.Instance.T_camHolder.GetChild(0).localRotation;
 

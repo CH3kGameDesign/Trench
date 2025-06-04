@@ -55,7 +55,14 @@ public class Bullet : DamageSource
     {
         HitObject hitObject;
         if (hit.transform.TryGetComponent<HitObject>(out hitObject))
+        {
             hitObject.OnDamage(B_info, this);
+            if (hitObject.PF_hitParticles != null)
+            {
+                GameObject GO = Instantiate(hitObject.PF_hitParticles, hit.point, B_info.PF_impactHit.transform.rotation);
+                GO.transform.forward = hit.normal;
+            }
+        }
     }
 
     public void HitPoint(RaycastHit hit)

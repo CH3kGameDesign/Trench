@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class PointerBuilder : MonoBehaviour
@@ -55,168 +56,171 @@ public class PointerBuilder : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit, 1000, arrowMask))
+            if(!EventSystem.current.IsPointerOverGameObject())
             {
-                activeArrow = hit.transform;
-                activeArrow.localScale = Vector3.one * 1.1f;
-                firstClickPos = GetPos();
-                drawMode = drawModes.arrow;
-                FocusGrid(activeArrow);
-                return;
-            }
-            if (Physics.Raycast(ray, out hit, 1000))
-            {
-                switch (hit.transform.gameObject.layer)
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out hit, 1000, arrowMask))
                 {
-                    case 6:
-                        drawMode = privateDrawMode;
+                    activeArrow = hit.transform;
+                    activeArrow.localScale = Vector3.one * 1.1f;
+                    firstClickPos = GetPos();
+                    drawMode = drawModes.arrow;
+                    FocusGrid(activeArrow);
+                    return;
+                }
+                if (Physics.Raycast(ray, out hit, 1000))
+                {
+                    switch (hit.transform.gameObject.layer)
+                    {
+                        case 6:
+                            drawMode = privateDrawMode;
 
-                        switch (drawMode)
-                        {
-                            case drawModes.square:
-                                if (activeWall != null)
-                                    activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
-                                firstClickPos = GetPos();
-                                GameObject GO = Instantiate(squarePrefab, floorHolder);
+                            switch (drawMode)
+                            {
+                                case drawModes.square:
+                                    if (activeWall != null)
+                                        activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
+                                    firstClickPos = GetPos();
+                                    GameObject GO = Instantiate(squarePrefab, floorHolder);
 
-                                Mesh tempMesh = new Mesh();
-                                tempMesh.vertices = new Vector3[]
-                                {
+                                    Mesh tempMesh = new Mesh();
+                                    tempMesh.vertices = new Vector3[]
+                                    {
                                     Vector3.zero,
                                     new Vector3(0,0,1),
                                     new Vector3(1,0,1),
                                     new Vector3(1,0,0)
 
-                                };
+                                    };
 
-                                Vector2[] temp2Dsquare = new Vector2[tempMesh.vertices.Length];
-                                for (int i = 0; i < temp2Dsquare.Length; i++)
-                                    temp2Dsquare[i] = new Vector2(tempMesh.vertices[i].x, tempMesh.vertices[i].z);
-                                Triangulator trSquare = new Triangulator(temp2Dsquare);
-                                int[] indicesSquare = trSquare.Triangulate();
+                                    Vector2[] temp2Dsquare = new Vector2[tempMesh.vertices.Length];
+                                    for (int i = 0; i < temp2Dsquare.Length; i++)
+                                        temp2Dsquare[i] = new Vector2(tempMesh.vertices[i].x, tempMesh.vertices[i].z);
+                                    Triangulator trSquare = new Triangulator(temp2Dsquare);
+                                    int[] indicesSquare = trSquare.Triangulate();
 
-                                tempMesh.triangles = indicesSquare;
-                                tempMesh.uv = temp2Dsquare;
+                                    tempMesh.triangles = indicesSquare;
+                                    tempMesh.uv = temp2Dsquare;
 
-                                tempMesh.RecalculateNormals();
-                                tempMesh.RecalculateBounds();
+                                    tempMesh.RecalculateNormals();
+                                    tempMesh.RecalculateBounds();
 
-                                GO.GetComponent<MeshFilter>().mesh = tempMesh;
-                                GO.GetComponent<MeshCollider>().sharedMesh = tempMesh;
+                                    GO.GetComponent<MeshFilter>().mesh = tempMesh;
+                                    GO.GetComponent<MeshCollider>().sharedMesh = tempMesh;
 
-                                GO.name = Time.time.ToString();
-                                //Mesh meshTemp = new Mesh();
-                                //Mesh meshTemp2 = GO.GetComponent<MeshFilter>().mesh;
-                                //meshTemp.vertices = meshTemp2.vertices;
-                                //meshTemp.uv = meshTemp2.uv;
-                                //meshTemp.triangles = meshTemp2.triangles;
-                                activeSquare = GO.transform;
-                                RoomUpdater RM = GO.AddComponent<RoomUpdater>();
-                                RM.roomName = GO.name;
-                                RM.mf = GO.GetComponent<MeshFilter>();
-                                RM.floor = GO.transform;
-                                RM.arrow = arrow;
+                                    GO.name = Time.time.ToString();
+                                    //Mesh meshTemp = new Mesh();
+                                    //Mesh meshTemp2 = GO.GetComponent<MeshFilter>().mesh;
+                                    //meshTemp.vertices = meshTemp2.vertices;
+                                    //meshTemp.uv = meshTemp2.uv;
+                                    //meshTemp.triangles = meshTemp2.triangles;
+                                    activeSquare = GO.transform;
+                                    RoomUpdater RM = GO.AddComponent<RoomUpdater>();
+                                    RM.roomName = GO.name;
+                                    RM.mf = GO.GetComponent<MeshFilter>();
+                                    RM.floor = GO.transform;
+                                    RM.arrow = arrow;
 
-                                RM.height = 3;
+                                    RM.height = 3;
 
-                                RM.architraves = architraves;
+                                    RM.architraves = architraves;
 
-                                RM.boxCollider = GO.GetComponent<BoxCollider>();
-                                RM.meshCollider = GO.GetComponent<MeshCollider>();
+                                    RM.boxCollider = GO.GetComponent<BoxCollider>();
+                                    RM.meshCollider = GO.GetComponent<MeshCollider>();
 
-                                GameObject GO2 = Instantiate(squarePrefab, activeSquare);
-                                RM.mf_Ceiling = GO2.GetComponent<MeshFilter>();
-                                RM.meshCollider_Ceiling = GO2.GetComponent<MeshCollider>();
+                                    GameObject GO2 = Instantiate(squarePrefab, activeSquare);
+                                    RM.mf_Ceiling = GO2.GetComponent<MeshFilter>();
+                                    RM.meshCollider_Ceiling = GO2.GetComponent<MeshCollider>();
 
-                                GO2.GetComponent<MeshFilter>().mesh = tempMesh;
-                                GO2.GetComponent<MeshCollider>().sharedMesh = tempMesh;
-                                AddWalls(GO.GetComponent<RoomUpdater>());
-                                break;
-                            case drawModes.point:
-                                Vector3 clickPos = GetPos();
-                                if (activeWall != null)
-                                    activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
-                                if (activeSquare == null)
-                                {
-                                    GameObject GO1 = Instantiate(squarePrefab, floorHolder);
-                                    GO1.name = Time.time.ToString();
-                                    Mesh meshTempPoint = new Mesh();
-                                    //Mesh meshTempPoint2 = GO1.GetComponent<MeshFilter>().mesh;
-                                    //meshTempPoint.vertices = meshTempPoint2.vertices;
-                                    //meshTempPoint.uv = meshTempPoint2.uv;
-                                    //meshTempPoint.triangles = meshTempPoint2.triangles;
-                                    activeSquare = GO1.transform;
-                                    GO1.AddComponent<RoomUpdater>();
-                                    GO1.GetComponent<MeshFilter>().mesh = meshTempPoint;
-                                    GO1.GetComponent<RoomUpdater>().roomName = GO1.name;
-                                    GO1.GetComponent<RoomUpdater>().mf = GO1.GetComponent<MeshFilter>();
-                                    GO1.GetComponent<RoomUpdater>().floor = GO1.transform;
-                                    GO1.GetComponent<RoomUpdater>().arrow = arrow;
+                                    GO2.GetComponent<MeshFilter>().mesh = tempMesh;
+                                    GO2.GetComponent<MeshCollider>().sharedMesh = tempMesh;
+                                    AddWalls(GO.GetComponent<RoomUpdater>());
+                                    break;
+                                case drawModes.point:
+                                    Vector3 clickPos = GetPos();
+                                    if (activeWall != null)
+                                        activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
+                                    if (activeSquare == null)
+                                    {
+                                        GameObject GO1 = Instantiate(squarePrefab, floorHolder);
+                                        GO1.name = Time.time.ToString();
+                                        Mesh meshTempPoint = new Mesh();
+                                        //Mesh meshTempPoint2 = GO1.GetComponent<MeshFilter>().mesh;
+                                        //meshTempPoint.vertices = meshTempPoint2.vertices;
+                                        //meshTempPoint.uv = meshTempPoint2.uv;
+                                        //meshTempPoint.triangles = meshTempPoint2.triangles;
+                                        activeSquare = GO1.transform;
+                                        GO1.AddComponent<RoomUpdater>();
+                                        GO1.GetComponent<MeshFilter>().mesh = meshTempPoint;
+                                        GO1.GetComponent<RoomUpdater>().roomName = GO1.name;
+                                        GO1.GetComponent<RoomUpdater>().mf = GO1.GetComponent<MeshFilter>();
+                                        GO1.GetComponent<RoomUpdater>().floor = GO1.transform;
+                                        GO1.GetComponent<RoomUpdater>().arrow = arrow;
 
-                                    GO1.GetComponent<RoomUpdater>().architraves = architraves;
+                                        GO1.GetComponent<RoomUpdater>().architraves = architraves;
 
-                                    GO1.GetComponent<RoomUpdater>().boxCollider = GO1.GetComponent<BoxCollider>();
-                                    GO1.GetComponent<RoomUpdater>().meshCollider = GO1.GetComponent<MeshCollider>();
-                                    GO1.GetComponent<RoomUpdater>().vertPos = new Vector3[0];
-                                }
-                                RoomUpdater ru = activeSquare.GetComponent<RoomUpdater>();
+                                        GO1.GetComponent<RoomUpdater>().boxCollider = GO1.GetComponent<BoxCollider>();
+                                        GO1.GetComponent<RoomUpdater>().meshCollider = GO1.GetComponent<MeshCollider>();
+                                        GO1.GetComponent<RoomUpdater>().vertPos = new Vector3[0];
+                                    }
+                                    RoomUpdater ru = activeSquare.GetComponent<RoomUpdater>();
 
-                                Vector3[] tempVerts = new Vector3[ru.vertPos.Length + 1];
+                                    Vector3[] tempVerts = new Vector3[ru.vertPos.Length + 1];
 
-                                for (int i = 0; i < ru.vertPos.Length; i++)
-                                    tempVerts[i] = ru.vertPos[i];
+                                    for (int i = 0; i < ru.vertPos.Length; i++)
+                                        tempVerts[i] = ru.vertPos[i];
 
-                                tempVerts[tempVerts.Length - 1] = clickPos;
+                                    tempVerts[tempVerts.Length - 1] = clickPos;
 
-                                ru.vertPos = tempVerts;
-                                if (tempVerts.Length == 2)
-                                {
-                                    AddWallSingle(ru);
-                                    ru.UpdateWall(ru.walls[ru.walls.Count - 1]);
-                                }
-                                if (tempVerts.Length >= 2)
-                                {
-                                    ru.walls[0].verts = new Vector2Int(ru.vertPos.Length - 1, 0);
-                                    AddWallSingle(ru);
-                                    ru.UpdateWall(ru.walls[ru.walls.Count - 1]);
-                                    ru.UpdateWall(ru.walls[0]);
-                                }
+                                    ru.vertPos = tempVerts;
+                                    if (tempVerts.Length == 2)
+                                    {
+                                        AddWallSingle(ru);
+                                        ru.UpdateWall(ru.walls[ru.walls.Count - 1]);
+                                    }
+                                    if (tempVerts.Length >= 2)
+                                    {
+                                        ru.walls[0].verts = new Vector2Int(ru.vertPos.Length - 1, 0);
+                                        AddWallSingle(ru);
+                                        ru.UpdateWall(ru.walls[ru.walls.Count - 1]);
+                                        ru.UpdateWall(ru.walls[0]);
+                                    }
 
-                                if (tempVerts.Length >= 3)
-                                {
-                                    Vector2[] temp2D = new Vector2[tempVerts.Length];
-                                    for (int i = 0; i < temp2D.Length; i++)
-                                        temp2D[i] = new Vector2(tempVerts[i].x, tempVerts[i].z);
-                                    Triangulator tr = new Triangulator(temp2D);
-                                    int[] indices = tr.Triangulate();
+                                    if (tempVerts.Length >= 3)
+                                    {
+                                        Vector2[] temp2D = new Vector2[tempVerts.Length];
+                                        for (int i = 0; i < temp2D.Length; i++)
+                                            temp2D[i] = new Vector2(tempVerts[i].x, tempVerts[i].z);
+                                        Triangulator tr = new Triangulator(temp2D);
+                                        int[] indices = tr.Triangulate();
 
-                                    ru.GetComponent<MeshFilter>().mesh.vertices = tempVerts;
-                                    ru.GetComponent<MeshFilter>().mesh.triangles = indices;
-                                    ru.GetComponent<MeshFilter>().mesh.uv = temp2D;
+                                        ru.GetComponent<MeshFilter>().mesh.vertices = tempVerts;
+                                        ru.GetComponent<MeshFilter>().mesh.triangles = indices;
+                                        ru.GetComponent<MeshFilter>().mesh.uv = temp2D;
 
-                                    ru.GetComponent<MeshFilter>().mesh.RecalculateNormals();
-                                    ru.GetComponent<MeshFilter>().mesh.RecalculateBounds();
+                                        ru.GetComponent<MeshFilter>().mesh.RecalculateNormals();
+                                        ru.GetComponent<MeshFilter>().mesh.RecalculateBounds();
 
-                                    ru.meshCollider.sharedMesh = ru.mf.mesh;
-                                }
-                                break;
-                            default:
-                                break;
-                        }
+                                        ru.meshCollider.sharedMesh = ru.mf.mesh;
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
 
-                        break;
-                    case 14:
-                        drawMode = drawModes.wall;
-                        Transform activeWallTemp = GetWall();
-                        if (activeWallTemp != activeWall && activeWall != null)
-                            activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
-                        activeWall = activeWallTemp;
-                        activeWall.GetComponentInParent<RoomUpdater>().ShowArrows();
-                        break;
-                    default:
-                        break;
+                            break;
+                        case 14:
+                            drawMode = drawModes.wall;
+                            Transform activeWallTemp = GetWall();
+                            if (activeWallTemp != activeWall && activeWall != null)
+                                activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
+                            activeWall = activeWallTemp;
+                            activeWall.GetComponentInParent<RoomUpdater>().ShowArrows();
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         }
@@ -225,7 +229,7 @@ public class PointerBuilder : MonoBehaviour
             case drawModes.square:
                 if (activeWall != null)
                     activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
-                drawModeText.text = "DRAW MODE: Square";
+                drawModeText.text = "Draw Mode";
                 if (Input.GetMouseButton(0) && activeSquare != null)
                 {
                     SetPosScale(firstClickPos, GetPos());
@@ -243,14 +247,14 @@ public class PointerBuilder : MonoBehaviour
                 {
                     if (activeWall != null)
                         activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
-                    drawModeText.text = "DRAW MODE: Point";
+                    drawModeText.text = "Point Mode";
                     break;
                 }
             case drawModes.wall:
-                drawModeText.text = "DRAW MODE: Edit";
+                drawModeText.text = "Edit Mode";
                 break;
             case drawModes.arrow:
-                drawModeText.text = "DRAW MODE: Arrow";
+                drawModeText.text = "Edit Mode";
                 if (activeArrow != null)
                 {
                     if (Input.GetMouseButton(0))

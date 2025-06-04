@@ -11,6 +11,7 @@ public class LevelGen_Block : MonoBehaviour
     public List<LevelGen_Bounds> B_bounds = new List<LevelGen_Bounds>();
     public LevelGen_Door[] LGD_Entries = new LevelGen_Door[0];
     public LevelGen_Spawn[] LGS_Spawns = new LevelGen_Spawn[0];
+    public Treasure_Point[] TP_TreasurePoints = new Treasure_Point[0];
 
     public enum entryTypeEnum { singleDoor, wideDoor, vent, shipDoor, shipPark, any}
     // Start is called before the first frame update
@@ -30,16 +31,19 @@ public class LevelGen_Block : MonoBehaviour
         UpdateEntryList();
         UpdateDecorList();
         UpdateBoundingBox();
+        UpdateTreasurePoints();
     }
     void UpdateEntryList()
     {
-        Transform _holder = transform.GetChild(0);
-        LGD_Entries = _holder.GetComponentsInChildren<LevelGen_Door>();
+        LGD_Entries = GetComponentsInChildren<LevelGen_Door>();
     }
     void UpdateDecorList()
     {
-        Transform _holder = transform.GetChild(1);
-        LGS_Spawns = _holder.GetComponentsInChildren<LevelGen_Spawn>();
+        LGS_Spawns = GetComponentsInChildren<LevelGen_Spawn>();
+    }
+    void UpdateTreasurePoints()
+    {
+        TP_TreasurePoints = GetComponentsInChildren<Treasure_Point>();
     }
 
     public void UpdateBoundingBox()

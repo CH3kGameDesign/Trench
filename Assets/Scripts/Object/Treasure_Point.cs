@@ -7,7 +7,7 @@ public class Treasure_Point : MonoBehaviour
 {
     public TextMeshProUGUI TM_valueText;
     public Transform T_sizeChanger;
-    [HideInInspector] public int I_totalValue = 0;
+    [HideInInspector] public int I_displayValue = 0;
     private List<Treasure> t_treasure = new List<Treasure>();
     private List<AgentController> ac_collected = new List<AgentController>();
 
@@ -17,6 +17,8 @@ public class Treasure_Point : MonoBehaviour
     private Color C_baseColor = Color.white;
     private Coroutine _sizeCoroutine;
     public GameObject PF_respawnParticles;
+
+    [HideInInspector] public int I_value = 0;
 
     [System.Serializable]
     public class sizeClass
@@ -29,20 +31,17 @@ public class Treasure_Point : MonoBehaviour
 
     private void Start()
     {
-        TM_valueText.text = I_totalValue.ToString_Currency();
+        TM_valueText.text = I_value.ToString_Currency();
+        I_displayValue = I_value;
         C_baseColor = TM_valueText.color;
     }
 
-    public void UpdatePoints()
+    public void UpdatePoints(int _value)
     {
-        int _value = 0;
-        foreach (var item in t_treasure)
-            _value += item.I_value;
-        foreach (var item in ac_collected)
-            _value += 50;
+        I_value = Mathf.Max(0, I_value + _value);
         if (_sizeCoroutine != null)
             StopCoroutine(_sizeCoroutine);
-        _sizeCoroutine = StartCoroutine(C_ValueChange(_value));
+        _sizeCoroutine = StartCoroutine(C_ValueChange(I_value));
     }
 
     private void OnTriggerEnter(Collider other)
@@ -55,7 +54,7 @@ public class Treasure_Point : MonoBehaviour
                 t_treasure.Add(_temp);
                 PlayerController.Instance.Update_Objectives(Objective_Type.Collect_Value, _temp.I_value);
                 other.gameObject.SetActive(false);
-                UpdatePoints();
+                UpdatePoints(_temp.I_value);
             }
         }
         HitObject _HO;
@@ -84,7 +83,7 @@ public class Treasure_Point : MonoBehaviour
                                 ac_collected.Add(AC);
                                 PlayerController.Instance.Update_Objectives(Objective_Type.Collect_Value, 50);
                                 AC.gameObject.SetActive(false);
-                                UpdatePoints();
+                                UpdatePoints(50);
                             }
                         }
                     }
@@ -108,14 +107,14 @@ public class Treasure_Point : MonoBehaviour
             if (t_treasure.Contains(_temp))
             {
                 t_treasure.Remove(_temp);
-                UpdatePoints();
+                UpdatePoints(-_temp.I_value);
             }
         }
     }
 
     private IEnumerator C_ValueChange(int _newValue)
     {
-        int _prevValue = I_totalValue;
+        int _prevValue = I_displayValue;
         int _curValue = _prevValue;
         int _distance = Mathf.Abs(_newValue - _prevValue);
 
@@ -150,7 +149,7 @@ public class Treasure_Point : MonoBehaviour
                     _timerScaled = _curve.Evaluate(_timer);
                     _curValue = Mathf.RoundToInt(Mathf.Lerp(_prevValue, _newValue, _timerScaled));
                     TM_valueText.text = _curValue.ToString_Currency();
-                    I_totalValue = _curValue;
+                    I_displayValue = _curValue;
                     _progress = Mathf.FloorToInt(_timerScaled * _distance) / (float)_distance;
 
                     T_sizeChanger.localScale = Vector3.one * (1 + Mathf.Lerp(0, _sizeIncrease, _progress));
@@ -159,13 +158,13 @@ public class Treasure_Point : MonoBehaviour
                 }
             }
             TM_valueText.text = _newValue.ToString_Currency();
-            I_totalValue = _newValue;
+            I_displayValue = _newValue;
             _sizeCoroutine = StartCoroutine(C_StopChange());
         }
         else
         {
             TM_valueText.text = _newValue.ToString_Currency();
-            I_totalValue = _newValue;
+            I_displayValue = _newValue;
             TM_valueText.color = C_baseColor;
             T_sizeChanger.localScale = Vector3.one;
         }

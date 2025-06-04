@@ -40,8 +40,7 @@ public class Space_LandingSpot : MonoBehaviour
                 break;
         }
         SaveData.lastLandingSpot = landingID;
-        SaveData.themeCurrent = _theme;
-        SceneManager.LoadScene(0);
+        LevelGen_Holder.LoadTheme(_theme);
     }
 
     void Start()
