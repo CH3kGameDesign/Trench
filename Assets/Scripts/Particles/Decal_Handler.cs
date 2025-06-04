@@ -1,9 +1,13 @@
+using DG.Tweening;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using static UnityEditor.Progress;
 
 public class Decal_Handler : MonoBehaviour
 {
+    public GameObject parent;
     public DecalProjector projector;
     public ColorClass _Color;
     [System.Serializable]
@@ -12,6 +16,7 @@ public class Decal_Handler : MonoBehaviour
         public bool _active = false;
         public Color color = Color.white;
         public Color color2 = Color.white;
+        public bool _fadeOut = false;
 
         public void Activate(DecalProjector projector)
         {
@@ -29,7 +34,8 @@ public class Decal_Handler : MonoBehaviour
     {
         public bool _active = false;
         public Vector2 sizeRange = Vector2.one;
-        
+        public bool _fadeOut = false;
+
     }
     private Vector3 _tarSize = Vector3.one;
     public float timeIncrease = 0.2f;
@@ -37,6 +43,8 @@ public class Decal_Handler : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        if (parent == null)
+            parent = gameObject;
         _Color.Activate(projector);
         SizeChange();
         if (lifeTime > 0)
@@ -54,19 +62,38 @@ public class Decal_Handler : MonoBehaviour
             _tarSize = projector.size;
 
         if (timeIncrease > 0f)
-            StartCoroutine(SizeChange(_tarSize, timeIncrease));
+            StartCoroutine(SizeChange(projector.size, _tarSize, timeIncrease));
         else
             projector.size = _tarSize;
     }
 
     void SizeDown()
     {
-        StartCoroutine(SizeChange(Vector3.zero, 1f));
+        bool _timer = false;
+        if (_Size._fadeOut)
+        {
+            StartCoroutine(SizeChange(projector.size, Vector3.zero, 1f));
+            _timer = true;
+        }
+        if (_Color._fadeOut)
+        {
+            Material _mat = projector.material;
+            Color _start = _mat.GetColor("_Color");
+            Color _tar = _start;
+            _tar.a = 0;
+            StartCoroutine(ColorChange(_start, _tar, 1f));
+            _timer = true;
+        }
+        if (_timer)
+            Invoke(nameof(Destroy_Delayed), 1f);
+    }
+    void Destroy_Delayed()
+    {
+        Destroy(parent);
     }
 
-    IEnumerator SizeChange(Vector3 _tar, float _speed)
+    IEnumerator SizeChange(Vector3 _start, Vector3 _tar, float _speed)
     {
-        Vector3 _start = projector.size;
         float _timer = 0f;
         while (_timer < 1f)
         {
@@ -75,8 +102,20 @@ public class Decal_Handler : MonoBehaviour
             _timer += Time.deltaTime / _speed;
         }
         projector.size = _tar;
-        if (_tar == Vector3.zero)
-            Destroy(this.gameObject);
+    }
+
+    IEnumerator ColorChange(Color _start, Color _tar, float _speed)
+    {
+        float _timer = 0f;
+        Material _mat = projector.material;
+        while (_timer < 1f)
+        {
+            Color _temp = Color.Lerp(_start, _tar, _timer);
+            _mat.SetColor("_Color", _temp);
+            yield return new WaitForEndOfFrame();
+            _timer += Time.deltaTime / _speed;
+        }
+        _mat.SetColor("_Color", _tar);
     }
 
     // Update is called once per frame

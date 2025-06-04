@@ -55,6 +55,7 @@ public class MainMenu : MonoBehaviour
     public class customizeRefClass : panelRefClass
     {
         [HideInInspector] public int I_armorType = 0;
+        [HideInInspector] public ArmorOptionButton _equipped;
         public GameObject G_listOptions;
         public GameObject G_subOptions;
 
@@ -149,42 +150,48 @@ public class MainMenu : MonoBehaviour
     {
         CustomizeShow();
         customize.I_armorType = 0;
-        ArmorManager.Instance.CreateHelmetUI(customize.G_subOptions.transform);
+        Armor_Type _enum = SaveData.equippedArmor[customize.I_armorType];
+        ArmorManager.Instance.CreateHelmetUI(customize.G_subOptions.transform, _enum);
         GamepadSwitch();
     }
     public void CustomizeSetup_Chest()
     {
         CustomizeShow();
         customize.I_armorType = 1;
-        ArmorManager.Instance.CreateChestUI(customize.G_subOptions.transform);
+        Armor_Type _enum = SaveData.equippedArmor[customize.I_armorType];
+        ArmorManager.Instance.CreateChestUI(customize.G_subOptions.transform, _enum);
         GamepadSwitch();
     }
     public void CustomizeSetup_LArm()
     {
         CustomizeShow();
         customize.I_armorType = 2;
-        ArmorManager.Instance.CreateArmUI(customize.G_subOptions.transform);
+        Armor_Type _enum = SaveData.equippedArmor[customize.I_armorType];
+        ArmorManager.Instance.CreateArmUI(customize.G_subOptions.transform, _enum);
         GamepadSwitch();
     }
     public void CustomizeSetup_RArm()
     {
         CustomizeShow();
         customize.I_armorType = 3;
-        ArmorManager.Instance.CreateArmUI(customize.G_subOptions.transform);
+        Armor_Type _enum = SaveData.equippedArmor[customize.I_armorType];
+        ArmorManager.Instance.CreateArmUI(customize.G_subOptions.transform, _enum);
         GamepadSwitch();
     }
     public void CustomizeSetup_Legs()
     {
         CustomizeShow();
         customize.I_armorType = 4;
-        ArmorManager.Instance.CreateLegUI(customize.G_subOptions.transform);
+        Armor_Type _enum = SaveData.equippedArmor[customize.I_armorType];
+        ArmorManager.Instance.CreateLegUI(customize.G_subOptions.transform, _enum);
         GamepadSwitch();
     }
     public void CustomizeSetup_Materials()
     {
         CustomizeShow();
         customize.I_armorType = 5;
-        ArmorManager.Instance.CreateMaterialUI(customize.G_subOptions.transform);
+        Armor_Type _enum = SaveData.equippedArmor[customize.I_armorType];
+        ArmorManager.Instance.CreateMaterialUI(customize.G_subOptions.transform, _enum);
         GamepadSwitch();
     }
     void CustomizeSetup_Close()

@@ -70,7 +70,6 @@ public class Bullet : DamageSource
         GameObject GO = Instantiate(B_info.PF_impactHit, hit.point, B_info.PF_impactHit.transform.rotation);
         GO.transform.forward = hit.normal;
         GO.transform.parent = hit.transform;
-        Destroy(GO, 5);
     }
     public virtual void Destroy()
     {

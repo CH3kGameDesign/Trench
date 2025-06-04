@@ -172,6 +172,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6768210955692100464}
   - component: {fileID: 1400069421148210208}
+  - component: {fileID: 7844283031032830221}
   m_Layer: 0
   m_Name: Quad
   m_TagString: Untagged
@@ -216,5 +217,30 @@ MonoBehaviour:
   m_DecalLayerMask: 1
   m_ScaleMode: 0
   m_Offset: {x: 0, y: 0, z: 0.5}
-  m_Size: {x: 0.3, y: 0.3, z: 1}
+  m_Size: {x: 0.15, y: 0.15, z: 1}
   m_FadeFactor: 1
+--- !u!114 &7844283031032830221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5041092142604892015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a621feb662e849743a476dc10f6c868a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent: {fileID: 1865873057473496165}
+  projector: {fileID: 1400069421148210208}
+  _Color:
+    _active: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+    color2: {r: 1, g: 1, b: 1, a: 1}
+    _fadeOut: 1
+  _Size:
+    _active: 0
+    sizeRange: {x: 1, y: 1}
+    _fadeOut: 0
+  timeIncrease: 0.2
+  lifeTime: 10

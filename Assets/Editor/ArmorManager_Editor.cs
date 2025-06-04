@@ -12,5 +12,9 @@ public class ArmorManager_Editor : Editor
         {
             myTarget.GenerateEnum();
         }
+        if (GUILayout.Button("Generate Sprites"))
+        {
+            myTarget.GenerateSprites();
+        }
     }
 }

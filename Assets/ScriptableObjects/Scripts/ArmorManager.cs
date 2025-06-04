@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -13,7 +14,7 @@ public class ArmorManager : ScriptableObject
     {
         public string _id;
         public string name;
-        public Sprite image;
+        public Texture2D image;
 
         public virtual void Equip(RagdollManager _RM, bool _left = true)
         {
@@ -30,6 +31,27 @@ public class ArmorManager : ScriptableObject
         public virtual Transform[] Hooks(RagdollManager _RM, bool _left = true)
         {
             return new Transform[0];
+        }
+        public virtual void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/Armor/")
+        {
+            if (_model != null)
+            {
+                GameObject GO;
+                string targetPath = filePath + name + ".png";
+                GO = Instantiate(_model);
+                GO.transform.position = pos;
+                GO.transform.eulerAngles = rot;
+                _camera.Render();
+                _camera.activeTexture.SaveToFile(targetPath, SetImage);
+                DestroyImmediate(GO);
+            }
+            else
+                image = onEmpty;
+        }
+        public void SetImage(bool set, Texture2D _texture)
+        {
+            if (set)
+                image = _texture;
         }
     }
     [System.Serializable]
@@ -48,6 +70,13 @@ public class ArmorManager : ScriptableObject
                 {
                     _RM.T_armorPoints[0]
                 };
+        }
+        public override void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/Armor/")
+        {
+            filePath += "Helmet/";
+            pos = new Vector3(0, -0.16f, 2);
+            rot = new Vector3(-90, 90, 0);
+            base.GenerateTexture(_camera, pos, rot, onEmpty, modelHelmet, filePath);
         }
     }
     [System.Serializable]
@@ -68,6 +97,13 @@ public class ArmorManager : ScriptableObject
                 {
                     _RM.T_armorPoints[2]
                 };
+        }
+        public override void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/Armor/")
+        {
+            pos = new Vector3(0, -1.33f, 3.3f);
+            rot = new Vector3(0, 180, 0);
+            filePath += "Chest/";
+            base.GenerateTexture(_camera, pos, rot, onEmpty, modelChest, filePath);
         }
     }
     [System.Serializable]
@@ -107,6 +143,11 @@ public class ArmorManager : ScriptableObject
                         _RM.T_armorPoints[6]
                     };
         }
+        public override void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/Armor/")
+        {
+            filePath += "Arm/";
+            base.GenerateTexture(_camera, pos, rot, onEmpty, modelArm, filePath);
+        }
     }
     [System.Serializable]
     public class LegClass : ArmorClass
@@ -141,6 +182,11 @@ public class ArmorManager : ScriptableObject
                     _RM.T_armorPoints[12]
                 };
         }
+        public override void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/Armor/")
+        {
+            filePath += "Leg/";
+            base.GenerateTexture(_camera, pos, rot, onEmpty, modelKnee, filePath);
+        }
     }
     [System.Serializable]
     public class MaterialClass : ArmorClass
@@ -158,6 +204,20 @@ public class ArmorManager : ScriptableObject
                     _RM.T_armorPoints[2]
                 };
         }
+
+        public override void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/Armor/")
+        {
+            GameObject GO;
+            filePath += "Material/";
+            string targetPath = filePath + name + ".png";
+            GO = Instantiate(_model);
+            GO.GetComponent<MeshRenderer>().material = modelMaterial;
+            pos = Vector3.forward * 6;
+            GO.transform.position = pos;
+            _camera.Render();
+            _camera.activeTexture.SaveToFile(targetPath, SetImage);
+            DestroyImmediate(GO);
+        }
     }
     public ArmorOptionButton PF_ArmorOptionPrefab;
     public List<HelmetClass> helmets = new List<HelmetClass>();
@@ -165,6 +225,10 @@ public class ArmorManager : ScriptableObject
     public List<ArmClass> arms = new List<ArmClass>();
     public List<LegClass> legs = new List<LegClass>();
     public List<MaterialClass> materials = new List<MaterialClass>();
+    [Space(10)]
+    public Camera PF_Camera;
+    public GameObject PF_Sphere;
+    public Texture2D T_empty;
     public static ArmorClass GetArmorType_Static(Armor_Type _type)
     {
         return Instance.GetArmorType(_type);
@@ -220,44 +284,49 @@ public class ArmorManager : ScriptableObject
         GetArmorType(_AT).Equip(_RM, _left);
     }
 
-    public void CreateHelmetUI(Transform _holder)
+    public void CreateHelmetUI(Transform _holder, Armor_Type _enum)
     {
         foreach (var item in helmets)
         {
             ArmorOptionButton AOB = Instantiate(PF_ArmorOptionPrefab, _holder);
             AOB.Setup(item);
+            AOB.Equipped(item._enum() == _enum);
         }
     }
-    public void CreateChestUI(Transform _holder)
+    public void CreateChestUI(Transform _holder, Armor_Type _enum)
     {
         foreach (var item in chests)
         {
             ArmorOptionButton AOB = Instantiate(PF_ArmorOptionPrefab, _holder);
             AOB.Setup(item);
+            AOB.Equipped(item._enum() == _enum);
         }
     }
-    public void CreateArmUI(Transform _holder)
+    public void CreateArmUI(Transform _holder, Armor_Type _enum)
     {
         foreach (var item in arms)
         {
             ArmorOptionButton AOB = Instantiate(PF_ArmorOptionPrefab, _holder);
             AOB.Setup(item);
+            AOB.Equipped(item._enum() == _enum);
         }
     }
-    public void CreateLegUI(Transform _holder)
+    public void CreateLegUI(Transform _holder, Armor_Type _enum)
     {
         foreach (var item in legs)
         {
             ArmorOptionButton AOB = Instantiate(PF_ArmorOptionPrefab, _holder);
             AOB.Setup(item);
+            AOB.Equipped(item._enum() == _enum);
         }
     }
-    public void CreateMaterialUI(Transform _holder)
+    public void CreateMaterialUI(Transform _holder, Armor_Type _enum)
     {
         foreach (var item in materials)
         {
             ArmorOptionButton AOB = Instantiate(PF_ArmorOptionPrefab, _holder);
             AOB.Setup(item);
+            AOB.Equipped(item._enum() == _enum);
         }
     }
 
@@ -336,6 +405,27 @@ public class ArmorManager : ScriptableObject
             }
             streamWriter.WriteLine("}");
         }
+        AssetDatabase.Refresh();
+    }
+    [ContextMenu("Tools/GenerateSprites")]
+    public void GenerateSprites()
+    {
+        Camera _camera = Instantiate(PF_Camera);
+        _camera.transform.position = Vector3.zero;
+        _camera.transform.forward = Vector3.forward;
+        Vector3 pos = Vector3.forward * 2;
+        Vector3 rot = Vector3.zero;
+        foreach (var item in helmets)
+            item.GenerateTexture(_camera, pos, rot, T_empty);
+        foreach (var item in chests)
+            item.GenerateTexture(_camera, pos, rot, T_empty);
+        foreach (var item in arms)
+            item.GenerateTexture(_camera, pos, rot, T_empty);
+        foreach (var item in legs)
+            item.GenerateTexture(_camera, pos, rot, T_empty);
+        foreach (var item in materials)
+            item.GenerateTexture(_camera, pos, rot, T_empty, PF_Sphere);
+        DestroyImmediate(_camera.gameObject);
         AssetDatabase.Refresh();
     }
 #endif

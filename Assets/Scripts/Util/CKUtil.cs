@@ -1,9 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 
 public static class CKUtil
 {
@@ -227,4 +230,78 @@ public static class CKUtil
             else GameObject.Destroy(_transform.GetChild(i).gameObject);
         }
     }
+#if UNITY_EDITOR
+    public enum SaveTextureFileFormat { PNG, JPG, EXR, TGA};
+    static public bool SaveToFile(this Texture source,
+                                         string filePath,
+                                         System.Action<bool, Texture2D> done = null,
+                                         int width = -1,
+                                         int height = -1,
+                                         SaveTextureFileFormat fileFormat = SaveTextureFileFormat.PNG,
+                                         int jpgQuality = 95,
+                                         bool asynchronous = false)
+    {
+        // check that the input we're getting is something we can handle:
+        if (!(source is Texture2D || source is RenderTexture))
+        {
+            Debug.LogError("Unsupported Type");
+            done?.Invoke(false, null);
+            return false;
+        }
+
+        // use the original texture size in case the input is negative:
+        if (width < 0 || height < 0)
+        {
+            width = source.width;
+            height = source.height;
+        }
+
+        // resize the original image:
+        var resizeRT = RenderTexture.GetTemporary(width, height, 0);
+        Graphics.Blit(source, resizeRT);
+
+        // create a native array to receive data from the GPU:
+        var narray = new NativeArray<byte>(width * height * 4, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+
+        // request the texture data back from the GPU:
+        var request = AsyncGPUReadback.RequestIntoNativeArray(ref narray, resizeRT, 0, (AsyncGPUReadbackRequest request) =>
+        {
+            // if the readback was successful, encode and write the results to disk
+            if (!request.hasError)
+            {
+                NativeArray<byte> encoded;
+
+                switch (fileFormat)
+                {
+                    case SaveTextureFileFormat.EXR:
+                        encoded = ImageConversion.EncodeNativeArrayToEXR(narray, resizeRT.graphicsFormat, (uint)width, (uint)height);
+                        break;
+                    case SaveTextureFileFormat.JPG:
+                        encoded = ImageConversion.EncodeNativeArrayToJPG(narray, resizeRT.graphicsFormat, (uint)width, (uint)height, 0, jpgQuality);
+                        break;
+                    case SaveTextureFileFormat.TGA:
+                        encoded = ImageConversion.EncodeNativeArrayToTGA(narray, resizeRT.graphicsFormat, (uint)width, (uint)height);
+                        break;
+                    default:
+                        encoded = ImageConversion.EncodeNativeArrayToPNG(narray, resizeRT.graphicsFormat, (uint)width, (uint)height);
+                        break;
+                }
+
+                System.IO.File.WriteAllBytes(filePath, encoded.ToArray());
+                encoded.Dispose();
+            }
+                narray.Dispose();
+
+        });
+
+        if (!asynchronous)
+            request.WaitForCompletion();
+        // notify the user that the operation is done, and its outcome.
+        AssetDatabase.Refresh();
+        Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(filePath);
+        texture.alphaIsTransparency = true;
+        done?.Invoke(!request.hasError, texture);
+        return !request.hasError;
+    }
+#endif
 }
