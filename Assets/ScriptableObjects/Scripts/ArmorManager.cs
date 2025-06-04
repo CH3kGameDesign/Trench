@@ -37,7 +37,7 @@ public class ArmorManager : ScriptableObject
             if (_model != null)
             {
                 GameObject GO;
-                string targetPath = filePath + name + ".png";
+                string targetPath = filePath + name.Replace("/", "_") + ".png";
                 GO = Instantiate(_model);
                 GO.transform.position = pos;
                 GO.transform.eulerAngles = rot;

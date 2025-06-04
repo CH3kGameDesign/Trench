@@ -7,9 +7,10 @@ using UnityEngine.UI;
 
 public class PointerBuilder : MonoBehaviour
 {
-
-    public enum drawModes { square, point, wall, arrow, place, placeNew, edit }
-    public drawModes drawMode;
+    public LevelGen_Materials _Materials;
+    public LevelGen_Placeables _Placeables;
+    public enum drawModes { square, point, wall, arrow, paint, place }
+    [HideInInspector] public drawModes drawMode;
 
     private drawModes privateDrawMode = drawModes.square;
 
@@ -43,12 +44,25 @@ public class PointerBuilder : MonoBehaviour
     public TextMeshProUGUI drawModeText;
     
     public Architraves architraves;
+    public CanvasClass _canvas;
+    [System.Serializable]
+    public class CanvasClass
+    {
+        public Button[] toolBelt_Buttons;
+        [HideInInspector] public Button[] toolBeltSub_Buttons;
+        [HideInInspector] public Button[] toolBeltFull_Buttons;
+
+        public Button PF_toolBeltSub;
+        public Button PF_toolBeltFull;
+    }
 
 
     // Start is called before the first frame update
     void Start()
     {
         gridSize = 1;
+        LevelGen_Materials.Instance = _Materials;
+        LevelGen_Placeables.Instance = _Placeables;
     }
 
     // Update is called once per frame
@@ -581,10 +595,10 @@ public class PointerBuilder : MonoBehaviour
                 privateDrawMode = drawModes.point;
                 break;
             case 2:
-                privateDrawMode = drawModes.placeNew;
+                privateDrawMode = drawModes.paint;
                 break;
             case 3:
-                privateDrawMode = drawModes.wall;
+                privateDrawMode = drawModes.place;
                 break;
             default:
                 break;

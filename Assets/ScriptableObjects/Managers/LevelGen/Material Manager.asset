@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28f0e58d82a0b764aad537594f6dd38e, type: 3}
+  m_Name: Material Manager
+  m_EditorClassIdentifier: 
+  walls:
+  - name: Debug/Red
+    image: {fileID: 2800000, guid: 22e8498a5e835bc42b9e07874e24a3e3, type: 3}
+    material: {fileID: 2100000, guid: 24a2354f44050074c898049b5555e81f, type: 2}
+  - name: Debug/Green
+    image: {fileID: 2800000, guid: 97ce5db9e75a659438dc93981a1c297f, type: 3}
+    material: {fileID: 2100000, guid: 39ac215caf749a244b46aba77888db3b, type: 2}
+  - name: Debug/Orange
+    image: {fileID: 2800000, guid: 588af2c9bb613f647860ff44bcdabb59, type: 3}
+    material: {fileID: 2100000, guid: d52ff6d5ee10de742aee69421116e657, type: 2}
+  - name: Debug/White
+    image: {fileID: 2800000, guid: 66e59489cb9c4de4683fd63fc0deb18a, type: 3}
+    material: {fileID: 2100000, guid: c949d26ba3ee6054db581a141d3c03cb, type: 2}
+  - name: Debug/Grid
+    image: {fileID: 2800000, guid: efef1bf8f4cd9444cb62b807cf85f52c, type: 3}
+    material: {fileID: 2100000, guid: 11fda2bbdf06a45408175d6e61792e12, type: 2}
+  - name: Debug/GridDark
+    image: {fileID: 2800000, guid: fd1b80b2d1a80a249b5016a6543b8038, type: 3}
+    material: {fileID: 2100000, guid: 7dbbac5cb55aec447b0fbcd82a90d13e, type: 2}
+  floors: []
+  ceilings: []
+  PF_sphere: {fileID: 1643148071477528111, guid: d383df95520fef4478bb0123aa556b7a, type: 3}
+  PF_Camera: {fileID: 3580604280446541953, guid: 870f5f839ad98ef4d857b2ef99d95056, type: 3}
