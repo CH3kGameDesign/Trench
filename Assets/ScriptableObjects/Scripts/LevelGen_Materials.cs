@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using static LevelGen_Placeables;
 
 [CreateAssetMenu(menuName = "Trench/AssetLists/LevelGen/Materials", fileName = "New Material Manager")]
 public class LevelGen_Materials : ScriptableObject
@@ -35,6 +35,42 @@ public class LevelGen_Materials : ScriptableObject
             if (set)
                 image = _texture;
         }
+    }
+    public List<PointerBuilder.SubItem> GetSubItemList(string _id)
+    {
+        List<MaterialClass> _temp = new List<MaterialClass>();
+        switch (_id)
+        {
+            case "room":
+                _temp.Concat<MaterialClass>(walls);
+                _temp.Concat<MaterialClass>(floors);
+                _temp.Concat<MaterialClass>(ceilings);
+                break;
+            case "wall":
+                _temp.Concat<MaterialClass>(walls);
+                break;
+            case "floor":
+                _temp.Concat<MaterialClass>(floors);
+                break;
+            case "ceiling":
+                _temp.Concat<MaterialClass>(ceilings);
+                break;
+            default:
+                break;
+        }
+        return ConvertToSubItemList(_temp);
+    }
+    public List<PointerBuilder.SubItem> ConvertToSubItemList(List<MaterialClass> _list)
+    {
+        List<PointerBuilder.SubItem> _temp = new List<PointerBuilder.SubItem>();
+        foreach (MaterialClass _item in _list)
+        {
+            PointerBuilder.SubItem _sub = new PointerBuilder.SubItem();
+            _sub.name = _item.name;
+            _sub.image = _item.image;
+            _temp.Add(_sub);
+        }
+        return _temp;
     }
 #if UNITY_EDITOR
     [ContextMenu("Tools/GenerateSprites")]

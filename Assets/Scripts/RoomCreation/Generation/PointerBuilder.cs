@@ -1,9 +1,12 @@
-﻿using System.Collections;
+﻿using NUnit.Framework;
+using NUnit.Framework.Internal;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static UnityEditor.Progress;
 
 public class PointerBuilder : MonoBehaviour
 {
@@ -49,13 +52,158 @@ public class PointerBuilder : MonoBehaviour
     public class CanvasClass
     {
         public Button[] toolBelt_Buttons;
-        [HideInInspector] public Button[] toolBeltSub_Buttons;
-        [HideInInspector] public Button[] toolBeltFull_Buttons;
+        [HideInInspector] public ToolBeltButton[] toolBeltSub_Buttons;
+        [HideInInspector] public ToolBeltButton[] toolBeltFull_Buttons;
 
-        public Button PF_toolBeltSub;
-        public Button PF_toolBeltFull;
+        public ToolBeltButton PF_toolBeltSub;
+        public ToolBeltButton PF_toolBeltFull;
+
+        public RectTransform RT_toolBeltSub;
+        public RectTransform RT_toolBeltFull;
     }
+    public BuildClass _Build;
+    public PaintClass _Paint;
+    public PlaceClass _Place;
 
+    [System.Serializable]
+    public class BeltClass
+    {
+        [HideInInspector] public int i_lastSel = 0;
+        public virtual void GenerateBelt(PointerBuilder PB, RectTransform _hook)
+        {
+            List<SubClass> _list = GetList();
+            PB._canvas.toolBeltSub_Buttons = new ToolBeltButton[_list.Count];
+            int i = 0;
+            foreach (var item in _list)
+            {
+                ToolBeltButton TBB = Instantiate(PB._canvas.PF_toolBeltSub, _hook);
+                TBB.Setup(this, item, PB);
+                TBB.Selected(i == i_lastSel);
+                PB._canvas.toolBeltSub_Buttons[i] = TBB;
+                i++;
+            }
+            Vector2 _size = _hook.sizeDelta;
+            GridLayoutGroup GLG = _hook.GetComponent<GridLayoutGroup>();
+            _size.y = (1 + Mathf.Ceil(_list.Count / 3)) * (GLG.cellSize.y + GLG.spacing.y);
+            _hook.sizeDelta = _size;
+            PB.GenerateBelt_Full(this, _list[i_lastSel]);
+        }
+        public virtual List<SubClass> GetList()
+        {
+            return new List<SubClass>();
+        }
+        public void UpdateItemsList()
+        {
+            List<SubClass> _list = GetList();
+            int i = 0;
+            foreach (var item in _list)
+            {
+                item.num = i;
+                item.UpdateItemsList();
+                i++;
+            }
+        }
+    }
+    [System.Serializable]
+    public class BuildClass : BeltClass
+    {
+        public List<BuildSubClass> list;
+        public override List<SubClass> GetList()
+        {
+            List<SubClass> _list = new List<SubClass>();
+            foreach (var item in list)
+                _list.Add(item);
+            return _list;
+        }
+    }
+    [System.Serializable]
+    public class PaintClass : BeltClass
+    {
+        public List<PaintSubClass> list;
+        public override List<SubClass> GetList()
+        {
+            List<SubClass> _list = new List<SubClass>();
+            foreach (var item in list)
+                _list.Add(item);
+            return _list;
+        }
+    }
+    [System.Serializable]
+    public class PlaceClass : BeltClass
+    {
+        public List<PlaceSubClass> list;
+        public override List<SubClass> GetList()
+        {
+            List<SubClass> _list = new List<SubClass>();
+            foreach (var item in list)
+                _list.Add(item);
+            return _list;
+        }
+    }
+    [System.Serializable]
+    public class SubClass
+    {
+        public string name;
+        public Sprite image;
+        [HideInInspector] public List<SubItem> items;
+        [HideInInspector] public int num;
+        [HideInInspector] public int i_lastSel;
+        public virtual void GenerateBelt_Full(PointerBuilder PB, RectTransform _hook)
+        {
+            PB._canvas.toolBeltFull_Buttons = new ToolBeltButton[items.Count];
+            int i = 0;
+            foreach (var item in items)
+            {
+                ToolBeltButton TBB = Instantiate(PB._canvas.PF_toolBeltSub, _hook);
+                TBB.Setup(this, item, PB);
+                TBB.Selected(i == i_lastSel);
+                PB._canvas.toolBeltFull_Buttons[i] = TBB;
+                i++;
+            }
+            Vector2 _size = _hook.sizeDelta;
+            GridLayoutGroup GLG = _hook.GetComponent<GridLayoutGroup>();
+            _size.x = (1 + Mathf.Ceil(items.Count / 2)) * (GLG.cellSize.x + GLG.spacing.x);
+            _hook.sizeDelta = _size;
+        }
+        public virtual void UpdateItemsList()
+        {
+
+        }
+    }
+    [System.Serializable]
+    public class BuildSubClass : SubClass
+    {
+        public List<SubItem> itemsOverride;
+        public override void UpdateItemsList()
+        {
+            items = itemsOverride;
+        }
+    }
+    [System.Serializable]
+    public class PaintSubClass : SubClass
+    {
+        public string _id;
+        public override void UpdateItemsList()
+        {
+
+            items = LevelGen_Materials.Instance.GetSubItemList(_id);
+        }
+    }
+    [System.Serializable]
+    public class PlaceSubClass : SubClass
+    {
+        public string _id;
+        public override void UpdateItemsList()
+        {
+                items = LevelGen_Placeables.Instance.GetSubItemList(_id);
+        }
+    }
+    [System.Serializable]
+    public class SubItem
+    {
+        public string name;
+        public Texture2D image;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -63,6 +211,14 @@ public class PointerBuilder : MonoBehaviour
         gridSize = 1;
         LevelGen_Materials.Instance = _Materials;
         LevelGen_Placeables.Instance = _Placeables;
+        GenerateBelt_Sub(0);
+        UpdateItemsList();
+    }
+    void UpdateItemsList()
+    {
+        _Build.UpdateItemsList();
+        _Paint.UpdateItemsList();
+        _Place.UpdateItemsList();
     }
 
     // Update is called once per frame
@@ -604,5 +760,49 @@ public class PointerBuilder : MonoBehaviour
                 break;
         }
         drawMode = privateDrawMode;
+    }
+
+    public void GenerateBelt_Sub(int _belt)
+    {
+        ClearBelt();
+        switch (_belt)
+        {
+            case 0:
+                _Build.GenerateBelt(this, _canvas.RT_toolBeltSub);
+                break;
+            case 1:
+                _Paint.GenerateBelt(this, _canvas.RT_toolBeltSub);
+                break;
+            case 2:
+                _Place.GenerateBelt(this, _canvas.RT_toolBeltSub);
+                break;
+            default:
+                break;
+        }
+    }
+    public void GenerateBelt_Full(BeltClass _belt, int _subInt)
+    {
+        SubClass _sub = _belt.GetList()[_subInt];
+        GenerateBelt_Full(_belt, _sub);
+    }
+    public void GenerateBelt_Full(BeltClass _belt, SubClass _sub)
+    {
+        _canvas.toolBeltSub_Buttons[_belt.i_lastSel].Selected(false);
+        _belt.i_lastSel = _sub.num;
+        _sub.GenerateBelt_Full(this, _canvas.RT_toolBeltFull);
+    }
+
+    public void ClearBelt()
+    {
+        foreach (var item in _canvas.toolBeltSub_Buttons)
+            Destroy(item.gameObject);
+        _canvas.toolBeltSub_Buttons = new ToolBeltButton[0];
+        ClearBeltFull();
+    }
+    public void ClearBeltFull()
+    {
+        foreach (var item in _canvas.toolBeltFull_Buttons)
+            Destroy(item.gameObject);
+        _canvas.toolBeltFull_Buttons = new ToolBeltButton[0];
     }
 }

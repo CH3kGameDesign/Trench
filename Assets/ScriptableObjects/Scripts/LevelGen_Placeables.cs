@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -8,7 +9,10 @@ public class LevelGen_Placeables : ScriptableObject
 {
     public static LevelGen_Placeables Instance;
     public List<SpawnPoint> spawnPoints = new List<SpawnPoint>();
-    public List<Furniture> furniture = new List<Furniture>();
+    public List<Structure> structures = new List<Structure>();
+    public List<Wall> walls = new List<Wall>();
+    public List<Floor> floors = new List<Floor>();
+    public List<Ceiling> ceilings = new List<Ceiling>();
     public Camera PF_Camera;
     [System.Serializable]
     public class PlaceableClass
@@ -48,13 +52,78 @@ public class LevelGen_Placeables : ScriptableObject
         }
     }
     [System.Serializable]
-    public class Furniture : PlaceableClass
+    public class Structure : PlaceableClass
     {
         public override void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/LevelGen/")
         {
-            filePath += "Furniture/";
+            filePath += "Structures/";
             base.GenerateTexture(_camera, pos, rot, onEmpty, prefab, filePath);
         }
+    }
+    [System.Serializable]
+    public class Wall : PlaceableClass
+    {
+        public override void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/LevelGen/")
+        {
+            filePath += "Structures/";
+            base.GenerateTexture(_camera, pos, rot, onEmpty, prefab, filePath);
+        }
+    }
+    [System.Serializable]
+    public class Floor : PlaceableClass
+    {
+        public override void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/LevelGen/")
+        {
+            filePath += "Structures/";
+            base.GenerateTexture(_camera, pos, rot, onEmpty, prefab, filePath);
+        }
+    }
+    [System.Serializable]
+    public class Ceiling : PlaceableClass
+    {
+        public override void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/LevelGen/")
+        {
+            filePath += "Structures/";
+            base.GenerateTexture(_camera, pos, rot, onEmpty, prefab, filePath);
+        }
+    }
+
+    public List<PointerBuilder.SubItem> GetSubItemList(string _id)
+    {
+        List<PlaceableClass> _temp = new List<PlaceableClass>();
+        switch (_id)
+        {
+            case "spawn":
+                _temp.Concat<PlaceableClass>(spawnPoints);
+                break;
+            case "structure":
+                _temp.Concat<PlaceableClass>(structures);
+                break;
+            case "wall":
+                _temp.Concat<PlaceableClass>(walls);
+                break;
+            case "floor":
+                _temp.Concat<PlaceableClass>(floors);
+                break;
+            case "ceiling":
+                _temp.Concat<PlaceableClass>(ceilings);
+                break;
+            default:
+                break;
+        }
+        return ConvertToSubItemList(_temp);
+    }
+    public List<PointerBuilder.SubItem> ConvertToSubItemList(List<PlaceableClass> _list)
+    {
+        List<PointerBuilder.SubItem> _temp = new List<PointerBuilder.SubItem>();
+        foreach (PlaceableClass _item in _list)
+        {
+            PointerBuilder.SubItem _sub = new PointerBuilder.SubItem();
+            _sub.name = _item.name;
+            _sub.image = _item.image;
+            _temp.Add(_sub);
+        }    
+        return _temp;
     }
 #if UNITY_EDITOR
     [ContextMenu("Tools/GenerateSprites")]
@@ -67,7 +136,13 @@ public class LevelGen_Placeables : ScriptableObject
         Vector3 rot = Vector3.zero;
         foreach (var item in spawnPoints)
             item.GenerateTexture(_camera, pos, rot);
-        foreach (var item in furniture)
+        foreach (var item in structures)
+            item.GenerateTexture(_camera, pos, rot);
+        foreach (var item in walls)
+            item.GenerateTexture(_camera, pos, rot);
+        foreach (var item in floors)
+            item.GenerateTexture(_camera, pos, rot);
+        foreach (var item in ceilings)
             item.GenerateTexture(_camera, pos, rot);
         DestroyImmediate(_camera.gameObject);
         AssetDatabase.Refresh();
