@@ -32,8 +32,11 @@ public class ToolBeltButton : MonoBehaviour
         PB = _pb;
         subClass = _subClass;
         item = _item;
-        Sprite sprite = Sprite.Create(_item.image, new Rect(0, 0, _item.image.width, _item.image.height), new Vector2(_item.image.width / 2, _item.image.height / 2));
-        I_sprite.sprite = sprite;
+        if (item.image != null)
+        {
+            Sprite sprite = Sprite.Create(_item.image, new Rect(0, 0, _item.image.width, _item.image.height), new Vector2(_item.image.width / 2, _item.image.height / 2));
+            I_sprite.sprite = sprite;
+        }
         TM_name.text = _item.name;
     }
 
@@ -42,9 +45,10 @@ public class ToolBeltButton : MonoBehaviour
         switch (_enum)
         {
             case enumType.belt:
-                PB.GenerateBelt_Full(beltClass, subClass);
+                PB.BeltButtonTap_Sub(beltClass, subClass);
                 break;
             case enumType.sub:
+                PB.BeltButtonTap_Full(subClass, item);
                 break;
             default:
                 break;

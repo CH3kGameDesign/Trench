@@ -42,18 +42,18 @@ public class LevelGen_Materials : ScriptableObject
         switch (_id)
         {
             case "room":
-                _temp.Concat<MaterialClass>(walls);
-                _temp.Concat<MaterialClass>(floors);
-                _temp.Concat<MaterialClass>(ceilings);
+                _temp.AddRange(walls);
+                _temp.AddRange(floors);
+                _temp.AddRange(ceilings);
                 break;
             case "wall":
-                _temp.Concat<MaterialClass>(walls);
+                _temp.AddRange(walls);
                 break;
             case "floor":
-                _temp.Concat<MaterialClass>(floors);
+                _temp.AddRange(floors);
                 break;
             case "ceiling":
-                _temp.Concat<MaterialClass>(ceilings);
+                _temp.AddRange(ceilings);
                 break;
             default:
                 break;

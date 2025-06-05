@@ -13,6 +13,8 @@ public class SpeedLines : MonoBehaviour
     void Start()
     {
         SetMaskActive(false, 0);
+        Material mat = new Material(image.material);
+        image.material = mat;
     }
 
     // Update is called once per frame

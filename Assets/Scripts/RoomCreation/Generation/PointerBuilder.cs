@@ -12,8 +12,10 @@ public class PointerBuilder : MonoBehaviour
 {
     public LevelGen_Materials _Materials;
     public LevelGen_Placeables _Placeables;
-    public enum drawModes { square, point, wall, arrow, paint, place }
+    public enum drawModes { square, point, wall, arrow }
+    public enum beltModes { build, paint, place}
     [HideInInspector] public drawModes drawMode;
+    [HideInInspector] public beltModes beltMode;
 
     private drawModes privateDrawMode = drawModes.square;
 
@@ -98,7 +100,7 @@ public class PointerBuilder : MonoBehaviour
             int i = 0;
             foreach (var item in _list)
             {
-                item.num = i;
+                item.index = i;
                 item.UpdateItemsList();
                 i++;
             }
@@ -108,6 +110,11 @@ public class PointerBuilder : MonoBehaviour
     public class BuildClass : BeltClass
     {
         public List<BuildSubClass> list;
+        public override void GenerateBelt(PointerBuilder PB, RectTransform _hook)
+        {
+            PB.beltMode = beltModes.build;
+            base.GenerateBelt(PB, _hook);
+        }
         public override List<SubClass> GetList()
         {
             List<SubClass> _list = new List<SubClass>();
@@ -120,6 +127,11 @@ public class PointerBuilder : MonoBehaviour
     public class PaintClass : BeltClass
     {
         public List<PaintSubClass> list;
+        public override void GenerateBelt(PointerBuilder PB, RectTransform _hook)
+        {
+            PB.beltMode = beltModes.paint;
+            base.GenerateBelt(PB, _hook);
+        }
         public override List<SubClass> GetList()
         {
             List<SubClass> _list = new List<SubClass>();
@@ -132,6 +144,11 @@ public class PointerBuilder : MonoBehaviour
     public class PlaceClass : BeltClass
     {
         public List<PlaceSubClass> list;
+        public override void GenerateBelt(PointerBuilder PB, RectTransform _hook)
+        {
+            PB.beltMode = beltModes.place;
+            base.GenerateBelt(PB, _hook);
+        }
         public override List<SubClass> GetList()
         {
             List<SubClass> _list = new List<SubClass>();
@@ -146,8 +163,8 @@ public class PointerBuilder : MonoBehaviour
         public string name;
         public Sprite image;
         [HideInInspector] public List<SubItem> items;
-        [HideInInspector] public int num;
-        [HideInInspector] public int i_lastSel;
+        [HideInInspector] public int index;
+        [HideInInspector] public int i_lastSel = 0;
         public virtual void GenerateBelt_Full(PointerBuilder PB, RectTransform _hook)
         {
             PB._canvas.toolBeltFull_Buttons = new ToolBeltButton[items.Count];
@@ -167,7 +184,12 @@ public class PointerBuilder : MonoBehaviour
         }
         public virtual void UpdateItemsList()
         {
-
+            int i = 0;
+            foreach(var item in items)
+            {
+                item.index = i;
+                i++;
+            }
         }
     }
     [System.Serializable]
@@ -177,6 +199,7 @@ public class PointerBuilder : MonoBehaviour
         public override void UpdateItemsList()
         {
             items = itemsOverride;
+            base.UpdateItemsList();
         }
     }
     [System.Serializable]
@@ -185,8 +208,8 @@ public class PointerBuilder : MonoBehaviour
         public string _id;
         public override void UpdateItemsList()
         {
-
             items = LevelGen_Materials.Instance.GetSubItemList(_id);
+            base.UpdateItemsList();
         }
     }
     [System.Serializable]
@@ -195,7 +218,8 @@ public class PointerBuilder : MonoBehaviour
         public string _id;
         public override void UpdateItemsList()
         {
-                items = LevelGen_Placeables.Instance.GetSubItemList(_id);
+            items = LevelGen_Placeables.Instance.GetSubItemList(_id);
+            base.UpdateItemsList();
         }
     }
     [System.Serializable]
@@ -203,6 +227,7 @@ public class PointerBuilder : MonoBehaviour
     {
         public string name;
         public Texture2D image;
+        [HideInInspector] public int index;
     }
 
     // Start is called before the first frame update
@@ -734,37 +759,10 @@ public class PointerBuilder : MonoBehaviour
         ru.walls.Add(wall);
     }
 
-    public void ChangeDrawMode (int temp)
-    {
-        if (activeSquare != null)
-        {
-            activeSquare.GetComponent<RoomUpdater>().HideArrows();
-            //GameObject.Destroy(activeSquare.gameObject);
-            activeSquare = null;
-        }
-        switch (temp)
-        {
-            case 0:
-                privateDrawMode = drawModes.square;
-                break;
-            case 1:
-                privateDrawMode = drawModes.point;
-                break;
-            case 2:
-                privateDrawMode = drawModes.paint;
-                break;
-            case 3:
-                privateDrawMode = drawModes.place;
-                break;
-            default:
-                break;
-        }
-        drawMode = privateDrawMode;
-    }
-
     public void GenerateBelt_Sub(int _belt)
     {
         ClearBelt();
+        DeselectSquare();
         switch (_belt)
         {
             case 0:
@@ -780,15 +778,34 @@ public class PointerBuilder : MonoBehaviour
                 break;
         }
     }
+
+    void DeselectSquare()
+    {
+        if (activeSquare != null)
+        {
+            activeSquare.GetComponent<RoomUpdater>().HideArrows();
+            activeSquare = null;
+        }
+    }
     public void GenerateBelt_Full(BeltClass _belt, int _subInt)
     {
         SubClass _sub = _belt.GetList()[_subInt];
         GenerateBelt_Full(_belt, _sub);
     }
-    public void GenerateBelt_Full(BeltClass _belt, SubClass _sub)
+    public void BeltButtonTap_Sub(BeltClass _belt, SubClass _sub)
     {
         _canvas.toolBeltSub_Buttons[_belt.i_lastSel].Selected(false);
-        _belt.i_lastSel = _sub.num;
+        GenerateBelt_Full(_belt, _sub);
+    }
+    public void BeltButtonTap_Full(SubClass _sub, SubItem _item)
+    {
+        _canvas.toolBeltFull_Buttons[_sub.i_lastSel].Selected(false);
+        _sub.i_lastSel = _item.index;
+    }
+    void GenerateBelt_Full(BeltClass _belt, SubClass _sub)
+    {
+        ClearBeltFull();
+        _belt.i_lastSel = _sub.index;
         _sub.GenerateBelt_Full(this, _canvas.RT_toolBeltFull);
     }
 

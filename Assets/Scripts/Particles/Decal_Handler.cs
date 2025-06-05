@@ -43,6 +43,8 @@ public class Decal_Handler : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        Material _mat = new Material(projector.material);
+        projector.material = _mat;
         if (parent == null)
             parent = gameObject;
         _Color.Activate(projector);

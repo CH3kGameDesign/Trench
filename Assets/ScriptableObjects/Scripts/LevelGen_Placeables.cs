@@ -94,19 +94,19 @@ public class LevelGen_Placeables : ScriptableObject
         switch (_id)
         {
             case "spawn":
-                _temp.Concat<PlaceableClass>(spawnPoints);
+                _temp.AddRange(spawnPoints);
                 break;
             case "structure":
-                _temp.Concat<PlaceableClass>(structures);
+                _temp.AddRange(structures);
                 break;
             case "wall":
-                _temp.Concat<PlaceableClass>(walls);
+                _temp.AddRange(walls);
                 break;
             case "floor":
-                _temp.Concat<PlaceableClass>(floors);
+                _temp.AddRange(floors);
                 break;
             case "ceiling":
-                _temp.Concat<PlaceableClass>(ceilings);
+                _temp.AddRange(ceilings);
                 break;
             default:
                 break;
