@@ -3,11 +3,9 @@ using NUnit.Framework.Internal;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using static UnityEditor.Progress;
 
 public class PointerBuilder : MonoBehaviour
 {
@@ -18,12 +16,11 @@ public class PointerBuilder : MonoBehaviour
     [HideInInspector] public drawModes drawMode;
     [HideInInspector] public beltModes beltMode;
 
-    private drawModes privateDrawMode = drawModes.square;
 
     [HideInInspector]
     public Transform activeSquare;
     [HideInInspector]
-    public Transform activeWall;
+    public SurfaceUpdater activeWall;
     [HideInInspector]
     public Transform activeArrow;
     public GameObject squarePrefab;
@@ -112,6 +109,10 @@ public class PointerBuilder : MonoBehaviour
                 i++;
             }
         }
+        public virtual void Setup(PointerBuilder PB)
+        {
+            UpdateItemsList();
+        }
     }
     [System.Serializable]
     public class BuildClass : BeltClass
@@ -134,6 +135,7 @@ public class PointerBuilder : MonoBehaviour
     public class PaintClass : BeltClass
     {
         public List<PaintSubClass> list;
+        public Material activeMat;
         public override void GenerateBelt(PointerBuilder PB, RectTransform _hook)
         {
             PB.beltMode = beltModes.paint;
@@ -146,11 +148,18 @@ public class PointerBuilder : MonoBehaviour
                 _list.Add(item);
             return _list;
         }
+        public override void Setup(PointerBuilder PB)
+        {
+            base.Setup(PB);
+            SubClass SC = list[i_lastSel];
+            SC.items[SC.i_lastSel].OnSelect(PB);
+        }
     }
     [System.Serializable]
     public class PlaceClass : BeltClass
     {
         public List<PlaceSubClass> list;
+        public GameObject activePrefab;
         public override void GenerateBelt(PointerBuilder PB, RectTransform _hook)
         {
             PB.beltMode = beltModes.place;
@@ -162,6 +171,12 @@ public class PointerBuilder : MonoBehaviour
             foreach (var item in list)
                 _list.Add(item);
             return _list;
+        }
+        public override void Setup(PointerBuilder PB)
+        {
+            base.Setup(PB);
+            SubClass SC = list[i_lastSel];
+            SC.items[SC.i_lastSel].OnSelect(PB);
         }
     }
     #endregion
@@ -208,11 +223,12 @@ public class PointerBuilder : MonoBehaviour
     [System.Serializable]
     public class BuildSubClass : SubClass
     {
-        public List<SubItem> itemsOverride;
+        public List<BuildItem> itemsOverride = new List<BuildItem>();
         public drawModes _mode;
         public override void UpdateItemsList()
         {
-            items = itemsOverride;
+            items = new List<SubItem>();
+            items.AddRange(itemsOverride);
             base.UpdateItemsList();
         }
         public override void OnSelect(PointerBuilder PB)
@@ -226,7 +242,8 @@ public class PointerBuilder : MonoBehaviour
         public string _id;
         public override void UpdateItemsList()
         {
-            items = LevelGen_Materials.Instance.GetSubItemList(_id);
+            items = new List<SubItem>();
+            items.AddRange(LevelGen_Materials.Instance.GetSubItemList(_id));
             base.UpdateItemsList();
         }
         public override void OnSelect(PointerBuilder PB)
@@ -240,7 +257,8 @@ public class PointerBuilder : MonoBehaviour
         public string _id;
         public override void UpdateItemsList()
         {
-            items = LevelGen_Placeables.Instance.GetSubItemList(_id);
+            items = new List<SubItem>();
+            items.AddRange(LevelGen_Placeables.Instance.GetSubItemList(_id));
             base.UpdateItemsList();
         }
         public override void OnSelect(PointerBuilder PB)
@@ -254,9 +272,32 @@ public class PointerBuilder : MonoBehaviour
         public string name;
         public Texture2D image;
         [HideInInspector] public int index;
-        public void OnSelect(PointerBuilder PB)
+        public virtual void OnSelect(PointerBuilder PB)
         {
 
+        }
+    }
+    public class BuildItem : SubItem
+    {
+        public override void OnSelect(PointerBuilder PB)
+        {
+
+        }
+    }
+    public class PaintItem : SubItem
+    {
+        public Material _mat;
+        public override void OnSelect(PointerBuilder PB)
+        {
+            PB._Paint.activeMat = _mat;
+        }
+    }
+    public class PlaceItem : SubItem
+    {
+        public GameObject _prefab;
+        public override void OnSelect(PointerBuilder PB)
+        {
+            PB._Place.activePrefab = _prefab;
         }
     }
     #endregion
@@ -268,7 +309,7 @@ public class PointerBuilder : MonoBehaviour
         LevelGen_Materials.Instance = _Materials;
         LevelGen_Placeables.Instance = _Placeables;
         GenerateBelt_Sub(0);
-        UpdateItemsList();
+        Setup();
     }
 
     // Update is called once per frame
@@ -314,13 +355,16 @@ public class PointerBuilder : MonoBehaviour
                     int l = hit.transform.gameObject.layer;
                     if (_layer.gridMask.Check(l))
                     {
+                        GameObject GO;
+                        RoomUpdater RU;
+                        SurfaceUpdater SU;
                         switch (drawMode)
                         {
                             case drawModes.square:
                                 if (activeWall != null)
                                     activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
                                 firstClickPos = GetPos();
-                                GameObject GO = Instantiate(squarePrefab, floorHolder);
+                                GO = Instantiate(squarePrefab, floorHolder);
 
                                 Mesh tempMesh = new Mesh();
                                 tempMesh.vertices = new Vector3[]
@@ -344,8 +388,6 @@ public class PointerBuilder : MonoBehaviour
                                 tempMesh.RecalculateNormals();
                                 tempMesh.RecalculateBounds();
 
-                                GO.GetComponent<MeshFilter>().mesh = tempMesh;
-                                GO.GetComponent<MeshCollider>().sharedMesh = tempMesh;
 
                                 GO.name = Time.time.ToString();
                                 //Mesh meshTemp = new Mesh();
@@ -354,26 +396,30 @@ public class PointerBuilder : MonoBehaviour
                                 //meshTemp.uv = meshTemp2.uv;
                                 //meshTemp.triangles = meshTemp2.triangles;
                                 activeSquare = GO.transform;
-                                RoomUpdater RM = GO.AddComponent<RoomUpdater>();
-                                RM.roomName = GO.name;
-                                RM.mf = GO.GetComponent<MeshFilter>();
-                                RM.floor = GO.transform;
-                                RM.arrow = arrow;
+                                RU = GO.AddComponent<RoomUpdater>();
+                                SU = GO.AddComponent<SurfaceUpdater>();
+                                SU.Setup(RU);
+                                RU.roomName = GO.name;
+                                RU.SU_Floor = SU;
 
-                                RM.height = 3;
+                                SU.mf.mesh = tempMesh;
+                                SU.mc.sharedMesh = tempMesh;
+                                RU.floor = GO.transform;
+                                RU.arrow = arrow;
 
-                                RM.architraves = architraves;
+                                RU.height = 3;
 
-                                RM.boxCollider = GO.GetComponent<BoxCollider>();
-                                RM.meshCollider = GO.GetComponent<MeshCollider>();
+                                RU.architraves = architraves;
 
-                                GameObject GO2 = Instantiate(squarePrefab, activeSquare);
-                                RM.mf_Ceiling = GO2.GetComponent<MeshFilter>();
-                                RM.meshCollider_Ceiling = GO2.GetComponent<MeshCollider>();
+                                //CEILING//////////
+                                GO = Instantiate(squarePrefab, activeSquare);
+                                SU = GO.AddComponent<SurfaceUpdater>();
+                                SU.Setup(RU);
+                                RU.SU_Ceiling = SU;
 
-                                GO2.GetComponent<MeshFilter>().mesh = tempMesh;
-                                GO2.GetComponent<MeshCollider>().sharedMesh = tempMesh;
-                                AddWalls(GO.GetComponent<RoomUpdater>());
+                                SU.mf.mesh = tempMesh;
+                                SU.mc.sharedMesh = tempMesh;
+                                AddWalls(RU);
                                 break;
                             case drawModes.point:
                                 Vector3 clickPos = GetPos();
@@ -381,26 +427,25 @@ public class PointerBuilder : MonoBehaviour
                                     activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
                                 if (activeSquare == null)
                                 {
-                                    GameObject GO1 = Instantiate(squarePrefab, floorHolder);
-                                    GO1.name = Time.time.ToString();
+                                    GO = Instantiate(squarePrefab, floorHolder);
+                                    GO.name = Time.time.ToString();
                                     Mesh meshTempPoint = new Mesh();
                                     //Mesh meshTempPoint2 = GO1.GetComponent<MeshFilter>().mesh;
                                     //meshTempPoint.vertices = meshTempPoint2.vertices;
                                     //meshTempPoint.uv = meshTempPoint2.uv;
                                     //meshTempPoint.triangles = meshTempPoint2.triangles;
-                                    activeSquare = GO1.transform;
-                                    GO1.AddComponent<RoomUpdater>();
-                                    GO1.GetComponent<MeshFilter>().mesh = meshTempPoint;
-                                    GO1.GetComponent<RoomUpdater>().roomName = GO1.name;
-                                    GO1.GetComponent<RoomUpdater>().mf = GO1.GetComponent<MeshFilter>();
-                                    GO1.GetComponent<RoomUpdater>().floor = GO1.transform;
-                                    GO1.GetComponent<RoomUpdater>().arrow = arrow;
+                                    activeSquare = GO.transform;
+                                    RU = GO.AddComponent<RoomUpdater>();
+                                    SU = GO.AddComponent<SurfaceUpdater>();
+                                    SU.Setup(RU);
+                                    RU.roomName = GO.name;
+                                    RU.floor = GO.transform;
+                                    RU.arrow = arrow;
 
-                                    GO1.GetComponent<RoomUpdater>().architraves = architraves;
+                                    RU.architraves = architraves;
 
-                                    GO1.GetComponent<RoomUpdater>().boxCollider = GO1.GetComponent<BoxCollider>();
-                                    GO1.GetComponent<RoomUpdater>().meshCollider = GO1.GetComponent<MeshCollider>();
-                                    GO1.GetComponent<RoomUpdater>().vertPos = new Vector3[0];
+                                    SU.mf.mesh = meshTempPoint;
+                                    RU.vertPos = new Vector3[0];
                                 }
                                 RoomUpdater ru = activeSquare.GetComponent<RoomUpdater>();
 
@@ -433,14 +478,14 @@ public class PointerBuilder : MonoBehaviour
                                     Triangulator tr = new Triangulator(temp2D);
                                     int[] indices = tr.Triangulate();
 
-                                    ru.GetComponent<MeshFilter>().mesh.vertices = tempVerts;
-                                    ru.GetComponent<MeshFilter>().mesh.triangles = indices;
-                                    ru.GetComponent<MeshFilter>().mesh.uv = temp2D;
+                                    ru.SU_Floor.mf.mesh.vertices = tempVerts;
+                                    ru.SU_Floor.mf.mesh.triangles = indices;
+                                    ru.SU_Floor.mf.mesh.uv = temp2D;
 
-                                    ru.GetComponent<MeshFilter>().mesh.RecalculateNormals();
-                                    ru.GetComponent<MeshFilter>().mesh.RecalculateBounds();
+                                    ru.SU_Floor.mf.mesh.RecalculateNormals();
+                                    ru.SU_Floor.mf.mesh.RecalculateBounds();
 
-                                    ru.meshCollider.sharedMesh = ru.mf.mesh;
+                                    ru.SU_Floor.mc.sharedMesh = ru.SU_Floor.mf.mesh;
                                 }
                                 break;
                             default:
@@ -450,7 +495,7 @@ public class PointerBuilder : MonoBehaviour
                     else if (_layer.interactableMask.Check(l))
                     {
                         drawMode = drawModes.wall;
-                        Transform activeWallTemp = GetWall();
+                        SurfaceUpdater activeWallTemp = GetWall();
                         if (activeWallTemp != activeWall && activeWall != null)
                             activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
                         activeWall = activeWallTemp;
@@ -521,6 +566,7 @@ public class PointerBuilder : MonoBehaviour
     }
     void Update_Paint()
     {
+        bool _deselect = true;
         if (!EventSystem.current.IsPointerOverGameObject())
         {
             RaycastHit hit;
@@ -528,8 +574,28 @@ public class PointerBuilder : MonoBehaviour
             if (Physics.Raycast(ray, out hit, 1000))
             {
                 int l = hit.transform.gameObject.layer;
+                if (_layer.interactableMask.Check(l))
+                {
+                    SurfaceUpdater SU;
+                    if (hit.transform.TryGetComponent<SurfaceUpdater>(out SU))
+                    {
+                        _deselect = false;
+                        if (SU != activeWall)
+                        {
+                            DeselectWall();
+                            SU.OnHover_Paint(_Paint.activeMat);
+                            activeWall = SU;
+                        }
+                        if (Input.GetMouseButtonDown(0))
+                        {
+                            SU.OnClick_Paint(_Paint.activeMat);
+                        }
+                    }
+                }
             }
         }
+        if (_deselect)
+            DeselectWall();
     }
     void Update_Place()
     {
@@ -599,6 +665,12 @@ public class PointerBuilder : MonoBehaviour
             activeSquare.GetComponent<RoomUpdater>().HideArrows();
         }
         activeSquare = null;
+        DeselectWall();
+    }
+    void DeselectWall()
+    {
+        if (activeWall != null)
+            activeWall.OffHover();
         activeWall = null;
     }
     void SelectSquare(Transform _newSquare)
@@ -719,11 +791,11 @@ public class PointerBuilder : MonoBehaviour
             GameObject GO = Instantiate(squarePrefab, activeSquare);
             GO.tag = "Wall";
             RoomUpdater.wall wall = new RoomUpdater.wall();
+            SurfaceUpdater SU = GO.AddComponent<SurfaceUpdater>();
+            SU.Setup(ru);
             wall.transform = GO.transform;
-            wall.mf = GO.GetComponent<MeshFilter>();
+            wall.SU = SU;
             wall.height = 3;
-            wall.boxCollider = GO.GetComponent<BoxCollider>();
-            wall.meshCollider = GO.GetComponent<MeshCollider>();
             
             switch (i)
             {
@@ -756,11 +828,11 @@ public class PointerBuilder : MonoBehaviour
         GameObject GO = Instantiate(squarePrefab, activeSquare);
         GO.tag = "Wall";
         RoomUpdater.wall wall = new RoomUpdater.wall();
+        SurfaceUpdater SU = GO.AddComponent<SurfaceUpdater>();
+        SU.Setup(ru);
+        wall.SU = SU;
         wall.transform = GO.transform;
-        wall.mf = GO.GetComponent<MeshFilter>();
         wall.height = 3;
-        wall.boxCollider = GO.GetComponent<BoxCollider>();
-        wall.meshCollider = GO.GetComponent<MeshCollider>();
 
         wall.verts = new Vector2Int(ru.vertPos.Length - 2, ru.vertPos.Length - 1);
         GO.name = "Wall " + (ru.vertPos.Length - 1).ToString() + " a";
@@ -769,6 +841,12 @@ public class PointerBuilder : MonoBehaviour
     #endregion
 
     #region Tool Belt
+    void Setup()
+    {
+        _Build.Setup(this);
+        _Paint.Setup(this);
+        _Place.Setup(this);
+    }
     void UpdateItemsList()
     {
         _Build.UpdateItemsList();
@@ -850,17 +928,21 @@ public class PointerBuilder : MonoBehaviour
     }
     #endregion
     #region Get Methods
-    private Transform GetWall()
+    private SurfaceUpdater GetWall()
     {
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        SurfaceUpdater SU;
         if (Physics.Raycast(ray, out hit, 1000, _layer.interactableMask))
         {
+            if (hit.transform.TryGetComponent<SurfaceUpdater>(out SU))
+                return SU;
+            /*
             Vector3Int vecInt = new Vector3Int(Mathf.RoundToInt(hit.point.x / (gridSize / 100)), Mathf.RoundToInt(hit.point.y / (gridSize / 100)), Mathf.RoundToInt(hit.point.z / (gridSize / 100)));
             Vector3 tempVec = vecInt;
-            return hit.transform;
+            */
         }
-        return this.transform;
+        return null;
     }
 
     private Vector3 GetPos()

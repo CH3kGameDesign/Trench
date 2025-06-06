@@ -7,12 +7,8 @@ public class RoomUpdater : MonoBehaviour
 {
     public string roomName;
     public Transform floor;
-    public MeshFilter mf;
-    public MeshFilter mf_Ceiling;
-
-    public BoxCollider boxCollider;
-    public MeshCollider meshCollider;
-    public MeshCollider meshCollider_Ceiling;
+    public SurfaceUpdater SU_Floor;
+    public SurfaceUpdater SU_Ceiling;
 
     public GameObject arrow;
 
@@ -31,11 +27,9 @@ public class RoomUpdater : MonoBehaviour
     public class wall
     {
         public Transform transform;
-        public MeshFilter mf;
+        public SurfaceUpdater SU;
         public float height;
         public Vector2Int verts;
-        public BoxCollider boxCollider;
-        public MeshCollider meshCollider;
         public GameObject arrow;
     }
 
@@ -70,28 +64,28 @@ public class RoomUpdater : MonoBehaviour
     
     public void UpdateFloor()
     {
-        mf.mesh.vertices = vertPos;
+        SU_Floor.mf.mesh.vertices = vertPos;
         Vector2[] temp = new Vector2[vertPos.Length];
         for (int i = 0; i < temp.Length; i++)
             temp[i] = new Vector2(vertPos[i].x, vertPos[i].z);
-        mf.mesh.uv = temp;
-        mf.mesh.RecalculateBounds();
-        meshCollider.sharedMesh = mf.mesh;
+        SU_Floor.mf.mesh.uv = temp;
+        SU_Floor.mf.mesh.RecalculateBounds();
+        SU_Floor.mc.sharedMesh = SU_Floor.mf.mesh;
         //boxCollider.size = new Vector3(Mathf.Abs(vertPos[0].x - vertPos[3].x), 0.01f, Mathf.Abs(vertPos[0].z - vertPos[3].z));
     }
 
     public void UpdateCeiling()
     {
-        mf_Ceiling.transform.localPosition = Vector3.up * height;
-        mf_Ceiling.mesh.vertices = vertPos.Reverse();
+        SU_Ceiling.mf.transform.localPosition = Vector3.up * height;
+        SU_Ceiling.mf.mesh.vertices = vertPos.Reverse();
 
-        Vector2[] temp = new Vector2[mf_Ceiling.mesh.vertices.Length];
+        Vector2[] temp = new Vector2[SU_Ceiling.mf.mesh.vertices.Length];
         for (int i = 0; i < temp.Length; i++)
-            temp[i] = new Vector2(mf_Ceiling.mesh.vertices[i].x, mf_Ceiling.mesh.vertices[i].z);
-        mf_Ceiling.mesh.uv = temp;
-        mf_Ceiling.mesh.RecalculateNormals();
-        mf_Ceiling.mesh.RecalculateBounds();
-        meshCollider_Ceiling.sharedMesh = mf.mesh;
+            temp[i] = new Vector2(SU_Ceiling.mf.mesh.vertices[i].x, SU_Ceiling.mf.mesh.vertices[i].z);
+        SU_Ceiling.mf.mesh.uv = temp;
+        SU_Ceiling.mf.mesh.RecalculateNormals();
+        SU_Ceiling.mf.mesh.RecalculateBounds();
+        SU_Ceiling.mc.sharedMesh = SU_Ceiling.mf.mesh;
         //boxCollider.size = new Vector3(Mathf.Abs(vertPos[0].x - vertPos[3].x), 0.01f, Mathf.Abs(vertPos[0].z - vertPos[3].z));
     }
 
@@ -103,18 +97,18 @@ public class RoomUpdater : MonoBehaviour
         foreach (var item in walls)
         {
             GO = Instantiate(arrow, item.transform.position, item.transform.rotation, item.transform);
-            GO.transform.LookAt(item.transform.position + new Vector3(item.mf.mesh.vertices[0].x, 0, item.mf.mesh.vertices[0].z));
+            GO.transform.LookAt(item.transform.position + new Vector3(item.SU.mf.mesh.vertices[0].x, 0, item.SU.mf.mesh.vertices[0].z));
             GO.transform.localEulerAngles += new Vector3(0, -90, 0);
             item.arrow = GO;
         }
         //Up Arrow
         Vector3 _height = new Vector3(0, height, 0);
-        GO = Instantiate(arrow, mf.transform.position + _height, mf.transform.rotation, mf.transform);
+        GO = Instantiate(arrow, SU_Floor.mf.transform.position + _height, SU_Floor.mf.transform.rotation, SU_Floor.mf.transform);
         GO.name = "UpArrow";
         GO.transform.localEulerAngles = new Vector3(90, 0, 0);
         upArrow = GO;
         //Down Arrow
-        GO = Instantiate(arrow, mf.transform.position, mf.transform.rotation, mf.transform);
+        GO = Instantiate(arrow, SU_Floor.mf.transform.position, SU_Floor.mf.transform.rotation, SU_Floor.mf.transform);
         GO.name = "DownArrow";
         GO.transform.localEulerAngles = new Vector3(-90, 0, 0);
         downArrow = GO;
@@ -125,7 +119,7 @@ public class RoomUpdater : MonoBehaviour
         Color[] color = new Color[] { Color.green, Color.blue, Color.red };
         for (int i = 0; i < 3; i++)
         {
-            GO = Instantiate(arrow, mf.transform.position + (_height)/2, mf.transform.rotation, mf.transform);
+            GO = Instantiate(arrow, SU_Floor.mf.transform.position + (_height)/2, SU_Floor.mf.transform.rotation, SU_Floor.mf.transform);
             GO.transform.localScale = Vector3.one * 0.5f;
             GO.name = names[i];
             GO.transform.forward = dir[i];
@@ -169,7 +163,6 @@ public class RoomUpdater : MonoBehaviour
             wallActive.transform.localEulerAngles -= new Vector3(0, 90, 0);
             MeshFilter MF = wallActive.AddComponent<MeshFilter>();
             MeshRenderer MR = wallActive.AddComponent<MeshRenderer>();
-
             cornices.Add(wallActive);
 
             Vector3[] tempVerts = new Vector3[architraves.skirting[0].positionCount * 2];
@@ -209,7 +202,7 @@ public class RoomUpdater : MonoBehaviour
             MF.mesh.uv = tempUV;
             MF.mesh.triangles = tempTris;
 
-            MR.material = architraves.defaultMaterial;
+            MR.material = walls[j].GetComponent<MeshRenderer>().material;
 
             MF.mesh.RecalculateNormals();
             MF.mesh.RecalculateBounds();
@@ -275,7 +268,7 @@ public class RoomUpdater : MonoBehaviour
             MF.mesh.uv = tempUV;
             MF.mesh.triangles = tempTris;
 
-            MR.material = architraves.defaultMaterial;
+            MR.material = SU_Ceiling.mr.material;
 
             MF.mesh.RecalculateNormals();
             MF.mesh.RecalculateBounds();
@@ -314,28 +307,6 @@ public class RoomUpdater : MonoBehaviour
 
     public void UpdateWall(wall wallActive)
     {
-        Vector3 low = vertPos[wallActive.verts.x];
-        Vector3 high = vertPos[wallActive.verts.y];
-
-        wallActive.transform.localPosition = ((low + high) / 2) + (new Vector3(0, wallActive.height / 2, 0));
-        wallActive.mf.mesh.vertices = new Vector3[]
-        {
-            low - wallActive.transform.localPosition,
-            high - wallActive.transform.localPosition,
-            new Vector3(low.x, low.y+ wallActive.height, low.z) -wallActive.transform.localPosition,
-            high + new Vector3(0, wallActive.height, 0) - wallActive.transform.localPosition
-        };
-        float dist = Vector3.Distance(low, high);
-        wallActive.mf.mesh.uv = new Vector2[]
-        {
-            Vector2.zero,
-            new Vector2(dist, 0),
-            new Vector2(0, wallActive.height),
-            new Vector2(dist, wallActive.height)
-        };
-
-        wallActive.mf.mesh.RecalculateBounds();
-        wallActive.meshCollider.sharedMesh = wallActive.mf.mesh;
-        wallActive.boxCollider.size = new Vector3(Mathf.Abs(vertPos[wallActive.verts.x].x - vertPos[wallActive.verts.y].x), wallActive.height, Mathf.Abs(vertPos[wallActive.verts.x].z - vertPos[wallActive.verts.y].z));
+        wallActive.SU.UpdateWall(vertPos, wallActive);
     }
 }

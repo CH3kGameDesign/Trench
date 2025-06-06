@@ -88,7 +88,7 @@ public class LevelGen_Placeables : ScriptableObject
         }
     }
 
-    public List<PointerBuilder.SubItem> GetSubItemList(string _id)
+    public List<PointerBuilder.PlaceItem> GetSubItemList(string _id)
     {
         List<PlaceableClass> _temp = new List<PlaceableClass>();
         switch (_id)
@@ -113,14 +113,15 @@ public class LevelGen_Placeables : ScriptableObject
         }
         return ConvertToSubItemList(_temp);
     }
-    public List<PointerBuilder.SubItem> ConvertToSubItemList(List<PlaceableClass> _list)
+    public List<PointerBuilder.PlaceItem> ConvertToSubItemList(List<PlaceableClass> _list)
     {
-        List<PointerBuilder.SubItem> _temp = new List<PointerBuilder.SubItem>();
+        List<PointerBuilder.PlaceItem> _temp = new List<PointerBuilder.PlaceItem>();
         foreach (PlaceableClass _item in _list)
         {
-            PointerBuilder.SubItem _sub = new PointerBuilder.SubItem();
+            PointerBuilder.PlaceItem _sub = new PointerBuilder.PlaceItem();
             _sub.name = _item.name;
             _sub.image = _item.image;
+            _sub._prefab = _item.prefab;
             _temp.Add(_sub);
         }    
         return _temp;

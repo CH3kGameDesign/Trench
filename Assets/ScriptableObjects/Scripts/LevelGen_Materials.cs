@@ -36,7 +36,7 @@ public class LevelGen_Materials : ScriptableObject
                 image = _texture;
         }
     }
-    public List<PointerBuilder.SubItem> GetSubItemList(string _id)
+    public List<PointerBuilder.PaintItem> GetSubItemList(string _id)
     {
         List<MaterialClass> _temp = new List<MaterialClass>();
         switch (_id)
@@ -60,14 +60,15 @@ public class LevelGen_Materials : ScriptableObject
         }
         return ConvertToSubItemList(_temp);
     }
-    public List<PointerBuilder.SubItem> ConvertToSubItemList(List<MaterialClass> _list)
+    public List<PointerBuilder.PaintItem> ConvertToSubItemList(List<MaterialClass> _list)
     {
-        List<PointerBuilder.SubItem> _temp = new List<PointerBuilder.SubItem>();
+        List<PointerBuilder.PaintItem> _temp = new List<PointerBuilder.PaintItem>();
         foreach (MaterialClass _item in _list)
         {
-            PointerBuilder.SubItem _sub = new PointerBuilder.SubItem();
+            PointerBuilder.PaintItem _sub = new PointerBuilder.PaintItem();
             _sub.name = _item.name;
             _sub.image = _item.image;
+            _sub._mat = _item.material;
             _temp.Add(_sub);
         }
         return _temp;
