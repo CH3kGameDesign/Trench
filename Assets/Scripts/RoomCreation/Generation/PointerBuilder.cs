@@ -3,6 +3,7 @@ using NUnit.Framework.Internal;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -18,10 +19,6 @@ public class PointerBuilder : MonoBehaviour
     [HideInInspector] public beltModes beltMode;
 
     private drawModes privateDrawMode = drawModes.square;
-
-    public LayerMask gridMask;
-    public LayerMask interactableMask;
-    public LayerMask arrowMask;
 
     [HideInInspector]
     public Transform activeSquare;
@@ -49,6 +46,15 @@ public class PointerBuilder : MonoBehaviour
     public TextMeshProUGUI drawModeText;
     
     public Architraves architraves;
+    public layerClass _layer;
+    [System.Serializable]
+    public class layerClass
+    {
+        public LayerMask gridMask;
+        public LayerMask interactableMask;
+        public LayerMask arrowMask;
+    }
+
     public CanvasClass _canvas;
     [System.Serializable]
     public class CanvasClass
@@ -67,6 +73,7 @@ public class PointerBuilder : MonoBehaviour
     public PaintClass _Paint;
     public PlaceClass _Place;
 
+    #region Belt Classes
     [System.Serializable]
     public class BeltClass
     {
@@ -157,6 +164,8 @@ public class PointerBuilder : MonoBehaviour
             return _list;
         }
     }
+    #endregion
+    #region Sub Classes
     [System.Serializable]
     public class SubClass
     {
@@ -191,15 +200,24 @@ public class PointerBuilder : MonoBehaviour
                 i++;
             }
         }
+        public virtual void OnSelect(PointerBuilder PB)
+        {
+
+        }
     }
     [System.Serializable]
     public class BuildSubClass : SubClass
     {
         public List<SubItem> itemsOverride;
+        public drawModes _mode;
         public override void UpdateItemsList()
         {
             items = itemsOverride;
             base.UpdateItemsList();
+        }
+        public override void OnSelect(PointerBuilder PB)
+        {
+            PB.drawMode = _mode;
         }
     }
     [System.Serializable]
@@ -211,6 +229,10 @@ public class PointerBuilder : MonoBehaviour
             items = LevelGen_Materials.Instance.GetSubItemList(_id);
             base.UpdateItemsList();
         }
+        public override void OnSelect(PointerBuilder PB)
+        {
+
+        }
     }
     [System.Serializable]
     public class PlaceSubClass : SubClass
@@ -221,6 +243,10 @@ public class PointerBuilder : MonoBehaviour
             items = LevelGen_Placeables.Instance.GetSubItemList(_id);
             base.UpdateItemsList();
         }
+        public override void OnSelect(PointerBuilder PB)
+        {
+
+        }
     }
     [System.Serializable]
     public class SubItem
@@ -228,7 +254,12 @@ public class PointerBuilder : MonoBehaviour
         public string name;
         public Texture2D image;
         [HideInInspector] public int index;
+        public void OnSelect(PointerBuilder PB)
+        {
+
+        }
     }
+    #endregion
 
     // Start is called before the first frame update
     void Start()
@@ -239,23 +270,37 @@ public class PointerBuilder : MonoBehaviour
         GenerateBelt_Sub(0);
         UpdateItemsList();
     }
-    void UpdateItemsList()
-    {
-        _Build.UpdateItemsList();
-        _Paint.UpdateItemsList();
-        _Place.UpdateItemsList();
-    }
 
     // Update is called once per frame
     void Update()
     {
+        switch (beltMode)
+        {
+            case beltModes.build:
+                Update_Build();
+                break;
+            case beltModes.paint:
+                Update_Paint();
+                break;
+            case beltModes.place:
+                Update_Place();
+                break;
+            default:
+                break;
+        }
+        if (Input.GetMouseButtonUp(0))
+            UnfocusGrid();
+    }
+
+    void Update_Build ()
+    {
         if (Input.GetMouseButtonDown(0))
         {
-            if(!EventSystem.current.IsPointerOverGameObject())
+            if (!EventSystem.current.IsPointerOverGameObject())
             {
                 RaycastHit hit;
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out hit, 1000, arrowMask))
+                if (Physics.Raycast(ray, out hit, 1000, _layer.arrowMask))
                 {
                     activeArrow = hit.transform;
                     activeArrow.localScale = Vector3.one * 1.1f;
@@ -266,155 +311,152 @@ public class PointerBuilder : MonoBehaviour
                 }
                 if (Physics.Raycast(ray, out hit, 1000))
                 {
-                    switch (hit.transform.gameObject.layer)
+                    int l = hit.transform.gameObject.layer;
+                    if (_layer.gridMask.Check(l))
                     {
-                        case 6:
-                            drawMode = privateDrawMode;
+                        switch (drawMode)
+                        {
+                            case drawModes.square:
+                                if (activeWall != null)
+                                    activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
+                                firstClickPos = GetPos();
+                                GameObject GO = Instantiate(squarePrefab, floorHolder);
 
-                            switch (drawMode)
-                            {
-                                case drawModes.square:
-                                    if (activeWall != null)
-                                        activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
-                                    firstClickPos = GetPos();
-                                    GameObject GO = Instantiate(squarePrefab, floorHolder);
-
-                                    Mesh tempMesh = new Mesh();
-                                    tempMesh.vertices = new Vector3[]
-                                    {
+                                Mesh tempMesh = new Mesh();
+                                tempMesh.vertices = new Vector3[]
+                                {
                                     Vector3.zero,
                                     new Vector3(0,0,1),
                                     new Vector3(1,0,1),
                                     new Vector3(1,0,0)
 
-                                    };
+                                };
 
-                                    Vector2[] temp2Dsquare = new Vector2[tempMesh.vertices.Length];
-                                    for (int i = 0; i < temp2Dsquare.Length; i++)
-                                        temp2Dsquare[i] = new Vector2(tempMesh.vertices[i].x, tempMesh.vertices[i].z);
-                                    Triangulator trSquare = new Triangulator(temp2Dsquare);
-                                    int[] indicesSquare = trSquare.Triangulate();
+                                Vector2[] temp2Dsquare = new Vector2[tempMesh.vertices.Length];
+                                for (int i = 0; i < temp2Dsquare.Length; i++)
+                                    temp2Dsquare[i] = new Vector2(tempMesh.vertices[i].x, tempMesh.vertices[i].z);
+                                Triangulator trSquare = new Triangulator(temp2Dsquare);
+                                int[] indicesSquare = trSquare.Triangulate();
 
-                                    tempMesh.triangles = indicesSquare;
-                                    tempMesh.uv = temp2Dsquare;
+                                tempMesh.triangles = indicesSquare;
+                                tempMesh.uv = temp2Dsquare;
 
-                                    tempMesh.RecalculateNormals();
-                                    tempMesh.RecalculateBounds();
+                                tempMesh.RecalculateNormals();
+                                tempMesh.RecalculateBounds();
 
-                                    GO.GetComponent<MeshFilter>().mesh = tempMesh;
-                                    GO.GetComponent<MeshCollider>().sharedMesh = tempMesh;
+                                GO.GetComponent<MeshFilter>().mesh = tempMesh;
+                                GO.GetComponent<MeshCollider>().sharedMesh = tempMesh;
 
-                                    GO.name = Time.time.ToString();
-                                    //Mesh meshTemp = new Mesh();
-                                    //Mesh meshTemp2 = GO.GetComponent<MeshFilter>().mesh;
-                                    //meshTemp.vertices = meshTemp2.vertices;
-                                    //meshTemp.uv = meshTemp2.uv;
-                                    //meshTemp.triangles = meshTemp2.triangles;
-                                    activeSquare = GO.transform;
-                                    RoomUpdater RM = GO.AddComponent<RoomUpdater>();
-                                    RM.roomName = GO.name;
-                                    RM.mf = GO.GetComponent<MeshFilter>();
-                                    RM.floor = GO.transform;
-                                    RM.arrow = arrow;
+                                GO.name = Time.time.ToString();
+                                //Mesh meshTemp = new Mesh();
+                                //Mesh meshTemp2 = GO.GetComponent<MeshFilter>().mesh;
+                                //meshTemp.vertices = meshTemp2.vertices;
+                                //meshTemp.uv = meshTemp2.uv;
+                                //meshTemp.triangles = meshTemp2.triangles;
+                                activeSquare = GO.transform;
+                                RoomUpdater RM = GO.AddComponent<RoomUpdater>();
+                                RM.roomName = GO.name;
+                                RM.mf = GO.GetComponent<MeshFilter>();
+                                RM.floor = GO.transform;
+                                RM.arrow = arrow;
 
-                                    RM.height = 3;
+                                RM.height = 3;
 
-                                    RM.architraves = architraves;
+                                RM.architraves = architraves;
 
-                                    RM.boxCollider = GO.GetComponent<BoxCollider>();
-                                    RM.meshCollider = GO.GetComponent<MeshCollider>();
+                                RM.boxCollider = GO.GetComponent<BoxCollider>();
+                                RM.meshCollider = GO.GetComponent<MeshCollider>();
 
-                                    GameObject GO2 = Instantiate(squarePrefab, activeSquare);
-                                    RM.mf_Ceiling = GO2.GetComponent<MeshFilter>();
-                                    RM.meshCollider_Ceiling = GO2.GetComponent<MeshCollider>();
+                                GameObject GO2 = Instantiate(squarePrefab, activeSquare);
+                                RM.mf_Ceiling = GO2.GetComponent<MeshFilter>();
+                                RM.meshCollider_Ceiling = GO2.GetComponent<MeshCollider>();
 
-                                    GO2.GetComponent<MeshFilter>().mesh = tempMesh;
-                                    GO2.GetComponent<MeshCollider>().sharedMesh = tempMesh;
-                                    AddWalls(GO.GetComponent<RoomUpdater>());
-                                    break;
-                                case drawModes.point:
-                                    Vector3 clickPos = GetPos();
-                                    if (activeWall != null)
-                                        activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
-                                    if (activeSquare == null)
-                                    {
-                                        GameObject GO1 = Instantiate(squarePrefab, floorHolder);
-                                        GO1.name = Time.time.ToString();
-                                        Mesh meshTempPoint = new Mesh();
-                                        //Mesh meshTempPoint2 = GO1.GetComponent<MeshFilter>().mesh;
-                                        //meshTempPoint.vertices = meshTempPoint2.vertices;
-                                        //meshTempPoint.uv = meshTempPoint2.uv;
-                                        //meshTempPoint.triangles = meshTempPoint2.triangles;
-                                        activeSquare = GO1.transform;
-                                        GO1.AddComponent<RoomUpdater>();
-                                        GO1.GetComponent<MeshFilter>().mesh = meshTempPoint;
-                                        GO1.GetComponent<RoomUpdater>().roomName = GO1.name;
-                                        GO1.GetComponent<RoomUpdater>().mf = GO1.GetComponent<MeshFilter>();
-                                        GO1.GetComponent<RoomUpdater>().floor = GO1.transform;
-                                        GO1.GetComponent<RoomUpdater>().arrow = arrow;
+                                GO2.GetComponent<MeshFilter>().mesh = tempMesh;
+                                GO2.GetComponent<MeshCollider>().sharedMesh = tempMesh;
+                                AddWalls(GO.GetComponent<RoomUpdater>());
+                                break;
+                            case drawModes.point:
+                                Vector3 clickPos = GetPos();
+                                if (activeWall != null)
+                                    activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
+                                if (activeSquare == null)
+                                {
+                                    GameObject GO1 = Instantiate(squarePrefab, floorHolder);
+                                    GO1.name = Time.time.ToString();
+                                    Mesh meshTempPoint = new Mesh();
+                                    //Mesh meshTempPoint2 = GO1.GetComponent<MeshFilter>().mesh;
+                                    //meshTempPoint.vertices = meshTempPoint2.vertices;
+                                    //meshTempPoint.uv = meshTempPoint2.uv;
+                                    //meshTempPoint.triangles = meshTempPoint2.triangles;
+                                    activeSquare = GO1.transform;
+                                    GO1.AddComponent<RoomUpdater>();
+                                    GO1.GetComponent<MeshFilter>().mesh = meshTempPoint;
+                                    GO1.GetComponent<RoomUpdater>().roomName = GO1.name;
+                                    GO1.GetComponent<RoomUpdater>().mf = GO1.GetComponent<MeshFilter>();
+                                    GO1.GetComponent<RoomUpdater>().floor = GO1.transform;
+                                    GO1.GetComponent<RoomUpdater>().arrow = arrow;
 
-                                        GO1.GetComponent<RoomUpdater>().architraves = architraves;
+                                    GO1.GetComponent<RoomUpdater>().architraves = architraves;
 
-                                        GO1.GetComponent<RoomUpdater>().boxCollider = GO1.GetComponent<BoxCollider>();
-                                        GO1.GetComponent<RoomUpdater>().meshCollider = GO1.GetComponent<MeshCollider>();
-                                        GO1.GetComponent<RoomUpdater>().vertPos = new Vector3[0];
-                                    }
-                                    RoomUpdater ru = activeSquare.GetComponent<RoomUpdater>();
+                                    GO1.GetComponent<RoomUpdater>().boxCollider = GO1.GetComponent<BoxCollider>();
+                                    GO1.GetComponent<RoomUpdater>().meshCollider = GO1.GetComponent<MeshCollider>();
+                                    GO1.GetComponent<RoomUpdater>().vertPos = new Vector3[0];
+                                }
+                                RoomUpdater ru = activeSquare.GetComponent<RoomUpdater>();
 
-                                    Vector3[] tempVerts = new Vector3[ru.vertPos.Length + 1];
+                                Vector3[] tempVerts = new Vector3[ru.vertPos.Length + 1];
 
-                                    for (int i = 0; i < ru.vertPos.Length; i++)
-                                        tempVerts[i] = ru.vertPos[i];
+                                for (int i = 0; i < ru.vertPos.Length; i++)
+                                    tempVerts[i] = ru.vertPos[i];
 
-                                    tempVerts[tempVerts.Length - 1] = clickPos;
+                                tempVerts[tempVerts.Length - 1] = clickPos;
 
-                                    ru.vertPos = tempVerts;
-                                    if (tempVerts.Length == 2)
-                                    {
-                                        AddWallSingle(ru);
-                                        ru.UpdateWall(ru.walls[ru.walls.Count - 1]);
-                                    }
-                                    if (tempVerts.Length >= 2)
-                                    {
-                                        ru.walls[0].verts = new Vector2Int(ru.vertPos.Length - 1, 0);
-                                        AddWallSingle(ru);
-                                        ru.UpdateWall(ru.walls[ru.walls.Count - 1]);
-                                        ru.UpdateWall(ru.walls[0]);
-                                    }
+                                ru.vertPos = tempVerts;
+                                if (tempVerts.Length == 2)
+                                {
+                                    AddWallSingle(ru);
+                                    ru.UpdateWall(ru.walls[ru.walls.Count - 1]);
+                                }
+                                if (tempVerts.Length >= 2)
+                                {
+                                    ru.walls[0].verts = new Vector2Int(ru.vertPos.Length - 1, 0);
+                                    AddWallSingle(ru);
+                                    ru.UpdateWall(ru.walls[ru.walls.Count - 1]);
+                                    ru.UpdateWall(ru.walls[0]);
+                                }
 
-                                    if (tempVerts.Length >= 3)
-                                    {
-                                        Vector2[] temp2D = new Vector2[tempVerts.Length];
-                                        for (int i = 0; i < temp2D.Length; i++)
-                                            temp2D[i] = new Vector2(tempVerts[i].x, tempVerts[i].z);
-                                        Triangulator tr = new Triangulator(temp2D);
-                                        int[] indices = tr.Triangulate();
+                                if (tempVerts.Length >= 3)
+                                {
+                                    Vector2[] temp2D = new Vector2[tempVerts.Length];
+                                    for (int i = 0; i < temp2D.Length; i++)
+                                        temp2D[i] = new Vector2(tempVerts[i].x, tempVerts[i].z);
+                                    Triangulator tr = new Triangulator(temp2D);
+                                    int[] indices = tr.Triangulate();
 
-                                        ru.GetComponent<MeshFilter>().mesh.vertices = tempVerts;
-                                        ru.GetComponent<MeshFilter>().mesh.triangles = indices;
-                                        ru.GetComponent<MeshFilter>().mesh.uv = temp2D;
+                                    ru.GetComponent<MeshFilter>().mesh.vertices = tempVerts;
+                                    ru.GetComponent<MeshFilter>().mesh.triangles = indices;
+                                    ru.GetComponent<MeshFilter>().mesh.uv = temp2D;
 
-                                        ru.GetComponent<MeshFilter>().mesh.RecalculateNormals();
-                                        ru.GetComponent<MeshFilter>().mesh.RecalculateBounds();
+                                    ru.GetComponent<MeshFilter>().mesh.RecalculateNormals();
+                                    ru.GetComponent<MeshFilter>().mesh.RecalculateBounds();
 
-                                        ru.meshCollider.sharedMesh = ru.mf.mesh;
-                                    }
-                                    break;
-                                default:
-                                    break;
-                            }
-
-                            break;
-                        case 14:
-                            drawMode = drawModes.wall;
-                            Transform activeWallTemp = GetWall();
-                            if (activeWallTemp != activeWall && activeWall != null)
-                                activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
-                            activeWall = activeWallTemp;
-                            activeWall.GetComponentInParent<RoomUpdater>().ShowArrows();
-                            break;
-                        default:
-                            break;
+                                    ru.meshCollider.sharedMesh = ru.mf.mesh;
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    else if (_layer.interactableMask.Check(l))
+                    {
+                        drawMode = drawModes.wall;
+                        Transform activeWallTemp = GetWall();
+                        if (activeWallTemp != activeWall && activeWall != null)
+                            activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
+                        activeWall = activeWallTemp;
+                        RoomUpdater RU = activeWall.GetComponentInParent<RoomUpdater>();
+                        activeSquare = RU.transform;
+                        RU.ShowArrows();
                     }
                 }
             }
@@ -431,8 +473,6 @@ public class PointerBuilder : MonoBehaviour
                 }
                 if (Input.GetMouseButtonUp(0) && activeSquare != null)
                 {
-                    //if (activeSquare.localScale.x < 0.1f || activeSquare.localScale.y < 0.1f)
-                    //    GameObject.Destroy(activeSquare.gameObject);
                     if (firstClickPos == GetPos())
                         GameObject.Destroy(activeSquare.gameObject);
                     activeSquare = null;
@@ -447,6 +487,8 @@ public class PointerBuilder : MonoBehaviour
                 }
             case drawModes.wall:
                 drawModeText.text = "Edit Mode";
+                if (Input.GetKeyDown(KeyCode.Delete))
+                    DeleteSquare();
                 break;
             case drawModes.arrow:
                 drawModeText.text = "Edit Mode";
@@ -469,27 +511,31 @@ public class PointerBuilder : MonoBehaviour
                         activeWall.GetComponentInParent<RoomUpdater>().ShowArrows();
                         activeArrow.localScale = Vector3.one;
                     }
+                    if (Input.GetKeyDown(KeyCode.Delete))
+                        DeleteSquare();
                 }
                 break;
             default:
                 break;
         }
-        if (Input.GetMouseButtonUp(0))
-            UnfocusGrid();
     }
-
-    void FocusGrid(Transform pos)
+    void Update_Paint()
     {
-        grid.position = pos.position;
-        grid.LookAt(Camera.main.transform);
-        grid.up = grid.forward;
+        if (!EventSystem.current.IsPointerOverGameObject())
+        {
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out hit, 1000))
+            {
+                int l = hit.transform.gameObject.layer;
+            }
+        }
     }
-    void UnfocusGrid()
+    void Update_Place()
     {
-        grid.rotation = new Quaternion();
-        grid.position = new Vector3(0, height, 0);
-    }
 
+    }
+    #region Player Interactions
     void ArrowMove(RoomUpdater RM, Vector3 changeFinal)
     {
         if (RM.upArrow == activeArrow.parent.gameObject)
@@ -537,26 +583,34 @@ public class PointerBuilder : MonoBehaviour
             }
         }
     }
-
-    public static Vector3 ClampPoint(Vector3 point, Vector3 segmentStart, Vector3 segmentEnd)
+    void DeleteSquare()
     {
-        return ClampProjection(ProjectPoint(point, segmentStart, segmentEnd), segmentStart, segmentEnd);
+        if (activeSquare != null)
+        {
+            GameObject.Destroy(activeSquare.gameObject);
+        }
+        activeSquare = null;
+        activeWall = null;
     }
-
-    public static Vector3 ProjectPoint(Vector3 point, Vector3 segmentStart, Vector3 segmentEnd)
+    void DeselectSquare()
     {
-        return segmentStart + Vector3.Project(point - segmentStart, segmentEnd - segmentStart);
+        if (activeSquare != null)
+        {
+            activeSquare.GetComponent<RoomUpdater>().HideArrows();
+        }
+        activeSquare = null;
+        activeWall = null;
     }
-
-    private static Vector3 ClampProjection(Vector3 point, Vector3 start, Vector3 end)
+    void SelectSquare(Transform _newSquare)
     {
-        var toStart = (point - start).sqrMagnitude;
-        var toEnd = (point - end).sqrMagnitude;
-        var segment = (start - end).sqrMagnitude;
-        if (toStart > segment || toEnd > segment) return toStart > toEnd ? end : start;
-        return point;
+        if (activeSquare == _newSquare)
+            return;
+        DeselectSquare();
+        activeSquare = _newSquare;
     }
+    #endregion
 
+    #region Edit Mesh
     private void DoorPlaceWallFix(Vector3[] points, MeshFilter mf, float heightFix)
     {
         Vector3 min = points[0];
@@ -593,8 +647,8 @@ public class PointerBuilder : MonoBehaviour
         {
             temp2D[i] = new Vector2(tempVerts[i].x + tempVerts[i].z, tempVerts[i].y);
         }
-        
-        
+
+
 
         Triangulator tr = new Triangulator(temp2D);
         int[] indices = tr.Triangulate();
@@ -620,51 +674,6 @@ public class PointerBuilder : MonoBehaviour
         mf.GetComponent<MeshCollider>().sharedMesh = mf.mesh;
 
     }
-
-    private Transform GetWall()
-    {
-        RaycastHit hit;
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out hit, 1000, interactableMask))
-        {
-            Vector3Int vecInt = new Vector3Int(Mathf.RoundToInt(hit.point.x / (gridSize / 100)), Mathf.RoundToInt(hit.point.y / (gridSize / 100)), Mathf.RoundToInt(hit.point.z / (gridSize / 100)));
-            Vector3 tempVec = vecInt;
-            return hit.transform;
-        }
-        return this.transform;
-    }
-
-    private Vector3 GetPos()
-    {
-        RaycastHit hit;
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out hit,1000, gridMask))
-        {
-            //Vector3Int vecInt = new Vector3Int(Mathf.RoundToInt(hit.point.x / gridSize), 0, Mathf.RoundToInt(hit.point.z / gridSize));
-            //Vector3 tempVec = vecInt;
-            Vector3 tempVec = new Vector3Int(Mathf.RoundToInt(hit.point.x / gridSize), Mathf.RoundToInt(hit.point.y / gridSize), Mathf.RoundToInt(hit.point.z / gridSize));
-            tempVec *= gridSize;
-            //tempVec = new Vector3(tempVec.x, tempVec.y, tempVec.z);
-            return tempVec;
-        }
-        return new Vector3(0,40400,0);
-    }
-
-    private Vector3 GetRoomPos()
-    {
-        RaycastHit hit;
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out hit, 1000))
-        {
-            Vector3Int vecInt = new Vector3Int(Mathf.RoundToInt(hit.point.x / gridSize), 0, Mathf.RoundToInt(hit.point.z / gridSize));
-            Vector3 tempVec = vecInt;
-            tempVec *= gridSize;
-            tempVec = new Vector3(tempVec.x, height/100, tempVec.z);
-            return tempVec;
-        }
-        return new Vector3(0, 40400, 0);
-    }
-
     private void SetPosScale(Vector3 start, Vector3 end)
     {
         activeSquare.position = (start + end) / 2 + new Vector3(0, 0.01f, 0);
@@ -703,7 +712,6 @@ public class PointerBuilder : MonoBehaviour
 
         ru.UpdateMeshes();
     }
-
     public void AddWalls(RoomUpdater ru)
     {
         for (int i = 0; i < 4; i++)
@@ -758,7 +766,15 @@ public class PointerBuilder : MonoBehaviour
         GO.name = "Wall " + (ru.vertPos.Length - 1).ToString() + " a";
         ru.walls.Add(wall);
     }
+    #endregion
 
+    #region Tool Belt
+    void UpdateItemsList()
+    {
+        _Build.UpdateItemsList();
+        _Paint.UpdateItemsList();
+        _Place.UpdateItemsList();
+    }
     public void GenerateBelt_Sub(int _belt)
     {
         ClearBelt();
@@ -779,14 +795,6 @@ public class PointerBuilder : MonoBehaviour
         }
     }
 
-    void DeselectSquare()
-    {
-        if (activeSquare != null)
-        {
-            activeSquare.GetComponent<RoomUpdater>().HideArrows();
-            activeSquare = null;
-        }
-    }
     public void GenerateBelt_Full(BeltClass _belt, int _subInt)
     {
         SubClass _sub = _belt.GetList()[_subInt];
@@ -796,11 +804,15 @@ public class PointerBuilder : MonoBehaviour
     {
         _canvas.toolBeltSub_Buttons[_belt.i_lastSel].Selected(false);
         GenerateBelt_Full(_belt, _sub);
+
+        _sub.OnSelect(this);
     }
     public void BeltButtonTap_Full(SubClass _sub, SubItem _item)
     {
         _canvas.toolBeltFull_Buttons[_sub.i_lastSel].Selected(false);
         _sub.i_lastSel = _item.index;
+
+        _item.OnSelect(this);
     }
     void GenerateBelt_Full(BeltClass _belt, SubClass _sub)
     {
@@ -822,4 +834,84 @@ public class PointerBuilder : MonoBehaviour
             Destroy(item.gameObject);
         _canvas.toolBeltFull_Buttons = new ToolBeltButton[0];
     }
+    #endregion
+
+    #region Grid Move
+    void FocusGrid(Transform pos)
+    {
+        grid.position = pos.position;
+        grid.LookAt(Camera.main.transform);
+        grid.up = grid.forward;
+    }
+    void UnfocusGrid()
+    {
+        grid.rotation = new Quaternion();
+        grid.position = new Vector3(0, height, 0);
+    }
+    #endregion
+    #region Get Methods
+    private Transform GetWall()
+    {
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out hit, 1000, _layer.interactableMask))
+        {
+            Vector3Int vecInt = new Vector3Int(Mathf.RoundToInt(hit.point.x / (gridSize / 100)), Mathf.RoundToInt(hit.point.y / (gridSize / 100)), Mathf.RoundToInt(hit.point.z / (gridSize / 100)));
+            Vector3 tempVec = vecInt;
+            return hit.transform;
+        }
+        return this.transform;
+    }
+
+    private Vector3 GetPos()
+    {
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out hit, 1000, _layer.gridMask))
+        {
+            //Vector3Int vecInt = new Vector3Int(Mathf.RoundToInt(hit.point.x / gridSize), 0, Mathf.RoundToInt(hit.point.z / gridSize));
+            //Vector3 tempVec = vecInt;
+            Vector3 tempVec = new Vector3Int(Mathf.RoundToInt(hit.point.x / gridSize), Mathf.RoundToInt(hit.point.y / gridSize), Mathf.RoundToInt(hit.point.z / gridSize));
+            tempVec *= gridSize;
+            //tempVec = new Vector3(tempVec.x, tempVec.y, tempVec.z);
+            return tempVec;
+        }
+        return new Vector3(0, 40400, 0);
+    }
+
+    private Vector3 GetRoomPos()
+    {
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out hit, 1000))
+        {
+            Vector3Int vecInt = new Vector3Int(Mathf.RoundToInt(hit.point.x / gridSize), 0, Mathf.RoundToInt(hit.point.z / gridSize));
+            Vector3 tempVec = vecInt;
+            tempVec *= gridSize;
+            tempVec = new Vector3(tempVec.x, height / 100, tempVec.z);
+            return tempVec;
+        }
+        return new Vector3(0, 40400, 0);
+    }
+    #endregion
+    #region Clamp Math
+    public static Vector3 ClampPoint(Vector3 point, Vector3 segmentStart, Vector3 segmentEnd)
+    {
+        return ClampProjection(ProjectPoint(point, segmentStart, segmentEnd), segmentStart, segmentEnd);
+    }
+
+    public static Vector3 ProjectPoint(Vector3 point, Vector3 segmentStart, Vector3 segmentEnd)
+    {
+        return segmentStart + Vector3.Project(point - segmentStart, segmentEnd - segmentStart);
+    }
+
+    private static Vector3 ClampProjection(Vector3 point, Vector3 start, Vector3 end)
+    {
+        var toStart = (point - start).sqrMagnitude;
+        var toEnd = (point - end).sqrMagnitude;
+        var segment = (start - end).sqrMagnitude;
+        if (toStart > segment || toEnd > segment) return toStart > toEnd ? end : start;
+        return point;
+    }
+    #endregion
 }

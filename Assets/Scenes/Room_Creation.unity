@@ -2799,15 +2799,7 @@ MonoBehaviour:
   _Materials: {fileID: 11400000, guid: 2d6ada1bcbae00f43ac26a3a3478745c, type: 2}
   _Placeables: {fileID: 11400000, guid: 3db66b67c70556546b8f126dae420a64, type: 2}
   drawMode: 0
-  gridMask:
-    serializedVersion: 2
-    m_Bits: 64
-  interactableMask:
-    serializedVersion: 2
-    m_Bits: 16384
-  arrowMask:
-    serializedVersion: 2
-    m_Bits: 1024
+  beltMode: 0
   activeSquare: {fileID: 0}
   activeWall: {fileID: 0}
   activeArrow: {fileID: 0}
@@ -2819,6 +2811,16 @@ MonoBehaviour:
   arrow: {fileID: 6230187527646837812, guid: be1e648433ff9fa45b13f2535ab2d308, type: 3}
   drawModeText: {fileID: 2083494334}
   architraves: {fileID: 11400000, guid: 883b5a67349b54e4095ea494df2a8ffd, type: 2}
+  _layer:
+    gridMask:
+      serializedVersion: 2
+      m_Bits: 64
+    interactableMask:
+      serializedVersion: 2
+      m_Bits: 16384
+    arrowMask:
+      serializedVersion: 2
+      m_Bits: 1024
   _canvas:
     toolBelt_Buttons:
     - {fileID: 851495114}
@@ -2835,85 +2837,85 @@ MonoBehaviour:
     list:
     - name: Draw
       image: {fileID: 0}
-      _id: 
-      itemsOverride: []
       items: []
+      index: 0
+      i_lastSel: 0
+      itemsOverride: []
+      _id: draw
     - name: Stretch
       image: {fileID: 0}
-      _id: 
-      itemsOverride: []
       items: []
+      index: 0
+      i_lastSel: 0
+      itemsOverride: []
+      _id: stretch
     - name: Move
       image: {fileID: 0}
-      _id: 
-      itemsOverride: []
       items: []
-    - name: Extrude
-      image: {fileID: 0}
-      _id: 
+      index: 0
+      i_lastSel: 0
       itemsOverride: []
-      items: []
-    - name: Bevel
-      image: {fileID: 0}
-      _id: 
-      itemsOverride: []
-      items: []
-    - name: Edit
-      image: {fileID: 0}
-      _id: 
-      itemsOverride: []
-      items: []
+      _id: move
   _Paint:
     i_lastSel: 0
     list:
     - name: Rooms
       image: {fileID: 0}
-      _id: room
-      itemsOverride: []
       items: []
+      index: 0
+      i_lastSel: 0
+      _id: room
     - name: Walls
       image: {fileID: 0}
-      _id: wall
-      itemsOverride: []
       items: []
+      index: 0
+      i_lastSel: 0
+      _id: wall
     - name: Floors
       image: {fileID: 0}
-      _id: floor
-      itemsOverride: []
       items: []
+      index: 0
+      i_lastSel: 0
+      _id: floor
     - name: Ceilings
       image: {fileID: 0}
-      _id: ceiling
-      itemsOverride: []
       items: []
+      index: 0
+      i_lastSel: 0
+      _id: ceiling
   _Place:
     i_lastSel: 0
     list:
     - name: Spawns
       image: {fileID: 0}
-      _id: spawn
-      itemsOverride: []
       items: []
+      index: 0
+      i_lastSel: 0
+      _id: spawn
     - name: Structures
       image: {fileID: 0}
-      _id: structure
-      itemsOverride: []
       items: []
+      index: 0
+      i_lastSel: 0
+      _id: structure
     - name: Walls
       image: {fileID: 0}
-      _id: wall
-      itemsOverride: []
       items: []
+      index: 0
+      i_lastSel: 0
+      _id: wall
     - name: Floors
       image: {fileID: 0}
-      _id: floor
-      itemsOverride: []
       items: []
+      index: 0
+      i_lastSel: 0
+      _id: floor
     - name: Ceilings
       image: {fileID: 0}
-      _id: ceiling
-      itemsOverride: []
       items: []
+      index: 0
+      i_lastSel: 0
+      _id: ceiling
 --- !u!4 &1066341703
 Transform:
   m_ObjectHideFlags: 0

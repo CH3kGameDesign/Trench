@@ -7,6 +7,8 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public static class CKUtil
 {
@@ -229,6 +231,10 @@ public static class CKUtil
             if (_immediate) GameObject.DestroyImmediate(_transform.GetChild(i).gameObject);
             else GameObject.Destroy(_transform.GetChild(i).gameObject);
         }
+    }
+    public static bool Check(this LayerMask _mask, int _layer)
+    {
+        return (_mask & (1 << _layer)) != 0;
     }
 #if UNITY_EDITOR
     public enum SaveTextureFileFormat { PNG, JPG, EXR, TGA};
