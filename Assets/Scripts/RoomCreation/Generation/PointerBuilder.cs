@@ -398,7 +398,7 @@ public class PointerBuilder : MonoBehaviour
                                 activeSquare = GO.transform;
                                 RU = GO.AddComponent<RoomUpdater>();
                                 SU = GO.AddComponent<SurfaceUpdater>();
-                                SU.Setup(RU);
+                                SU.Setup(RU, SurfaceUpdater.enumType.floor);
                                 RU.roomName = GO.name;
                                 RU.SU_Floor = SU;
 
@@ -414,7 +414,7 @@ public class PointerBuilder : MonoBehaviour
                                 //CEILING//////////
                                 GO = Instantiate(squarePrefab, activeSquare);
                                 SU = GO.AddComponent<SurfaceUpdater>();
-                                SU.Setup(RU);
+                                SU.Setup(RU, SurfaceUpdater.enumType.ceiling);
                                 RU.SU_Ceiling = SU;
 
                                 SU.mf.mesh = tempMesh;
@@ -437,7 +437,7 @@ public class PointerBuilder : MonoBehaviour
                                     activeSquare = GO.transform;
                                     RU = GO.AddComponent<RoomUpdater>();
                                     SU = GO.AddComponent<SurfaceUpdater>();
-                                    SU.Setup(RU);
+                                    SU.Setup(RU, SurfaceUpdater.enumType.floor);
                                     RU.roomName = GO.name;
                                     RU.floor = GO.transform;
                                     RU.arrow = arrow;
@@ -792,7 +792,7 @@ public class PointerBuilder : MonoBehaviour
             GO.tag = "Wall";
             RoomUpdater.wall wall = new RoomUpdater.wall();
             SurfaceUpdater SU = GO.AddComponent<SurfaceUpdater>();
-            SU.Setup(ru);
+            SU.Setup(ru, SurfaceUpdater.enumType.wall);
             wall.transform = GO.transform;
             wall.SU = SU;
             wall.height = 3;
@@ -829,7 +829,7 @@ public class PointerBuilder : MonoBehaviour
         GO.tag = "Wall";
         RoomUpdater.wall wall = new RoomUpdater.wall();
         SurfaceUpdater SU = GO.AddComponent<SurfaceUpdater>();
-        SU.Setup(ru);
+        SU.Setup(ru, SurfaceUpdater.enumType.wall);
         wall.SU = SU;
         wall.transform = GO.transform;
         wall.height = 3;

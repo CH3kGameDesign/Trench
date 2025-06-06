@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class SurfaceUpdater : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class SurfaceUpdater : MonoBehaviour
     public BoxCollider bc;
 
     public RoomUpdater RU;
+    [HideInInspector] public List<MeshRenderer> architraves = new List<MeshRenderer>();
 
     private Material mat;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -19,9 +21,10 @@ public class SurfaceUpdater : MonoBehaviour
         
     }
 
-    public void Setup(RoomUpdater _RU)
+    public void Setup(RoomUpdater _RU, enumType _type)
     {
         RU = _RU;
+        _enum = _type;
 
         mf = GetComponent<MeshFilter>();
         mr = GetComponent<MeshRenderer>();
@@ -43,15 +46,22 @@ public class SurfaceUpdater : MonoBehaviour
 
     public void OnHover_Paint(Material _material)
     {
-        mr.material = _material;
+        UpdateMaterial(_material);
     }
     public void OffHover_Paint()
     {
-        mr.material = mat;
+        UpdateMaterial(mat);
     }
     public void OnClick_Paint(Material _material)
     {
         mat = _material;
+    }
+
+    void UpdateMaterial(Material _material)
+    {
+        mr.material = _material;
+        foreach (MeshRenderer _mr in architraves)
+            _mr.material = _material;
     }
 
     public void UpdateWall(Vector3[] vertPos, RoomUpdater.wall wallActive)

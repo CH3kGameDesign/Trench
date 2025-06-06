@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class RoomUpdater : MonoBehaviour
@@ -152,6 +153,8 @@ public class RoomUpdater : MonoBehaviour
         }
         for (int j = 0; j < walls.Count; j++)
         {
+            SurfaceUpdater SU = walls[j].GetComponent<SurfaceUpdater>();
+            SU.architraves = new List<MeshRenderer>();
             int k = j + 1;
             if (k >= GetComponent<MeshFilter>().mesh.vertices.Length)
                 k = 0;
@@ -203,7 +206,7 @@ public class RoomUpdater : MonoBehaviour
             MF.mesh.triangles = tempTris;
 
             MR.material = walls[j].GetComponent<MeshRenderer>().material;
-
+            SU.architraves.Add(MR);
             MF.mesh.RecalculateNormals();
             MF.mesh.RecalculateBounds();
 
@@ -214,7 +217,7 @@ public class RoomUpdater : MonoBehaviour
 
     public void UpdateCornices()
     {
-
+        SU_Ceiling.architraves = new List<MeshRenderer>();
         for (int j = 0; j < GetComponent<MeshFilter>().mesh.vertices.Length; j++)
         {
             int k = j + 1;
@@ -230,7 +233,7 @@ public class RoomUpdater : MonoBehaviour
             MeshRenderer MR = wallActive.AddComponent<MeshRenderer>();
 
             cornices.Add(wallActive);
-
+            SU_Ceiling.architraves.Add(MR);
             Vector3[] tempVerts = new Vector3[architraves.cornices[0].positionCount * 2];
             for (int i = 0; i < architraves.cornices[0].positionCount; i++)
             {
