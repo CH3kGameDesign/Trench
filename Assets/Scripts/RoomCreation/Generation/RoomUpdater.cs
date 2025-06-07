@@ -90,9 +90,26 @@ public class RoomUpdater : MonoBehaviour
         //boxCollider.size = new Vector3(Mathf.Abs(vertPos[0].x - vertPos[3].x), 0.01f, Mathf.Abs(vertPos[0].z - vertPos[3].z));
     }
 
-    public void ShowArrows()
+    public void ShowArrows(PointerBuilder.drawModes _mode)
     {
         HideArrows();
+        switch (_mode)
+        {
+            case PointerBuilder.drawModes.stretch:
+                StretchArrows();
+                break;
+            case PointerBuilder.drawModes.move:
+                MoveArrows();
+                break;
+            default:
+                StretchArrows();
+                MoveArrows();
+                break;
+        }
+    }
+
+    void StretchArrows()
+    {
         GameObject GO;
         //Wall Arrow
         foreach (var item in walls)
@@ -113,14 +130,18 @@ public class RoomUpdater : MonoBehaviour
         GO.name = "DownArrow";
         GO.transform.localEulerAngles = new Vector3(-90, 0, 0);
         downArrow = GO;
-        //Move Arrows
+    }
+    void MoveArrows()
+    {
+        GameObject GO;
+        Vector3 _height = new Vector3(0, height, 0);
         moveArrows = new GameObject[3];
-        string[] names = new string[] { "MoveUpArrow", "MoveForwardArrow", "MoveRightArrow"};
+        string[] names = new string[] { "MoveUpArrow", "MoveForwardArrow", "MoveRightArrow" };
         Vector3[] dir = new Vector3[] { -Vector3.up, -Vector3.forward, -Vector3.right };
         Color[] color = new Color[] { Color.green, Color.blue, Color.red };
         for (int i = 0; i < 3; i++)
         {
-            GO = Instantiate(arrow, SU_Floor.mf.transform.position + (_height)/2, SU_Floor.mf.transform.rotation, SU_Floor.mf.transform);
+            GO = Instantiate(arrow, SU_Floor.mf.transform.position + (_height) / 2, SU_Floor.mf.transform.rotation, SU_Floor.mf.transform);
             GO.transform.localScale = Vector3.one * 0.5f;
             GO.name = names[i];
             GO.transform.forward = dir[i];

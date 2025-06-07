@@ -11,7 +11,7 @@ public class PointerBuilder : MonoBehaviour
 {
     public LevelGen_Materials _Materials;
     public LevelGen_Placeables _Placeables;
-    public enum drawModes { square, point, wall, arrow }
+    public enum drawModes { square, point, stretch, move }
     public enum beltModes { build, paint, place}
     [HideInInspector] public drawModes drawMode;
     [HideInInspector] public beltModes beltMode;
@@ -56,6 +56,7 @@ public class PointerBuilder : MonoBehaviour
     [System.Serializable]
     public class CanvasClass
     {
+        public RectTransform RT_canvas;
         public Button[] toolBelt_Buttons;
         [HideInInspector] public ToolBeltButton[] toolBeltSub_Buttons;
         [HideInInspector] public ToolBeltButton[] toolBeltFull_Buttons;
@@ -65,6 +66,9 @@ public class PointerBuilder : MonoBehaviour
 
         public RectTransform RT_toolBeltSub;
         public RectTransform RT_toolBeltFull;
+
+        public RectTransform RT_cursorImage;
+        public RawImage RI_cursorImage;
     }
     public BuildClass _Build;
     public PaintClass _Paint;
@@ -205,6 +209,11 @@ public class PointerBuilder : MonoBehaviour
             GridLayoutGroup GLG = _hook.GetComponent<GridLayoutGroup>();
             _size.x = (1 + Mathf.Ceil(items.Count / 2)) * (GLG.cellSize.x + GLG.spacing.x);
             _hook.sizeDelta = _size;
+
+            if (items.Count > i_lastSel)
+                items[i_lastSel].OnSelect(PB);
+            else
+                PB.UpdateCursor_Image(null);
         }
         public virtual void UpdateItemsList()
         {
@@ -234,6 +243,7 @@ public class PointerBuilder : MonoBehaviour
         public override void OnSelect(PointerBuilder PB)
         {
             PB.drawMode = _mode;
+            PB.Update_ArrowTypes();
         }
     }
     [System.Serializable]
@@ -274,14 +284,14 @@ public class PointerBuilder : MonoBehaviour
         [HideInInspector] public int index;
         public virtual void OnSelect(PointerBuilder PB)
         {
-
+            PB.UpdateCursor_Image(image);
         }
     }
     public class BuildItem : SubItem
     {
         public override void OnSelect(PointerBuilder PB)
         {
-
+            base.OnSelect(PB);
         }
     }
     public class PaintItem : SubItem
@@ -290,6 +300,7 @@ public class PointerBuilder : MonoBehaviour
         public override void OnSelect(PointerBuilder PB)
         {
             PB._Paint.activeMat = _mat;
+            base.OnSelect(PB);
         }
     }
     public class PlaceItem : SubItem
@@ -298,6 +309,7 @@ public class PointerBuilder : MonoBehaviour
         public override void OnSelect(PointerBuilder PB)
         {
             PB._Place.activePrefab = _prefab;
+            base.OnSelect(PB);
         }
     }
     #endregion
@@ -315,6 +327,7 @@ public class PointerBuilder : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        UpdateCursor_Pos();
         switch (beltMode)
         {
             case beltModes.build:
@@ -332,8 +345,244 @@ public class PointerBuilder : MonoBehaviour
         if (Input.GetMouseButtonUp(0))
             UnfocusGrid();
     }
-
+    void UpdateCursor_Pos ()
+    {
+        Vector2 _tarPos = Input.mousePosition;
+        _tarPos.x = (_tarPos.x/Screen.width) * _canvas.RT_canvas.sizeDelta.x;
+        _tarPos.y = (_tarPos.y / Screen.height) * _canvas.RT_canvas.sizeDelta.y;
+        _canvas.RT_cursorImage.anchoredPosition = _tarPos;
+    }
+    void UpdateCursor_Image(Texture _image)
+    {
+        _canvas.RI_cursorImage.texture = _image;
+        _canvas.RI_cursorImage.gameObject.SetActive(_image != null);
+    }
     void Update_Build ()
+    {
+        switch (drawMode)
+        {
+            case drawModes.square:
+                Update_BuildDraw_Square();
+                break;
+            case drawModes.point:
+                Update_BuildDraw_Point();
+                break;
+            default:
+                Update_BuildEdit();
+                break;
+        }
+    }
+
+    void Update_BuildDraw_Square()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (!EventSystem.current.IsPointerOverGameObject())
+            {
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out hit, 1000))
+                {
+                    int l = hit.transform.gameObject.layer;
+                    if (_layer.gridMask.Check(l))
+                    {
+                        GameObject GO;
+                        RoomUpdater RU;
+                        SurfaceUpdater SU;
+
+                        if (activeWall != null)
+                            activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
+                        firstClickPos = GetPos();
+                        GO = Instantiate(squarePrefab, floorHolder);
+
+                        Mesh tempMesh = new Mesh();
+                        tempMesh.vertices = new Vector3[]
+                        {
+                                    Vector3.zero,
+                                    new Vector3(0,0,1),
+                                    new Vector3(1,0,1),
+                                    new Vector3(1,0,0)
+
+                        };
+
+                        Vector2[] temp2Dsquare = new Vector2[tempMesh.vertices.Length];
+                        for (int i = 0; i < temp2Dsquare.Length; i++)
+                            temp2Dsquare[i] = new Vector2(tempMesh.vertices[i].x, tempMesh.vertices[i].z);
+                        Triangulator trSquare = new Triangulator(temp2Dsquare);
+                        int[] indicesSquare = trSquare.Triangulate();
+
+                        tempMesh.triangles = indicesSquare;
+                        tempMesh.uv = temp2Dsquare;
+
+                        tempMesh.RecalculateNormals();
+                        tempMesh.RecalculateBounds();
+
+
+                        GO.name = Time.time.ToString();
+                        //Mesh meshTemp = new Mesh();
+                        //Mesh meshTemp2 = GO.GetComponent<MeshFilter>().mesh;
+                        //meshTemp.vertices = meshTemp2.vertices;
+                        //meshTemp.uv = meshTemp2.uv;
+                        //meshTemp.triangles = meshTemp2.triangles;
+                        activeSquare = GO.transform;
+                        RU = GO.AddComponent<RoomUpdater>();
+                        SU = GO.AddComponent<SurfaceUpdater>();
+                        SU.Setup(RU, SurfaceUpdater.enumType.floor);
+                        RU.roomName = GO.name;
+                        RU.SU_Floor = SU;
+
+                        SU.mf.mesh = tempMesh;
+                        SU.mc.sharedMesh = tempMesh;
+                        RU.floor = GO.transform;
+                        RU.arrow = arrow;
+
+                        RU.height = 3;
+
+                        RU.architraves = architraves;
+
+                        //CEILING//////////
+                        GO = Instantiate(squarePrefab, activeSquare);
+                        SU = GO.AddComponent<SurfaceUpdater>();
+                        SU.Setup(RU, SurfaceUpdater.enumType.ceiling);
+                        RU.SU_Ceiling = SU;
+
+                        SU.mf.mesh = tempMesh;
+                        SU.mc.sharedMesh = tempMesh;
+                        AddWalls(RU);
+                    }
+                }
+            }
+        }
+        //Update
+        if (activeWall != null)
+        activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
+        drawModeText.text = "Draw Mode";
+        if (Input.GetMouseButton(0) && activeSquare != null)
+        {
+            SetPosScale(firstClickPos, GetPos());
+        }
+        if (Input.GetMouseButtonUp(0) && activeSquare != null)
+        {
+            if (firstClickPos == GetPos())
+                GameObject.Destroy(activeSquare.gameObject);
+            activeSquare = null;
+        }
+    }
+    void Update_BuildDraw_Point()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (!EventSystem.current.IsPointerOverGameObject())
+            {
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out hit, 1000))
+                {
+                    int l = hit.transform.gameObject.layer;
+                    if (_layer.gridMask.Check(l))
+                    {
+                        GameObject GO;
+                        RoomUpdater RU;
+                        SurfaceUpdater SU;
+                        Vector3 clickPos = GetPos();
+                        if (activeWall != null)
+                            activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
+                        if (activeSquare == null)
+                        {
+                            GO = Instantiate(squarePrefab, floorHolder);
+                            GO.name = Time.time.ToString();
+                            Mesh meshTempPoint = new Mesh();
+                            //Mesh meshTempPoint2 = GO1.GetComponent<MeshFilter>().mesh;
+                            //meshTempPoint.vertices = meshTempPoint2.vertices;
+                            //meshTempPoint.uv = meshTempPoint2.uv;
+                            //meshTempPoint.triangles = meshTempPoint2.triangles;
+                            activeSquare = GO.transform;
+                            RU = GO.AddComponent<RoomUpdater>();
+                            SU = GO.AddComponent<SurfaceUpdater>();
+                            SU.Setup(RU, SurfaceUpdater.enumType.floor);
+                            RU.roomName = GO.name;
+                            RU.floor = GO.transform;
+                            RU.arrow = arrow;
+
+                            RU.architraves = architraves;
+
+                            SU.mf.mesh = meshTempPoint;
+                            RU.vertPos = new Vector3[0];
+                        }
+                        RoomUpdater ru = activeSquare.GetComponent<RoomUpdater>();
+
+                        Vector3[] tempVerts = new Vector3[ru.vertPos.Length + 1];
+
+                        for (int i = 0; i < ru.vertPos.Length; i++)
+                            tempVerts[i] = ru.vertPos[i];
+
+                        tempVerts[tempVerts.Length - 1] = clickPos;
+
+                        ru.vertPos = tempVerts;
+                        if (tempVerts.Length == 2)
+                        {
+                            AddWallSingle(ru);
+                            ru.UpdateWall(ru.walls[ru.walls.Count - 1]);
+                        }
+                        if (tempVerts.Length >= 2)
+                        {
+                            ru.walls[0].verts = new Vector2Int(ru.vertPos.Length - 1, 0);
+                            AddWallSingle(ru);
+                            ru.UpdateWall(ru.walls[ru.walls.Count - 1]);
+                            ru.UpdateWall(ru.walls[0]);
+                        }
+
+                        if (tempVerts.Length >= 3)
+                        {
+                            Vector2[] temp2D = new Vector2[tempVerts.Length];
+                            for (int i = 0; i < temp2D.Length; i++)
+                                temp2D[i] = new Vector2(tempVerts[i].x, tempVerts[i].z);
+                            Triangulator tr = new Triangulator(temp2D);
+                            int[] indices = tr.Triangulate();
+
+                            ru.SU_Floor.mf.mesh.vertices = tempVerts;
+                            ru.SU_Floor.mf.mesh.triangles = indices;
+                            ru.SU_Floor.mf.mesh.uv = temp2D;
+
+                            ru.SU_Floor.mf.mesh.RecalculateNormals();
+                            ru.SU_Floor.mf.mesh.RecalculateBounds();
+
+                            ru.SU_Floor.mc.sharedMesh = ru.SU_Floor.mf.mesh;
+                        }
+                    }
+                }
+            }
+        }
+        //UPDATE
+        if (activeWall != null)
+            activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
+        drawModeText.text = "Point Mode";
+    }
+    void Update_ArrowTypes()
+    {
+        if (activeWall != null)
+        {
+            if (beltMode != beltModes.build)
+            {
+                activeWall.RU.HideArrows();
+                return;
+            }
+            switch (drawMode)
+            {
+                case drawModes.square:
+                    activeWall.RU.HideArrows();
+                    break;
+                case drawModes.point:
+                    activeWall.RU.HideArrows();
+                    break;
+                default:
+                    activeWall.RU.ShowArrows(drawMode);
+                    break;
+            }
+        }
+    }
+    
+    void Update_BuildEdit()
     {
         if (Input.GetMouseButtonDown(0))
         {
@@ -346,223 +595,45 @@ public class PointerBuilder : MonoBehaviour
                     activeArrow = hit.transform;
                     activeArrow.localScale = Vector3.one * 1.1f;
                     firstClickPos = GetPos();
-                    drawMode = drawModes.arrow;
                     FocusGrid(activeArrow);
                     return;
                 }
                 if (Physics.Raycast(ray, out hit, 1000))
                 {
                     int l = hit.transform.gameObject.layer;
-                    if (_layer.gridMask.Check(l))
+                    if (_layer.interactableMask.Check(l))
                     {
-                        GameObject GO;
-                        RoomUpdater RU;
-                        SurfaceUpdater SU;
-                        switch (drawMode)
-                        {
-                            case drawModes.square:
-                                if (activeWall != null)
-                                    activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
-                                firstClickPos = GetPos();
-                                GO = Instantiate(squarePrefab, floorHolder);
-
-                                Mesh tempMesh = new Mesh();
-                                tempMesh.vertices = new Vector3[]
-                                {
-                                    Vector3.zero,
-                                    new Vector3(0,0,1),
-                                    new Vector3(1,0,1),
-                                    new Vector3(1,0,0)
-
-                                };
-
-                                Vector2[] temp2Dsquare = new Vector2[tempMesh.vertices.Length];
-                                for (int i = 0; i < temp2Dsquare.Length; i++)
-                                    temp2Dsquare[i] = new Vector2(tempMesh.vertices[i].x, tempMesh.vertices[i].z);
-                                Triangulator trSquare = new Triangulator(temp2Dsquare);
-                                int[] indicesSquare = trSquare.Triangulate();
-
-                                tempMesh.triangles = indicesSquare;
-                                tempMesh.uv = temp2Dsquare;
-
-                                tempMesh.RecalculateNormals();
-                                tempMesh.RecalculateBounds();
-
-
-                                GO.name = Time.time.ToString();
-                                //Mesh meshTemp = new Mesh();
-                                //Mesh meshTemp2 = GO.GetComponent<MeshFilter>().mesh;
-                                //meshTemp.vertices = meshTemp2.vertices;
-                                //meshTemp.uv = meshTemp2.uv;
-                                //meshTemp.triangles = meshTemp2.triangles;
-                                activeSquare = GO.transform;
-                                RU = GO.AddComponent<RoomUpdater>();
-                                SU = GO.AddComponent<SurfaceUpdater>();
-                                SU.Setup(RU, SurfaceUpdater.enumType.floor);
-                                RU.roomName = GO.name;
-                                RU.SU_Floor = SU;
-
-                                SU.mf.mesh = tempMesh;
-                                SU.mc.sharedMesh = tempMesh;
-                                RU.floor = GO.transform;
-                                RU.arrow = arrow;
-
-                                RU.height = 3;
-
-                                RU.architraves = architraves;
-
-                                //CEILING//////////
-                                GO = Instantiate(squarePrefab, activeSquare);
-                                SU = GO.AddComponent<SurfaceUpdater>();
-                                SU.Setup(RU, SurfaceUpdater.enumType.ceiling);
-                                RU.SU_Ceiling = SU;
-
-                                SU.mf.mesh = tempMesh;
-                                SU.mc.sharedMesh = tempMesh;
-                                AddWalls(RU);
-                                break;
-                            case drawModes.point:
-                                Vector3 clickPos = GetPos();
-                                if (activeWall != null)
-                                    activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
-                                if (activeSquare == null)
-                                {
-                                    GO = Instantiate(squarePrefab, floorHolder);
-                                    GO.name = Time.time.ToString();
-                                    Mesh meshTempPoint = new Mesh();
-                                    //Mesh meshTempPoint2 = GO1.GetComponent<MeshFilter>().mesh;
-                                    //meshTempPoint.vertices = meshTempPoint2.vertices;
-                                    //meshTempPoint.uv = meshTempPoint2.uv;
-                                    //meshTempPoint.triangles = meshTempPoint2.triangles;
-                                    activeSquare = GO.transform;
-                                    RU = GO.AddComponent<RoomUpdater>();
-                                    SU = GO.AddComponent<SurfaceUpdater>();
-                                    SU.Setup(RU, SurfaceUpdater.enumType.floor);
-                                    RU.roomName = GO.name;
-                                    RU.floor = GO.transform;
-                                    RU.arrow = arrow;
-
-                                    RU.architraves = architraves;
-
-                                    SU.mf.mesh = meshTempPoint;
-                                    RU.vertPos = new Vector3[0];
-                                }
-                                RoomUpdater ru = activeSquare.GetComponent<RoomUpdater>();
-
-                                Vector3[] tempVerts = new Vector3[ru.vertPos.Length + 1];
-
-                                for (int i = 0; i < ru.vertPos.Length; i++)
-                                    tempVerts[i] = ru.vertPos[i];
-
-                                tempVerts[tempVerts.Length - 1] = clickPos;
-
-                                ru.vertPos = tempVerts;
-                                if (tempVerts.Length == 2)
-                                {
-                                    AddWallSingle(ru);
-                                    ru.UpdateWall(ru.walls[ru.walls.Count - 1]);
-                                }
-                                if (tempVerts.Length >= 2)
-                                {
-                                    ru.walls[0].verts = new Vector2Int(ru.vertPos.Length - 1, 0);
-                                    AddWallSingle(ru);
-                                    ru.UpdateWall(ru.walls[ru.walls.Count - 1]);
-                                    ru.UpdateWall(ru.walls[0]);
-                                }
-
-                                if (tempVerts.Length >= 3)
-                                {
-                                    Vector2[] temp2D = new Vector2[tempVerts.Length];
-                                    for (int i = 0; i < temp2D.Length; i++)
-                                        temp2D[i] = new Vector2(tempVerts[i].x, tempVerts[i].z);
-                                    Triangulator tr = new Triangulator(temp2D);
-                                    int[] indices = tr.Triangulate();
-
-                                    ru.SU_Floor.mf.mesh.vertices = tempVerts;
-                                    ru.SU_Floor.mf.mesh.triangles = indices;
-                                    ru.SU_Floor.mf.mesh.uv = temp2D;
-
-                                    ru.SU_Floor.mf.mesh.RecalculateNormals();
-                                    ru.SU_Floor.mf.mesh.RecalculateBounds();
-
-                                    ru.SU_Floor.mc.sharedMesh = ru.SU_Floor.mf.mesh;
-                                }
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    else if (_layer.interactableMask.Check(l))
-                    {
-                        drawMode = drawModes.wall;
                         SurfaceUpdater activeWallTemp = GetWall();
                         if (activeWallTemp != activeWall && activeWall != null)
-                            activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
+                            activeWall.RU.HideArrows();
                         activeWall = activeWallTemp;
-                        RoomUpdater RU = activeWall.GetComponentInParent<RoomUpdater>();
-                        activeSquare = RU.transform;
-                        RU.ShowArrows();
+                        activeWall.RU.ShowArrows(drawMode);
                     }
                 }
             }
         }
-        switch (drawMode)
+        drawModeText.text = "Edit Mode";
+        if (activeArrow != null)
         {
-            case drawModes.square:
-                if (activeWall != null)
-                    activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
-                drawModeText.text = "Draw Mode";
-                if (Input.GetMouseButton(0) && activeSquare != null)
-                {
-                    SetPosScale(firstClickPos, GetPos());
-                }
-                if (Input.GetMouseButtonUp(0) && activeSquare != null)
-                {
-                    if (firstClickPos == GetPos())
-                        GameObject.Destroy(activeSquare.gameObject);
-                    activeSquare = null;
-                }
-                break;
-            case drawModes.point:
-                {
-                    if (activeWall != null)
-                        activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
-                    drawModeText.text = "Point Mode";
-                    break;
-                }
-            case drawModes.wall:
-                drawModeText.text = "Edit Mode";
-                if (Input.GetKeyDown(KeyCode.Delete))
-                    DeleteSquare();
-                break;
-            case drawModes.arrow:
-                drawModeText.text = "Edit Mode";
-                if (activeArrow != null)
-                {
-                    if (Input.GetMouseButton(0))
-                    {
-                        RoomUpdater RM = activeWall.GetComponentInParent<RoomUpdater>();
-                        Vector3 temp = GetPos();
-                        //temp = new Vector3(temp.x, firstClickPos.y, temp.z);
-                        Vector3 changeFinal = temp - firstClickPos;
-                        changeFinal = ClampPoint(changeFinal, activeArrow.up * -1, activeArrow.up * 1);
-                        ArrowMove(RM, changeFinal);
+            if (Input.GetMouseButton(0))
+            {
+                Vector3 temp = GetPos();
+                //temp = new Vector3(temp.x, firstClickPos.y, temp.z);
+                Vector3 changeFinal = temp - firstClickPos;
+                changeFinal = ClampPoint(changeFinal, activeArrow.up * -1, activeArrow.up * 1);
+                ArrowMove(activeWall.RU, changeFinal);
 
-                        RM.UpdateMeshes();
-                        firstClickPos = temp;
-                    }
-                    if (Input.GetMouseButtonUp(0))
-                    {
-                        activeWall.GetComponentInParent<RoomUpdater>().ShowArrows();
-                        activeArrow.localScale = Vector3.one;
-                    }
-                    if (Input.GetKeyDown(KeyCode.Delete))
-                        DeleteSquare();
-                }
-                break;
-            default:
-                break;
+                activeWall.RU.UpdateMeshes();
+                firstClickPos = temp;
+            }
+            if (Input.GetMouseButtonUp(0))
+            {
+                activeWall.RU.ShowArrows(drawMode);
+                activeArrow.localScale = Vector3.one;
+            }
         }
+        if (Input.GetKeyDown(KeyCode.Delete))
+            DeleteSquare();
     }
     void Update_Paint()
     {
@@ -586,7 +657,7 @@ public class PointerBuilder : MonoBehaviour
                             SU.OnHover_Paint(_Paint.activeMat);
                             activeWall = SU;
                         }
-                        if (Input.GetMouseButtonDown(0))
+                        if (Input.GetMouseButton(0))
                         {
                             SU.OnClick_Paint(_Paint.activeMat);
                         }
