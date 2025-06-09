@@ -2,16 +2,16 @@ using System.ComponentModel;
 using UnityEngine;
 public enum Armor_Type
 {
-	[Description ("None")]	[InspectorName ("Helmet/Empty")]	Helmet_Empty,
+	[Description ("Empty")]	[InspectorName ("Helmet/Empty")]	Helmet_Empty,
 	[Description ("Basic")]	[InspectorName ("Helmet/Basic")]	Helmet_Basic,
-	[Description ("Day Dreamer")]	[InspectorName ("Helmet/DayDreamer")]	Helmet_DayDreamer,
-	[Description ("Range Finder")]	[InspectorName ("Helmet/RangeFinder")]	Helmet_RangeFinder,
+	[Description ("DayDreamer")]	[InspectorName ("Helmet/DayDreamer")]	Helmet_DayDreamer,
+	[Description ("RangeFinder")]	[InspectorName ("Helmet/RangeFinder")]	Helmet_RangeFinder,
 	[Description ("Shaved")]	[InspectorName ("Helmet/Shaved")]	Helmet_Shaved,
-	[Description ("None")]	[InspectorName ("Chest/Empty")]	Chest_Empty,
+	[Description ("Empty")]	[InspectorName ("Chest/Empty")]	Chest_Empty,
 	[Description ("Basic")]	[InspectorName ("Chest/Basic")]	Chest_Basic,
-	[Description ("None")]	[InspectorName ("Arm/Empty")]	Arm_Empty,
+	[Description ("Empty")]	[InspectorName ("Arm/Empty")]	Arm_Empty,
 	[Description ("Basic")]	[InspectorName ("Arm/Basic")]	Arm_Basic,
-	[Description ("None")]	[InspectorName ("Leg/Empty")]	Leg_Empty,
+	[Description ("Empty")]	[InspectorName ("Leg/Empty")]	Leg_Empty,
 	[Description ("Basic")]	[InspectorName ("Leg/Basic")]	Leg_Basic,
 	[Description ("Black")]	[InspectorName ("Material/Black")]	Material_Black,
 	[Description ("Green")]	[InspectorName ("Material/Green")]	Material_Green,

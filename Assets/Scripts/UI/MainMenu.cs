@@ -15,6 +15,7 @@ public class MainMenu : MonoBehaviour
     public mainRefClass main;
     public customizeRefClass customize;
     public panelRefClass load;
+    public storeRefClass store;
 
     public Volume V_postProcess;
     public AnimCurve AC_smooth;
@@ -67,6 +68,46 @@ public class MainMenu : MonoBehaviour
                 return _defaultButton.gameObject;
             else
                 return G_subOptions.transform.GetChild(0).gameObject;
+        }
+    }
+    [System.Serializable]
+    public class storeRefClass : panelRefClass
+    {
+        public ButtonGeneric PF_buttonTab;
+        public ButtonGeneric PF_buttonGrid;
+
+        public RectTransform RT_tabHolder;
+        public RectTransform RT_gridHolder;
+        public RectTransform RT_listHolder;
+
+        public Image I_itemImage;
+        public TextMeshProUGUI TM_itemName;
+        public TextMeshProUGUI TM_itemRarity;
+        public TextMeshProUGUI TM_itemDescription;
+
+        public TextMeshProUGUI TM_cost;
+        public TextMeshProUGUI TM_currency;
+
+
+        public override GameObject DefaultButton(bool _back = false)
+        {
+            if (_back)
+                return _backButton.gameObject;
+            else
+                return _defaultButton.gameObject;
+        }
+
+        public void UpdateTabs()
+        {
+
+        }
+        public void UpdateGrid()
+        {
+
+        }
+        public void UpdateItem()
+        {
+
         }
     }
     public void SwitchTo(panelRefClass GO)
@@ -207,7 +248,7 @@ public class MainMenu : MonoBehaviour
         customize.G_subOptions.SetActive(true);
         customize.G_subOptions.transform.DeleteChildren();
     }
-    public void ChooseArmor(ArmorManager.ArmorClass _armor)
+    public void ChooseArmor(ArmorPiece _armor)
     {
         SaveData.equippedArmor[customize.I_armorType] = _armor._enum();
         _armor.Equip(PlayerController.Instance.RM_ragdoll, customize.I_armorType != 3);

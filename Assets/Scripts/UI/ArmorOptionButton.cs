@@ -9,11 +9,11 @@ public class ArmorOptionButton : MonoBehaviour
     public GameObject G_selected;
     public TextMeshProUGUI TM_name;
 
-    public ArmorManager.ArmorClass armorClass;
+    public ArmorPiece armorClass;
 
     public bool locked;
 
-    public void Setup(ArmorManager.ArmorClass _armor)
+    public void Setup(ArmorPiece _armor)
     {
         armorClass = _armor;
         Sprite sprite = Sprite.Create(_armor.image, new Rect(0, 0, _armor.image.width, _armor.image.height), new Vector2(_armor.image.width / 2, _armor.image.height / 2));

@@ -8,12 +8,10 @@ public class ArmorManager_Editor : Editor
     {
         ArmorManager myTarget = (ArmorManager)target;
         DrawDefaultInspector();
-        if (GUILayout.Button("Generate Enum"))
+        if (GUILayout.Button("Update"))
         {
+            myTarget.Collect();
             myTarget.GenerateEnum();
-        }
-        if (GUILayout.Button("Generate Sprites"))
-        {
             myTarget.GenerateSprites();
         }
     }

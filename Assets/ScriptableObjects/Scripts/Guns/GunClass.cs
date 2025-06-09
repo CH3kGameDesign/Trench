@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Trench/AssetLists/Gun", fileName = "New Default Gun")]
-public class GunClass : ScriptableObject
+public class GunClass : ItemClass
 {
-    public string name = "";
-    public string id = "";
     [Space(10)]
     public GunPrefab prefab;
     public Bullet bullet;
@@ -76,8 +74,8 @@ public class GunClass : ScriptableObject
     }
     public virtual GunClass Clone(GunClass _temp)
     {
-        _temp.name = name;
-        _temp.id = id;
+        _temp._name = _name;
+        _temp._id = _id;
 
         _temp.prefab = prefab;
         _temp.bullet = bullet;

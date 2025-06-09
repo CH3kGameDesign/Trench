@@ -14,78 +14,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PF_ArmorOptionPrefab: {fileID: 4611847558388120823, guid: 948a131715d820649902cd416e429efb, type: 3}
   helmets:
-  - _id: Helmet/Empty
-    name: None
-    image: {fileID: 2800000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
-    modelHelmet: {fileID: 0}
-  - _id: Helmet/Basic
-    name: Basic
-    image: {fileID: 2800000, guid: 47f727caa77b81d4cb9e081606967c41, type: 3}
-    modelHelmet: {fileID: 6827022911036299193, guid: 3e3f164aed5ac8546ae1ffe496620c75, type: 3}
-  - _id: Helmet/DayDreamer
-    name: Day Dreamer
-    image: {fileID: 2800000, guid: 16e604bd7d611d94cb11c9b9c0fda5b3, type: 3}
-    modelHelmet: {fileID: 7989375529088540196, guid: ec1c2b538f86c5f44953cd4e6eb1a97b, type: 3}
-  - _id: Helmet/RangeFinder
-    name: Range Finder
-    image: {fileID: 2800000, guid: 3f77484061c9dea42b8be019172931c0, type: 3}
-    modelHelmet: {fileID: 365944370717396022, guid: 11be7b4c24c833c43b1135f92303c518, type: 3}
-  - _id: Helmet/Shaved
-    name: Shaved
-    image: {fileID: 2800000, guid: f14b67d19fe7dbd4c91d58889b85dcb3, type: 3}
-    modelHelmet: {fileID: 7715631469731849979, guid: 725733e8d7cb12f4194c74936ae23c55, type: 3}
+  - {fileID: 11400000, guid: 5c6246c2ed36f674d9ec9a60f2223f4a, type: 2}
+  - {fileID: 11400000, guid: 5fafa1458b238a149aa1b2b42d773ae5, type: 2}
+  - {fileID: 11400000, guid: 624e5d81af21b9945a1c2c908f7c9064, type: 2}
+  - {fileID: 11400000, guid: 4b84d44bebf2db3429a91d579feee3ec, type: 2}
+  - {fileID: 11400000, guid: d8c9879be0f8c1748bd7a732046358da, type: 2}
   chests:
-  - _id: Chest/Empty
-    name: None
-    image: {fileID: 2800000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
-    modelChest: {fileID: 0}
-    modelBelt: {fileID: 0}
-  - _id: Chest/Basic
-    name: Basic
-    image: {fileID: 2800000, guid: d7e753f5b9cb3c9458f64d4b9c7937a8, type: 3}
-    modelChest: {fileID: 6889230632462997232, guid: 0a41a614245e11e4fb9dfc2af3c824a8, type: 3}
-    modelBelt: {fileID: 4108750470630767989, guid: 7704739c9c75f6144825e4685367c7d5, type: 3}
+  - {fileID: 11400000, guid: 033cdf44d538c6a489dbfdd47dea052d, type: 2}
+  - {fileID: 11400000, guid: c0c939e1eb272f1449e367897341fed7, type: 2}
   arms:
-  - _id: Arm/Empty
-    name: None
-    image: {fileID: 2800000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
-    modelArm: {fileID: 0}
-    modelWrist: {fileID: 0}
-  - _id: Arm/Basic
-    name: Basic
-    image: {fileID: 2800000, guid: 7f1da08a81469ae40b5e58c87264f5bd, type: 3}
-    modelArm: {fileID: 1721140395219804839, guid: 34f5615aca44ac445b41f99d3c065364, type: 3}
-    modelWrist: {fileID: 931920005928250288, guid: 206b4544bb64e964d81cabfe4a910805, type: 3}
+  - {fileID: 11400000, guid: 9e7d43f0e1470be4eaf2a24316374fea, type: 2}
+  - {fileID: 11400000, guid: 2ff4d90fdabda724fb608414ecdeb634, type: 2}
   legs:
-  - _id: Leg/Empty
-    name: None
-    image: {fileID: 2800000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
-    modelKnee: {fileID: 0}
-    modelShin: {fileID: 0}
-    modelFoot: {fileID: 0}
-  - _id: Leg/Basic
-    name: Basic
-    image: {fileID: 2800000, guid: 5077f851f039732439da0885925876d4, type: 3}
-    modelKnee: {fileID: 5126623940152383960, guid: 44574eca456c32f43867308e1e1f2ba5, type: 3}
-    modelShin: {fileID: 2353897761478084946, guid: 778087c49101c9644820f9ccc72e36dd, type: 3}
-    modelFoot: {fileID: 1512659033437603453, guid: 2526686113faec54d9376fb63933d164, type: 3}
+  - {fileID: 11400000, guid: 8aa784c28a5cba147a8c8e7171a7104a, type: 2}
+  - {fileID: 11400000, guid: be8450f93fe7f9a428365658e1af67a0, type: 2}
   materials:
-  - _id: Material/Black
-    name: Black
-    image: {fileID: 2800000, guid: 5b39df9a289a3d34ab3235af796e6a79, type: 3}
-    modelMaterial: {fileID: 2100000, guid: 0889fa8fbca5a9642ad0e66baeccf863, type: 2}
-  - _id: Material/Green
-    name: Green
-    image: {fileID: 2800000, guid: abec1745a65e69140b9038c0a3dfc95e, type: 3}
-    modelMaterial: {fileID: 2100000, guid: 39ac215caf749a244b46aba77888db3b, type: 2}
-  - _id: Material/Orange
-    name: Orange
-    image: {fileID: 2800000, guid: a7b8dc775b9f08b439ec6be6255ef825, type: 3}
-    modelMaterial: {fileID: 2100000, guid: 00136626f69df2e4a931a6caff77a98a, type: 2}
-  - _id: Material/Red
-    name: Red
-    image: {fileID: 2800000, guid: 6e18f8ced9fcf7e4a830de798f577825, type: 3}
-    modelMaterial: {fileID: 2100000, guid: 24a2354f44050074c898049b5555e81f, type: 2}
+  - {fileID: 11400000, guid: 71f57979d909ae3429ed170f6b44c701, type: 2}
+  - {fileID: 11400000, guid: a9ea68d7b90763742a05fd9adab30092, type: 2}
+  - {fileID: 11400000, guid: 6f504f68956ff0b4dba03c6f793d115f, type: 2}
+  - {fileID: 11400000, guid: 5a2be178e0572ba498990fe2cc14b22f, type: 2}
   PF_Camera: {fileID: 3580604280446541953, guid: 870f5f839ad98ef4d857b2ef99d95056, type: 3}
   PF_Sphere: {fileID: 1643148071477528111, guid: d383df95520fef4478bb0123aa556b7a, type: 3}
   T_empty: {fileID: 2800000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
