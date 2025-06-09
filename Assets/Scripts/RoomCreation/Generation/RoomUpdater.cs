@@ -101,9 +101,10 @@ public class RoomUpdater : MonoBehaviour
             case PointerBuilder.drawModes.move:
                 MoveArrows();
                 break;
-            default:
+            case PointerBuilder.drawModes.extend:
                 StretchArrows();
-                MoveArrows();
+                break;
+            default:
                 break;
         }
     }

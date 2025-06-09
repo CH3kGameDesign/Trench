@@ -11,7 +11,7 @@ public class PointerBuilder : MonoBehaviour
 {
     public LevelGen_Materials _Materials;
     public LevelGen_Placeables _Placeables;
-    public enum drawModes { square, point, stretch, move }
+    public enum drawModes { square, point, stretch, move, extend }
     public enum beltModes { build, paint, place}
     [HideInInspector] public drawModes drawMode;
     [HideInInspector] public beltModes beltMode;
@@ -36,6 +36,7 @@ public class PointerBuilder : MonoBehaviour
     public Transform grid;
 
     private Vector3 firstClickPos;
+    private float _totalChange = 0;
 
     public GameObject arrow;
 
@@ -386,69 +387,11 @@ public class PointerBuilder : MonoBehaviour
                     int l = hit.transform.gameObject.layer;
                     if (_layer.gridMask.Check(l))
                     {
-                        GameObject GO;
-                        RoomUpdater RU;
-                        SurfaceUpdater SU;
-
                         if (activeWall != null)
                             activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
                         firstClickPos = GetPos();
-                        GO = Instantiate(squarePrefab, floorHolder);
 
-                        Mesh tempMesh = new Mesh();
-                        tempMesh.vertices = new Vector3[]
-                        {
-                                    Vector3.zero,
-                                    new Vector3(0,0,1),
-                                    new Vector3(1,0,1),
-                                    new Vector3(1,0,0)
-
-                        };
-
-                        Vector2[] temp2Dsquare = new Vector2[tempMesh.vertices.Length];
-                        for (int i = 0; i < temp2Dsquare.Length; i++)
-                            temp2Dsquare[i] = new Vector2(tempMesh.vertices[i].x, tempMesh.vertices[i].z);
-                        Triangulator trSquare = new Triangulator(temp2Dsquare);
-                        int[] indicesSquare = trSquare.Triangulate();
-
-                        tempMesh.triangles = indicesSquare;
-                        tempMesh.uv = temp2Dsquare;
-
-                        tempMesh.RecalculateNormals();
-                        tempMesh.RecalculateBounds();
-
-
-                        GO.name = Time.time.ToString();
-                        //Mesh meshTemp = new Mesh();
-                        //Mesh meshTemp2 = GO.GetComponent<MeshFilter>().mesh;
-                        //meshTemp.vertices = meshTemp2.vertices;
-                        //meshTemp.uv = meshTemp2.uv;
-                        //meshTemp.triangles = meshTemp2.triangles;
-                        activeSquare = GO.transform;
-                        RU = GO.AddComponent<RoomUpdater>();
-                        SU = GO.AddComponent<SurfaceUpdater>();
-                        SU.Setup(RU, SurfaceUpdater.enumType.floor);
-                        RU.roomName = GO.name;
-                        RU.SU_Floor = SU;
-
-                        SU.mf.mesh = tempMesh;
-                        SU.mc.sharedMesh = tempMesh;
-                        RU.floor = GO.transform;
-                        RU.arrow = arrow;
-
-                        RU.height = 3;
-
-                        RU.architraves = architraves;
-
-                        //CEILING//////////
-                        GO = Instantiate(squarePrefab, activeSquare);
-                        SU = GO.AddComponent<SurfaceUpdater>();
-                        SU.Setup(RU, SurfaceUpdater.enumType.ceiling);
-                        RU.SU_Ceiling = SU;
-
-                        SU.mf.mesh = tempMesh;
-                        SU.mc.sharedMesh = tempMesh;
-                        AddWalls(RU);
+                        CreateNewSquare();
                     }
                 }
             }
@@ -467,6 +410,70 @@ public class PointerBuilder : MonoBehaviour
                 GameObject.Destroy(activeSquare.gameObject);
             activeSquare = null;
         }
+    }
+
+    void CreateNewSquare(float _height = 3f)
+    {
+        GameObject GO;
+        RoomUpdater RU;
+        SurfaceUpdater SU;
+
+
+        GO = Instantiate(squarePrefab, floorHolder);
+
+        Mesh tempMesh = new Mesh();
+        tempMesh.vertices = new Vector3[]
+        {
+                                    Vector3.zero,
+                                    new Vector3(0,0,1),
+                                    new Vector3(1,0,1),
+                                    new Vector3(1,0,0)
+        };
+
+        Vector2[] temp2Dsquare = new Vector2[tempMesh.vertices.Length];
+        for (int i = 0; i < temp2Dsquare.Length; i++)
+            temp2Dsquare[i] = new Vector2(tempMesh.vertices[i].x, tempMesh.vertices[i].z);
+        Triangulator trSquare = new Triangulator(temp2Dsquare);
+        int[] indicesSquare = trSquare.Triangulate();
+
+        tempMesh.triangles = indicesSquare;
+        tempMesh.uv = temp2Dsquare;
+
+        tempMesh.RecalculateNormals();
+        tempMesh.RecalculateBounds();
+
+
+        GO.name = Time.time.ToString();
+        //Mesh meshTemp = new Mesh();
+        //Mesh meshTemp2 = GO.GetComponent<MeshFilter>().mesh;
+        //meshTemp.vertices = meshTemp2.vertices;
+        //meshTemp.uv = meshTemp2.uv;
+        //meshTemp.triangles = meshTemp2.triangles;
+        activeSquare = GO.transform;
+        RU = GO.AddComponent<RoomUpdater>();
+        SU = GO.AddComponent<SurfaceUpdater>();
+        SU.Setup(RU, SurfaceUpdater.enumType.floor);
+        RU.roomName = GO.name;
+        RU.SU_Floor = SU;
+
+        SU.mf.mesh = tempMesh;
+        SU.mc.sharedMesh = tempMesh;
+        RU.floor = GO.transform;
+        RU.arrow = arrow;
+
+        RU.height = _height;
+
+        RU.architraves = architraves;
+
+        //CEILING//////////
+        GO = Instantiate(squarePrefab, activeSquare);
+        SU = GO.AddComponent<SurfaceUpdater>();
+        SU.Setup(RU, SurfaceUpdater.enumType.ceiling);
+        RU.SU_Ceiling = SU;
+
+        SU.mf.mesh = tempMesh;
+        SU.mc.sharedMesh = tempMesh;
+        AddWalls(RU, _height);
     }
     void Update_BuildDraw_Point()
     {
@@ -586,6 +593,7 @@ public class PointerBuilder : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
+            _totalChange = 0;
             if (!EventSystem.current.IsPointerOverGameObject())
             {
                 RaycastHit hit;
@@ -596,6 +604,22 @@ public class PointerBuilder : MonoBehaviour
                     activeArrow.localScale = Vector3.one * 1.1f;
                     firstClickPos = GetPos();
                     FocusGrid(activeArrow);
+                    RoomUpdater RM = activeWall.RU;
+                    if (RM.upArrow == activeArrow.parent.gameObject)
+                        activeWall = RM.SU_Ceiling;
+                    if (RM.downArrow == activeArrow.parent.gameObject)
+                        activeWall = RM.SU_Floor;
+                    foreach (var item in RM.walls)
+                        if (item.arrow == activeArrow.parent.gameObject)
+                            activeWall = item.SU;
+                    switch (drawMode)
+                    {
+                        case drawModes.extend:
+                            CreateNewSquare(activeWall.RU.height);
+                            break;
+                        default:
+                            break;
+                    }
                     return;
                 }
                 if (Physics.Raycast(ray, out hit, 1000))
@@ -621,7 +645,20 @@ public class PointerBuilder : MonoBehaviour
                 //temp = new Vector3(temp.x, firstClickPos.y, temp.z);
                 Vector3 changeFinal = temp - firstClickPos;
                 changeFinal = ClampPoint(changeFinal, activeArrow.up * -1, activeArrow.up * 1);
-                ArrowMove(activeWall.RU, changeFinal);
+                switch (drawMode)
+                {
+                    case drawModes.stretch:
+                        Arrow_Stretch(activeWall.RU, changeFinal);
+                        break;
+                    case drawModes.move:
+                        Arrow_Move(activeWall.RU, changeFinal);
+                        break;
+                    case drawModes.extend:
+                        Arrow_Extend(activeWall.RU, changeFinal);
+                        break;
+                    default:
+                        break;
+                }
 
                 activeWall.RU.UpdateMeshes();
                 firstClickPos = temp;
@@ -630,6 +667,19 @@ public class PointerBuilder : MonoBehaviour
             {
                 activeWall.RU.ShowArrows(drawMode);
                 activeArrow.localScale = Vector3.one;
+                switch (drawMode)
+                {
+                    case drawModes.extend:
+                        if (activeSquare != null)
+                        {
+                            if (Mathf.Abs(_totalChange) <= 0.01f)
+                                GameObject.Destroy(activeSquare.gameObject);
+                            activeSquare = null;
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
         }
         if (Input.GetKeyDown(KeyCode.Delete))
@@ -673,7 +723,18 @@ public class PointerBuilder : MonoBehaviour
 
     }
     #region Player Interactions
-    void ArrowMove(RoomUpdater RM, Vector3 changeFinal)
+    void Arrow_Move(RoomUpdater RM, Vector3 changeFinal)
+    {
+        for (int i = 0; i < RM.moveArrows.Length; i++)
+        {
+            if (RM.moveArrows[i] == activeArrow.parent.gameObject)
+            {
+                RM.transform.position += changeFinal;
+                return;
+            }
+        }
+    }
+    void Arrow_Stretch(RoomUpdater RM, Vector3 changeFinal)
     {
         if (RM.upArrow == activeArrow.parent.gameObject)
         {
@@ -696,14 +757,6 @@ public class PointerBuilder : MonoBehaviour
             RM.transform.position += changeFinal;
             return;
         }
-        for (int i = 0; i < RM.moveArrows.Length; i++)
-        {
-            if (RM.moveArrows[i] == activeArrow.parent.gameObject)
-            {
-                RM.transform.position += changeFinal;
-                return;
-            }
-        }
         foreach (var item in RM.walls)
         {
             if (item.arrow == activeArrow.parent.gameObject)
@@ -716,6 +769,47 @@ public class PointerBuilder : MonoBehaviour
                     else
                         RM.vertPos[i] -= changeFinal / 2;
                 }
+                return;
+            }
+        }
+    }
+    void Arrow_Extend(RoomUpdater RM, Vector3 changeFinal)
+    {
+        if (RM.upArrow == activeArrow.parent.gameObject ||
+            RM.downArrow == activeArrow.parent.gameObject)
+        {
+            float change = changeFinal.y;
+            _totalChange += change;
+            Vector3 _start = activeWall.mf.mesh.vertices[0] + activeWall.transform.position;
+            Vector3 _end = activeWall.mf.mesh.vertices[2] + activeWall.transform.position;
+
+            RoomUpdater ru = activeSquare.GetComponent<RoomUpdater>();
+            ru.height = Mathf.Abs(_totalChange);
+            if (_totalChange < 0)
+            {
+                _start += Vector3.up * _totalChange;
+                _end += Vector3.up * _totalChange;
+            }
+            foreach (var item in ru.walls)
+                item.height = Mathf.Abs(_totalChange);
+            SetPosScale(_start, _end);
+            return;
+        }
+        foreach (var item in RM.walls)
+        {
+            if (item.arrow == activeArrow.parent.gameObject)
+            {
+                float change = changeFinal.z + changeFinal.x;
+                _totalChange += change;
+                Vector3 _start = activeWall.mf.mesh.vertices[0] + activeWall.transform.position;
+                Vector3 _end = activeWall.mf.mesh.vertices[3] + activeWall.transform.position;
+
+                Vector3 _dir = new Vector3(
+                    Mathf.Abs(activeWall.mf.mesh.normals[3].x),
+                    Mathf.Abs(activeWall.mf.mesh.normals[3].y),
+                    Mathf.Abs(activeWall.mf.mesh.normals[3].z));
+                _end += _totalChange * _dir;
+                SetPosScale(_start, _end);
                 return;
             }
         }
@@ -855,7 +949,7 @@ public class PointerBuilder : MonoBehaviour
 
         ru.UpdateMeshes();
     }
-    public void AddWalls(RoomUpdater ru)
+    public void AddWalls(RoomUpdater ru, float _height = 3f)
     {
         for (int i = 0; i < 4; i++)
         {
@@ -866,7 +960,7 @@ public class PointerBuilder : MonoBehaviour
             SU.Setup(ru, SurfaceUpdater.enumType.wall);
             wall.transform = GO.transform;
             wall.SU = SU;
-            wall.height = 3;
+            wall.height = _height;
             
             switch (i)
             {
@@ -894,7 +988,7 @@ public class PointerBuilder : MonoBehaviour
 
     }
 
-    public void AddWallSingle(RoomUpdater ru)
+    public void AddWallSingle(RoomUpdater ru, float _height = 3f)
     {
         GameObject GO = Instantiate(squarePrefab, activeSquare);
         GO.tag = "Wall";
@@ -903,7 +997,7 @@ public class PointerBuilder : MonoBehaviour
         SU.Setup(ru, SurfaceUpdater.enumType.wall);
         wall.SU = SU;
         wall.transform = GO.transform;
-        wall.height = 3;
+        wall.height = _height;
 
         wall.verts = new Vector2Int(ru.vertPos.Length - 2, ru.vertPos.Length - 1);
         GO.name = "Wall " + (ru.vertPos.Length - 1).ToString() + " a";
