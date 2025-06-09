@@ -1,13 +1,14 @@
-using System.Collections;
-using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
-using UnityEngine.Events;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using UnityEngine.Rendering;
-using UnityEngine.InputSystem;
 using TMPro;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
@@ -88,6 +89,7 @@ public class MainMenu : MonoBehaviour
         public TextMeshProUGUI TM_cost;
         public TextMeshProUGUI TM_currency;
 
+        public StoreManager Store;
 
         public override GameObject DefaultButton(bool _back = false)
         {
@@ -99,13 +101,37 @@ public class MainMenu : MonoBehaviour
 
         public void UpdateTabs()
         {
+            RT_tabHolder.DeleteChildren();
 
+            ButtonGeneric BG = Instantiate(PF_buttonTab, RT_tabHolder);
+            BG.Setup(UpdateGrid_Guns, Store.gunIcon, Color.white);
+
+            BG = Instantiate(PF_buttonTab, RT_tabHolder);
+            BG.Setup(UpdateGrid_Armor, Store.armorIcon, Color.white);
         }
-        public void UpdateGrid()
+        public void UpdateGrid_Guns()
         {
-
+            List<ItemClass> _items = new List<ItemClass>();
+            _items.AddRange(Store._guns);
+            UpdateGrid(_items);
         }
-        public void UpdateItem()
+        public void UpdateGrid_Armor()
+        {
+            List<ItemClass> _items = new List<ItemClass>();
+            _items.AddRange(Store._armor);
+            UpdateGrid(_items);
+        }
+        public void UpdateGrid(List<ItemClass> _items)
+        {
+            RT_gridHolder.DeleteChildren();
+            foreach (ItemClass _item in _items)
+            {
+                ButtonGeneric BG = Instantiate(PF_buttonGrid, RT_gridHolder);
+                Sprite sprite = Sprite.Create(_item.image, new Rect(0, 0, _item.image.width, _item.image.height), new Vector2(_item.image.width / 2, _item.image.height / 2));
+                BG.Setup(UpdateGrid_Guns, sprite, Color.white);
+            }
+        }
+        public void UpdateItem(ItemClass _item)
         {
 
         }
@@ -119,6 +145,7 @@ public class MainMenu : MonoBehaviour
         main._anim.SetBool("Open", main == GO);
         customize._anim.SetBool("Open", customize == GO);
         load._anim.SetBool("Open", load == GO);
+        store._anim.SetBool("Open", load == GO);
 
         GamepadSwitch();
     }

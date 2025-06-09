@@ -1,6 +1,8 @@
+using NUnit.Framework;
 using System;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
+using System.Collections.Generic;
 
 public class ItemClass : ScriptableObject
 {
@@ -9,6 +11,22 @@ public class ItemClass : ScriptableObject
     public string _id;
     public string _name;
     public Texture2D image;
+
+    public costClass cost;
+
+    [System.Serializable]
+    public class costClass
+    {
+        public bool unlockAtStart = false;
+        public int coinCost = 0;
+        public List<resourceClass> list = new List<resourceClass>();
+    }
+    [System.Serializable]
+    public class resourceClass
+    {
+        public Resource_Type _type;
+        public int amt = 0;
+    }
 
     public int sortOrder = 0;
     public enum enumType {

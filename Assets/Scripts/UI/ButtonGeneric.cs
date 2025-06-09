@@ -1,10 +1,11 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using System;
 
 public class ButtonGeneric : MonoBehaviour
 {
-    private UnityEvent _event;
+    private Action _event;
     public Image I_BG;
     public Image I_Sprite;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -18,7 +19,7 @@ public class ButtonGeneric : MonoBehaviour
     {
         
     }
-    public void Setup(UnityEvent onPress, Sprite _sprite, Color _bg)
+    public void Setup(Action onPress, Sprite _sprite, Color _bg)
     {
         _event = onPress;
         I_BG.color = _bg;
