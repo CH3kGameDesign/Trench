@@ -10,6 +10,10 @@ public class Armor_Material : ArmorPiece
     {
         _RM.MR_skinnedMeshRenderer.material = modelMaterial;
     }
+    public override void AssignToPlayer(bool _left = true)
+    {
+        SaveData.equippedArmorSet.material = this;
+    }
     public override Transform[] Hooks(RagdollManager _RM, bool _left = true)
     {
         return new Transform[]

@@ -372,6 +372,7 @@ public class MainMenu : MonoBehaviour
     {
         SaveData.equippedArmor[customize.I_armorType] = _armor.GetEnum();
         _armor.Equip(PlayerController.Instance.RM_ragdoll, customize.I_armorType != 3);
+        _armor.AssignToPlayer(customize.I_armorType != 3);
         EquipParticles(_armor.Hooks(PlayerController.Instance.RM_ragdoll));
     }
     void EquipParticles(Transform[] _points)

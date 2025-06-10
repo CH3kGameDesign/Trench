@@ -23,6 +23,10 @@ public class Armor_Leg : ArmorPiece
         if (modelShin != null) Instantiate(modelShin, _RM.T_armorPoints[11]);
         if (modelFoot != null) Instantiate(modelFoot, _RM.T_armorPoints[12]);
     }
+    public override void AssignToPlayer(bool _left = true)
+    {
+        SaveData.equippedArmorSet.legs = this;
+    }
     public override Transform[] Hooks(RagdollManager _RM, bool _left = true)
     {
         return new Transform[]

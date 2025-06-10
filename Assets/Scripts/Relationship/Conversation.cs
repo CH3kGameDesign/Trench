@@ -3,9 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
-using Unity.VisualScripting.FullSerializer;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
@@ -26,8 +23,8 @@ public class Conversation : MonoBehaviour
     public Canvas C_canvas;
     public Volume V_dialogueVolume;
 
-    public Image I_Speaker_L;
-    public Image I_Speaker_R;
+    public RawImage I_Speaker_L;
+    public RawImage I_Speaker_R;
     public Animator A_speaker_L;
     public Animator A_speaker_R;
     [Space(10)]
@@ -36,6 +33,85 @@ public class Conversation : MonoBehaviour
     private int i_dialogueChoice = 0;
     public float F_choiceMoveSpeed = 0.2f;
     private float f_choiceMoveTimer = 0;
+    [Header("Speaker Image References")]
+    public Camera PF_speakerCamera;
+    public speakerClass speakerL = new speakerClass();
+    public speakerClass speakerR = new speakerClass();
+
+    [System.Serializable]
+    public class speakerClass
+    {
+        [HideInInspector] public Camera c_speakerCamera = null;
+        [HideInInspector] public List<ConversationManager.characterClass> characters = new List<ConversationManager.characterClass>();
+        [HideInInspector] public List<RagdollManager> RMs = new List<RagdollManager>();
+        [HideInInspector] public List<Animator> animators = new List<Animator>();
+        public RenderTexture RendTex;
+
+        public void Setup(Camera _cam, bool _left, List<ConversationManager.characterClass> _char)
+        {
+            if (c_speakerCamera == null)
+            {
+                float _offset = 10f;
+                if (_left) _offset = -_offset;
+                c_speakerCamera = Instantiate(_cam, new Vector3(_offset, -100000, 0), _cam.transform.rotation);
+            }
+            c_speakerCamera.targetTexture = RendTex;
+            ClearCharacters();
+            characters = _char;
+            int i = 0;
+            foreach (ConversationManager.characterClass c in characters)
+            {
+                RagdollManager rm = Instantiate(c.PF_ragdoll, c_speakerCamera.transform);
+
+                rm.transform.localPosition = new Vector3(0,-1.5f,8f);
+                rm.transform.localPosition += Vector3.forward * i;
+
+                if (_left)
+                {
+                    rm.transform.localPosition -= Vector3.right * i;
+                    rm.transform.localEulerAngles = new Vector3(0, 140, 0);
+                }
+                else
+                {
+                    rm.transform.localPosition += Vector3.right * i;
+                    rm.transform.localEulerAngles = new Vector3(0, 180, 0);
+                }
+                RMs.Add(rm);
+                Animator a = rm.GetComponent<Animator>();
+                a.SetLayerWeight(1, 0);
+                animators.Add(a);
+
+                if(ConversationManager.Instance.GetCharacterID(c.id) == CharacterID.Player)
+                    SaveData.equippedArmorSet.Equip(rm);
+                else
+                    c.Armor.Equip(rm);
+            }
+        }
+        public void Close()
+        {
+            Destroy(c_speakerCamera.gameObject);
+            c_speakerCamera = null;
+            ClearCharacters();
+        }
+        void ClearCharacters()
+        {
+            RMs.Clear();
+            characters.Clear();
+            foreach (var item in animators)
+                Destroy(item.gameObject);
+            animators.Clear();
+        }
+        public void Play(string _clip)
+        {
+            if (animators.Count > 0)
+                animators[0].Play(_clip);
+        }
+        public void Play(List<string> _clips)
+        {
+            for (int i = 0; i < _clips.Count && i < animators.Count; i++)
+                animators[i].Play(_clips[i]);
+        }
+    }
 
     [Header("Banter References")]
     public CanvasGroup CG_banterHolder;
@@ -170,6 +246,7 @@ public class Conversation : MonoBehaviour
             else
                 HideDialogueChoices(false);
             PlayerController.GameState = PlayerController.gameStateEnum.dialogue;
+
             A_speaker_L.PlayClip("Transition_Inactive");
             A_speaker_R.PlayClip("Transition_New");
             curConversation = _convo;
@@ -330,13 +407,29 @@ public class Conversation : MonoBehaviour
             StopCoroutine(C_typing);
         ConversationManager.dStringClass _string = curConversation.strings[i_convoStep];
 
+        /*
         Image _speaker;
         Image _listener;
         if (_string.leftSide)   { _speaker = I_Speaker_L; _listener = I_Speaker_R; }
         else                    { _speaker = I_Speaker_R; _listener = I_Speaker_L; }
         _speaker.sprite = _string.GetFace(true);
         _listener.sprite = _string.GetFace(false);
-        C_typing = StartCoroutine(TypeMessage_Coroutine(TM_dialogue, _string.GetString(), _string.speed, true));
+        */
+        if (_string.leftSide)
+        {
+            speakerL.Setup(PF_speakerCamera, true, new List<ConversationManager.characterClass>() { _string.GetSpeaker() });
+            speakerR.Setup(PF_speakerCamera, false, new List<ConversationManager.characterClass>() { _string.GetListener() });
+            speakerL.Play(ConversationManager.GetAnim(_string.emotion));
+            speakerR.Play(ConversationManager.GetAnim(_string.otherEmotion));
+        }
+        else
+        {
+            speakerL.Setup(PF_speakerCamera, true, new List<ConversationManager.characterClass>() { _string.GetListener() });
+            speakerR.Setup(PF_speakerCamera, false, new List<ConversationManager.characterClass>() { _string.GetSpeaker() });
+            speakerL.Play(ConversationManager.GetAnim(_string.otherEmotion));
+            speakerR.Play(ConversationManager.GetAnim(_string.emotion));
+        }
+            C_typing = StartCoroutine(TypeMessage_Coroutine(TM_dialogue, _string.GetString(), _string.speed, true));
     }
 
     IEnumerator TypeMessage_Coroutine(TextMeshProUGUI _TM, string _string, float _delay = 0.02f, bool mainMessage = false)

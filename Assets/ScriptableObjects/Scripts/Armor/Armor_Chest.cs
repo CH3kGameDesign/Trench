@@ -14,6 +14,10 @@ public class Armor_Chest : ArmorPiece
         if (modelChest != null) Instantiate(modelChest, _RM.T_armorPoints[1]);
         if (modelBelt != null) Instantiate(modelBelt, _RM.T_armorPoints[2]);
     }
+    public override void AssignToPlayer(bool _left = true)
+    {
+        SaveData.equippedArmorSet.chest = this;
+    }
     public override Transform[] Hooks(RagdollManager _RM, bool _left = true)
     {
         return new Transform[]

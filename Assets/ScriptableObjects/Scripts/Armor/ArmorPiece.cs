@@ -6,6 +6,10 @@ public class ArmorPiece : ItemClass
     {
 
     }
+    public virtual void AssignToPlayer(bool _left = true)
+    {
+
+    }
     public virtual Armor_Type GetEnum()
     {
         string _string = _id.Replace('/', '_');

@@ -10,6 +10,10 @@ public class Armor_Helmet : ArmorPiece
         _RM.T_armorPoints[0].DeleteChildren();
         if (modelHelmet != null) Instantiate(modelHelmet, _RM.T_armorPoints[0]);
     }
+    public override void AssignToPlayer(bool _left = true)
+    {
+        SaveData.equippedArmorSet.helmet = this;
+    }
     public override Transform[] Hooks(RagdollManager _RM, bool _left = true)
     {
         return new Transform[]

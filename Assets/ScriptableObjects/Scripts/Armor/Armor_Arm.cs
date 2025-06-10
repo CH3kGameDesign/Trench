@@ -24,6 +24,13 @@ public class Armor_Arm : ArmorPiece
             if (modelWrist != null) Instantiate(modelWrist, _RM.T_armorPoints[6]);
         }
     }
+    public override void AssignToPlayer(bool _left = true)
+    {
+        if (_left)
+            SaveData.equippedArmorSet.armL = this;
+        else
+            SaveData.equippedArmorSet.armR = this;
+    }
     public override Transform[] Hooks(RagdollManager _RM, bool _left = true)
     {
         if (_left)

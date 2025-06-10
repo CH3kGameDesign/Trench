@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http.Headers;
 using UnityEngine;
+using Unity.Mathematics;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -213,6 +215,26 @@ public class ConversationManager : ScriptableObject
         }
         Debug.LogError("Couldn't find Character ID: " + _id);
         return new characterClass();
+    }
+    public CharacterID GetCharacterID(string _type)
+    {
+        string _string = _type.Replace('/', '_');
+        if (CharacterID.TryParse(_string, out CharacterID _temp))
+            return _temp;
+        Debug.LogError("Can't find CharacterID Enum:" + _string);
+        return CharacterID.DEBUG_Placeholder;
+    }
+
+    public static string GetAnim(emotionEnum _emotion)
+    {
+        switch (_emotion)
+        {
+            case emotionEnum.neutral: return "Conv_Idle";
+            case emotionEnum.happy: return "Conv_Happy";
+            case emotionEnum.angry: return "Conv_Angry";
+            case emotionEnum.sad: return "Conv_Sad";
+            default: return "Conv_Idle";
+        }
     }
 
 #if UNITY_EDITOR
