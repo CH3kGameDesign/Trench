@@ -31,6 +31,7 @@ public class AgentController : BaseController
     [Header("Animations")]
     public Animator A_model;
     private Vector2 v2_animMove = Vector2.zero;
+    public ArmorManager.SetClass Armor;
 
     [Header("Loot Table")]
     public Resource.resourceDrop ResourceDrop = new Resource.resourceDrop();
@@ -179,6 +180,7 @@ public class AgentController : BaseController
 
         gun_Equipped = gunManager.GetGunByInt(DEBUG_EquippedGunNum, this);
         gun_Equipped.OnEquip(this);
+        Armor.Equip(RM_ragdoll);
         base.Start();
     }
 

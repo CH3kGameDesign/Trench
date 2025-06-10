@@ -121,6 +121,8 @@ public class ConversationManager : ScriptableObject
         public string id = "";
         public string name = "";
         public emotionClass emotion = new emotionClass();
+        public RagdollManager PF_ragdoll;
+        public ArmorManager.SetClass Armor;
     }
     public enum emotionEnum
     {

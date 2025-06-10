@@ -87,6 +87,37 @@ MonoBehaviour:
     m_HintWeight: 1
     m_MaintainTargetPositionOffset: 0
     m_MaintainTargetRotationOffset: 0
+--- !u!1 &607352020652048108
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6982681304873049333}
+  m_Layer: 11
+  m_Name: Cam_StoreHook
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6982681304873049333
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 607352020652048108}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: 1.5, y: 0.8333333, z: 2.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5286100758049851119}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &818489220132817319
 GameObject:
   m_ObjectHideFlags: 0
@@ -2208,6 +2239,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: bf6965db94003934dae88d13247dafe9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2296568051925554971}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: bf6965db94003934dae88d13247dafe9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6982681304873049333}
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: bf6965db94003934dae88d13247dafe9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1575293874385009423}

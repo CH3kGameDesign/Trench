@@ -12,7 +12,28 @@ using UnityEngine.TextCore.Text;
 public class ArmorManager : ScriptableObject
 {
     public static ArmorManager Instance;
-    
+
+    [System.Serializable]
+    public class SetClass
+    {
+        public Armor_Helmet helmet;
+        public Armor_Chest chest;
+        public Armor_Arm armL;
+        public Armor_Arm armR;
+        public Armor_Leg legs;
+        public Armor_Material material;
+
+        public void Equip(RagdollManager RM)
+        {
+            if (helmet != null) helmet.Equip(RM);
+            if (chest != null) chest.Equip(RM);
+            if (armL != null) armL.Equip(RM);
+            if (armR != null) armR.Equip(RM, false);
+            if (legs != null) legs.Equip(RM);
+            if (material != null) material.Equip(RM);
+        }
+    }
+
     public ArmorOptionButton PF_ArmorOptionPrefab;
     public List<Armor_Helmet> helmets = new List<Armor_Helmet>();
     public List<Armor_Chest> chests = new List<Armor_Chest>();

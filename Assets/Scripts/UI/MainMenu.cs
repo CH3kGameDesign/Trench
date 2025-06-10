@@ -127,7 +127,6 @@ public class MainMenu : MonoBehaviour
             else
                 return _defaultButton.gameObject;
         }
-
         public void UpdateTabs()
         {
             RT_tabHolder.DeleteChildren();
@@ -256,7 +255,8 @@ public class MainMenu : MonoBehaviour
         public override void Open(AnimCurve _curve, Vector3 v3_camMenuLocalPos, Quaternion q_camLastLocalRot)
         {
             UpdateTabs();
-            base.Open(_curve, v3_camMenuLocalPos, q_camLastLocalRot);
+            Transform _pivot = PlayerController.Instance.T_camHookStore;
+            Instance.StartCoroutine(PlayerController.Instance.T_camHolder.GetChild(0).Move(_pivot.position, _pivot.rotation, false, 0.4f, _curve));
         }
     }
     public void SwitchTo(panelRefClass GO)

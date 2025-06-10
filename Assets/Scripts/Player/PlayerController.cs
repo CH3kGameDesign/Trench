@@ -46,6 +46,7 @@ public class PlayerController : BaseController
     public Transform T_camHookAiming;
     public Transform T_camHookCrouching;
     public Transform T_camHookArmorEquip;
+    public Transform T_camHookStore;
     [HideInInspector] public Vector3 v3_camDir;
     public Vector3 V3_camOffset = new Vector3(2,0.25f,-5);
     public Vector3 V3_camOffset_Crouch = new Vector3(1f, 0.125f, -1.5f);
@@ -342,7 +343,6 @@ public class PlayerController : BaseController
         AnimationUpdate();
 
         InteractHandler();
-
 
         FireManager();
         ReloadHandler();
@@ -880,11 +880,13 @@ public class PlayerController : BaseController
                     if (item.rigidbody.TryGetComponent<HitObject>(out HO))
                     {
                         AgentController AC;
-                        if(HO.RM_ragdollManager.GetAgentController(out AC))
+                        if (HO.RM_ragdollManager.GetAgentController(out AC))
                         {
                             if (AC.b_friendly || !AC.b_alive)
                                 continue;
                         }
+                        else
+                            continue;
                     }
                     Vector2 _mult = Inputs.b_aiming ? autoAim.aimDriftMultiplier : autoAim.hipDriftMultiplier;
                     Vector3 dirToIntended = (item.transform.position - Camera.main.transform.position).normalized;

@@ -15,7 +15,7 @@ public class AudioDirector : MonoBehaviour
         
     }
 
-    public void Step_Walk() { AudioHolder.Play(AgentAudioHolder.type.step); }
-    public void Step_Crouch() { AudioHolder.Play(AgentAudioHolder.type.crouchStep); }
-    public void Step_Sprint() { AudioHolder.Play(AgentAudioHolder.type.sprintStep); }
+    public void Step_Walk() { if (AudioHolder != null) AudioHolder.Play(AgentAudioHolder.type.step); }
+    public void Step_Crouch() { if (AudioHolder != null) AudioHolder.Play(AgentAudioHolder.type.crouchStep); }
+    public void Step_Sprint() { if (AudioHolder != null) AudioHolder.Play(AgentAudioHolder.type.sprintStep); }
 }
