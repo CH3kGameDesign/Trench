@@ -53,7 +53,7 @@ public class Conversation : MonoBehaviour
             {
                 float _offset = 10f;
                 if (_left) _offset = -_offset;
-                c_speakerCamera = Instantiate(_cam, new Vector3(_offset, -100000, 0), _cam.transform.rotation);
+                c_speakerCamera = Instantiate(_cam, new Vector3(_offset, -10000, 0), _cam.transform.rotation);
             }
             c_speakerCamera.targetTexture = RendTex;
             ClearCharacters();
@@ -406,7 +406,7 @@ public class Conversation : MonoBehaviour
         if (C_typing != null)
             StopCoroutine(C_typing);
         ConversationManager.dStringClass _string = curConversation.strings[i_convoStep];
-
+        TM_speaker.text = _string.GetName();
         /*
         Image _speaker;
         Image _listener;
