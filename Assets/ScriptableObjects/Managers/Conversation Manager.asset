@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Conversation Manager
   m_EditorClassIdentifier: 
   dialogueList:
-  - id: Dialogue/Tavern/Hello/001
+  - id: Dialogue/Tavern/Hello/Gregori/001
     strings:
     - speaker: 2
       english: Welcome Back Stranger! How can Gregori help you today?
@@ -85,6 +85,98 @@ MonoBehaviour:
       emotion: 0
       leftSide: 0
       other: 0
+      otherEmotion: 0
+    response: []
+    followUp:
+      type: 0
+      _convo: 0
+      _event: 
+  - id: Dialogue/Tavern/Hello/Pimm/001
+    strings:
+    - speaker: 5
+      english: Hoi hey and hi, whatcha want off the menu today?
+      spanish: 
+      japanese: 
+      speed: 0.04
+      emotion: 1
+      leftSide: 0
+      other: 4
+      otherEmotion: 0
+    response:
+    - english: What do you have?
+      spanish: 
+      japanese: 
+      followUp:
+        type: 2
+        _convo: 0
+        _event: openStore
+    - english: Nothing at the moment
+      spanish: 
+      japanese: 
+      followUp:
+        type: 1
+        _convo: 4
+        _event: 
+    followUp:
+      type: 0
+      _convo: 0
+      _event: 
+  - id: Dialogue/Tavern/Bye/Pimm/001
+    strings:
+    - speaker: 5
+      english: Easy lad, see you round
+      spanish: 
+      japanese: 
+      speed: 0.04
+      emotion: 1
+      leftSide: 0
+      other: 4
+      otherEmotion: 0
+    response: []
+    followUp:
+      type: 0
+      _convo: 0
+      _event: 
+  - id: Dialogue/Tavern/Hello/Bochi/001
+    strings:
+    - speaker: 6
+      english: Now what are we bolting to you today?
+      spanish: 
+      japanese: 
+      speed: 0.04
+      emotion: 1
+      leftSide: 0
+      other: 4
+      otherEmotion: 0
+    response:
+    - english: Let's have a look
+      spanish: 
+      japanese: 
+      followUp:
+        type: 2
+        _convo: 0
+        _event: openCustomize
+    - english: Nothing yet
+      spanish: 
+      japanese: 
+      followUp:
+        type: 1
+        _convo: 6
+        _event: 
+    followUp:
+      type: 0
+      _convo: 0
+      _event: 
+  - id: Dialogue/Tavern/Bye/Bochi/001
+    strings:
+    - speaker: 6
+      english: Ahh next time then
+      spanish: 
+      japanese: 
+      speed: 0.04
+      emotion: 1
+      leftSide: 0
+      other: 4
       otherEmotion: 0
     response: []
     followUp:
@@ -183,6 +275,20 @@ MonoBehaviour:
       sad: {fileID: 21300000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
   - id: Player
     name: Player
+    emotion:
+      neutral: {fileID: 21300000, guid: a437e72b1645fb24cb870209a16a73e1, type: 3}
+      happy: {fileID: 21300000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
+      angry: {fileID: 21300000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
+      sad: {fileID: 21300000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
+  - id: NPC/Pimm
+    name: Pimm
+    emotion:
+      neutral: {fileID: 21300000, guid: a437e72b1645fb24cb870209a16a73e1, type: 3}
+      happy: {fileID: 21300000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
+      angry: {fileID: 21300000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
+      sad: {fileID: 21300000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
+  - id: NPC/Bochi
+    name: Bochi
     emotion:
       neutral: {fileID: 21300000, guid: a437e72b1645fb24cb870209a16a73e1, type: 3}
       happy: {fileID: 21300000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}

@@ -30,7 +30,7 @@ public class Objective : ScriptableObject
             {
                 if (resource == null)
                     resource = Resource.GetResourceType_Static(_resource);
-                _temp += "<b>" + resource.name + "</b> ";
+                _temp += "<b>" + resource._name + "</b> ";
             }
             return _temp;
         }
@@ -71,6 +71,10 @@ public class Objective : ScriptableObject
         }
         Debug.LogError("Couldn't find Objective ID: " + _id);
         return null;
+    }
+    public void Setup()
+    {
+        Instance = this;
     }
 
     public void NewObjectives()

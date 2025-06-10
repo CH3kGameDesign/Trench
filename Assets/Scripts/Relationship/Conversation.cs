@@ -303,6 +303,14 @@ public class Conversation : MonoBehaviour
                 Objective.Instance.NewObjectives();
                 EndConversation();
                 break;
+            case "openStore":
+                EndConversation();
+                MainMenu.Instance.Open(MainMenu.panelEnum.store);
+                break;
+            case "openCustomize":
+                EndConversation();
+                MainMenu.Instance.Open(MainMenu.panelEnum.customize);
+                break;
             default:
                 EndConversation();
                 break;

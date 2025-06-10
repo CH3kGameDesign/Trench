@@ -14,7 +14,6 @@ public class SpaceGenerator : MonoBehaviour
 
     void Generate()
     {
-        SpaceManager.Instance.Setup();
         GameObject GO = Instantiate(SpaceManager.Instance.sectorPrefabs[0, 0, 0].gameObject, transform);
     }
 

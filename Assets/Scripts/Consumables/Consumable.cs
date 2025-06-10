@@ -97,6 +97,10 @@ public class Consumable : ScriptableObject
         public Sprite image;
         public GameObject model;
     }
+    public void Setup()
+    {
+        Instance = this;
+    }
     public static consumableType GetConsumableType_Static(Consumable_Type _type)
     {
         string _id = _type.ToString().Replace('_', '/');

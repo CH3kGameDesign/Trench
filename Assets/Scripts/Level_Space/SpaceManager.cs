@@ -11,6 +11,7 @@ public class SpaceManager : ScriptableObject
 
     public void Setup()
     {
+        Instance = this;
         sectorPrefabs = new SpaceSegment[1, 1, 1];
         sectorPrefabs[0, 0, 0] = DEBUG_gameObject;
         sectorAmount = Vector3Int.one;

@@ -6,13 +6,29 @@ public class ArmorPiece : ItemClass
     {
 
     }
-    public virtual Armor_Type _enum()
+    public virtual Armor_Type GetEnum()
     {
         string _string = _id.Replace('/', '_');
         if (Armor_Type.TryParse(_string, out Armor_Type _temp))
             return _temp;
         Debug.LogError("Can't find Armor_Type Enum:" + _string);
         return Armor_Type.Helmet_Empty;
+    }
+    public override void Setup()
+    {
+        Armor_Type _enum = GetEnum();
+        if (SaveData.ownedArmor.Contains(_enum))
+            ownedAmt = 1;
+        else
+        {
+            if (cost.unlockAtStart)
+            {
+                ownedAmt = 1;
+                SaveData.ownedArmor.Add(_enum);
+            }
+            else
+                ownedAmt = 0;
+        }
     }
     public virtual Transform[] Hooks(RagdollManager _RM, bool _left = true)
     {
@@ -22,5 +38,14 @@ public class ArmorPiece : ItemClass
         string filePath = "Assets/Art/Sprites/Armor/")
     {
         base.GenerateTexture(_camera, pos, rot, onEmpty, _model, filePath);
+    }
+    public override void Purchase()
+    {
+        base.Purchase();
+        Armor_Type _enum = GetEnum();
+        if (!SaveData.ownedArmor.Contains(_enum))
+            SaveData.ownedArmor.Add(_enum);
+        PlayerController.Instance.DebugGunList();
+        PlayerController.Instance.Setup_Radial();
     }
 }

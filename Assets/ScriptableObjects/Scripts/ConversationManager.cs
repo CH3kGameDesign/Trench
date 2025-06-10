@@ -148,6 +148,10 @@ public class ConversationManager : ScriptableObject
             }
         }
     }
+    public void Setup()
+    {
+        Instance = this;
+    }
     public bool GetConversationByID(string _id, out conversationClass _convo)
     {
         foreach (var item in dialogueList)

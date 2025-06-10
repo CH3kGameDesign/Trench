@@ -4,6 +4,7 @@ using System.Collections.Generic;
 [CreateAssetMenu(menuName = "Trench/AssetLists/Store", fileName = "New Store")]
 public class StoreManager : ScriptableObject
 {
+    public enum enumType { guns,  armor}
     public Sprite gunIcon;
     public List<GunClass> _guns = new List<GunClass>();
     [Space(10)]

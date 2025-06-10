@@ -5,6 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Trench/AssetLists/Gun", fileName = "New Default Gun")]
 public class GunClass : ItemClass
 {
+    public override enumType GetEnumType() { return enumType.gun; }
     [Space(10)]
     public GunPrefab prefab;
     public Bullet bullet;
@@ -89,6 +90,13 @@ public class GunClass : ItemClass
 
         _temp.clipAmmo = clipVariables.clipSize;
         _temp.reserveAmmo = clipVariables.clipSize * (clipVariables.clipAmount - 1);
+
+        _temp.rarity = rarity;
+        _temp.cost = cost;
+        _temp.ownedAmt = ownedAmt;
+        _temp.sortOrder = sortOrder;
+        _temp.image = image;
+        _temp._description = _description;
         return _temp;
     }
 
@@ -255,5 +263,44 @@ public class GunClass : ItemClass
     public virtual void OnHit(Bullet _bullet)
     {
 
+    }
+    public virtual Gun_Type GetEnum()
+    {
+        string _string = _id.Replace('/', '_');
+        if (Gun_Type.TryParse(_string, out Gun_Type _temp))
+            return _temp;
+        Debug.LogError("Can't find Gun_Type Enum:" + _string);
+        return Gun_Type.gun_Rifle;
+    }
+
+    public override void Setup()
+    {
+        Gun_Type _enum = GetEnum();
+        if (SaveData.ownedGun.Contains(_enum))
+            ownedAmt = 1;
+        else
+        {
+            if (cost.unlockAtStart)
+            {
+                ownedAmt = 1;
+                SaveData.ownedGun.Add(_enum);
+            }
+            else
+                ownedAmt = 0;
+        }
+    }
+    public override void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null,
+        string filePath = "Assets/Art/Sprites/Guns/")
+    {
+        base.GenerateTexture(_camera, pos, rot, onEmpty, prefab.gameObject, filePath);
+    }
+    public override void Purchase()
+    {
+        base.Purchase();
+        Gun_Type _enum = GetEnum();
+        if (!SaveData.ownedGun.Contains(_enum))
+            SaveData.ownedGun.Add(_enum);
+        PlayerController.Instance.DebugGunList();
+        PlayerController.Instance.Setup_Radial();
     }
 }

@@ -1,13 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
+using System.Linq;
 
 [CreateAssetMenu(menuName = "Trench/AssetLists/GunManager", fileName = "New Gun Manager")]
 public class GunManager : ScriptableObject
 {
+    public static GunManager Instance;
     public List<GunClass> list = new List<GunClass>();
+    [Space(10)]
+    public Camera PF_Camera;
+    public Texture2D T_empty;
 
-
+    public void Setup()
+    {
+        Instance = this;
+        foreach (var item in list)
+            item.Setup();
+    }
 
     [System.Serializable]
     public class bulletClass
@@ -87,4 +100,81 @@ public class GunManager : ScriptableObject
         }
         return list[_i].Clone(_agent);
     }
+#if UNITY_EDITOR
+    [ContextMenu("Tools/Collect")]
+    public void Collect()
+    {
+        string mainPath = Application.dataPath + "/ScriptableObjects/Guns/";
+        string[] filePaths = Directory.GetFiles(mainPath, "*.asset",
+                                         SearchOption.AllDirectories);
+        list.Clear();
+        foreach (var path in filePaths)
+        {
+            string _path = "Assets" + path.Substring(Application.dataPath.Length);
+            ItemClass _temp = (ItemClass)AssetDatabase.LoadAssetAtPath(_path, typeof(ItemClass));
+            if (_temp != null)
+            {
+                switch (_temp.GetEnumType())
+                {
+                    case ItemClass.enumType.gun:
+                        list.Add((GunClass)_temp);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        list = list.OrderByDescending(h => h.sortOrder).ToList();
+        EditorUtility.SetDirty(this);
+    }
+    [ContextMenu("Tools/GenerateEnum")]
+    public void GenerateEnum()
+    {
+        string enumName = "Gun_Type";
+        List<string> enumEntries = new List<string>();
+        List<GunClass> typeEntries = new List<GunClass>();
+        foreach (var item in list)
+        {
+            if (!enumEntries.Contains(item._id))
+            {
+                enumEntries.Add(item._id);
+                typeEntries.Add(item);
+            }
+            else
+                Debug.LogError("Duplicate ID: " + item._id);
+        }
+        string filePathAndName = "Assets/Scripts/Enums/" + enumName + ".cs"; //The folder Scripts/Enums/ is expected to exist
+
+        using (StreamWriter streamWriter = new StreamWriter(filePathAndName))
+        {
+            streamWriter.WriteLine("using System.ComponentModel;");
+            streamWriter.WriteLine("using UnityEngine;");
+            streamWriter.WriteLine("public enum " + enumName);
+            streamWriter.WriteLine("{");
+            for (int i = 0; i < typeEntries.Count; i++)
+            {
+                streamWriter.WriteLine(
+                    "	" + "[Description (\"" + typeEntries[i].name + "\")]" +
+                    "	" + "[InspectorName (\"" + typeEntries[i]._id + "\")]" +
+                    "	" + typeEntries[i]._id.Replace('/', '_') + ","
+                    );
+            }
+            streamWriter.WriteLine("}");
+        }
+        AssetDatabase.Refresh();
+    }
+    [ContextMenu("Tools/GenerateSprites")]
+    public void GenerateSprites()
+    {
+        Camera _camera = Instantiate(PF_Camera);
+        _camera.transform.position = Vector3.zero;
+        _camera.transform.forward = Vector3.forward;
+        Vector3 pos = new Vector3(-0.05f, -0.15f, 6);
+        Vector3 rot = new Vector3(0, 0, -45);
+        foreach (var item in list)
+            item.GenerateTexture(_camera, pos, rot, T_empty);
+        DestroyImmediate(_camera.gameObject);
+        AssetDatabase.Refresh();
+    }
+#endif
 }

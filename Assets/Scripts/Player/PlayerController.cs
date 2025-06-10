@@ -166,10 +166,7 @@ public class PlayerController : BaseController
         f_camDistance = V3_camOffset.magnitude;
         SetNavIDs();
 
-        for (int i = 0; i < Mathf.Min(DEBUG_EquippedGunNum.Length, gun_EquippedList.Length); i++)
-        {
-            gun_EquippedList[i] = gunManager.GetGunByInt(DEBUG_EquippedGunNum[i], this);
-        }
+        DebugGunList();
         Gun_Equip(0);
         reticle.UpdateRoundCount(gun_Equipped);
 
@@ -184,6 +181,21 @@ public class PlayerController : BaseController
 
         GameState = gameStateEnum.active;
         base.Start();
+    }
+
+    public void DebugGunList()
+    {
+        List<GunClass> _list = new List<GunClass>();
+        for (int i = 0; i < DEBUG_EquippedGunNum.Length; i++)
+        {
+            GunClass _temp = gunManager.GetGunByInt(DEBUG_EquippedGunNum[i], this);
+            if (_temp.ownedAmt > 0)
+            {
+                Debug.Log(_temp._name);
+                _list.Add(_temp);
+            }
+        }
+        gun_EquippedList = _list.ToArray();
     }
 
     void Setup_InteractStrings()
@@ -211,9 +223,15 @@ public class PlayerController : BaseController
         T_camHolder.transform.rotation = Quaternion.Euler(v3_camDir);
     }
 
-    void Setup_Radial()
+    public void Setup_Radial()
     {
-        Ref.RM_radial.Setup(new int[] { 3, 2, 5 });
+        int[] _amt =
+        {
+            gun_EquippedList.Length,
+            2,
+            5
+        };
+        Ref.RM_radial.Setup(_amt);
         Update_Radial();
     }
 

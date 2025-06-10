@@ -8,14 +8,16 @@ public class StaticData : MonoBehaviour
     public ConversationManager _ConversationManager;
     public SpaceManager _SpaceManager;
     public ArmorManager _ArmorManager;
+    public GunManager _GunManager;
 
     public void Awake()
     {
-        if (Resource.Instance == null) Resource.Instance = _Resource;
-        if (Objective.Instance == null) Objective.Instance = _Objective;
-        if (Consumable.Instance == null) Consumable.Instance = _Consumable;
-        if (ConversationManager.Instance == null) ConversationManager.Instance = _ConversationManager;
-        if (SpaceManager.Instance == null) SpaceManager.Instance = _SpaceManager;
-        if (ArmorManager.Instance == null) ArmorManager.Instance = _ArmorManager;
+        _Resource.Setup();
+        _Objective.Setup();
+        _Consumable.Setup();
+        _ConversationManager.Setup();
+        _SpaceManager.Setup();
+        _ArmorManager.Setup();
+        _GunManager.Setup();
     }
 }

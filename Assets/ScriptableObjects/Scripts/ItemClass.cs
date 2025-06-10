@@ -11,6 +11,9 @@ public class ItemClass : ScriptableObject
     public string _id;
     public string _name;
     public Texture2D image;
+    public string _description;
+    [HideInInspector]public int ownedAmt = 0;
+    public enumRarity rarity = enumRarity.Common;
 
     public costClass cost;
 
@@ -19,13 +22,7 @@ public class ItemClass : ScriptableObject
     {
         public bool unlockAtStart = false;
         public int coinCost = 0;
-        public List<resourceClass> list = new List<resourceClass>();
-    }
-    [System.Serializable]
-    public class resourceClass
-    {
-        public Resource_Type _type;
-        public int amt = 0;
+        public List<Resource.resourceClass> list = new List<Resource.resourceClass>();
     }
 
     public int sortOrder = 0;
@@ -35,6 +32,13 @@ public class ItemClass : ScriptableObject
         consumable, 
         upgrade, 
         undefined
+    }
+    public enum enumRarity
+    {
+        Common,
+        Rare,
+        Epic,
+        Legendary
     }
     public virtual void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null,
         string filePath = "Assets/Art/Sprites/")
@@ -57,5 +61,28 @@ public class ItemClass : ScriptableObject
     {
         if (set)
             image = _texture;
+    }
+
+    public void OnClick()
+    {
+        MainMenu.Instance.store.UpdateItem(this);
+    }
+    public virtual void Setup()
+    {
+        if (cost.unlockAtStart)
+            ownedAmt = 1;
+        else
+            ownedAmt = 0;
+    }
+    public virtual void Purchase()
+    {
+        ownedAmt++;
+        SaveData.i_currency -= cost.coinCost;
+        foreach (var item in cost.list)
+        {
+            Resource.resourceClass _temp = SaveData.GetResource(item._type);
+            if (_temp != null)
+                _temp.amt -= item.amt;
+        }
     }
 }

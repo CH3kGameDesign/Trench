@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -57,6 +58,20 @@ public class ArmorManager : ScriptableObject
         Debug.LogError("Couldn't find Armor ID: " + _id);
         return null;
     }
+    public void Setup()
+    {
+        Instance = this;
+        foreach (var item in helmets)
+            item.Setup();
+        foreach (var item in chests)
+            item.Setup();
+        foreach (var item in arms)
+            item.Setup();
+        foreach (var item in legs)
+            item.Setup();
+        foreach (var item in materials)
+            item.Setup();
+    }
     public static void EquipArmor_Static(RagdollManager _RM, Armor_Type[] _AT)
     {
         Instance.EquipArmor(_RM, _AT);
@@ -81,45 +96,60 @@ public class ArmorManager : ScriptableObject
     {
         foreach (var item in helmets)
         {
-            ArmorOptionButton AOB = Instantiate(PF_ArmorOptionPrefab, _holder);
-            AOB.Setup(item);
-            AOB.Equipped(item._enum() == _enum);
+            if (item.ownedAmt > 0)
+            {
+                ArmorOptionButton AOB = Instantiate(PF_ArmorOptionPrefab, _holder);
+                AOB.Setup(item);
+                AOB.Equipped(item.GetEnum() == _enum);
+            }
         }
     }
     public void CreateChestUI(Transform _holder, Armor_Type _enum)
     {
         foreach (var item in chests)
         {
-            ArmorOptionButton AOB = Instantiate(PF_ArmorOptionPrefab, _holder);
-            AOB.Setup(item);
-            AOB.Equipped(item._enum() == _enum);
+            if (item.ownedAmt > 0)
+            {
+                ArmorOptionButton AOB = Instantiate(PF_ArmorOptionPrefab, _holder);
+                AOB.Setup(item);
+                AOB.Equipped(item.GetEnum() == _enum);
+            }
         }
     }
     public void CreateArmUI(Transform _holder, Armor_Type _enum)
     {
         foreach (var item in arms)
         {
-            ArmorOptionButton AOB = Instantiate(PF_ArmorOptionPrefab, _holder);
-            AOB.Setup(item);
-            AOB.Equipped(item._enum() == _enum);
+            if (item.ownedAmt > 0)
+            {
+                ArmorOptionButton AOB = Instantiate(PF_ArmorOptionPrefab, _holder);
+                AOB.Setup(item);
+                AOB.Equipped(item.GetEnum() == _enum);
+            }
         }
     }
     public void CreateLegUI(Transform _holder, Armor_Type _enum)
     {
         foreach (var item in legs)
         {
-            ArmorOptionButton AOB = Instantiate(PF_ArmorOptionPrefab, _holder);
-            AOB.Setup(item);
-            AOB.Equipped(item._enum() == _enum);
+            if (item.ownedAmt > 0)
+            {
+                ArmorOptionButton AOB = Instantiate(PF_ArmorOptionPrefab, _holder);
+                AOB.Setup(item);
+                AOB.Equipped(item.GetEnum() == _enum);
+            }
         }
     }
     public void CreateMaterialUI(Transform _holder, Armor_Type _enum)
     {
         foreach (var item in materials)
         {
-            ArmorOptionButton AOB = Instantiate(PF_ArmorOptionPrefab, _holder);
-            AOB.Setup(item);
-            AOB.Equipped(item._enum() == _enum);
+            if (item.ownedAmt > 0)
+            {
+                ArmorOptionButton AOB = Instantiate(PF_ArmorOptionPrefab, _holder);
+                AOB.Setup(item);
+                AOB.Equipped(item.GetEnum() == _enum);
+            }
         }
     }
 
@@ -168,6 +198,7 @@ public class ArmorManager : ScriptableObject
         arms = arms.OrderByDescending(h => h.sortOrder).ToList();
         legs = legs.OrderByDescending(h => h.sortOrder).ToList();
         materials = materials.OrderByDescending(h => h.sortOrder).ToList();
+        EditorUtility.SetDirty(this);
     }
     [ContextMenu("Tools/GenerateEnum")]
     public void GenerateEnum()

@@ -52,16 +52,16 @@ public class Resource : ScriptableObject
         private resourceType type = null;
         public resourceType GetType(Resource _resource = null)
         {
-            if (type == null)
-            {
+            if (_resource == null)
+                type = GetResourceType_Static(_type);
+            else
                 type = _resource.GetResourceType(_type);
-            }
             return type;
         }
         public int amt = 0;
         public string GetString()
         {
-            string _temp = "<b>" + amt.ToString() + "</b> " + type.name;
+            string _temp = "<b>" + amt.ToString() + "</b> " + type._name;
             return _temp;
         }
         public static resourceClass Create(Resource_Type _type, int _amt = 1, Resource _resource = null)
@@ -86,15 +86,25 @@ public class Resource : ScriptableObject
             _temp.amt = amt;
             return _temp;
         }
+
+        public void OnClick()
+        {
+
+        }
     }
     public List<resourceType> types = new List<resourceType>();
     [System.Serializable]
     public class resourceType
     {
         public string _id;
-        public string name;
+        public string _name;
         public Sprite image;
         public GameObject model;
+    }
+
+    public void Setup()
+    {
+        Instance = this;
     }
     public static resourceType GetResourceType_Static(Resource_Type _type)
     {
@@ -148,7 +158,7 @@ public class Resource : ScriptableObject
             for (int i = 0; i < typeEntries.Count; i++)
             {
                 streamWriter.WriteLine(
-                    "	" + "[Description (\"" + typeEntries[i].name + "\")]" +
+                    "	" + "[Description (\"" + typeEntries[i]._name + "\")]" +
                     "	" + "[InspectorName (\"" + typeEntries[i]._id + "\")]" +
                     "	" + typeEntries[i]._id.Replace('/', '_') + ","
                     );
