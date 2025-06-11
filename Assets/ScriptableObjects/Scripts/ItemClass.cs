@@ -51,7 +51,9 @@ public class ItemClass : ScriptableObject
             GO.transform.position = pos;
             GO.transform.eulerAngles = rot;
             _camera.Render();
+#if UNITY_EDITOR
             _camera.activeTexture.SaveToFile(targetPath, SetImage);
+#endif
             DestroyImmediate(GO);
         }
         else

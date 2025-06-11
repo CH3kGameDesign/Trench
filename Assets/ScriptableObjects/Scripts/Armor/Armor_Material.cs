@@ -36,7 +36,9 @@ public class Armor_Material : ArmorPiece
             pos = Vector3.forward * 6;
             GO.transform.position = pos;
             _camera.Render();
+#if UNITY_EDITOR
             _camera.activeTexture.SaveToFile(targetPath, SetImage);
+#endif
             DestroyImmediate(GO);
         }
     }

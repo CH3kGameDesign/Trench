@@ -170,8 +170,6 @@ public class PlayerController : BaseController
         Instance = this;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
-        Setup_InteractStrings();
     }
 
     public override void Start()
@@ -209,7 +207,6 @@ public class PlayerController : BaseController
             GunClass _temp = gunManager.GetGunByInt(DEBUG_EquippedGunNum[i], this);
             if (_temp.ownedAmt > 0)
             {
-                Debug.Log(_temp._name);
                 _list.Add(_temp);
             }
         }
@@ -218,7 +215,7 @@ public class PlayerController : BaseController
 
     void Setup_InteractStrings()
     {
-        if (Instance != null) Instance = this;
+        if (Instance == null) Instance = this;
         Inputs.playerInput = GetComponent<PlayerInput>();
 
         TextMeshProUGUI _TM = Ref.TM_controlText;
@@ -240,9 +237,16 @@ public class PlayerController : BaseController
 
     void Setup_Consumables()
     {
-        SaveData.consumables = new List<Consumable.consumableClass>();
-        SaveData.consumables.Add(Consumable.consumableClass.Create(Consumable_Type.Potion_Health, 1));
-        SaveData.consumables.Add(Consumable.consumableClass.Create(Consumable_Type.Potion_Revive, 1));
+        if (SaveData.consumables.Count == 0)
+        {
+            SaveData.consumables.Add(Consumable.save.Create(Consumable_Type.Item_HealthPotion, 10));
+            SaveData.consumables.Add(Consumable.save.Create(Consumable_Type.Item_RevivePotion, 1));
+        }
+        else
+        {
+            foreach (var item in SaveData.consumables)
+                item._amt = item._totalAmt;
+        }
     }
 
     void Setup_Camera()
@@ -256,7 +260,7 @@ public class PlayerController : BaseController
         int[] _amt =
         {
             gun_EquippedList.Length,
-            2,
+            SaveData.consumables.Count,
             5
         };
         Ref.RM_radial.Setup(_amt);
@@ -644,12 +648,12 @@ public class PlayerController : BaseController
             if (item._type == _consumable._type)
             {
                 _collected = true;
-                item.amt += _consumable.amt;
+                item._amt += _consumable._amt;
                 break;
             }
         }
         if (!_collected)
-            SaveData.consumables.Add(_consumable.Clone());
+            SaveData.consumables.Add(_consumable.CloneToSave());
         AH_agentAudioHolder.Play(AgentAudioHolder.type.pickupSmall);
         MusicHandler.AdjustVolume(MusicHandler.typeEnum.synth, 0.1f);
     }
@@ -1088,11 +1092,9 @@ public class PlayerController : BaseController
         AH_agentAudioHolder.Gun_Equip(gun_Equipped);
     }
 
-    public void Consumable_Use(Consumable.consumableClass _consumable)
+    public void Consumable_Use(Item_Consumable _consumable)
     {
-        if (_consumable.amt <= 0)
-            return;
-        if (Consumable.Use(this, _consumable))
+        if (_consumable.Use(this))
         {
 
         }

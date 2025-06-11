@@ -45,8 +45,8 @@ public class Pickup_Object : MonoBehaviour
     public void Setup(Consumable_Type _type)
     {
         _PickUpType = pickupEnum.consumable;
-        _Consumable = Consumable.consumableClass.Create(_type);
-        GameObject GO = Instantiate(_Consumable.GetType().model, T_modelHolder);
+        _Consumable = Consumable.consumableClass.Create(_type, 1);
+        GameObject GO = Instantiate(_Consumable.Get_Item().model, T_modelHolder);
         GO.transform.localPosition = Vector3.zero;
         StartCoroutine(Spawn());
     }

@@ -122,7 +122,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""name"": ""Fire"",
                     ""type"": ""Button"",
                     ""id"": ""078122db-3b61-4db4-b02f-93c1f1390fa8"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -149,7 +149,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""name"": ""Interact"",
                     ""type"": ""Button"",
                     ""id"": ""9882b44a-cf81-41e5-ac61-a14c0d9822bc"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -167,7 +167,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""name"": ""Crouch"",
                     ""type"": ""Button"",
                     ""id"": ""2ef41898-3fc2-4b27-9daf-65a0e697af41"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -176,7 +176,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""name"": ""Reload"",
                     ""type"": ""Button"",
                     ""id"": ""14d44ba7-c6fc-4271-beed-3f786813bfdb"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": ""Press"",
                     ""initialStateCheck"": false
@@ -185,7 +185,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""name"": ""RadialMenu"",
                     ""type"": ""Button"",
                     ""id"": ""1f412c1e-b2c1-404b-ab9c-9c00c8f5cebd"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -194,7 +194,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""name"": ""Melee"",
                     ""type"": ""Button"",
                     ""id"": ""5bd84528-12a7-4964-a10b-cfe82c3d049d"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": ""Press"",
                     ""initialStateCheck"": false

@@ -1,7 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-using static Consumable;
+using Unity.VisualScripting;
+using System.Linq;
+
 
 #if UNITY_EDITOR
 using System.IO;
@@ -38,73 +40,75 @@ public class Consumable : ScriptableObject
             }
         }
     }
-
+    [System.Serializable]
+    public class consumableClass
+    {
+        public Consumable_Type _type;
+        public int _amt = 0;
+        public static consumableClass Create(Consumable_Type _t, int _a)
+        {
+            consumableClass _temp = new consumableClass();
+            _temp._type = _t;
+            _temp._amt = _a;
+            return _temp;
+        }
+        public consumableClass Clone()
+        {
+            consumableClass _temp = new consumableClass();
+            _temp._type = _type;
+            _temp._amt = _amt;
+            return _temp;
+        }
+        public save CloneToSave()
+        {
+            save _temp = new save();
+            _temp._type = _type;
+            _temp._amt = _amt;
+            _temp._totalAmt = _amt;
+            return _temp;
+        }
+        public Item_Consumable Get_Item()
+        {
+            return Consumable.Instance.GetConsumableType(_type);
+        }
+    }
+    [System.Serializable]
+    public class save : consumableClass
+    {
+        public int _totalAmt = 0;
+        new public static save Create(Consumable_Type _t, int _a)
+        {
+            save _temp = new save();
+            _temp._type = _t;
+            _temp._amt = _a;
+            _temp._totalAmt = _a;
+            return _temp;
+        }
+        new public save Clone()
+        {
+            save _temp = new save();
+            _temp._type = _type;
+            _temp._amt = _amt;
+            _temp._totalAmt = _totalAmt;
+            return _temp;
+        }
+    }
     [System.Serializable]
     public class consumableDrop_Single
     {
         public Consumable_Type _type;
         [Range(0,100)] public float _chance = 100;
     }
+    public List<Item_Consumable> list = new List<Item_Consumable>();
 
-    [System.Serializable]
-    public class consumableClass
-    {
-        public Consumable_Type _type;
-        private consumableType type = null;
-        public consumableType GetType(Consumable _consumable = null)
-        {
-            if (type == null)
-            {
-                type = _consumable.GetConsumableType(_type);
-            }
-            return type;
-        }
-        public int amt = 0;
-        public string GetString()
-        {
-            string _temp = "<b>" + amt.ToString() + "</b> " + type.name;
-            return _temp;
-        }
-        public static consumableClass Create(Consumable_Type _type, int _amt = 1, Consumable _consumable = null)
-        {
-            consumableClass _temp = new consumableClass();
-            _temp._type = _type;
-            if (_consumable != null)
-                _temp.type = _consumable.GetConsumableType(_type);
-            else
-                _temp.type = Instance.GetConsumableType(_type);
-            _temp.amt = _amt;
-            return _temp;
-        }
-        public consumableClass Clone(Consumable _consumable = null)
-        {
-            consumableClass _temp = new consumableClass();
-            _temp._type = _type;
-            if (_consumable != null)
-                _temp.type = _consumable.GetConsumableType(_type);
-            else
-                _temp.type = Instance.GetConsumableType(_type);
-            _temp.amt = amt;
-            return _temp;
-        }
-    }
-    public List<consumableType> types = new List<consumableType>();
-    [System.Serializable]
-    public class consumableType
-    {
-        public string _id;
-        public string name;
-        public Sprite image;
-        public GameObject model;
-    }
     public void Setup()
     {
         Instance = this;
     }
-    public static consumableType GetConsumableType_Static(Consumable_Type _type)
+    public static Item_Consumable GetConsumableType_Static(Consumable_Type _type)
     {
         string _id = _type.ToString().Replace('_', '/');
-        foreach (var item in Instance.types)
+        foreach (var item in Instance.list)
         {
             if (_id == item._id)
                 return item;
@@ -112,10 +116,10 @@ public class Consumable : ScriptableObject
         Debug.LogError("Couldn't find Consumable ID: " + _id);
         return null;
     }
-    public consumableType GetConsumableType(Consumable_Type _type)
+    public Item_Consumable GetConsumableType(Consumable_Type _type)
     {
         string _id = _type.ToString().Replace('_', '/');
-        foreach (var item in types)
+        foreach (var item in list)
         {
             if (_id == item._id)
                 return item;
@@ -132,32 +136,40 @@ public class Consumable : ScriptableObject
         GO.Setup(_type);
     }
 
-    public static bool Use(BaseController _agent, consumableClass _consumable)
-    {
-        switch (_consumable._type)
-        {
-            case Consumable_Type.Potion_Health:
-                if (_agent.F_curHealth >= _agent.F_maxHealth)
-                    return false;
-                _agent.OnHeal(_agent.F_maxHealth);
-                break;
-            case Consumable_Type.Potion_Revive:
-                break;
-            default:
-                return false;
-        }
-        _consumable.amt -= 1;
-        return true;
-    }
-
 #if UNITY_EDITOR
+    [ContextMenu("Tools/Collect")]
+    public void Collect()
+    {
+        string mainPath = Application.dataPath + "/ScriptableObjects/Items";
+        string[] filePaths = Directory.GetFiles(mainPath, "*.asset",
+                                         SearchOption.AllDirectories);
+        list.Clear();
+        foreach (var path in filePaths)
+        {
+            string _path = "Assets" + path.Substring(Application.dataPath.Length);
+            ItemClass _temp = (ItemClass)AssetDatabase.LoadAssetAtPath(_path, typeof(ItemClass));
+            if (_temp != null)
+            {
+                switch (_temp.GetEnumType())
+                {
+                    case ItemClass.enumType.consumable:
+                        list.Add((Item_Consumable)_temp);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        list = list.OrderByDescending(h => h.sortOrder).ToList();
+        EditorUtility.SetDirty(this);
+    }
     [ContextMenu("Tools/GenerateEnum")]
     public void GenerateEnum()
     {
         string enumName = "Consumable_Type";
         List<string> enumEntries = new List<string>();
-        List<consumableType> typeEntries = new List<consumableType>();
-        foreach (var item in types)
+        List<Item_Consumable> typeEntries = new List<Item_Consumable>();
+        foreach (var item in list)
         {
             if (!enumEntries.Contains(item._id))
             {

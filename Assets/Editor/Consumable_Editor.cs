@@ -8,8 +8,9 @@ public class Consumable_Editor : Editor
     {
         Consumable myTarget = (Consumable)target;
         DrawDefaultInspector();
-        if (GUILayout.Button("Generate Enum"))
+        if (GUILayout.Button("Update"))
         {
+            myTarget.Collect();
             myTarget.GenerateEnum();
         }
     }

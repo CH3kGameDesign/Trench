@@ -3,7 +3,6 @@ using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
-using static UnityEditor.Progress;
 
 public class Decal_Handler : MonoBehaviour
 {

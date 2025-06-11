@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Collections;
 using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.ProBuilder.Shapes;
@@ -12,6 +11,9 @@ using UnityEngine.Rendering;
 using UnityEngine.UI;
 using UnityEngine.Windows;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 public static class CKUtil
 {
     public static string ToString_Currency(this int _value)
@@ -43,7 +45,7 @@ public static class CKUtil
     public static string ToString_InputSetup(this string _interactable, PlayerController.inputActions _input, Interactable.enumType _type = Interactable.enumType.interact)
     {
         PlayerController.inputClass _IC = PlayerController.Instance.Inputs;
-        string _sprite = _IC.playerInput.actions.FindAction(_input.SelectedName(false)).GetBindingDisplayString(0, _IC.b_isGamepad ? "Gamepad": "Keyboard");
+        string _sprite = _IC.playerInput.actions.FindAction(_input.ToString()).GetBindingDisplayString(0, _IC.b_isGamepad ? "Gamepad": "Keyboard");
         if (_sprite.Length > 6)
             if (_sprite.Substring(0, 6) == "Press ")
                 _sprite = _sprite.Remove(0, 6);
@@ -58,7 +60,25 @@ public static class CKUtil
                     case "PlayStation Controller":
                         _sprite = "ps5_stick_left";
                         break;
+                    case "DualSense Wireless Controller":
+                        _sprite = "ps5_stick_left";
+                        break;
+                    case "DualShock Wireless Controller":
+                        _sprite = "ps5_stick_left";
+                        break;
+                    case "Wireless Controller":
+                        _sprite = "ps5_stick_left";
+                        break;
                     case "Switch Pro Controller":
+                        _sprite = "switch_stick_left";
+                        break;
+                    case "NSW Pro Controller":
+                        _sprite = "switch_stick_left";
+                        break;
+                    case "NSW Wired Controller":
+                        _sprite = "switch_stick_left";
+                        break;
+                    case "NSW Wireless Controller":
                         _sprite = "switch_stick_left";
                         break;
                     case "Steam Controller":
@@ -78,7 +98,25 @@ public static class CKUtil
                     case "PlayStation Controller":
                         _sprite = "ps5_stick_right";
                         break;
+                    case "DualSense Wireless Controller":
+                        _sprite = "ps5_stick_right";
+                        break;
+                    case "DualShock Wireless Controller":
+                        _sprite = "ps5_stick_right";
+                        break;
+                    case "Wireless Controller":
+                        _sprite = "ps5_stick_right";
+                        break;
                     case "Switch Pro Controller":
+                        _sprite = "switch_stick_right";
+                        break;
+                    case "NSW Pro Controller":
+                        _sprite = "switch_stick_right";
+                        break;
+                    case "NSW Wired Controller":
+                        _sprite = "switch_stick_right";
+                        break;
+                    case "NSW Wireless Controller":
                         _sprite = "switch_stick_right";
                         break;
                     case "Steam Controller":
@@ -98,7 +136,25 @@ public static class CKUtil
                     case "PlayStation Controller":
                         _sprite = "ps5_button_" + _sprite;
                         break;
+                    case "DualSense Wireless Controller":
+                        _sprite = "ps5_button_" + _sprite;
+                        break;
+                    case "DualShock Wireless Controller":
+                        _sprite = "ps5_button_" + _sprite;
+                        break;
+                    case "Wireless Controller":
+                        _sprite = "ps5_button_" + _sprite;
+                        break;
                     case "Switch Pro Controller":
+                        _sprite = "switch_button_" + _sprite;
+                        break;
+                    case "NSW Pro Controller":
+                        _sprite = "switch_button_" + _sprite;
+                        break;
+                    case "NSW Wired Controller":
+                        _sprite = "switch_button_" + _sprite;
+                        break;
+                    case "NSW Wireless Controller":
                         _sprite = "switch_button_" + _sprite;
                         break;
                     case "Steam Controller":
@@ -127,7 +183,25 @@ public static class CKUtil
             case "PlayStation Controller":
                 _TM.spriteAsset = MainMenu.Instance.input.SA_ps;
                 break;
+            case "DualSense Wireless Controller":
+                _TM.spriteAsset = MainMenu.Instance.input.SA_ps;
+                break;
+            case "DualShock Wireless Controller":
+                _TM.spriteAsset = MainMenu.Instance.input.SA_ps;
+                break;
+            case "Wireless Controller":
+                _TM.spriteAsset = MainMenu.Instance.input.SA_ps;
+                break;
             case "Switch Pro Controller":
+                _TM.spriteAsset = MainMenu.Instance.input.SA_switch;
+                break;
+            case "NSW Pro Controller":
+                _TM.spriteAsset = MainMenu.Instance.input.SA_switch;
+                break;
+            case "NSW Wired Controller":
+                _TM.spriteAsset = MainMenu.Instance.input.SA_switch;
+                break;
+            case "NSW Wireless Controller":
                 _TM.spriteAsset = MainMenu.Instance.input.SA_switch;
                 break;
             case "Steam Controller":

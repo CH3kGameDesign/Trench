@@ -8,7 +8,7 @@ public static class SaveData
     public static int i_currency = 200;
     public static List<Objective.objectiveClass> objectives = new List<Objective.objectiveClass>();
     public static List<Resource.resourceClass> resources = new List<Resource.resourceClass>();
-    public static List<Consumable.consumableClass> consumables = new List<Consumable.consumableClass>();
+    public static List<Consumable.save> consumables = new List<Consumable.save>();
 
     public static List<Gun_Type> ownedGun = new List<Gun_Type>();
     public static List<Armor_Type> ownedArmor = new List<Armor_Type>();

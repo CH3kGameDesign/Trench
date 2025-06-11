@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using UnityEditorInternal.Profiling.Memory.Experimental;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class RadialMenu : MonoBehaviour
 {
@@ -86,17 +87,17 @@ public class RadialMenu : MonoBehaviour
             Ref.rt_radialItems_Sub[0][i].GetChild(0).GetComponent<Image>().sprite = _gunList[i].sprite;
         }
     }
-    public void Setup_Consumables(List<Consumable.consumableClass> _consumables)
+    public void Setup_Consumables(List<Consumable.save> _consumables)
     {
         int _first = 999;
         Color _trans = new Color(1, 1, 1, 0.3f);
 
         for (int i = 0; i < Mathf.Min(_consumables.Count, Ref.rt_radialItems_Sub[1].Length); i++)
         {
-            Ref.rt_radialItems_Sub[1][i].GetChild(0).GetComponent<Image>().sprite = _consumables[i].GetType().image;
-            Ref.rt_radialItems_Sub[1][i].GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = _consumables[i].amt.ToString();
+            Ref.rt_radialItems_Sub[1][i].GetChild(0).GetComponent<Image>().sprite = _consumables[i].Get_Item().sprite;
+            Ref.rt_radialItems_Sub[1][i].GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = _consumables[i]._amt.ToString();
 
-            if (_consumables[i].amt > 0)
+            if (_consumables[i]._amt > 0)
             {
                 Ref.rt_radialItems_Sub[1][i].GetChild(0).GetComponent<Image>().color = Color.white;
                 Ref.rt_radialItems_Sub[1][i].GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().color = Color.white;
@@ -110,12 +111,12 @@ public class RadialMenu : MonoBehaviour
         }
         if (_first < _consumables.Count)
         {
-            Ref.rt_radialItems[1].GetChild(0).GetComponent<Image>().sprite = _consumables[_first].GetType().image;
+            Ref.rt_radialItems[1].GetChild(0).GetComponent<Image>().sprite = _consumables[_first].Get_Item().sprite;
             Ref.rt_radialItems[1].GetChild(0).GetComponent<Image>().color = Color.white;
         }
         else if (_consumables.Count > 0)
         {
-            Ref.rt_radialItems[1].GetChild(0).GetComponent<Image>().sprite = _consumables[0].GetType().image;
+            Ref.rt_radialItems[1].GetChild(0).GetComponent<Image>().sprite = _consumables[0].Get_Item().sprite;
             Ref.rt_radialItems[1].GetChild(0).GetComponent<Image>().color = _trans;
         }
     }
@@ -290,7 +291,7 @@ public class RadialMenu : MonoBehaviour
         else if (Values.i_selChild == 1)
         {
             if (Values.i_selSubChild >= 0)
-                PlayerController.Instance.Consumable_Use(SaveData.consumables[Values.i_selSubChild]);
+                PlayerController.Instance.Consumable_Use(SaveData.consumables[Values.i_selSubChild].Get_Item());
         }
     }
 }

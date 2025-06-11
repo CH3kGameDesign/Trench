@@ -9,7 +9,6 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
-using static UnityEditor.Progress;
 
 public class MainMenu : MonoBehaviour
 {
@@ -139,6 +138,9 @@ public class MainMenu : MonoBehaviour
             BG = Instantiate(PF_buttonTab, RT_tabHolder);
             BG.Setup(UpdateGrid_Armor, Store.armorIcon, Color.white);
 
+            BG = Instantiate(PF_buttonTab, RT_tabHolder);
+            BG.Setup(UpdateGrid_Consumable, Store.consumableIcon, Color.white);
+
             UpdateGrid_Guns();
         }
         public void UpdateGrid_Guns()
@@ -159,6 +161,17 @@ public class MainMenu : MonoBehaviour
             foreach (ItemClass item in Store._armor)
             {
                 if (item.ownedAmt == 0)
+                    _items.Add(item);
+            }
+            UpdateGrid(_items);
+        }
+        public void UpdateGrid_Consumable()
+        {
+            _activeTab = StoreManager.enumType.consumable;
+            List<ItemClass> _items = new List<ItemClass>();
+            foreach (ItemClass item in Store._consumable)
+            {
+                if (item.ownedAmt >= 0)
                     _items.Add(item);
             }
             UpdateGrid(_items);

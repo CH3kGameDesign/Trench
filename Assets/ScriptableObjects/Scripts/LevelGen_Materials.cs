@@ -27,7 +27,9 @@ public class LevelGen_Materials : ScriptableObject
             GO.GetComponent<MeshRenderer>().material = material;
             GO.transform.position = pos;
             _camera.Render();
+#if UNITY_EDITOR
             _camera.activeTexture.SaveToFile(targetPath, SetImage);
+#endif
             DestroyImmediate(GO);
         }
         public void SetImage(bool set, Texture2D _texture)
