@@ -132,6 +132,8 @@ public class ConversationManager : ScriptableObject
         happy,
         angry,
         sad,
+        sneaky,
+        idle,
     }
     [System.Serializable]
     public class emotionClass
@@ -229,10 +231,12 @@ public class ConversationManager : ScriptableObject
     {
         switch (_emotion)
         {
-            case emotionEnum.neutral: return "Conv_Idle";
+            case emotionEnum.neutral: return "Conv_Neutral";
             case emotionEnum.happy: return "Conv_Happy";
             case emotionEnum.angry: return "Conv_Angry";
             case emotionEnum.sad: return "Conv_Sad";
+            case emotionEnum.sneaky: return "Conv_Sneaky";
+            case emotionEnum.idle: return "Conv_Idle";
             default: return "Conv_Idle";
         }
     }

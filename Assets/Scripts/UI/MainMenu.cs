@@ -18,7 +18,9 @@ public class MainMenu : MonoBehaviour
     public customizeRefClass customize;
     public panelRefClass load;
     public storeRefClass store;
-
+    [Space(10)]
+    public inputRefClass input;
+    [Space(10)]
     public Volume V_postProcess;
     public AnimCurve AC_smooth;
 
@@ -258,6 +260,15 @@ public class MainMenu : MonoBehaviour
             Transform _pivot = PlayerController.Instance.T_camHookStore;
             Instance.StartCoroutine(PlayerController.Instance.T_camHolder.GetChild(0).Move(_pivot.position, _pivot.rotation, false, 0.4f, _curve));
         }
+    }
+    [System.Serializable]
+    public class inputRefClass
+    {
+        public TMP_SpriteAsset SA_keyboard;
+        public TMP_SpriteAsset SA_xbox;
+        public TMP_SpriteAsset SA_ps;
+        public TMP_SpriteAsset SA_switch;
+        public TMP_SpriteAsset SA_steamDeck;
     }
     public void SwitchTo(panelRefClass GO)
     {

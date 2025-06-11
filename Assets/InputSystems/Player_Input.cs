@@ -101,7 +101,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""Cam Movement"",
+                    ""name"": ""CamMovement"",
                     ""type"": ""Value"",
                     ""id"": ""75fe9429-38e8-494c-8373-3d46c687a083"",
                     ""expectedControlType"": ""Vector2"",
@@ -113,7 +113,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""name"": ""Sprint"",
                     ""type"": ""Button"",
                     ""id"": ""e25e34b7-8a92-4517-9862-7dfa3a13ddb6"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -131,7 +131,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""name"": ""Aim"",
                     ""type"": ""Button"",
                     ""id"": ""6b6a7123-9a5b-43c0-afbc-5792392b8871"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -158,7 +158,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""name"": ""Confirm"",
                     ""type"": ""Button"",
                     ""id"": ""40577fa8-23c7-446a-b0d5-316efdc40d46"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": ""Press"",
                     ""initialStateCheck"": false
@@ -336,7 +336,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Cam Movement"",
+                    ""action"": ""CamMovement"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -347,7 +347,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard"",
-                    ""action"": ""Cam Movement"",
+                    ""action"": ""CamMovement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -358,7 +358,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard"",
-                    ""action"": ""Cam Movement"",
+                    ""action"": ""CamMovement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -369,7 +369,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard"",
-                    ""action"": ""Cam Movement"",
+                    ""action"": ""CamMovement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -380,7 +380,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard"",
-                    ""action"": ""Cam Movement"",
+                    ""action"": ""CamMovement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -391,7 +391,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Cam Movement"",
+                    ""action"": ""CamMovement"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -402,7 +402,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""Cam Movement"",
+                    ""action"": ""CamMovement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -413,7 +413,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""Cam Movement"",
+                    ""action"": ""CamMovement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -424,7 +424,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""Cam Movement"",
+                    ""action"": ""CamMovement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -435,7 +435,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""Cam Movement"",
+                    ""action"": ""CamMovement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -683,6 +683,17 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""07a5f4bb-ec63-4ceb-b785-818903fcb856"",
+                    ""path"": ""<Keyboard>/backspace"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""Back"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""6926fe66-378b-4eab-aca6-50b7a2bf1fdd"",
                     ""path"": ""<Gamepad>/buttonEast"",
                     ""interactions"": """",
@@ -728,7 +739,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
         // Base
         m_Base = asset.FindActionMap("Base", throwIfNotFound: true);
         m_Base_Movement = m_Base.FindAction("Movement", throwIfNotFound: true);
-        m_Base_CamMovement = m_Base.FindAction("Cam Movement", throwIfNotFound: true);
+        m_Base_CamMovement = m_Base.FindAction("CamMovement", throwIfNotFound: true);
         m_Base_Sprint = m_Base.FindAction("Sprint", throwIfNotFound: true);
         m_Base_Fire = m_Base.FindAction("Fire", throwIfNotFound: true);
         m_Base_Aim = m_Base.FindAction("Aim", throwIfNotFound: true);
@@ -1097,7 +1108,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMovement(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Cam Movement" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "CamMovement" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />

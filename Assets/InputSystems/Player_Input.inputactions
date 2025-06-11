@@ -15,7 +15,7 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Cam Movement",
+                    "name": "CamMovement",
                     "type": "Value",
                     "id": "75fe9429-38e8-494c-8373-3d46c687a083",
                     "expectedControlType": "Vector2",
@@ -27,7 +27,7 @@
                     "name": "Sprint",
                     "type": "Button",
                     "id": "e25e34b7-8a92-4517-9862-7dfa3a13ddb6",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -45,7 +45,7 @@
                     "name": "Aim",
                     "type": "Button",
                     "id": "6b6a7123-9a5b-43c0-afbc-5792392b8871",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -72,7 +72,7 @@
                     "name": "Confirm",
                     "type": "Button",
                     "id": "40577fa8-23c7-446a-b0d5-316efdc40d46",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "Press",
                     "initialStateCheck": false
@@ -250,7 +250,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Cam Movement",
+                    "action": "CamMovement",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -261,7 +261,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",
-                    "action": "Cam Movement",
+                    "action": "CamMovement",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -272,7 +272,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",
-                    "action": "Cam Movement",
+                    "action": "CamMovement",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -283,7 +283,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",
-                    "action": "Cam Movement",
+                    "action": "CamMovement",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -294,7 +294,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",
-                    "action": "Cam Movement",
+                    "action": "CamMovement",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -305,7 +305,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Cam Movement",
+                    "action": "CamMovement",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -316,7 +316,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Cam Movement",
+                    "action": "CamMovement",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -327,7 +327,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Cam Movement",
+                    "action": "CamMovement",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -338,7 +338,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Cam Movement",
+                    "action": "CamMovement",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -349,7 +349,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Cam Movement",
+                    "action": "CamMovement",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -592,6 +592,17 @@
                     "processors": "",
                     "groups": ";Gamepad",
                     "action": "Menu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "07a5f4bb-ec63-4ceb-b785-818903fcb856",
+                    "path": "<Keyboard>/backspace",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard",
+                    "action": "Back",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

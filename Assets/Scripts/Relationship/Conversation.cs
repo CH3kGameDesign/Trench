@@ -63,7 +63,7 @@ public class Conversation : MonoBehaviour
             {
                 RagdollManager rm = Instantiate(c.PF_ragdoll, c_speakerCamera.transform);
 
-                rm.transform.localPosition = new Vector3(0,-1.5f,8f);
+                rm.transform.localPosition = new Vector3(0,-1.5f,10f);
                 rm.transform.localPosition += Vector3.forward * i;
 
                 if (_left)

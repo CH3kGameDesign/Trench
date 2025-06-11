@@ -1,14 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.Collections;
 using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using static UnityEngine.GraphicsBuffer;
 
 public class PlayerController : BaseController
 {
@@ -21,6 +18,7 @@ public class PlayerController : BaseController
     {
         public RadialMenu RM_radial;
         public TextMeshProUGUI TM_interactText;
+        public TextMeshProUGUI TM_controlText;
         public Slider S_healthSlider;
         public TextMeshProUGUI TM_healthText;
         public Image I_curWeapon;
@@ -32,7 +30,6 @@ public class PlayerController : BaseController
         public SpeedLines speedLines;
         public SpeedLines hurtFace;
     }
-
     [Header ("Camera Values")]
     public float F_camLatSpeed = 1;
     public float F_camRotSpeed = 240f;
@@ -112,6 +109,7 @@ public class PlayerController : BaseController
     [HideInInspector] public inputClass Inputs = new inputClass();
     public class inputClass
     {
+        public string s_inputType = "";
         public bool b_isGamepad = false;
         public Vector2 v2_inputDir;
         public Vector2 v2_camInputDir;
@@ -125,6 +123,8 @@ public class PlayerController : BaseController
         public bool b_reload = false;
         public bool b_radial = false;
         public bool b_melee = false;
+
+        public PlayerInput playerInput;
 
         public bool IsInput()
         {
@@ -140,8 +140,24 @@ public class PlayerController : BaseController
                 b_radial ||
                 b_melee;
         }
-
-        public string[] s_inputStrings = new string[2];
+        public string[] inputs = new string[0];
+    }
+    public enum inputActions
+    {
+        Movement,
+        CamMovement,
+        Sprint,
+        Fire,
+        Aim,
+        Jump,
+        Interact,
+        Confirm,
+        Crouch,
+        Reload,
+        RadialMenu,
+        Melee,
+        Menu,
+        Back
     }
 
     [HideInInspector] public Interactable I_curInteractable = null;
@@ -154,6 +170,8 @@ public class PlayerController : BaseController
         Instance = this;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        Setup_InteractStrings();
     }
 
     public override void Start()
@@ -175,7 +193,6 @@ public class PlayerController : BaseController
         Setup_Camera();
         Setup_Consumables();
         Setup_Radial();
-        Setup_InteractStrings();
         Update_Objectives();
 
         ArmorManager.EquipArmor_Static(RM_ragdoll, SaveData.equippedArmor);
@@ -201,14 +218,24 @@ public class PlayerController : BaseController
 
     void Setup_InteractStrings()
     {
-        PlayerInput playerInput = GetComponent<PlayerInput>();
-        string[] _temp = {
-            playerInput.actions.FindAction("Interact").GetBindingDisplayString(0).Remove(0,6),
-            playerInput.actions.FindAction("Interact").GetBindingDisplayString(1),
-            playerInput.actions.FindAction("Jump").GetBindingDisplayString(0),
-            playerInput.actions.FindAction("Jump").GetBindingDisplayString(1),
-        };
-        Inputs.s_inputStrings = _temp;
+        if (Instance != null) Instance = this;
+        Inputs.playerInput = GetComponent<PlayerInput>();
+
+        TextMeshProUGUI _TM = Ref.TM_controlText;
+        _TM.SetupInputSpriteSheet();
+        Interactable.enumType _E = Interactable.enumType.input;
+        List<string> _list = new List<string>();
+        string _body = "";
+        string[] _names = System.Enum.GetNames(typeof(inputActions));
+        for (int i = 0; i < _names.Length; i++)
+        {
+            string _input = "".ToString_InputSetup((inputActions)i, _E);
+            _list.Add(_input);
+            _body += _names[i].ToString_Interact(_input,Interactable.enumType.combineReverse) + "\n";
+        }
+        Inputs.inputs = _list.ToArray();
+        _body = _body.Remove(_body.Length - 1, 1);
+        _TM.text = _body;
     }
 
     void Setup_Consumables()
@@ -498,8 +525,7 @@ public class PlayerController : BaseController
                 if (_interact != I_curInteractable)
                 {
                     I_curInteractable = _interact;
-                    int _controlScheme = Inputs.b_isGamepad ? 1 : 0;
-                    string _temp = I_curInteractable.S_interactName.ToString_Input(Inputs.s_inputStrings[_controlScheme], _interact.I_type);
+                    string _temp = I_curInteractable.S_interactName.ToString_Input(inputActions.Interact, Ref.TM_interactText, _interact.I_type);
                     Ref.TM_interactText.gameObject.SetActive(true);
                     Ref.TM_interactText.text = _temp;
 
@@ -516,8 +542,7 @@ public class PlayerController : BaseController
                     if (_bc != BC_curBaseController && _bc.F_curHealth <= 0)
                     {
                         BC_curBaseController = _bc;
-                        int _controlScheme = Inputs.b_isGamepad ? 1 : 0;
-                        string _temp = _bc.name.ToString_Input(Inputs.s_inputStrings[_controlScheme], Interactable.enumType.interact);
+                        string _temp = _bc.name.ToString_Input(inputActions.Interact, Ref.TM_interactText, Interactable.enumType.interact);
                         Ref.TM_interactText.gameObject.SetActive(true);
                         Ref.TM_interactText.text = _temp;
 
@@ -564,8 +589,7 @@ public class PlayerController : BaseController
                 if (_landingSpot != I_curLandingSpot)
                 {
                     I_curLandingSpot = _landingSpot;
-                    int _controlScheme = Inputs.b_isGamepad ? 3 : 2;
-                    string _temp = _landingSpot.landingName.ToString_Input(Inputs.s_inputStrings[_controlScheme], Interactable.enumType.landing);
+                    string _temp = _landingSpot.landingName.ToString_Input(inputActions.Jump, Ref.TM_interactText, Interactable.enumType.landing);
                     Ref.TM_interactText.gameObject.SetActive(true);
                     Ref.TM_interactText.text = _temp;
                 }
@@ -1182,8 +1206,10 @@ public class PlayerController : BaseController
 
     public void Input_ChangedInput(PlayerInput input)
     {
+        Inputs.s_inputType = input.devices[0].displayName;
         Inputs.b_isGamepad = input.currentControlScheme == "Gamepad";
         MainMenu.Instance.GamepadSwitch();
+        Setup_InteractStrings();
     }
 
     bool Input_GetPressed(InputAction.CallbackContext cxt)

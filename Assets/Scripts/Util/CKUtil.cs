@@ -1,14 +1,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Collections;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.ProBuilder.Shapes;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
-using static UnityEditor.Experimental.GraphView.GraphView;
+using UnityEngine.Windows;
 
 public static class CKUtil
 {
@@ -38,16 +40,126 @@ public static class CKUtil
         }
         return _temp;
     }
-
-    public static string ToString_Input(this string _interactable, string _input, Interactable.enumType _type = Interactable.enumType.interact)
+    public static string ToString_InputSetup(this string _interactable, PlayerController.inputActions _input, Interactable.enumType _type = Interactable.enumType.interact)
     {
-
+        PlayerController.inputClass _IC = PlayerController.Instance.Inputs;
+        string _sprite = _IC.playerInput.actions.FindAction(_input.SelectedName(false)).GetBindingDisplayString(0, _IC.b_isGamepad ? "Gamepad": "Keyboard");
+        if (_sprite.Length > 6)
+            if (_sprite.Substring(0, 6) == "Press ")
+                _sprite = _sprite.Remove(0, 6);
+        switch (_input)
+        {
+            case PlayerController.inputActions.Movement:
+                switch (_IC.s_inputType)
+                {
+                    case "Keyboard":
+                        _sprite = "mousekeyboard_key_WASD";
+                        break;
+                    case "PlayStation Controller":
+                        _sprite = "ps5_stick_left";
+                        break;
+                    case "Switch Pro Controller":
+                        _sprite = "switch_stick_left";
+                        break;
+                    case "Steam Controller":
+                        _sprite = "steamdeck_stick_left";
+                        break;
+                    default:
+                        _sprite = "xbox_series_stick_left";
+                        break;
+                }
+                break;
+            case PlayerController.inputActions.CamMovement:
+                switch (_IC.s_inputType)
+                {
+                    case "Keyboard":
+                        _sprite = "mousekeyboard_mouse_simple";
+                        break;
+                    case "PlayStation Controller":
+                        _sprite = "ps5_stick_right";
+                        break;
+                    case "Switch Pro Controller":
+                        _sprite = "switch_stick_right";
+                        break;
+                    case "Steam Controller":
+                        _sprite = "steamdeck_stick_right";
+                        break;
+                    default:
+                        _sprite = "xbox_series_stick_right";
+                        break;
+                }
+                break;
+            default:
+                switch (_IC.s_inputType)
+                {
+                    case "Keyboard":
+                        _sprite = "mousekeyboard_key_" + _sprite;
+                        break;
+                    case "PlayStation Controller":
+                        _sprite = "ps5_button_" + _sprite;
+                        break;
+                    case "Switch Pro Controller":
+                        _sprite = "switch_button_" + _sprite;
+                        break;
+                    case "Steam Controller":
+                        _sprite = "steamdeck_button_" + _sprite;
+                        break;
+                    default:
+                        _sprite = "xbox_series_button_" + _sprite;
+                        break;
+                }
+                break;
+        }
+        
+        string _temp = Interactable.interactText[(int)_type];
+        _temp = _temp.Replace("[0]", _sprite.ToSprite());
+        _temp = _temp.Replace("[1]", _interactable);
+        return _temp;
+    }
+    public static void SetupInputSpriteSheet(this TMP_Text _TM)
+    {
+        PlayerController.inputClass _IC = PlayerController.Instance.Inputs;
+        switch (_IC.s_inputType)
+        {
+            case "Keyboard":
+                _TM.spriteAsset = MainMenu.Instance.input.SA_keyboard;
+                break;
+            case "PlayStation Controller":
+                _TM.spriteAsset = MainMenu.Instance.input.SA_ps;
+                break;
+            case "Switch Pro Controller":
+                _TM.spriteAsset = MainMenu.Instance.input.SA_switch;
+                break;
+            case "Steam Controller":
+                _TM.spriteAsset = MainMenu.Instance.input.SA_steamDeck;
+                break;
+            default:
+                _TM.spriteAsset = MainMenu.Instance.input.SA_xbox;
+                break;
+        }
+    }
+    public static string ToString_Input(this string _interactable, PlayerController.inputActions _input, TMP_Text _TM, Interactable.enumType _type = Interactable.enumType.interact)
+    {
+        PlayerController.inputClass _IC = PlayerController.Instance.Inputs;
+        string _sprite = _IC.inputs[(int)_input];
+        _TM.SetupInputSpriteSheet();
+        string _temp = Interactable.interactText[(int)_type];
+        _temp = _temp.Replace("[0]", _sprite);
+        _temp = _temp.Replace("[1]", _interactable);
+        return _temp;
+    }
+    public static string ToSprite(this string _string)
+    {
+        _string = "<sprite name=\"" + _string + "\">";
+        return _string;
+    }
+    public static string ToString_Interact(this string _interactable, string _input, Interactable.enumType _type = Interactable.enumType.interact)
+    {
         string _temp = Interactable.interactText[(int)_type];
         _temp = _temp.Replace("[0]", _input);
         _temp = _temp.Replace("[1]", _interactable);
         return _temp;
     }
-
     public static bool CheckEntry(this LevelGen_Block.entryTypeEnum _entry, LevelGen_Block.entryTypeEnum _exit)
     {
         switch (_entry)
