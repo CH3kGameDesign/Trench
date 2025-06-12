@@ -14,7 +14,8 @@ public class SpaceGenerator : MonoBehaviour
 
     void Generate()
     {
-        GameObject GO = Instantiate(SpaceManager.Instance.sectorPrefabs[0, 0, 0].gameObject, transform);
+        SpaceSegment GO = Instantiate(SpaceManager.Instance.sectorPrefabs[0, 0, 0], transform);
+        GO.Setup();
     }
 
     public bool GetExitPos(out Vector3 _pos,string _id)

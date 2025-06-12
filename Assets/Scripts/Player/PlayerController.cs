@@ -123,6 +123,7 @@ public class PlayerController : BaseController
         public bool b_reload = false;
         public bool b_radial = false;
         public bool b_melee = false;
+        public bool b_purchase = false;
 
         public PlayerInput playerInput;
 
@@ -138,7 +139,8 @@ public class PlayerController : BaseController
                 b_crouch ||
                 b_reload ||
                 b_radial ||
-                b_melee;
+                b_melee ||
+                b_purchase;
         }
         public string[] inputs = new string[0];
     }
@@ -151,13 +153,16 @@ public class PlayerController : BaseController
         Aim,
         Jump,
         Interact,
-        Confirm,
         Crouch,
         Reload,
         RadialMenu,
         Melee,
         Menu,
-        Back
+        Confirm,
+        Back,
+        LeftTab,
+        RightTab,
+        Purchase
     }
 
     [HideInInspector] public Interactable I_curInteractable = null;
@@ -195,7 +200,7 @@ public class PlayerController : BaseController
 
         ArmorManager.EquipArmor_Static(RM_ragdoll, SaveData.equippedArmor);
 
-        GameState = gameStateEnum.active;
+        GameState_Change(gameStateEnum.active);
         base.Start();
     }
 
@@ -224,11 +229,13 @@ public class PlayerController : BaseController
         List<string> _list = new List<string>();
         string _body = "";
         string[] _names = System.Enum.GetNames(typeof(inputActions));
+        int mainAmt = Inputs.playerInput.actions.actionMaps[0].actions.Count;
         for (int i = 0; i < _names.Length; i++)
         {
             string _input = "".ToString_InputSetup((inputActions)i, _E);
             _list.Add(_input);
-            _body += _names[i].ToString_Interact(_input,Interactable.enumType.combineReverse) + "\n";
+            if (i < mainAmt)
+                _body += _names[i].ToString_Interact(_input, Interactable.enumType.combineReverse) + "\n";
         }
         Inputs.inputs = _list.ToArray();
         _body = _body.Remove(_body.Length - 1, 1);
@@ -1186,6 +1193,26 @@ public class PlayerController : BaseController
     }
 
     #region Input Actions
+    public override void GameState_Change(gameStateEnum _state)
+    {
+        switch (_state)
+        {
+            case gameStateEnum.dialogue:
+                Inputs.playerInput.SwitchCurrentActionMap("Menu");
+                break;
+            case gameStateEnum.dialogueResponse:
+                Inputs.playerInput.SwitchCurrentActionMap("Menu");
+                break;
+            case gameStateEnum.menu:
+                Inputs.playerInput.SwitchCurrentActionMap("Menu");
+                break;
+            default:
+                Inputs.playerInput.SwitchCurrentActionMap("Base");
+                break;
+        }
+        base.GameState_Change(_state);
+    }
+
     public void Input_Movement(InputAction.CallbackContext cxt) { Inputs.v2_inputDir = Input_GetVector2(cxt); }
     public void Input_CamMovement(InputAction.CallbackContext cxt) { Inputs.v2_camInputDir = Input_GetVector2(cxt); }
     public void Input_Sprint(InputAction.CallbackContext cxt) { Inputs.b_sprinting = Input_GetPressed(cxt); }
@@ -1199,19 +1226,39 @@ public class PlayerController : BaseController
     public void Input_Radial(InputAction.CallbackContext cxt) { Inputs.b_radial = Input_GetPressed(cxt); }
     public void Input_Melee(InputAction.CallbackContext cxt) { Inputs.b_melee = Input_GetPressed(cxt); }
     public void Input_Menu(InputAction.CallbackContext cxt) { if (cxt.phase == InputActionPhase.Started) MainMenu.Instance.Menu_Tapped(); }
+
+    public void Input_Purchase(InputAction.CallbackContext cxt)
+    {
+        Inputs.b_purchase = Input_GetPressed(cxt);
+        if (cxt.phase == InputActionPhase.Started)
+            if (GameState == gameStateEnum.menu)
+                MainMenu.Instance.Purchase_Pressed();
+    }
     public void Input_Back(InputAction.CallbackContext cxt)
     {
         if (cxt.phase == InputActionPhase.Started)
             if (GameState == gameStateEnum.menu)
                 MainMenu.Instance.BackButton();
     }
+    public void Input_LeftTab(InputAction.CallbackContext cxt)
+    {
+        if (cxt.phase == InputActionPhase.Started)
+            if (GameState == gameStateEnum.menu)
+                MainMenu.Instance.Tab_Switch(true);
+    }
+    public void Input_RightTab(InputAction.CallbackContext cxt)
+    {
+        if (cxt.phase == InputActionPhase.Started)
+            if (GameState == gameStateEnum.menu)
+                MainMenu.Instance.Tab_Switch(false);
+    }
 
     public void Input_ChangedInput(PlayerInput input)
     {
         Inputs.s_inputType = input.devices[0].displayName;
         Inputs.b_isGamepad = input.currentControlScheme == "Gamepad";
-        MainMenu.Instance.GamepadSwitch();
         Setup_InteractStrings();
+        MainMenu.Instance.GamepadSwitch();
     }
 
     bool Input_GetPressed(InputAction.CallbackContext cxt)

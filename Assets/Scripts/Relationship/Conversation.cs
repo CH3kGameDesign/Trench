@@ -245,7 +245,7 @@ public class Conversation : MonoBehaviour
             }
             else
                 HideDialogueChoices(false);
-            PlayerController.GameState = PlayerController.gameStateEnum.dialogue;
+            PlayerController.Instance.GameState_Change(PlayerController.gameStateEnum.dialogue);
 
             A_speaker_L.PlayClip("Transition_Inactive");
             A_speaker_R.PlayClip("Transition_New");
@@ -287,7 +287,7 @@ public class Conversation : MonoBehaviour
 
     void ShowDialogueChoices()
     {
-        PlayerController.GameState = PlayerController.gameStateEnum.dialogueResponse;
+        PlayerController.Instance.GameState_Change(PlayerController.gameStateEnum.dialogueResponse);
         A_speaker_L.PlayClip("Transition_New");
         A_speaker_R.PlayClip("Transition_Inactive");
         A_bouncer.Play("Idle_Hidden");
@@ -399,7 +399,7 @@ public class Conversation : MonoBehaviour
         StartCoroutine(CG_dialogueHolder.Fade(false));
         StartCoroutine(V_dialogueVolume.Fade(false));
         StartCoroutine(CG_banterHolder.Fade(true));
-        PlayerController.GameState = PlayerController.gameStateEnum.active;
+        PlayerController.Instance.GameState_Change(PlayerController.gameStateEnum.active);
     }
     void TypeMessage()
     {

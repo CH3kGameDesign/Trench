@@ -68,6 +68,14 @@ public class Bullet : DamageSource
     public void HitPoint(RaycastHit hit)
     {
         GameObject GO = Instantiate(B_info.PF_impactHit, hit.point, B_info.PF_impactHit.transform.rotation);
+        Explosion _exp;
+        if (GO.TryGetComponent<Explosion>(out _exp))
+        {
+            if (B_info.B_player)
+                _exp.OnCreate(B_info.con_Player, B_info.con_Gun);
+            else
+                _exp.OnCreate(B_info.con_Agent, B_info.con_Gun);
+        }
         GO.transform.forward = hit.normal;
         GO.transform.parent = hit.transform;
     }

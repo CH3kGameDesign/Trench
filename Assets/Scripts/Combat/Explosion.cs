@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Explosion : DamageSource
@@ -29,6 +30,19 @@ public class Explosion : DamageSource
             B_info = _classOverride;
     }
 
+    public void OnCreate(PlayerController _player, GunClass _gun)
+    {
+        B_info.con_Gun = _gun;
+        B_info.B_player = true;
+        B_info.con_Player = _player;
+    }
+    public void OnCreate(AgentController _agent, GunClass _gun)
+    {
+        B_info.con_Gun = _gun;
+        B_info.B_player = false;
+        B_info.con_Agent = _agent;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         for (int i = 0; i < g_affectedObjects.Count; i++)
@@ -36,7 +50,17 @@ public class Explosion : DamageSource
             if (other.gameObject == g_affectedObjects[i])
                 return;
         }
-        g_affectedObjects.Add(other.gameObject);
+        HitObject HO;
+        if(other.TryGetComponent<HitObject>(out HO))
+        {
+            if (HO.RM_ragdollManager != null)
+            {
+                foreach (var item in HO.RM_ragdollManager.C_colliders)
+                    g_affectedObjects.Add(item.gameObject);
+            }
+        }
+        else
+            g_affectedObjects.Add(other.gameObject);
         Damage(other);
     }
 
@@ -55,6 +79,12 @@ public class Explosion : DamageSource
             GunManager.bulletClass _bc = B_info.Clone();
             _bc.F_damage = _damage;
             _ho.OnDamage(_bc, this);
+
+            if (B_info.B_player)
+            {
+                B_info.con_Gun.Damage_Objective(Mathf.FloorToInt(_damage));
+                B_info.con_Player.Update_Objectives(Objective_Type.Damage_Explosions, Mathf.FloorToInt(_damage));
+            }
         }
     }
 }

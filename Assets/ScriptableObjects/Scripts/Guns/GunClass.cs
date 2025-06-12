@@ -303,4 +303,19 @@ public class GunClass : ItemClass
         PlayerController.Instance.DebugGunList();
         PlayerController.Instance.Setup_Radial();
     }
+
+    public void Damage_Objective(int _damage = -1)
+    {
+        if (b_playerGun)
+        {
+            if (_damage < 0) _damage = Mathf.FloorToInt(fireVariables.damage);
+            switch (_id)
+            {
+                case "gun_Rifle": PM_player.Update_Objectives(Objective_Type.Damage_Rifle, _damage); break;
+                case "gun_Rod": PM_player.Update_Objectives(Objective_Type.Damage_Rod, _damage); break;
+                case "gun_Rocket": PM_player.Update_Objectives(Objective_Type.Damage_RPG, _damage); break;
+                default: break;
+            }
+        }
+    }
 }

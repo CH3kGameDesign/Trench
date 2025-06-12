@@ -19,48 +19,126 @@ MonoBehaviour:
       _id: 
       description: 
       image: {fileID: 0}
-    amt: 0
-    total: 5
-  - _type: 0
-    _resource: 0
-    type:
+    resource:
       _id: 
-      description: 
+      _name: 
       image: {fileID: 0}
+      model: {fileID: 0}
     amt: 0
     total: 10
+    completed: 0
   - _type: 1
     _resource: 0
     type:
       _id: 
       description: 
       image: {fileID: 0}
-    amt: 0
-    total: 100
-  - _type: 1
-    _resource: 0
-    type:
+    resource:
       _id: 
-      description: 
+      _name: 
       image: {fileID: 0}
+      model: {fileID: 0}
     amt: 0
     total: 300
+    completed: 0
   - _type: 2
     _resource: 0
     type:
       _id: 
       description: 
       image: {fileID: 0}
+    resource:
+      _id: 
+      _name: 
+      image: {fileID: 0}
+      model: {fileID: 0}
     amt: 0
-    total: 2
+    total: 5
+    completed: 0
   - _type: 2
+    _resource: 1
+    type:
+      _id: 
+      description: 
+      image: {fileID: 0}
+    resource:
+      _id: 
+      _name: 
+      image: {fileID: 0}
+      model: {fileID: 0}
+    amt: 0
+    total: 5
+    completed: 0
+  - _type: 3
     _resource: 0
     type:
       _id: 
       description: 
       image: {fileID: 0}
+    resource:
+      _id: 
+      _name: 
+      image: {fileID: 0}
+      model: {fileID: 0}
     amt: 0
-    total: 4
+    total: 5
+    completed: 0
+  - _type: 4
+    _resource: 0
+    type:
+      _id: 
+      description: 
+      image: {fileID: 0}
+    resource:
+      _id: 
+      _name: 
+      image: {fileID: 0}
+      model: {fileID: 0}
+    amt: 0
+    total: 1000
+    completed: 0
+  - _type: 5
+    _resource: 0
+    type:
+      _id: 
+      description: 
+      image: {fileID: 0}
+    resource:
+      _id: 
+      _name: 
+      image: {fileID: 0}
+      model: {fileID: 0}
+    amt: 0
+    total: 1000
+    completed: 0
+  - _type: 6
+    _resource: 0
+    type:
+      _id: 
+      description: 
+      image: {fileID: 0}
+    resource:
+      _id: 
+      _name: 
+      image: {fileID: 0}
+      model: {fileID: 0}
+    amt: 0
+    total: 1000
+    completed: 0
+  - _type: 7
+    _resource: 0
+    type:
+      _id: 
+      description: 
+      image: {fileID: 0}
+    resource:
+      _id: 
+      _name: 
+      image: {fileID: 0}
+      model: {fileID: 0}
+    amt: 0
+    total: 1000
+    completed: 0
   types:
   - _id: Kill/Any
     description: Defeat Enemies
@@ -71,3 +149,18 @@ MonoBehaviour:
   - _id: Collect/Resource
     description: 'Collect '
     image: {fileID: 21300000, guid: 299ba41030d7a36409e6380e9317c890, type: 3}
+  - _id: Collect/Enemy
+    description: Collect Enemy Bodies
+    image: {fileID: 21300000, guid: 299ba41030d7a36409e6380e9317c890, type: 3}
+  - _id: Damage/Rifle
+    description: Damage Enemies with Rifle
+    image: {fileID: 21300000, guid: 760affdb2aeb03c4bbae9fccc64c19fb, type: 3}
+  - _id: Damage/Rod
+    description: Damage Enemies with Rod Gun
+    image: {fileID: 21300000, guid: 01e5895c7333a544c9475e84a981ec48, type: 3}
+  - _id: Damage/RPG
+    description: Damage Enemies with RPG
+    image: {fileID: 21300000, guid: 31d5c220e24d4b14f8af325bbcc10ac7, type: 3}
+  - _id: Damage/Explosions
+    description: Damage Enemies with Explosions
+    image: {fileID: 21300000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}

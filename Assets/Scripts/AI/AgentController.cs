@@ -454,6 +454,7 @@ public class AgentController : BaseController
             }
             if (IsHostile())
             {
+                _bullet.con_Gun.Damage_Objective(Mathf.FloorToInt(_bullet.F_damage));
                 attackTarget.FollowPlayer(_bullet.con_Player);
                 if (state == stateEnum.patrol)
                 {
@@ -506,7 +507,11 @@ public class AgentController : BaseController
         else
         {
             if (_bullet.con_Agent != null)
+            {
                 _bullet.con_Agent.TargetDead();
+                if (_bullet.con_Agent.b_friendly)
+                    _bullet.con_Player.Update_Objectives(Objective_Type.Kill_Any, 1);
+            }
         }
         ResourceDrop.Drop(T_model.position);
         state = stateEnum.ragdoll;

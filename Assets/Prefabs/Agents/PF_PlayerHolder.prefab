@@ -2106,7 +2106,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -50, y: 50}
+  m_AnchoredPosition: {x: -10, y: 10}
   m_SizeDelta: {x: 200, y: 280}
   m_Pivot: {x: 1, y: 0}
 --- !u!222 &8668565438956127543
@@ -2172,7 +2172,7 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 4
-  m_VerticalAlignment: 256
+  m_VerticalAlignment: 1024
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -3420,10 +3420,10 @@ MonoBehaviour:
   V3_camOffset_Crouch: {x: 1, y: 0, z: -1.5}
   LM_CameraRay:
     serializedVersion: 2
-    m_Bits: 16449
+    m_Bits: 147521
   LM_GunRay:
     serializedVersion: 2
-    m_Bits: 19137
+    m_Bits: 150209
   LM_AutoAimRay:
     serializedVersion: 2
     m_Bits: 2048
@@ -3600,22 +3600,6 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 668208048646576681}
         m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: Input_Confirm
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-    m_ActionId: 40577fa8-23c7-446a-b0d5-316efdc40d46
-    m_ActionName: 'Base/Confirm[/Mouse/leftButton]'
-  - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 668208048646576681}
-        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
         m_MethodName: Input_Crouch
         m_Mode: 0
         m_Arguments:
@@ -3696,6 +3680,22 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 668208048646576681}
         m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: Input_Confirm
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 3846dc8e-19dc-4ce6-9c16-731dc8162dbc
+    m_ActionName: 'Menu/Confirm[/Mouse/leftButton,/XInputControllerWindows/buttonSouth]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 668208048646576681}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
         m_MethodName: Input_Back
         m_Mode: 0
         m_Arguments:
@@ -3706,8 +3706,88 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-    m_ActionId: 698df57b-b9ec-4653-bab5-632d6f2df0a5
-    m_ActionName: 'Base/Back[/XInputControllerWindows/buttonEast]'
+    m_ActionId: f45707ae-e1e2-49b0-857a-c4c345c4ae2a
+    m_ActionName: 'Menu/Back[/Keyboard/backspace,/XInputControllerWindows/buttonEast]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 668208048646576681}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: Input_LeftTab
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: cea49d05-4ddd-43e2-8c34-574cdbf7ddbf
+    m_ActionName: 'Menu/LeftTab[/Keyboard/q,/XInputControllerWindows/leftShoulder]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 668208048646576681}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: Input_RightTab
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: eec46c12-13a9-40cf-aafe-5c2a16c87cce
+    m_ActionName: 'Menu/RightTab[/Keyboard/e,/XInputControllerWindows/rightShoulder]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 668208048646576681}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: Input_Purchase
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: a7de8ba4-fda2-4b50-88de-1962ac2392f8
+    m_ActionName: 'Menu/Purchase[/Keyboard/space,/XInputControllerWindows/buttonWest]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 668208048646576681}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: Input_Movement
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 7f50945a-eb8e-41af-9961-8db751cc91a1
+    m_ActionName: 'Menu/Movement[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d,/XInputControllerWindows/leftStick/up,/XInputControllerWindows/leftStick/down,/XInputControllerWindows/leftStick/left,/XInputControllerWindows/leftStick/right]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 668208048646576681}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: Input_Menu
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 878897ed-3ed1-4866-bf89-707930a902dd
+    m_ActionName: 'Menu/Menu[/Keyboard/escape,/XInputControllerWindows/start]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Base

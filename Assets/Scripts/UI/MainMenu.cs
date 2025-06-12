@@ -9,6 +9,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
+using UnityEngine.Windows;
 
 public class MainMenu : MonoBehaviour
 {
@@ -107,6 +108,11 @@ public class MainMenu : MonoBehaviour
 
         public TextMeshProUGUI TM_cost;
         public TextMeshProUGUI TM_currency;
+        [Space (10)]
+        public TextMeshProUGUI TM_leftTab;
+        public TextMeshProUGUI TM_rightTab;
+        public TextMeshProUGUI TM_purchase;
+        [Space(10)]
 
         public Image I_purchaseButton;
 
@@ -142,6 +148,15 @@ public class MainMenu : MonoBehaviour
             BG.Setup(UpdateGrid_Consumable, Store.consumableIcon, Color.white);
 
             UpdateGrid_Guns();
+        }
+        public List<Action> ActionList()
+        {
+            return new List<Action>()
+            {
+                UpdateGrid_Guns,
+                UpdateGrid_Armor,
+                UpdateGrid_Consumable
+            };
         }
         public void UpdateGrid_Guns()
         {
@@ -490,11 +505,27 @@ public class MainMenu : MonoBehaviour
         if (close == 2)
             Close();
     }
-
-    void ButtonHit()
+    public void Tab_Switch(bool _left)
     {
-        if (!PlayerController.Instance.Inputs.b_isGamepad)
-            EventSystem.current.SetSelectedGameObject(null);
+        if (menuOpen)
+        {
+            if (_current == store)
+            {
+                List<Action> _actions = store.ActionList();
+                int _tab = Mathf.Clamp((int)store._activeTab + (_left ? -1 : 1), 0, _actions.Count - 1);
+                _actions[_tab].Invoke();
+            }
+        }
+    }
+    public void Purchase_Pressed()
+    {
+        if (menuOpen)
+        {
+            if (_current == store)
+            {
+                PurchaseItem();
+            }
+        }
     }
     public void GamepadSwitch(bool _back = false)
     {
@@ -514,6 +545,15 @@ public class MainMenu : MonoBehaviour
                 Cursor.visible = false;
             }
         }
+        GamepadUpdate();
+    }
+
+    public void GamepadUpdate()
+    {
+        store.TM_leftTab.text = "".ToString_Input(PlayerController.inputActions.LeftTab, store.TM_leftTab, Interactable.enumType.input);
+        store.TM_rightTab.text = "".ToString_Input(PlayerController.inputActions.RightTab, store.TM_rightTab, Interactable.enumType.input);
+
+        store.TM_purchase.text = "Get".ToString_Input(PlayerController.inputActions.Purchase, store.TM_purchase, Interactable.enumType.combine);
     }
 
     
