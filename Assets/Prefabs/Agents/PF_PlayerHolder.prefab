@@ -2357,6 +2357,7 @@ GameObject:
   - component: {fileID: 2806240414845446853}
   - component: {fileID: 748759331089592094}
   - component: {fileID: 5634573469513103511}
+  - component: {fileID: 4687438752052238142}
   m_Layer: 3
   m_Name: Mover
   m_TagString: Player
@@ -2452,6 +2453,19 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4687438752052238142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4218579458554171712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffc2e457bb23a924292e9415ad1b005c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controller: {fileID: 668208048646576681}
 --- !u!1 &4348839166574037118
 GameObject:
   m_ObjectHideFlags: 0
@@ -3392,6 +3406,7 @@ MonoBehaviour:
   - {fileID: 0}
   b_alive: 1
   b_grounded: 0
+  I_curRoom: -1
   gunManager: {fileID: 11400000, guid: 1e3b59fdefa93a743beff3357901afa0, type: 2}
   Ref:
     RM_radial: {fileID: 4998445071879505069}

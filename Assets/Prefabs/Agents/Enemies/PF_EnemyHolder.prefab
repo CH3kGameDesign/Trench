@@ -57,7 +57,7 @@ MonoBehaviour:
   T_surface: {fileID: 0}
   LM_TerrainRay:
     serializedVersion: 2
-    m_Bits: 279104
+    m_Bits: 16960
   F_maxHealth: 100
   F_curHealth: 100
   gun_Equipped: {fileID: 0}
@@ -67,6 +67,7 @@ MonoBehaviour:
   - {fileID: 0}
   b_alive: 1
   b_grounded: 0
+  I_curRoom: -1
   gunManager: {fileID: 11400000, guid: 1e3b59fdefa93a743beff3357901afa0, type: 2}
   fieldOfView: {fileID: 6328522580476208218}
   S_characterID: Lido_Police
@@ -93,7 +94,7 @@ MonoBehaviour:
   T_targetTransforms: []
   LM_hitScan:
     serializedVersion: 2
-    m_Bits: 278529
+    m_Bits: 16385
   A_model: {fileID: 7364725358455803264}
   Armor:
     helmet: {fileID: 11400000, guid: d8c9879be0f8c1748bd7a732046358da, type: 2}
@@ -113,6 +114,13 @@ MonoBehaviour:
   DEBUG_EquippedGunNum: -1
   DEBUG_FollowPlayerImmediately: 0
   DEBUG_TargetAgent: {fileID: 0}
+  behaviour:
+    onFound: 4
+    onHit_Surprise: 9
+    f_allyDeathRange: 3
+    onDeath_Ally: 6
+    f_enemyDeathRange: 15
+    onDeath_Enemy: 8
   state: 1
 --- !u!1 &446909121369230874
 GameObject:
@@ -659,6 +667,7 @@ GameObject:
   - component: {fileID: 642101389629788198}
   - component: {fileID: 6328522580476208218}
   - component: {fileID: 856952303997979374}
+  - component: {fileID: 8516097355408228839}
   m_Layer: 3
   m_Name: Enemy
   m_TagString: Character
@@ -782,6 +791,19 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8516097355408228839
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6822896586392946825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffc2e457bb23a924292e9415ad1b005c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controller: {fileID: 4076457481858739809}
 --- !u!1 &6877985217339918725
 GameObject:
   m_ObjectHideFlags: 0

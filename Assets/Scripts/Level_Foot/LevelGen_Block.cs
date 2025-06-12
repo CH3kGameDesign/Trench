@@ -13,6 +13,8 @@ public class LevelGen_Block : MonoBehaviour
     public LevelGen_Spawn[] LGS_Spawns = new LevelGen_Spawn[0];
     public Treasure_Point[] TP_TreasurePoints = new Treasure_Point[0];
 
+    [HideInInspector] public int I_roomNum = -1;
+
     public enum entryTypeEnum { singleDoor, wideDoor, vent, shipDoor, shipPark, any}
     // Start is called before the first frame update
     void Start()
@@ -44,6 +46,13 @@ public class LevelGen_Block : MonoBehaviour
     void UpdateTreasurePoints()
     {
         TP_TreasurePoints = GetComponentsInChildren<Treasure_Point>();
+    }
+
+    public void Setup(int roomNum)
+    {
+        I_roomNum = roomNum;
+        foreach (var item in B_bounds)
+            item.I_roomNum = roomNum;
     }
 
     public void UpdateBoundingBox()
@@ -83,5 +92,10 @@ public class LevelGen_Block : MonoBehaviour
             GO.size = _temp.size;
             */
         }
+    }
+    public Vector3 GetRandomPoint(bool _3D = false)
+    {
+        int _bound = UnityEngine.Random.Range(0, B_bounds.Count);
+        return B_bounds[_bound].B_Bounds.bounds.GetRandomPoint(_3D);
     }
 }

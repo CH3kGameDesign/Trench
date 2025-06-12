@@ -27,6 +27,7 @@ public class BaseController : MonoBehaviour
     [HideInInspector] public bool b_alive = true;
     [HideInInspector] public bool b_grounded = false;
 
+    [HideInInspector] public int I_curRoom = -1;
 
     public static gameStateEnum GameState = gameStateEnum.active;
     public enum gameStateEnum { inactive, active, dialogue, vehicle, ragdoll, dialogueResponse, menu }
@@ -122,6 +123,10 @@ public class BaseController : MonoBehaviour
 
     }
     public virtual void EnterExit_Vehicle(bool _enter, Vehicle _vehicle)
+    {
+
+    }
+    public virtual void UpdateRoom(int _roomNum)
     {
 
     }

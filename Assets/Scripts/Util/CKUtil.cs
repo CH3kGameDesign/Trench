@@ -172,6 +172,18 @@ public static class CKUtil
         _temp = _temp.Replace("[1]", _interactable);
         return _temp;
     }
+
+    public static Vector3 GetRandomPoint(this Bounds _bound, bool _3D = true)
+    {
+        Vector3 _pos = _bound.center;
+        Vector3 _e = _bound.extents;
+        _pos += new Vector3(UnityEngine.Random.Range(-1f, 1f) * _e.x, 0, UnityEngine.Random.Range(-1f, 1f) * _e.z);
+        if (_3D)
+            _pos.y += UnityEngine.Random.Range(-1f, 1f) * _e.y;
+        else
+            _pos.y -= _e.y;
+        return _pos;
+    }
     public static void SetupInputSpriteSheet(this TMP_Text _TM)
     {
         PlayerController.inputClass _IC = PlayerController.Instance.Inputs;

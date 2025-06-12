@@ -64,11 +64,11 @@ public class LevelGen : MonoBehaviour
         
     }
 
-    public Vector3 GetRandomPoint()
+    public Vector3 GetRandomPoint(int _block = -1, bool _3D = false)
     {
-        int _block = UnityEngine.Random.Range(0, LG_Blocks.Count);
-        int _bound = UnityEngine.Random.Range(0, LG_Blocks[_block].B_bounds.Count);
-        return LG_Blocks[_block].B_bounds[_bound].B_Bounds.center + LG_Blocks[_block].B_bounds[_bound].B_Bounds.transform.position;
+        if (_block < 0)
+            _block = UnityEngine.Random.Range(0, LG_Blocks.Count);
+        return LG_Blocks[_block].GetRandomPoint(_3D);
     }
 
     public void GenerateLayout_Series(LevelGen_Theme _theme)
@@ -288,6 +288,7 @@ public class LevelGen : MonoBehaviour
         LevelGen_Block _temp = Instantiate(_prefab, _holder);
         _temp.transform.localPosition = Vector3.zero;
 
+        _temp.Setup(LG_Blocks.Count);
         LG_Blocks.Add(_temp);
         foreach (var bound in _temp.B_bounds)
             bound.B_Bounds.enabled = true;
@@ -329,6 +330,8 @@ public class LevelGen : MonoBehaviour
                 else
                 {
                     entry.OnConnect();
+
+                    _temp.Setup(LG_Blocks.Count);
                     LG_Blocks.Add(_temp);
                     foreach (var bound in _temp.B_bounds)
                         bound.B_Bounds.enabled = true;
@@ -398,6 +401,7 @@ public class LevelGen : MonoBehaviour
                 else
                 {
                     entry.OnConnect();
+                    _temp.Setup(LG_Blocks.Count);
                     LG_Blocks.Add(_temp);
                     foreach (var bound in _temp.B_bounds)
                         bound.B_Bounds.enabled = true;

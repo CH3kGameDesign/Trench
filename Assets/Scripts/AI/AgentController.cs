@@ -45,8 +45,22 @@ public class AgentController : BaseController
     private Coroutine Coroutine_Target;
     private Coroutine Coroutine_RandomPathing;
 
+    public behaviourClass behaviour = new behaviourClass();
+    [System.Serializable]
+    public class behaviourClass
+    {
+        public stateEnum onFound = stateEnum.hunt;
+        public stateEnum onHit_Surprise = stateEnum.aggressive;
+        [Space(10)]
+        public float f_allyDeathRange = 3f;
+        public stateEnum onDeath_Ally = stateEnum.scared;
+        [Space(10)]
+        public float f_enemyDeathRange = 15f;
+        public stateEnum onDeath_Enemy = stateEnum.loud;
+    }
+
     public stateEnum state = stateEnum.protect;
-    public enum stateEnum { idle, patrol, protect, hunt, ragdoll};
+    public enum stateEnum { idle, wander, patrol, protect, hunt, ragdoll, scared, tactical, loud, aggressive, kamikaze, unchanged};
 
     class TargetClass
     {
@@ -184,9 +198,9 @@ public class AgentController : BaseController
         base.Start();
     }
 
-    void NavSurface_Update()
+    void NavSurface_Update(bool _override = false)
     {
-        if (!b_grounded)
+        if (!b_grounded || _override)
         {
             RaycastHit hit;
             if (Physics.SphereCast(NMA.transform.position, 0.2f, Vector3.down, out hit, 1f, LM_TerrainRay))
@@ -217,6 +231,9 @@ public class AgentController : BaseController
         switch (state)
         {
             case stateEnum.idle:
+                break;
+            case stateEnum.wander:
+                ModelRotate(b_firing);
                 break;
             case stateEnum.patrol:
                 ModelRotate(b_firing);
@@ -254,10 +271,16 @@ public class AgentController : BaseController
                 case stateEnum.idle:
                     yield return new WaitForSeconds(0.5f);
                     break;
+                case stateEnum.wander:
+                    if (fieldOfView != null)
+                        FindTarget();
+                    GoToRandomPoint(true);
+                    yield return new WaitForSeconds(f_searchDelay);
+                    break;
                 case stateEnum.patrol:
                     if (fieldOfView != null)
                         FindTarget();
-                    GoToRandomPoint();
+                    GoToRandomPoint(false);
                     yield return new WaitForSeconds(f_searchDelay);
                     break;
                 case stateEnum.protect:
@@ -281,13 +304,22 @@ public class AgentController : BaseController
             }
         }
     }
-    void GoToRandomPoint()
+    void GoToRandomPoint(bool _sameRoom = false)
     {
         if (!NMA.isOnNavMesh || V_curVehicle != null)
             return;
         //PLACEHOLDER
         if (!NMA.hasPath || NMA.velocity.sqrMagnitude == 0f)
-            SetDestination(NMA.navMeshOwner.GetComponentInParent<LevelGen>().GetRandomPoint());
+        {
+
+            if (_sameRoom)
+            {
+                if (I_curRoom >= 0)
+                    SetDestination(NMA.navMeshOwner.GetComponentInParent<LevelGen>().GetRandomPoint(I_curRoom));
+            }
+            else
+                SetDestination(NMA.navMeshOwner.GetComponentInParent<LevelGen>().GetRandomPoint());
+        }
     }
 
     void FindTarget()
@@ -302,7 +334,7 @@ public class AgentController : BaseController
                 {
                     attackTarget.FollowPlayer(_PC);
 
-                    if (state == stateEnum.patrol)
+                    if (state == stateEnum.patrol || state == stateEnum.wander || state == stateEnum.idle)
                     {
                         state = stateEnum.hunt;
                         Conversation.Instance.StartMessage(ConversationID.Banter_Found_001, T_messageHook);
@@ -316,7 +348,7 @@ public class AgentController : BaseController
                 {
                     attackTarget.FollowAgent(_AC);
 
-                    if (state == stateEnum.patrol)
+                    if (state == stateEnum.patrol || state == stateEnum.wander || state == stateEnum.idle)
                     {
                         state = stateEnum.hunt;
                         Conversation.Instance.StartMessage(ConversationID.Banter_Found_001, T_messageHook);
@@ -456,7 +488,7 @@ public class AgentController : BaseController
             {
                 _bullet.con_Gun.Damage_Objective(Mathf.FloorToInt(_bullet.F_damage));
                 attackTarget.FollowPlayer(_bullet.con_Player);
-                if (state == stateEnum.patrol)
+                if (state == stateEnum.patrol || state == stateEnum.wander || state == stateEnum.idle)
                 {
                     state = stateEnum.hunt;
                     Conversation.Instance.StartMessage(ConversationID.Banter_Attacked_001, T_messageHook);
@@ -474,7 +506,7 @@ public class AgentController : BaseController
                 if (IsHostile() != _bullet.con_Agent.IsHostile())
                 {
                     attackTarget.FollowAgent(_bullet.con_Agent);
-                    if (state == stateEnum.patrol)
+                    if (state == stateEnum.patrol || state == stateEnum.wander || state == stateEnum.idle)
                     {
                         state = stateEnum.hunt;
                         Conversation.Instance.StartMessage(ConversationID.Banter_Attacked_001, T_messageHook);
@@ -576,5 +608,23 @@ public class AgentController : BaseController
         }
 
         return _temp;
+    }
+    public override void UpdateRoom(int _roomNum)
+    {
+        if (I_curRoom <= -1)
+        {
+            I_curRoom = _roomNum;
+            return;
+        }
+        switch (state)
+        {
+            case stateEnum.idle:
+                break;
+            case stateEnum.wander:
+                break;
+            default:
+                I_curRoom = _roomNum;
+                break;
+        }
     }
 }

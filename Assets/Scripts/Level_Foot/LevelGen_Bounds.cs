@@ -5,6 +5,7 @@ using UnityEngine;
 public class LevelGen_Bounds : MonoBehaviour
 {
     public BoxCollider B_Bounds;
+    [HideInInspector] public int I_roomNum = -1;
     // Start is called before the first frame update
     void Start()
     {
