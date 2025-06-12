@@ -70,23 +70,28 @@ public class Decal_Handler : MonoBehaviour
 
     void SizeDown()
     {
-        bool _timer = false;
-        if (_Size._fadeOut)
+        if (gameObject.activeInHierarchy)
         {
-            StartCoroutine(SizeChange(projector.size, Vector3.zero, 1f));
-            _timer = true;
+            bool _timer = false;
+            if (_Size._fadeOut)
+            {
+                StartCoroutine(SizeChange(projector.size, Vector3.zero, 1f));
+                _timer = true;
+            }
+            if (_Color._fadeOut)
+            {
+                Material _mat = projector.material;
+                Color _start = _mat.GetColor("_Color");
+                Color _tar = _start;
+                _tar.a = 0;
+                StartCoroutine(ColorChange(_start, _tar, 1f));
+                _timer = true;
+            }
+            if (_timer)
+                Invoke(nameof(Destroy_Delayed), 1f);
         }
-        if (_Color._fadeOut)
-        {
-            Material _mat = projector.material;
-            Color _start = _mat.GetColor("_Color");
-            Color _tar = _start;
-            _tar.a = 0;
-            StartCoroutine(ColorChange(_start, _tar, 1f));
-            _timer = true;
-        }
-        if (_timer)
-            Invoke(nameof(Destroy_Delayed), 1f);
+        else
+            Destroy(parent);
     }
     void Destroy_Delayed()
     {
