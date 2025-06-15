@@ -132,7 +132,12 @@ public class MainMenu : MonoBehaviour
             if (_back)
                 return _backButton.gameObject;
             else
-                return _defaultButton.gameObject;
+            {
+                if (RT_gridHolder.childCount > 0)
+                    return RT_gridHolder.GetChild(0).gameObject;
+                else
+                    return RT_tabHolder.GetChild(0).gameObject;
+            }
         }
         public void UpdateTabs()
         {
@@ -337,9 +342,6 @@ public class MainMenu : MonoBehaviour
     {
 
     }
-
-    
-
     
     #region Customize
     public void CustomizeButton()

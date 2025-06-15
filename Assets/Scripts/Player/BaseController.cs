@@ -29,6 +29,8 @@ public class BaseController : MonoBehaviour
 
     [HideInInspector] public int I_curRoom = -1;
 
+    [HideInInspector] public List<BaseController> followers = new List<BaseController>();
+
     public static gameStateEnum GameState = gameStateEnum.active;
     public enum gameStateEnum { inactive, active, dialogue, vehicle, ragdoll, dialogueResponse, menu }
     public virtual void Start()
@@ -129,5 +131,22 @@ public class BaseController : MonoBehaviour
     public virtual void UpdateRoom(int _roomNum)
     {
 
+    }
+
+    public virtual void AddFollower(BaseController _base)
+    {
+        followers.Add(_base);
+    }
+    public virtual void RemoveFollower(BaseController _base)
+    {
+        followers.Remove(_base);
+    }
+    public virtual void UpdateFollowerHealth(BaseController _base)
+    {
+
+    }
+    public virtual string GetName()
+    {
+        return "Undefined";
     }
 }

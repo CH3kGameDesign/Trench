@@ -30,6 +30,10 @@ public class PlayerController : BaseController
         public SpeedLines speedLines;
         public SpeedLines hurtFace;
     }
+    [Header("UI")]
+    public FollowerHealthUI PF_followerHealth;
+    public RectTransform RT_followerHealthHolder;
+    private List<FollowerHealthUI> FollowerHealthList = new List<FollowerHealthUI>();
     [Header ("Camera Values")]
     public float F_camLatSpeed = 1;
     public float F_camRotSpeed = 240f;
@@ -1001,7 +1005,13 @@ public class PlayerController : BaseController
         gun_Equipped.OnUpdate();
     }
 
-    void Drop()
+    public void Drop()
+    {
+        DropTreasure();
+        DropController();
+    }
+
+    public void DropTreasure()
     {
         if (T_equippedTreasure != null)
         {
@@ -1009,6 +1019,9 @@ public class PlayerController : BaseController
             T_equippedTreasure = null;
             AH_agentAudioHolder.Play(AgentAudioHolder.type.throww);
         }
+    }
+    public void DropController()
+    {
         if (BC_equippedController != null)
         {
             BC_equippedController.OnDrop(this, b_isSprinting);
@@ -1088,6 +1101,39 @@ public class PlayerController : BaseController
         base.OnHeal(_amt);
     }
 
+    public override void AddFollower(BaseController _base)
+    {
+        base.AddFollower(_base);
+        FollowerHealthUI _GO = Instantiate(PF_followerHealth, RT_followerHealthHolder);
+        FollowerHealthList.Add(_GO);
+        _GO.Setup(_base);
+    }
+    public override void RemoveFollower(BaseController _base)
+    {
+        for (int i = 0; i < followers.Count; ++i)
+        {
+            if (followers[i] == _base)
+            {
+                Destroy(FollowerHealthList[i].gameObject);
+                followers.RemoveAt(i);
+                FollowerHealthList.RemoveAt(i);
+                break;
+            }
+        }
+    }
+
+    public override void UpdateFollowerHealth(BaseController _base)
+    {
+        for (int i = 0; i < followers.Count; ++i)
+        {
+            if (followers[i] == _base)
+            {
+                FollowerHealthList[i].UpdateHealth();
+                break;
+            }
+        }
+    }
+
     public void Gun_Equip(int _invNum)
     {
         if (gun_Equipped != null)
@@ -1134,7 +1180,12 @@ public class PlayerController : BaseController
 
     public override void EnterExit_Vehicle(bool _enter, Vehicle _vehicle)
     {
+        base.EnterExit_Vehicle(_enter, _vehicle);
         Ref.speedLines.SetMaskActive(false);
+    }
+    public override string GetName()
+    {
+        return "Player";
     }
 
     IEnumerator TimeScale (float _scale)
@@ -1177,6 +1228,7 @@ public class PlayerController : BaseController
             yield return new WaitForEndOfFrame();
         }
         Ref.S_healthSlider.value = _health;
+        Ref.TM_healthText.text = Mathf.RoundToInt(Ref.S_healthSlider.value).ToString();
     }
 
     IEnumerator Idle_Anim(float _animWait = 20f)

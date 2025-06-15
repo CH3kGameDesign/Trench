@@ -183,9 +183,12 @@ public class AgentController : BaseController
         if (DEBUG_FollowPlayerImmediately)
         {
             if (b_friendly)
-                followTarget.FollowPlayer(FindFirstObjectByType<PlayerController>());
+            {
+                followTarget.FollowPlayer(PlayerController.Instance);
+                PlayerController.Instance.AddFollower(this);
+            }
             else
-                attackTarget.FollowPlayer(FindFirstObjectByType<PlayerController>());
+                attackTarget.FollowPlayer(PlayerController.Instance);
         }
         attackTarget.FollowAgent(DEBUG_TargetAgent);
 
@@ -514,12 +517,22 @@ public class AgentController : BaseController
                 }
             }
         }
-
+        
         F_curHealth -= _bullet.F_damage;
         if (F_curHealth <= 0)
             OnDeath(_bullet);
         else
             AH_agentAudioHolder.Play(AgentAudioHolder.type.hurt);
+        FollowerHealthUpdate();
+    }
+    public override void OnHeal(float _amt)
+    {
+        if (b_alive)
+        {
+            F_curHealth = Mathf.Max(F_curHealth, 0);
+            F_curHealth = Mathf.Min(F_curHealth + _amt, F_maxHealth);
+            FollowerHealthUpdate();
+        }
     }
 
     void OnDeath(GunManager.bulletClass _bullet)
@@ -557,6 +570,12 @@ public class AgentController : BaseController
         //gameObject.SetActive(false);
     }
 
+    void FollowerHealthUpdate()
+    {
+        if (followTarget.PC_tarPlayer != null)
+            followTarget.PC_tarPlayer.UpdateFollowerHealth(this);
+    }
+
     void GroundedUpdate(bool _grounded)
     {
         NMA.updatePosition = _grounded;
@@ -570,8 +589,6 @@ public class AgentController : BaseController
 
     public override void Revive()
     {
-        F_curHealth = F_maxHealth / 2;
-        state = stateEnum.protect;
 
         RM_ragdoll.transform.position = RM_ragdoll.T_transforms[0].position;
         //RM_ragdoll.T_transforms[0].localPosition = Vector3.zero;
@@ -593,6 +610,9 @@ public class AgentController : BaseController
         RM_ragdoll.ApplyBaseTransforms();
         A_model.enabled = true;
         b_alive = true;
+
+        state = stateEnum.protect;
+        OnHeal(F_maxHealth / 2);
     }
 
     Relationship.meterClass GetRelationship()
@@ -626,5 +646,11 @@ public class AgentController : BaseController
                 I_curRoom = _roomNum;
                 break;
         }
+    }
+    public override string GetName()
+    {
+        if (C_character != null)
+            return C_character.name;
+        return "???";
     }
 }
