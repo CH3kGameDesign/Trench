@@ -555,7 +555,7 @@ public class AgentController : BaseController
             {
                 _bullet.con_Agent.TargetDead();
                 if (_bullet.con_Agent.b_friendly)
-                    _bullet.con_Player.Update_Objectives(Objective_Type.Kill_Any, 1);
+                    PlayerController.Instance.Update_Objectives(Objective_Type.Kill_Any, 1);
             }
         }
         ResourceDrop.Drop(T_model.position);

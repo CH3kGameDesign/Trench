@@ -1,6 +1,5 @@
 using DG.Tweening;
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -39,6 +38,9 @@ public class Decal_Handler : MonoBehaviour
     private Vector3 _tarSize = Vector3.one;
     public float timeIncrease = 0.2f;
     public float lifeTime = 0;
+
+    private Coroutine SizeDownCo = null;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -49,7 +51,7 @@ public class Decal_Handler : MonoBehaviour
         _Color.Activate(projector);
         SizeChange();
         if (lifeTime > 0)
-            Invoke(nameof(SizeDown), lifeTime);
+            SizeDownCo = StartCoroutine(SizeDownEnum());
     }
 
     void SizeChange()
@@ -66,6 +68,20 @@ public class Decal_Handler : MonoBehaviour
             StartCoroutine(SizeChange(projector.size, _tarSize, timeIncrease));
         else
             projector.size = _tarSize;
+    }
+
+    public void Remove()
+    {
+        if (SizeDownCo == null)
+        {
+            if (lifeTime <= 0)
+                SizeDown();
+        }
+        else
+        {
+            StopCoroutine(SizeDownCo);
+            SizeDown();
+        }
     }
 
     void SizeDown()
@@ -91,11 +107,20 @@ public class Decal_Handler : MonoBehaviour
                 Invoke(nameof(Destroy_Delayed), 1f);
         }
         else
+        {
+            LevelGen_Holder.Instance.RemoveDecal(this);
             Destroy(parent);
+        }
     }
     void Destroy_Delayed()
     {
+        LevelGen_Holder.Instance.RemoveDecal(this);
         Destroy(parent);
+    }
+    IEnumerator SizeDownEnum()
+    {
+        yield return new WaitForSecondsRealtime(lifeTime);
+        SizeDown();
     }
 
     IEnumerator SizeChange(Vector3 _start, Vector3 _tar, float _speed)

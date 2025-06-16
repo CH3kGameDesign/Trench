@@ -4,9 +4,11 @@ using System.Collections.Generic;
 
 public class ParticleCollision : MonoBehaviour
 {
-    public GameObject PF_createOnCollision;
+    public Decal_Handler PF_createOnCollision;
     private ParticleSystem part;
     private List<ParticleCollisionEvent> collisionEvents;
+    public int I_maxAmt = 1;
+    private int i_curAmt = 0;
 
     void Start()
     {
@@ -20,13 +22,15 @@ public class ParticleCollision : MonoBehaviour
 
         int i = 0;
 
-        while (i < numCollisionEvents)
+        while (i < numCollisionEvents && i_curAmt < I_maxAmt)
         {
-            Transform T = Instantiate(PF_createOnCollision, other.transform).transform;
-            T.position = collisionEvents[i].intersection;
-            T.forward = -collisionEvents[i].normal;
-            T.localScale = transform.localScale;
+            Decal_Handler DC = Instantiate(PF_createOnCollision, other.transform);
+            LevelGen_Holder.Instance.AddDecal(DC);
+            DC.transform.position = collisionEvents[i].intersection;
+            DC.transform.forward = -collisionEvents[i].normal;
+            DC.transform.localScale = transform.localScale;
             i++;
+            i_curAmt++;
         }
     }
 }
