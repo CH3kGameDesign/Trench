@@ -183,7 +183,7 @@ public class PlayerController : BaseController
 
     public override void Start()
     {
-        F_curHealth = F_maxHealth;
+        base.Start();
         Ref.S_healthSlider.maxValue = F_maxHealth;
         Ref.S_healthSlider.value = F_curHealth;
         Ref.TM_healthText.text = F_curHealth.ToString();
@@ -205,7 +205,6 @@ public class PlayerController : BaseController
         ArmorManager.EquipArmor_Static(RM_ragdoll, SaveData.equippedArmor);
 
         GameState_Change(gameStateEnum.active);
-        base.Start();
     }
 
     public void DebugGunList()
@@ -480,7 +479,7 @@ public class PlayerController : BaseController
             }
             else
             {
-                b_isSprinting = false;
+                SprintStop();
             }
             if (C_idleAnim != null)
             {

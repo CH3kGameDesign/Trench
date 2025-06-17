@@ -68,6 +68,7 @@ MonoBehaviour:
   b_alive: 1
   b_grounded: 0
   I_curRoom: -1
+  followers: []
   gunManager: {fileID: 11400000, guid: 1e3b59fdefa93a743beff3357901afa0, type: 2}
   fieldOfView: {fileID: 6328522580476208218}
   S_characterID: Lido_Police
@@ -114,14 +115,35 @@ MonoBehaviour:
   DEBUG_EquippedGunNum: -1
   DEBUG_FollowPlayerImmediately: 0
   DEBUG_TargetAgent: {fileID: 0}
+  state: 2
   behaviour:
-    onFound: 4
-    onHit_Surprise: 9
+    onFound:
+      state: 10
+      B_voiceLine: 1
+      banter: 7
+    onHit_Surprise:
+      state: 10
+      B_voiceLine: 1
+      banter: 8
+    onHit_FriendlyFire:
+      state: -10
+      B_voiceLine: 0
+      banter: 10
+    f_healthPercent: 0.5
+    onHit_LowHealth:
+      state: -10
+      B_voiceLine: 0
+      banter: 8
     f_allyDeathRange: 3
-    onDeath_Ally: 6
+    onDeath_Ally:
+      state: -10
+      B_voiceLine: 0
+      banter: 8
     f_enemyDeathRange: 15
-    onDeath_Enemy: 8
-  state: 1
+    onDeath_Enemy:
+      state: -10
+      B_voiceLine: 0
+      banter: 8
 --- !u!1 &446909121369230874
 GameObject:
   m_ObjectHideFlags: 0

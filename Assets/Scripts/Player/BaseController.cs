@@ -35,7 +35,7 @@ public class BaseController : MonoBehaviour
     public enum gameStateEnum { inactive, active, dialogue, vehicle, ragdoll, dialogueResponse, menu }
     public virtual void Start()
     {
-
+        F_curHealth = F_maxHealth;
     }
 
     public virtual void Update()

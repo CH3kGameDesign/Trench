@@ -160,12 +160,33 @@ MonoBehaviour:
   DEBUG_FollowPlayerImmediately: 1
   DEBUG_TargetAgent: {fileID: 0}
   behaviour:
-    onFound: 4
-    onHit_Surprise: 9
+    onFound:
+      state: -10
+      B_voiceLine: 0
+      banter: 7
+    onHit_Surprise:
+      state: -10
+      B_voiceLine: 0
+      banter: 8
+    onHit_FriendlyFire:
+      state: -10
+      B_voiceLine: 1
+      banter: 10
+    f_healthPercent: 0.5
+    onHit_LowHealth:
+      state: -10
+      B_voiceLine: 0
+      banter: 8
     f_allyDeathRange: 3
-    onDeath_Ally: 6
+    onDeath_Ally:
+      state: -10
+      B_voiceLine: 0
+      banter: 8
     f_enemyDeathRange: 15
-    onDeath_Enemy: 8
+    onDeath_Enemy:
+      state: -10
+      B_voiceLine: 0
+      banter: 8
   state: 3
 --- !u!1 &2238208043467293688
 GameObject:

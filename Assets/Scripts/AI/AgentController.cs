@@ -45,22 +45,128 @@ public class AgentController : BaseController
     private Coroutine Coroutine_Target;
     private Coroutine Coroutine_RandomPathing;
 
+    public stateEnum state = stateEnum.protect;
+    public enum stateEnum
+    {
+        idle = 0, wander = 1, patrol = 2, protect = 3,
+        hunt = 10, scared = 11, tactical = 12, loud = 13, aggressive = 14, kamikaze = 15,
+        ragdoll = -1,
+        unchanged = -10
+    };
     public behaviourClass behaviour = new behaviourClass();
     [System.Serializable]
     public class behaviourClass
     {
-        public stateEnum onFound = stateEnum.hunt;
-        public stateEnum onHit_Surprise = stateEnum.aggressive;
+        public stateClass onFound = new stateClass()
+        {
+            state = stateEnum.hunt,
+            B_voiceLine = true,
+            banter = ConversationID.Banter_Found_001
+        };
+        public stateClass onHit_Surprise = new stateClass()
+        {
+            state = stateEnum.aggressive,
+            B_voiceLine = true,
+            banter = ConversationID.Banter_Attacked_001
+        };
+        [Space(10)]
+        public stateClass onHit_FriendlyFire = new stateClass()
+        {
+            state = stateEnum.unchanged,
+            B_voiceLine = true,
+            banter = ConversationID.Banter_FriendlyFire_001
+        };
+        [Space(10)]
+        [Range(0,1)]public float f_healthPercent = 0.5f;
+        public stateClass onHit_LowHealth = new stateClass()
+        {
+            state = stateEnum.scared,
+            B_voiceLine = false,
+            banter = ConversationID.Banter_Attacked_001
+        };
         [Space(10)]
         public float f_allyDeathRange = 3f;
-        public stateEnum onDeath_Ally = stateEnum.scared;
+        public stateClass onDeath_Ally = new stateClass()
+        {
+            state = stateEnum.scared,
+            B_voiceLine = false,
+            banter = ConversationID.Banter_Attacked_001
+        };
         [Space(10)]
         public float f_enemyDeathRange = 15f;
-        public stateEnum onDeath_Enemy = stateEnum.loud;
+        public stateClass onDeath_Enemy = new stateClass()
+        {
+            state = stateEnum.loud,
+            B_voiceLine = false,
+            banter = ConversationID.Banter_Attacked_001
+        };
+
+        public void OnFound(AgentController AC)
+        {
+            if (AC.b_alive && (int)AC.state < 10)
+                onFound.Activate(AC);
+        }
+        public void OnHit(AgentController AC, GunManager.bulletClass _bullet)
+        {
+            if (AC.b_alive)
+            {
+                //Friendly Fire
+                if (AC.b_friendly && _bullet.B_player)
+                {
+                    onHit_FriendlyFire.Activate(AC);
+                    return;
+                }
+                //Surprised
+                if ((int)AC.state < 3)
+                {
+                    onHit_Surprise.Activate(AC);
+                    return;
+                }
+                //Low Health
+                if ((AC.F_curHealth / AC.F_maxHealth) <= f_healthPercent)
+                {
+                    onHit_LowHealth.Activate(AC);
+                    return;
+                }
+            }
+        }
+        public void OnDeath(AgentController AC, AgentController _dead)
+        {
+            if (AC.b_alive)
+            {
+                //Ally Death
+                if (AC.b_friendly == _dead.b_friendly)
+                {
+                    onDeath_Ally.Activate(AC);
+                    return;
+                }
+                //Enemy Death
+                else
+                {
+                    onDeath_Enemy.Activate(AC);
+                    return;
+                }
+            }
+        }
+    }
+    [System.Serializable]
+    public class stateClass
+    {
+        public stateEnum state = stateEnum.unchanged;
+        public bool B_voiceLine = false;
+        public ConversationID banter = 0;
+
+        public void Activate(AgentController AC)
+        {
+            if (state != AC.state)
+            {
+                if (B_voiceLine)
+                    Conversation.Instance.StartMessage(banter, AC.T_messageHook);
+                AC.ChangeState(state);
+            }
+        }
     }
 
-    public stateEnum state = stateEnum.protect;
-    public enum stateEnum { idle, wander, patrol, protect, hunt, ragdoll, scared, tactical, loud, aggressive, kamikaze, unchanged};
 
     class TargetClass
     {
@@ -101,6 +207,16 @@ public class AgentController : BaseController
         public void Stop()
         {
             targetType = targetTypeEnum.none;
+        }
+        public bool IsActive()
+        {
+            switch (targetType)
+            {
+                case targetTypeEnum.none: return false;
+                case targetTypeEnum.player: return PC_tarPlayer != null;
+                case targetTypeEnum.agent: return AC_tarAgent != null;
+                default: return false;
+            }
         }
         public bool GetNavPos(out Vector3 pos)
         {
@@ -178,6 +294,7 @@ public class AgentController : BaseController
     // Start is called before the first frame update
     public override void Start()
     {
+        base.Start();
         C_character = Relationship.Instance.GetCharacterFromID(S_characterID);
 
         if (DEBUG_FollowPlayerImmediately)
@@ -195,10 +312,10 @@ public class AgentController : BaseController
         if (DEBUG_EquippedGunNum < 0)
             DEBUG_EquippedGunNum = Random.Range(0, 3);
 
+
         gun_Equipped = gunManager.GetGunByInt(DEBUG_EquippedGunNum, this);
         gun_Equipped.OnEquip(this);
         Armor.Equip(RM_ragdoll);
-        base.Start();
     }
 
     void NavSurface_Update(bool _override = false)
@@ -248,6 +365,9 @@ public class AgentController : BaseController
             case stateEnum.hunt:
                 b_firing = FireManager();
                 ModelRotate(b_firing);
+                break;
+            case stateEnum.kamikaze:
+                ModelRotate(false);
                 break;
             default:
                 break;
@@ -301,6 +421,12 @@ public class AgentController : BaseController
                 case stateEnum.ragdoll:
                     yield return new WaitForSeconds(0.5f);
                     break;
+                case stateEnum.kamikaze:
+                    Follow(attackTarget);
+                    if (fieldOfView != null && !b_firing)
+                        FindTarget();
+                    yield return new WaitForSeconds(f_searchDelay);
+                    break;
                 default:
                     yield return new WaitForSeconds(0.5f);
                     break;
@@ -314,7 +440,6 @@ public class AgentController : BaseController
         //PLACEHOLDER
         if (!NMA.hasPath || NMA.velocity.sqrMagnitude == 0f)
         {
-
             if (_sameRoom)
             {
                 if (I_curRoom >= 0)
@@ -336,12 +461,7 @@ public class AgentController : BaseController
                 if (!b_friendly)
                 {
                     attackTarget.FollowPlayer(_PC);
-
-                    if (state == stateEnum.patrol || state == stateEnum.wander || state == stateEnum.idle)
-                    {
-                        state = stateEnum.hunt;
-                        Conversation.Instance.StartMessage(ConversationID.Banter_Found_001, T_messageHook);
-                    }
+                    behaviour.OnFound(this);
                     break;
                 }
             }
@@ -350,12 +470,7 @@ public class AgentController : BaseController
                 if (b_friendly != _AC.b_friendly)
                 {
                     attackTarget.FollowAgent(_AC);
-
-                    if (state == stateEnum.patrol || state == stateEnum.wander || state == stateEnum.idle)
-                    {
-                        state = stateEnum.hunt;
-                        Conversation.Instance.StartMessage(ConversationID.Banter_Found_001, T_messageHook);
-                    }
+                    behaviour.OnFound(this);
                     break;
                 }
             }
@@ -370,10 +485,13 @@ public class AgentController : BaseController
 
     void Follow(TargetClass _target)
     {
-        Vector3 _tarPos;
-        if (_target.GetNavPos(out _tarPos))
-            SetDestination(_tarPos);
-        Vehicle_FollowCheck(_target);
+        if (_target.IsActive())
+        {
+            Vector3 _tarPos;
+            if (_target.GetNavPos(out _tarPos))
+                SetDestination(_tarPos);
+            Vehicle_FollowCheck(_target);
+        }
     }
 
     void Vehicle_FollowCheck(TargetClass _target)
@@ -491,13 +609,7 @@ public class AgentController : BaseController
             {
                 _bullet.con_Gun.Damage_Objective(Mathf.FloorToInt(_bullet.F_damage));
                 attackTarget.FollowPlayer(_bullet.con_Player);
-                if (state == stateEnum.patrol || state == stateEnum.wander || state == stateEnum.idle)
-                {
-                    state = stateEnum.hunt;
-                    Conversation.Instance.StartMessage(ConversationID.Banter_Attacked_001, T_messageHook);
-                }
-                else if (b_friendly)
-                    Conversation.Instance.StartMessage(ConversationID.Banter_Betray_001, T_messageHook);
+                behaviour.OnHit(this, _bullet);
             }
             else if (b_friendly)
                 Conversation.Instance.StartMessage(ConversationID.Banter_FriendlyFire_001, T_messageHook);
@@ -509,11 +621,7 @@ public class AgentController : BaseController
                 if (IsHostile() != _bullet.con_Agent.IsHostile())
                 {
                     attackTarget.FollowAgent(_bullet.con_Agent);
-                    if (state == stateEnum.patrol || state == stateEnum.wander || state == stateEnum.idle)
-                    {
-                        state = stateEnum.hunt;
-                        Conversation.Instance.StartMessage(ConversationID.Banter_Attacked_001, T_messageHook);
-                    }
+                    behaviour.OnHit(this, _bullet);
                 }
             }
         }
@@ -559,7 +667,7 @@ public class AgentController : BaseController
             }
         }
         ResourceDrop.Drop(T_model.position);
-        state = stateEnum.ragdoll;
+        ChangeState(stateEnum.ragdoll);
         RM_ragdoll.EnableRigidbodies(true);
         GroundedUpdate(false);
         RM_ragdoll.R_aimRig.weight = 0;
@@ -611,7 +719,7 @@ public class AgentController : BaseController
         A_model.enabled = true;
         b_alive = true;
 
-        state = stateEnum.protect;
+        ChangeState(stateEnum.protect);
         OnHeal(F_maxHealth / 2);
     }
 
@@ -644,6 +752,33 @@ public class AgentController : BaseController
                 break;
             default:
                 I_curRoom = _roomNum;
+                break;
+        }
+    }
+    public void ChangeState(stateEnum _state)
+    {
+        if (_state == stateEnum.unchanged ||
+            _state == state) return;
+
+        ExitState(state);
+        switch (_state)
+        {
+            case stateEnum.kamikaze:
+                NMA.stoppingDistance = 0.1f;
+                break;
+            default:
+                break;
+        }
+        state = _state;
+    }
+    void ExitState(stateEnum _state)
+    {
+        switch (_state)
+        {
+            case stateEnum.kamikaze:
+                NMA.stoppingDistance = 5;
+                break;
+            default:
                 break;
         }
     }
