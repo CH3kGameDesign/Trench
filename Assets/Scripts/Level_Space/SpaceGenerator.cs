@@ -1,8 +1,11 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static UnityEditor.Progress;
 
 public class SpaceGenerator : MonoBehaviour
 {
+    [HideInInspector] public SpaceSegment[,,] activeSegments = new SpaceSegment[0, 0, 0];
+    [HideInInspector] public Vector3Int segmentAmt = Vector3Int.zero;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -14,24 +17,41 @@ public class SpaceGenerator : MonoBehaviour
 
     void Generate()
     {
-        SpaceSegment GO = Instantiate(SpaceManager.Instance.sectorPrefabs[0, 0, 0], transform);
-        GO.Setup();
+        SpaceSegment _prefab;
+        SpaceSegment GO;
+        segmentAmt = SpaceManager.Instance.sectorAmount;
+        activeSegments = new SpaceSegment[segmentAmt.x, segmentAmt.y, segmentAmt.z];
+        for (int x = 0; x < segmentAmt.x; x++)
+        {
+            for (int y = 0; y < segmentAmt.y; y++)
+            {
+                for (int z = 0; z < segmentAmt.z; z++)
+                {
+                    _prefab = SpaceManager.Instance.sectorPrefabs[x, y, z];
+                    if (_prefab == null) continue;
+
+                    GO = Instantiate(_prefab, transform);
+                    GO.transform.localPosition = GO.index * 500;
+                    GO.Setup();
+                    activeSegments[x, y, z] = GO;
+                }
+            }
+        }
     }
 
     public bool GetExitPos(out Vector3 _pos,string _id)
     {
-        Vector3Int _size = SpaceManager.Instance.sectorAmount;
-        for (int x = 0; x <_size.x; x++)
+        for (int x = 0; x < segmentAmt.x; x++)
         {
-            for (int y = 0; y < _size.y; y++)
+            for (int y = 0; y < segmentAmt.y; y++)
             {
-                for (int z = 0; z < _size.z; z++)
+                for (int z = 0; z < segmentAmt.z; z++)
                 {
-                    foreach (var item in SpaceManager.Instance.sectorPrefabs[x, y, z].landingSpots)
+                    foreach (var item in activeSegments[x, y, z].landingSpots)
                     {
                         if (item.landingID == _id)
                         {
-                            _pos = item.transform.position;
+                            _pos = item.exitTransform.position;
                             return true;
                         }
                     }

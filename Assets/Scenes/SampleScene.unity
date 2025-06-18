@@ -15,18 +15,18 @@ RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
   m_Fog: 1
-  m_FogColor: {r: 0.34718758, g: 0.81406915, b: 0.8867924, a: 1}
+  m_FogColor: {r: 0.14901961, g: 0.015686275, b: 0.07058824, a: 1}
   m_FogMode: 1
   m_FogDensity: 0.01
   m_LinearFogStart: 300
-  m_LinearFogEnd: 10000
+  m_LinearFogEnd: 1000
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 2100000, guid: 31c67442b61495a4d9ba679ca8703766, type: 2}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 98f94fde7263ac847b3b9615395b05b7, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -299,6 +299,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87ba4e392f6cc4c4f8bf1468a5b4e878, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  segmentAmt: {x: 0, y: 0, z: 0}
 --- !u!1 &66495420
 GameObject:
   m_ObjectHideFlags: 0
@@ -346,6 +347,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   List:
   - {fileID: 140771293}
+  I_maxDecals: 100
 --- !u!1 &140771291
 GameObject:
   m_ObjectHideFlags: 0
@@ -11008,7 +11010,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2081558763
 RectTransform:
   m_ObjectHideFlags: 0
