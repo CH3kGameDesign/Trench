@@ -16,6 +16,7 @@ public class PlayerController : BaseController
     [System.Serializable]
     public class RefClass
     {
+        public Recall R_recall;
         public RadialMenu RM_radial;
         public TextMeshProUGUI TM_interactText;
         public TextMeshProUGUI TM_controlText;
@@ -53,6 +54,7 @@ public class PlayerController : BaseController
     public Vector3 V3_camOffset_Crouch = new Vector3(1f, 0.125f, -1.5f);
     private float f_camRadius = 0.15f;
     public LayerMask LM_CameraRay;
+    public LayerMask LM_CameraRayVehicle;
     public LayerMask LM_GunRay;
     public LayerMask LM_AutoAimRay;
 
@@ -128,6 +130,7 @@ public class PlayerController : BaseController
         public bool b_radial = false;
         public bool b_melee = false;
         public bool b_purchase = false;
+        public bool b_recall = false;
 
         public PlayerInput playerInput;
 
@@ -144,7 +147,8 @@ public class PlayerController : BaseController
                 b_reload ||
                 b_radial ||
                 b_melee ||
-                b_purchase;
+                b_purchase ||
+                b_recall;
         }
         public string[] inputs = new string[0];
     }
@@ -162,6 +166,7 @@ public class PlayerController : BaseController
         RadialMenu,
         Melee,
         Menu,
+        Recall,
         Confirm,
         Back,
         LeftTab,
@@ -201,6 +206,8 @@ public class PlayerController : BaseController
         Setup_Consumables();
         Setup_Radial();
         Update_Objectives();
+
+        Ref.R_recall.Setup(this);
 
         ArmorManager.EquipArmor_Static(RM_ragdoll, SaveData.equippedArmor);
 
@@ -389,6 +396,9 @@ public class PlayerController : BaseController
         ReloadHandler();
 
         RadialHandler();
+
+        if (SaveData.themeCurrent == Themes.themeEnum.ship)
+            Ref.R_recall._Update();
     }
 
     void Update_Dialogue()
@@ -404,12 +414,14 @@ public class PlayerController : BaseController
     {
         V_curVehicle.OnUpdate(this);
         LandingHandler();
+        CamCollision(V_curVehicle.T_camHook, V_curVehicle.V3_camOffset, true, true, false);
+
         if (Inputs.b_interact) V_curVehicle.OnInteract(this);
     }
     void FixedUpdate_Vehicle()
     {
-        CamMovement();
-        CamCollision(V_curVehicle.T_camHook, V_curVehicle.V3_camOffset, true, true);
+        V_curVehicle.OnFixedUpdate(this);
+        CamMovement(true);
     }
 
     void FixedUpdate_Active()
@@ -418,8 +430,8 @@ public class PlayerController : BaseController
         JumpHandler();
         CrouchHandler();
         AerialMovement();
-        CamMovement();
-        CamCollision();
+        CamMovement(true);
+        CamCollision(true);
     }
 
     void AnimationUpdate()
@@ -878,14 +890,14 @@ public class PlayerController : BaseController
             return Vector3.up;
     }
 
-    void CamMovement()
+    void CamMovement(bool _fixedDelta = false)
     {
         if (!b_radialOpen)
         {
             float _mult = Time.deltaTime;
-            if (Inputs.b_aiming)        _mult *= F_camAimRotSpeed;
-            else if (b_isSprinting)     _mult *= F_camSprintRotSpeed;
-            else                        _mult *= F_camRotSpeed;
+            if (Inputs.b_aiming) _mult *= F_camAimRotSpeed;
+            else if (b_isSprinting) _mult *= F_camSprintRotSpeed;
+            else _mult *= F_camRotSpeed;
             if (AutoAim()) _mult *= autoAim.slowMultiplier;
             v3_camDir += new Vector3(-Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0) * _mult;
             if (v3_camDir.y > 180)
@@ -900,7 +912,11 @@ public class PlayerController : BaseController
             }
             v3_camDir.x = Mathf.Clamp(v3_camDir.x, -80, 80);
         }
-            T_camHolder.transform.rotation = Quaternion.Lerp(T_camHolder.transform.rotation, Quaternion.Euler(v3_camDir), Time.deltaTime * 10);
+
+        float _delta = _fixedDelta ?
+            Time.fixedDeltaTime : Time.deltaTime;
+
+        T_camHolder.transform.rotation = Quaternion.Lerp(T_camHolder.transform.rotation, Quaternion.Euler(v3_camDir), _delta * 10);
     }
 
     bool AutoAim()
@@ -952,41 +968,46 @@ public class PlayerController : BaseController
         return false;
     }
 
-    void CamCollision()
+    void CamCollision(bool _fixedDelta = false)
     { 
         if (b_isCrouching || b_isSprinting)
-            CamCollision(T_camHookCrouching, V3_camOffset_Crouch);
+            CamCollision(T_camHookCrouching, V3_camOffset_Crouch, _fixedDelta);
         else
-            CamCollision(T_camHook, V3_camOffset);
+            CamCollision(T_camHook, V3_camOffset, _fixedDelta);
     }
-    void CamCollision(Transform _camHook, Vector3 _camOffset, bool _canAim = true, bool _inVehicle = false)
+    void CamCollision(Transform _camHook, Vector3 _camOffset, bool _canAim = true, bool _inVehicle = false, bool _fixedDelta = false)
     {
+        float _delta = _fixedDelta ? 
+            Time.fixedDeltaTime : Time.deltaTime;
+
         if (Inputs.b_aiming && _canAim)
         {
             gun_Equipped.OnAim(true);
-            T_camHolder.position = Vector3.Slerp(T_camHolder.position, T_camHookAiming.position, Time.deltaTime * F_camLatSpeed * 10);
-            T_camHolder.GetChild(0).localPosition = Vector3.Slerp(T_camHolder.GetChild(0).localPosition, Vector3.zero, Time.deltaTime * F_camLatSpeed);
+            T_camHolder.position = Vector3.Slerp(T_camHolder.position, T_camHookAiming.position, _delta * F_camLatSpeed * 10);
+            T_camHolder.GetChild(0).localPosition = Vector3.Slerp(T_camHolder.GetChild(0).localPosition, Vector3.zero, _delta * F_camLatSpeed);
         }
         else
         {
             gun_Equipped.OnAim(false);
-            T_camHolder.position = Vector3.Slerp(T_camHolder.position, _camHook.position, Time.deltaTime * F_camLatSpeed);
-            if (!_inVehicle)
+            if (_inVehicle)
+                T_camHolder.position = Vector3.Slerp(T_camHolder.position, _camHook.position, _delta * F_camLatSpeed);
+            else
+                T_camHolder.position = _camHook.position;
+
+            LayerMask _LM = _inVehicle ?
+                    LM_CameraRayVehicle : LM_CameraRay;
+
+            RaycastHit hit;
+            if (Physics.SphereCast(T_camHolder.position, f_camRadius, T_camHolder.rotation * _camOffset, out hit, _camOffset.magnitude, _LM))
             {
-                RaycastHit hit;
-                if (Physics.SphereCast(T_camHolder.position, f_camRadius, T_camHolder.rotation * _camOffset, out hit, _camOffset.magnitude, LM_CameraRay))
-                {
-                    f_camDistance = hit.distance;
-                    T_camHolder.GetChild(0).localPosition = _camOffset.normalized * f_camDistance;
-                }
-                else
-                {
-                    f_camDistance = V3_camOffset.magnitude;
-                    T_camHolder.GetChild(0).localPosition = Vector3.Slerp(T_camHolder.GetChild(0).localPosition, _camOffset, Time.deltaTime * F_camLatSpeed);
-                }
+                f_camDistance = hit.distance;
+                T_camHolder.GetChild(0).localPosition = _camOffset.normalized * f_camDistance;
             }
             else
-                T_camHolder.GetChild(0).localPosition = Vector3.Slerp(T_camHolder.GetChild(0).localPosition, _camOffset, Time.deltaTime * F_camLatSpeed);
+            {
+                f_camDistance = V3_camOffset.magnitude;
+                T_camHolder.GetChild(0).localPosition = Vector3.Slerp(T_camHolder.GetChild(0).localPosition, _camOffset, _delta * F_camLatSpeed);
+            }
         }
     }
 
@@ -1152,6 +1173,13 @@ public class PlayerController : BaseController
         }
     }
 
+    public void OnKill(AgentController AC, bool _player = true)
+    {
+        Update_Objectives(Objective_Type.Kill_Any, 1);
+        if (_player)
+            reticle.Kill();
+    }
+
     void OnDeath()
     {
         GameState_Change(gameStateEnum.ragdoll);
@@ -1160,6 +1188,9 @@ public class PlayerController : BaseController
         A_model.enabled = false;
         Invoke(nameof(Restart), 3f);
         CloseRadial();
+
+        if (gun_Equipped != null)
+            gun_Equipped.OnUnEquip();
 
         Ref.speedLines.SetMaskActive(false);
         AH_agentAudioHolder.Play(AgentAudioHolder.type.death);
@@ -1276,6 +1307,7 @@ public class PlayerController : BaseController
     public void Input_Reload(InputAction.CallbackContext cxt) { Inputs.b_reload = Input_GetPressed(cxt); }
     public void Input_Radial(InputAction.CallbackContext cxt) { Inputs.b_radial = Input_GetPressed(cxt); }
     public void Input_Melee(InputAction.CallbackContext cxt) { Inputs.b_melee = Input_GetPressed(cxt); }
+    public void Input_Recall(InputAction.CallbackContext cxt) { Inputs.b_recall = Input_GetPressed(cxt); }
     public void Input_Menu(InputAction.CallbackContext cxt) { if (cxt.phase == InputActionPhase.Started) MainMenu.Instance.Menu_Tapped(); }
 
     public void Input_Purchase(InputAction.CallbackContext cxt)
@@ -1310,6 +1342,7 @@ public class PlayerController : BaseController
         Inputs.b_isGamepad = input.currentControlScheme == "Gamepad";
         Setup_InteractStrings();
         MainMenu.Instance.GamepadSwitch();
+        Ref.R_recall.TextUpdate();
     }
 
     bool Input_GetPressed(InputAction.CallbackContext cxt)

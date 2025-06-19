@@ -6,6 +6,10 @@ using TMPro;
 
 public class Reticle : MonoBehaviour
 {
+    public GameObject PF_hitMarker;
+    public GameObject PF_explosionMarker;
+    public GameObject PF_killMarker;
+    [Space(10)]
     public Image I_Reticle;
     public Sprite S_aimReticle;
     public TextMeshProUGUI[] TM_roundCounter;
@@ -15,6 +19,30 @@ public class Reticle : MonoBehaviour
     public void UpdateRoundCount(GunClass _gun)
     {
         UpdateRoundCount(_gun.clipAmmo, _gun.clipVariables.clipSize);
+    }
+
+    public void Hit(HitObject.damageTypeEnum _type = HitObject.damageTypeEnum.bullet)
+    {
+        GameObject GO;
+        switch (_type)
+        {
+            case HitObject.damageTypeEnum.explosive:
+                GO = Instantiate(PF_explosionMarker, I_Reticle.transform);
+                break;
+            default:
+                GO = Instantiate(PF_hitMarker, I_Reticle.transform);
+                break;
+        }
+        GO.transform.localPosition = Vector3.zero;
+        Destroy(GO, 1);
+    }
+
+    public void Kill()
+    {
+        GameObject GO;
+        GO = Instantiate(PF_killMarker, I_Reticle.transform);
+        GO.transform.localPosition = Vector3.zero;
+        Destroy(GO, 1);
     }
 
     public void UpdateRoundCount(int _remaining, int _total)

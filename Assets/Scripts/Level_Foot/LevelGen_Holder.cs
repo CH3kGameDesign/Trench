@@ -52,4 +52,12 @@ public class LevelGen_Holder : MonoBehaviour
         if (d_Handlers.Contains(handler))
             d_Handlers.Remove(handler);
     }
+
+    public void AgentDeath(AgentController _AC)
+    {
+        foreach (var LG in List)
+        {
+            LG.AgentDeath(_AC);
+        }
+    }
 }

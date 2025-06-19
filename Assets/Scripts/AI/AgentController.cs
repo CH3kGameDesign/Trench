@@ -4,6 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using static Resource;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 
 public class AgentController : BaseController
@@ -134,16 +135,19 @@ public class AgentController : BaseController
         {
             if (AC.b_alive)
             {
+                float _dist = Vector3.Distance(AC.NMA.transform.position, _dead.NMA.transform.position);
                 //Ally Death
                 if (AC.b_friendly == _dead.b_friendly)
                 {
-                    onDeath_Ally.Activate(AC);
+                    if (_dist <= f_allyDeathRange)
+                        onDeath_Ally.Activate(AC);
                     return;
                 }
                 //Enemy Death
                 else
                 {
-                    onDeath_Enemy.Activate(AC);
+                    if (_dist <= f_enemyDeathRange)
+                        onDeath_Enemy.Activate(AC);
                     return;
                 }
             }
@@ -174,6 +178,7 @@ public class AgentController : BaseController
 
         public PlayerController PC_tarPlayer;
         public AgentController AC_tarAgent;
+        public BaseController _base;
 
         public Vehicle GetVehicle()
         {
@@ -194,6 +199,7 @@ public class AgentController : BaseController
             {
                 targetType = targetTypeEnum.player;
                 PC_tarPlayer = _player;
+                _base = _player;
             }
         }
         public void FollowAgent(AgentController _agent)
@@ -202,11 +208,29 @@ public class AgentController : BaseController
             {
                 targetType = targetTypeEnum.agent;
                 AC_tarAgent = _agent;
+                _base = AC_tarAgent;
             }
         }
         public void Stop()
         {
             targetType = targetTypeEnum.none;
+            PC_tarPlayer = null;
+            AC_tarAgent = null;
+            _base = null;
+        }
+        public bool Check()
+        {
+            if (targetType != targetTypeEnum.none)
+            {
+                if (_base.b_alive)
+                    return true;
+                else
+                {
+                    Stop();
+                    return false;
+                }
+            }
+            return false;
         }
         public bool IsActive()
         {
@@ -296,6 +320,7 @@ public class AgentController : BaseController
     {
         base.Start();
         C_character = Relationship.Instance.GetCharacterFromID(S_characterID);
+        ChangeState(state);
 
         if (DEBUG_FollowPlayerImmediately)
         {
@@ -564,9 +589,14 @@ public class AgentController : BaseController
             {
                 if (attackTarget.GetTargetPos(T_barrelHook.position, LM_hitScan, out _tarPos))
                 {
-                    gun_Equipped.OnFire();
-                    T_aimPoint.position = _tarPos;
-                    _startShot = true;
+                    if (attackTarget.Check())
+                    {
+                        gun_Equipped.OnFire();
+                        T_aimPoint.position = _tarPos;
+                        _startShot = true;
+                    }
+                    else
+                        TargetDead();
                 }
             }
         }
@@ -584,7 +614,7 @@ public class AgentController : BaseController
 
     public void TargetDead()
     {
-        attackTarget.Stop();
+
     }
 
     public override void OnHit(GunManager.bulletClass _bullet)
@@ -655,17 +685,20 @@ public class AgentController : BaseController
                 Relationship.groupClass _group = Relationship.Instance.GetGroupFromEnum(item);
                 _group.relationship.chaotic += 10;
             }
-            _bullet.con_Player.Update_Objectives(Objective_Type.Kill_Any, 1);
+            _bullet.con_Player.OnKill(this, true);
         }
         else
         {
             if (_bullet.con_Agent != null)
             {
-                _bullet.con_Agent.TargetDead();
                 if (_bullet.con_Agent.b_friendly)
-                    PlayerController.Instance.Update_Objectives(Objective_Type.Kill_Any, 1);
+                    PlayerController.Instance.OnKill(this, false);
             }
         }
+
+        if (gun_Equipped != null)
+            gun_Equipped.OnUnEquip();
+
         ResourceDrop.Drop(T_model.position);
         ChangeState(stateEnum.ragdoll);
         RM_ragdoll.EnableRigidbodies(true);
@@ -673,6 +706,7 @@ public class AgentController : BaseController
         RM_ragdoll.R_aimRig.weight = 0;
         A_model.enabled = false;
         b_alive = false;
+        LevelGen_Holder.Instance.AgentDeath(this);
         AH_agentAudioHolder.Play(AgentAudioHolder.type.death);
         MusicHandler.AdjustVolume(MusicHandler.typeEnum.brass, 0.5f);
         //gameObject.SetActive(false);

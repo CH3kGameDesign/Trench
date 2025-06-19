@@ -30,6 +30,11 @@ public class Interactable : MonoBehaviour
 
     }
 
+    public virtual void OnFixedUpdate(BaseController _player)
+    {
+
+    }
+
     public virtual void Update()
     {
 

@@ -431,6 +431,8 @@ public class MainMenu : MonoBehaviour
         {
             store.activeItem.Purchase();
             store.UpdateGrid(store._activeTab);
+            if (PlayerController.Instance.Inputs.b_isGamepad && EventSystem.current.currentSelectedGameObject == null)
+                EventSystem.current.SetSelectedGameObject(_current.DefaultButton(false));
         }
     }
     #endregion
@@ -516,6 +518,8 @@ public class MainMenu : MonoBehaviour
                 List<Action> _actions = store.ActionList();
                 int _tab = Mathf.Clamp((int)store._activeTab + (_left ? -1 : 1), 0, _actions.Count - 1);
                 _actions[_tab].Invoke();
+                if (PlayerController.Instance.Inputs.b_isGamepad && EventSystem.current.currentSelectedGameObject == null)
+                    EventSystem.current.SetSelectedGameObject(_current.DefaultButton(false));
             }
         }
     }

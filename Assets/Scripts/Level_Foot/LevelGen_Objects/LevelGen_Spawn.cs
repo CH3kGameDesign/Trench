@@ -6,6 +6,10 @@ public class LevelGen_Spawn : LevelGen_Object
 {
     public spawnTypeEnum spawnType = spawnTypeEnum.enemy;
     public enum spawnTypeEnum { player, companion, enemy, treasure};
+
+    public GameObject PF_override;
+    public AgentController.stateEnum _state = AgentController.stateEnum.unchanged;
+
     public Color C_Color = new Color (1,0,0,0.4f);
 
     // Start is called before the first frame update

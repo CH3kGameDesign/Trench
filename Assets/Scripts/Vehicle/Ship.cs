@@ -251,9 +251,18 @@ public class Ship : Vehicle
             {
 
             }
+        }
+    }
+
+    public override void OnFixedUpdate_Driver(BaseController _player)
+    {
+        if (_player is PlayerController)
+        {
+            PlayerController _temp = _player as PlayerController;
             Update_Rotation(_temp);
         }
     }
+
     public override void OnEnter(BaseController _player)
     {
         if (useSounds && hasDriver())
@@ -302,7 +311,7 @@ public class Ship : Vehicle
         Quaternion _target = Quaternion.Euler(_tarRot) * Quaternion.Euler(_rotate);
         _target *= Quaternion.Inverse(T_pilotSeat.rotation);
         _target =  _target * transform.rotation;
-        Quaternion _angle = Quaternion.Slerp(transform.rotation, _target, Time.deltaTime * steeringSpeed);
+        Quaternion _angle = Quaternion.Slerp(transform.rotation, _target, Time.fixedDeltaTime * steeringSpeed);
         transform.rotation = _angle;
     }
 

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Bullet : DamageSource
@@ -57,12 +58,19 @@ public class Bullet : DamageSource
         if (hit.transform.TryGetComponent<HitObject>(out hitObject))
         {
             hitObject.OnDamage(B_info, this);
+            HitMarker();
             if (hitObject.PF_hitParticles != null)
             {
                 GameObject GO = Instantiate(hitObject.PF_hitParticles, hit.point, B_info.PF_impactHit.transform.rotation);
                 GO.transform.forward = hit.normal;
             }
         }
+    }
+
+    void HitMarker()
+    {
+        if (B_info.B_player)
+            B_info.con_Player.reticle.Hit(B_info.D_damageType);
     }
 
     public void HitPoint(RaycastHit hit)

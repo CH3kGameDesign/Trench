@@ -23,6 +23,8 @@ public class LevelGen : MonoBehaviour
 
     public SpaceGenerator spaceGenerator;
 
+    [HideInInspector] public List<AgentController> AC_agents = new List<AgentController>();
+
     public LayerMask LM_mask;
 
     private int i_series = 2;
@@ -185,30 +187,44 @@ public class LevelGen : MonoBehaviour
                         if (prefab != null && playerSpawned == false)
                         {
                             GO = Instantiate(prefab, spawn.transform.position, Quaternion.Euler(Vector3.zero), transform);
-                            GO.GetComponent<PlayerController>().NMA.transform.rotation = spawn.transform.rotation;
+                            PlayerController PC = GO.GetComponent<PlayerController>();
+                            PC.NMA.transform.rotation = spawn.transform.rotation;
+                            PC.Ref.R_recall.SetRecallPos(spawn.transform);
                             playerSpawned = true;
                         }
                         break;
                     case LevelGen_Spawn.spawnTypeEnum.companion:
-                        prefab = LG_Theme.GetCompanion(Random_Seeded);
+                        if (spawn.PF_override != null) prefab = spawn.PF_override;
+                        else prefab = LG_Theme.GetCompanion(Random_Seeded);
+
                         Random_Seeded.NextInt();
                         if (prefab != null)
                         {
                             GO = Instantiate(prefab, spawn.transform.position, Quaternion.Euler(Vector3.zero), transform);
-                            GO.GetComponent<AgentController>().NMA.transform.rotation = spawn.transform.rotation;
+                            AgentController AC = GO.GetComponent<AgentController>();
+                            AC.NMA.transform.rotation = spawn.transform.rotation;
+                            AC.ChangeState(spawn._state);
+                            AC_agents.Add(AC);
                         }
                         break;
                     case LevelGen_Spawn.spawnTypeEnum.enemy:
-                        prefab = LG_Theme.GetEnemy(Random_Seeded);
+                        if (spawn.PF_override != null) prefab = spawn.PF_override;
+                        else prefab = LG_Theme.GetEnemy(Random_Seeded);
+
                         Random_Seeded.NextInt();
                         if (prefab != null)
                         {
                             GO = Instantiate(prefab, spawn.transform.position, Quaternion.Euler(Vector3.zero), transform);
-                            GO.GetComponent<AgentController>().NMA.transform.rotation = spawn.transform.rotation;
+                            AgentController AC = GO.GetComponent<AgentController>();
+                            AC.NMA.transform.rotation = spawn.transform.rotation;
+                            AC.ChangeState(spawn._state);
+                            AC_agents.Add(AC);
                         }
                         break;
                     case LevelGen_Spawn.spawnTypeEnum.treasure:
-                        prefab = LG_Theme.GetTreasure(Random_Seeded);
+                        if (spawn.PF_override != null) prefab = spawn.PF_override;
+                        else prefab = LG_Theme.GetTreasure(Random_Seeded);
+
                         Random_Seeded.NextInt();
                         if (prefab != null)
                             GO = Instantiate(prefab, spawn.transform.position, spawn.transform.rotation, transform);
@@ -465,5 +481,15 @@ public class LevelGen : MonoBehaviour
             }
         }
         return _value;
+    }
+
+    public void AgentDeath(AgentController _AC)
+    {
+        foreach (AgentController agent in AC_agents)
+        {
+            if (agent == _AC || agent == null)
+                continue;
+            agent.behaviour.OnDeath(agent, _AC);
+        }
     }
 }

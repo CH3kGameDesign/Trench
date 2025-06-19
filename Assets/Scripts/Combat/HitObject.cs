@@ -20,6 +20,7 @@ public class HitObject : MonoBehaviour
 
     public RagdollManager RM_ragdollManager;
 
+
     private void Start()
     {
         f_health = I_maxHealth;

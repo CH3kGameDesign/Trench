@@ -53,7 +53,30 @@ using UnityEngine;
         }
     }
 
+    public override void OnFixedUpdate(BaseController _player)
+    {
+        seatClass _seat = GetSeat(_player);
+        if (_seat == null) { Debug.LogError("'" + _player.name + "' isn't in a dedicated seat in '" + name + "', but is still attempting to Update in it"); return; }
+        switch (_seat.seatType)
+        {
+            case seatTypeEnum.driver:
+                OnFixedUpdate_Driver(_player);
+                break;
+            case seatTypeEnum.passenger:
+                break;
+            case seatTypeEnum.none:
+                break;
+            default:
+                break;
+        }
+    }
+
     public virtual void OnUpdate_Driver(BaseController _player)
+    {
+
+    }
+
+    public virtual void OnFixedUpdate_Driver(BaseController _player)
     {
 
     }

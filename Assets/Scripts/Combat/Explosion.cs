@@ -64,6 +64,7 @@ public class Explosion : DamageSource
         Damage(other);
     }
 
+    bool _hit = false;
     void Damage(Collider other)
     {
         Rigidbody _rb;
@@ -80,11 +81,19 @@ public class Explosion : DamageSource
             _bc.F_damage = _damage;
             _ho.OnDamage(_bc, this);
 
+            if (!_hit) HitMarker();
+
             if (B_info.B_player)
             {
                 B_info.con_Gun.Damage_Objective(Mathf.FloorToInt(_damage));
                 B_info.con_Player.Update_Objectives(Objective_Type.Damage_Explosions, Mathf.FloorToInt(_damage));
             }
         }
+    }
+    void HitMarker()
+    {
+        if (B_info.B_player)
+            B_info.con_Player.reticle.Hit(HitObject.damageTypeEnum.explosive);
+        _hit = true;
     }
 }
