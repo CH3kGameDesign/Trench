@@ -320,6 +320,13 @@ public class AgentController : BaseController
         C_character = Relationship.Instance.GetCharacterFromID(S_characterID);
         ChangeState(state);
 
+        if (DEBUG_EquippedGunNum < 0)
+            DEBUG_EquippedGunNum = Random.Range(0, 3);
+
+        gun_Equipped = gunManager.GetGunByInt(DEBUG_EquippedGunNum, this);
+        gun_Equipped.OnEquip(this);
+        Armor.Equip(RM_ragdoll);
+
         if (DEBUG_FollowPlayerImmediately)
         {
             if (b_friendly)
@@ -331,14 +338,6 @@ public class AgentController : BaseController
                 attackTarget.FollowPlayer(PlayerController.Instance);
         }
         attackTarget.FollowAgent(DEBUG_TargetAgent);
-
-        if (DEBUG_EquippedGunNum < 0)
-            DEBUG_EquippedGunNum = Random.Range(0, 3);
-
-
-        gun_Equipped = gunManager.GetGunByInt(DEBUG_EquippedGunNum, this);
-        gun_Equipped.OnEquip(this);
-        Armor.Equip(RM_ragdoll);
     }
 
     void NavSurface_Update(bool _override = false)

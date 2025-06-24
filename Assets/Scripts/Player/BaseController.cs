@@ -21,6 +21,8 @@ public class BaseController : MonoBehaviour
     public float F_maxHealth = 100;
     [HideInInspector] public float F_curHealth = 100;
 
+    [HideInInspector] public Texture2D T_icon { get; private set;}
+
     [HideInInspector] public GunClass gun_Equipped;
     [HideInInspector] public GunClass[] gun_EquippedList = new GunClass[3];
 
@@ -148,5 +150,9 @@ public class BaseController : MonoBehaviour
     public virtual string GetName()
     {
         return "Undefined";
+    }
+    public virtual void SetIcon(Texture2D _icon)
+    {
+        T_icon = _icon;
     }
 }

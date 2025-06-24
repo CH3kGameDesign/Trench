@@ -20,8 +20,9 @@ public class PlayerController : BaseController
         public RadialMenu RM_radial;
         public TextMeshProUGUI TM_interactText;
         public TextMeshProUGUI TM_controlText;
-        public Image S_healthSlider;
-        public TextMeshProUGUI TM_healthText;
+
+        public HealthUI HUI_health;
+
         public Image I_curWeapon;
 
         public ObjectiveHUD HUD_objective;
@@ -32,9 +33,9 @@ public class PlayerController : BaseController
         public SpeedLines hurtFace;
     }
     [Header("UI")]
-    public FollowerHealthUI PF_followerHealth;
+    public HealthUI PF_followerHealth;
     public RectTransform RT_followerHealthHolder;
-    private List<FollowerHealthUI> FollowerHealthList = new List<FollowerHealthUI>();
+    private List<HealthUI> FollowerHealthList = new List<HealthUI>();
     [Header ("Camera Values")]
     public float F_camLatSpeed = 1;
     public float F_camRotSpeed = 240f;
@@ -189,9 +190,8 @@ public class PlayerController : BaseController
     public override void Start()
     {
         base.Start();
-        Ref.S_healthSlider.material.SetFloat("_Value", 1);
-        _health = F_maxHealth;
-        Ref.TM_healthText.text = F_curHealth.ToString();
+        ArmorManager.EquipArmor_Static(RM_ragdoll, SaveData.equippedArmor);
+        Ref.HUI_health.Setup(this);
         v3_camDir = T_camHolder.localEulerAngles;
         v3_camDir.z = 0;
         f_camDistance = V3_camOffset.magnitude;
@@ -209,7 +209,6 @@ public class PlayerController : BaseController
 
         Ref.R_recall.Setup(this);
 
-        ArmorManager.EquipArmor_Static(RM_ragdoll, SaveData.equippedArmor);
 
         GameState_Change(gameStateEnum.active);
     }
@@ -1096,8 +1095,7 @@ public class PlayerController : BaseController
             return;
         F_curHealth -= _bullet.F_damage;
 
-        if (C_updateHealth != null) StopCoroutine(C_updateHealth);
-        C_updateHealth = StartCoroutine(Health_Update(F_curHealth));
+        Ref.HUI_health.UpdateHealth();
 
         if (F_curHealth <= 0)
             OnDeath();
@@ -1112,8 +1110,7 @@ public class PlayerController : BaseController
     {
         F_curHealth = Mathf.Clamp(F_curHealth + _amt, 0, F_maxHealth);
 
-        if (C_updateHealth != null) StopCoroutine(C_updateHealth);
-        C_updateHealth = StartCoroutine(Health_Update(F_curHealth));
+        Ref.HUI_health.UpdateHealth();
 
         float _scale = Mathf.Clamp(Mathf.Pow((F_curHealth / F_maxHealth), 2) * 2, 0, 1);
         Ref.hurtFace.SetMaskScale(_scale, 0.05f);
@@ -1124,7 +1121,7 @@ public class PlayerController : BaseController
     public override void AddFollower(BaseController _base)
     {
         base.AddFollower(_base);
-        FollowerHealthUI _GO = Instantiate(PF_followerHealth, RT_followerHealthHolder);
+        HealthUI _GO = Instantiate(PF_followerHealth, RT_followerHealthHolder);
         FollowerHealthList.Add(_GO);
         _GO.Setup(_base);
     }
@@ -1218,6 +1215,12 @@ public class PlayerController : BaseController
         return "Player";
     }
 
+    public override void SetIcon(Texture2D _icon)
+    {
+        base.SetIcon(_icon);
+        Ref.HUI_health.Setup(this);
+    }
+
     IEnumerator TimeScale (float _scale)
     {
         float _timer = 0;
@@ -1243,23 +1246,6 @@ public class PlayerController : BaseController
             yield return new WaitForEndOfFrame();
         }
         T_model.localPosition = v3_modelLocalPos;
-    }
-
-    float _health;
-    IEnumerator Health_Update(float _tarHealth)
-    {
-        float _timer = 0;
-        float _oldHealth = _health;
-        while (_timer < 1)
-        {
-            _health = Mathf.Lerp(_oldHealth, _tarHealth, _timer);
-            Ref.S_healthSlider.material.SetFloat("_Value", _health / F_maxHealth);
-            Ref.TM_healthText.text = Mathf.RoundToInt(_health).ToString();
-            _timer += Time.deltaTime / 0.2f;
-            yield return new WaitForEndOfFrame();
-        }
-        Ref.S_healthSlider.material.SetFloat("_Value", _tarHealth / F_maxHealth);
-        Ref.TM_healthText.text = Mathf.RoundToInt(_tarHealth).ToString();
     }
 
     IEnumerator Idle_Anim(float _animWait = 20f)

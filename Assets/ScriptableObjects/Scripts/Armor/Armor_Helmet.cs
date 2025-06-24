@@ -9,6 +9,8 @@ public class Armor_Helmet : ArmorPiece
     {
         _RM.T_armorPoints[0].DeleteChildren();
         if (modelHelmet != null) Instantiate(modelHelmet, _RM.T_armorPoints[0]);
+        if (_RM.BaseController != null)
+            _RM.BaseController.SetIcon(image);
     }
     public override void AssignToPlayer(bool _left = true)
     {
