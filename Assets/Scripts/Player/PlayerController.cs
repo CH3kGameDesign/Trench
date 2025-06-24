@@ -20,7 +20,7 @@ public class PlayerController : BaseController
         public RadialMenu RM_radial;
         public TextMeshProUGUI TM_interactText;
         public TextMeshProUGUI TM_controlText;
-        public Slider S_healthSlider;
+        public Image S_healthSlider;
         public TextMeshProUGUI TM_healthText;
         public Image I_curWeapon;
 
@@ -189,8 +189,8 @@ public class PlayerController : BaseController
     public override void Start()
     {
         base.Start();
-        Ref.S_healthSlider.maxValue = F_maxHealth;
-        Ref.S_healthSlider.value = F_curHealth;
+        Ref.S_healthSlider.material.SetFloat("_Value", 1);
+        _health = F_maxHealth;
         Ref.TM_healthText.text = F_curHealth.ToString();
         v3_camDir = T_camHolder.localEulerAngles;
         v3_camDir.z = 0;
@@ -1245,20 +1245,21 @@ public class PlayerController : BaseController
         T_model.localPosition = v3_modelLocalPos;
     }
 
-    IEnumerator Health_Update(float _health)
+    float _health;
+    IEnumerator Health_Update(float _tarHealth)
     {
         float _timer = 0;
-        float _oldHealth = Ref.S_healthSlider.value;
-        Ref.S_healthSlider.maxValue = F_maxHealth;
+        float _oldHealth = _health;
         while (_timer < 1)
         {
-            Ref.S_healthSlider.value = Mathf.Lerp(_oldHealth, _health, _timer);
-            Ref.TM_healthText.text = Mathf.RoundToInt(Ref.S_healthSlider.value).ToString();
+            _health = Mathf.Lerp(_oldHealth, _tarHealth, _timer);
+            Ref.S_healthSlider.material.SetFloat("_Value", _health / F_maxHealth);
+            Ref.TM_healthText.text = Mathf.RoundToInt(_health).ToString();
             _timer += Time.deltaTime / 0.2f;
             yield return new WaitForEndOfFrame();
         }
-        Ref.S_healthSlider.value = _health;
-        Ref.TM_healthText.text = Mathf.RoundToInt(Ref.S_healthSlider.value).ToString();
+        Ref.S_healthSlider.material.SetFloat("_Value", _tarHealth / F_maxHealth);
+        Ref.TM_healthText.text = Mathf.RoundToInt(_tarHealth).ToString();
     }
 
     IEnumerator Idle_Anim(float _animWait = 20f)
