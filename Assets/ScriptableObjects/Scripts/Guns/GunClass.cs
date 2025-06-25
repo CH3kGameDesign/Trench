@@ -182,6 +182,7 @@ public class GunClass : ItemClass
             if (b_playerGun)
                 PM_player.reticle.ReloadReticle(f_fireTimer, this);
             clipAmmo = clipVariables.clipSize;
+            baseController.Weapon_Fired();
             A_charModel.Play("Reload_Rifle", 1);
             baseController.AH_agentAudioHolder.Play(AgentAudioHolder.type.reload);
         }
@@ -227,6 +228,7 @@ public class GunClass : ItemClass
             f_burstTimer = fireVariables.burstRate;
             i_burstRemaining--;
             clipAmmo--;
+            baseController.Weapon_Fired();
 
             G_gunModel.Shoot();
 

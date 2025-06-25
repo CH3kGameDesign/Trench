@@ -22,8 +22,7 @@ public class PlayerController : BaseController
         public TextMeshProUGUI TM_controlText;
 
         public HealthUI HUI_health;
-
-        public Image I_curWeapon;
+        public GunUI GUI_gun;
 
         public ObjectiveHUD HUD_objective;
 
@@ -192,12 +191,14 @@ public class PlayerController : BaseController
         base.Start();
         ArmorManager.EquipArmor_Static(RM_ragdoll, SaveData.equippedArmor);
         Ref.HUI_health.Setup(this);
+        Ref.GUI_gun.Setup(this);
         v3_camDir = T_camHolder.localEulerAngles;
         v3_camDir.z = 0;
         f_camDistance = V3_camOffset.magnitude;
         SetNavIDs();
 
         DebugGunList();
+        gun_secondaryEquipped = gun_EquippedList[1];
         Gun_Equip(0);
         reticle.UpdateRoundCount(gun_Equipped);
 
@@ -1154,10 +1155,14 @@ public class PlayerController : BaseController
     public void Gun_Equip(int _invNum)
     {
         if (gun_Equipped != null)
+        {
+            gun_secondaryEquipped = gun_Equipped;
             gun_Equipped.OnUnEquip();
+        }
         gun_Equipped = gun_EquippedList[_invNum];
         gun_Equipped.OnEquip(this);
-        Ref.I_curWeapon.sprite = gun_Equipped.sprite;
+
+        Ref.GUI_gun.Equip(gun_Equipped, gun_secondaryEquipped);
 
         AH_agentAudioHolder.Gun_Equip(gun_Equipped);
     }
@@ -1219,6 +1224,10 @@ public class PlayerController : BaseController
     {
         base.SetIcon(_icon);
         Ref.HUI_health.Setup(this);
+    }
+    public override void Weapon_Fired()
+    {
+        Ref.GUI_gun.UpdateClip(gun_Equipped);
     }
 
     IEnumerator TimeScale (float _scale)
@@ -1330,6 +1339,7 @@ public class PlayerController : BaseController
         Setup_InteractStrings();
         MainMenu.Instance.GamepadSwitch();
         Ref.R_recall.TextUpdate();
+        Ref.GUI_gun.UpdateControl();
     }
 
     bool Input_GetPressed(InputAction.CallbackContext cxt)

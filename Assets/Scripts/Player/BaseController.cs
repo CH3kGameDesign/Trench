@@ -24,6 +24,7 @@ public class BaseController : MonoBehaviour
     [HideInInspector] public Texture2D T_icon { get; private set;}
 
     [HideInInspector] public GunClass gun_Equipped;
+    [HideInInspector] public GunClass gun_secondaryEquipped;
     [HideInInspector] public GunClass[] gun_EquippedList = new GunClass[3];
 
     [HideInInspector] public bool b_alive = true;
@@ -154,5 +155,9 @@ public class BaseController : MonoBehaviour
     public virtual void SetIcon(Texture2D _icon)
     {
         T_icon = _icon;
+    }
+    public virtual void Weapon_Fired()
+    {
+
     }
 }

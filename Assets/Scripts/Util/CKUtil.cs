@@ -16,6 +16,17 @@ using UnityEditor;
 #endif
 public static class CKUtil
 {
+    public static string ToString_Clip(this int _value)
+    {
+        string _temp = "";
+        if (_value < 10)
+            _temp += "<color=#B0B0B0>0</color>";
+        if (_value == 0)
+            _temp += "<color=#E44F4C>";
+        _temp += _value.ToString();
+        return _temp;
+    }
+
     public static string ToString_Currency(this int _value)
     {
         string _temp = "$" + _value.ToString();
