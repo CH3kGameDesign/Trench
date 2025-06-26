@@ -1,6 +1,10 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using DG.Tweening;
+using Unity.VisualScripting;
+
+
 
 
 #if UNITY_EDITOR
@@ -23,15 +27,26 @@ public class Objective : ScriptableObject
         [HideInInspector] public int amt = 0;
         public int total = 0;
         [HideInInspector] public bool completed = false;
-        public string GetString()
+        public string GetDescription()
         {
-            string _temp = "<b>" + amt.ToString() + "/" + total.ToString() + "</b> " + type.description;
+            string _temp = type.description;
             if (_type == Objective_Type.Collect_Resource)
             {
                 if (resource == null)
                     resource = Resource.GetResourceType_Static(_resource);
                 _temp += "<b>" + resource._name + "</b> ";
             }
+            if (completed)
+                _temp = "<s><color=#232323>" + _temp + "</color></s>";
+            return _temp;
+        }
+        public string GetAmount()
+        {
+            string _temp;
+            if (completed)
+                _temp = "<color=#232323>" + total.ToString() + "</color>";
+            else
+                _temp = "<color=#FF9500>" + amt.ToString() + "</color> " + total.ToString();
             return _temp;
         }
         public objectiveClass Clone(Objective _objective)
@@ -60,6 +75,13 @@ public class Objective : ScriptableObject
         int _id = UnityEngine.Random.Range(0, list.Count);
         return list[_id].Clone(this);
     }
+    public objectiveClass GetObjective_Random(List<objectiveClass> _list)
+    {
+        int _id = UnityEngine.Random.Range(0, _list.Count);
+        objectiveClass _temp = _list[_id].Clone(this);
+        _list.RemoveAt(_id);
+        return _temp;
+    }
 
     public objectiveType GetObjectiveType(Objective_Type _type)
     {
@@ -79,12 +101,13 @@ public class Objective : ScriptableObject
 
     public void NewObjectives()
     {
-        List<Objective.objectiveClass> _objectives = new List<Objective.objectiveClass>();
+        List<objectiveClass> _list = new List<objectiveClass>();
+        _list.AddRange(list);
+        List<objectiveClass> _objectives = new List<Objective.objectiveClass>();
+
         for (int i = 0; i < 3; i++)
-        {
-            Objective.objectiveClass _temp = GetObjective_Random();
-            _objectives.Add(_temp);
-        }
+            _objectives.Add(GetObjective_Random(_list));
+
         SaveData.objectives = _objectives;
         PlayerController.Instance.Update_Objectives();
 
