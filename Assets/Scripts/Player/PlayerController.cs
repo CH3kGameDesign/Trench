@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -5,7 +6,6 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
 public class PlayerController : BaseController
 {
@@ -20,6 +20,9 @@ public class PlayerController : BaseController
         public RadialMenu RM_radial;
         public TextMeshProUGUI TM_interactText;
         public TextMeshProUGUI TM_controlText;
+
+        public RectTransform RT_canvasPivot;
+        [HideInInspector] public Vector3 V3_canvasRot;
 
         public HealthUI HUI_health;
         public GunUI GUI_gun;
@@ -150,6 +153,33 @@ public class PlayerController : BaseController
                 b_purchase ||
                 b_recall;
         }
+
+
+        [HideInInspector]
+        public inputActions[] baseInputs = new inputActions[]
+        {
+            inputActions.Jump,
+            inputActions.Crouch,
+            inputActions.Melee,
+            inputActions.Reload,
+            inputActions.Sprint,
+        };
+        [HideInInspector]
+        public inputActions[] spaceInputs = new inputActions[]
+        {
+            inputActions.Jump,
+            inputActions.Crouch,
+            inputActions.Melee,
+            inputActions.Reload,
+            inputActions.Sprint,
+            inputActions.Recall,
+        };
+        [HideInInspector]
+        public inputActions[] vehicleInputs = new inputActions[]
+        {
+            inputActions.Interact,
+            inputActions.Sprint,
+        };
         public string[] inputs = new string[0];
     }
     public enum inputActions
@@ -210,7 +240,6 @@ public class PlayerController : BaseController
 
         Ref.R_recall.Setup(this);
 
-
         GameState_Change(gameStateEnum.active);
     }
 
@@ -244,11 +273,28 @@ public class PlayerController : BaseController
         {
             string _input = "".ToString_InputSetup((inputActions)i, _E);
             _list.Add(_input);
-            if (i < mainAmt)
+            inputActions[] _inputListed;
+            switch (GameState)
+            {
+                case gameStateEnum.active:
+                    if (SaveData.themeCurrent == Themes.themeEnum.ship)
+                        _inputListed = Inputs.spaceInputs;
+                    else
+                        _inputListed = Inputs.baseInputs;
+                        break;
+                case gameStateEnum.vehicle:
+                    _inputListed = Inputs.vehicleInputs;
+                    break;
+                default:
+                    _inputListed = new inputActions[0];
+                    break;
+            }
+            if (Array.IndexOf(_inputListed, (inputActions)i) > -1)
                 _body += _names[i].ToString_Interact(_input, Interactable.enumType.combineReverse) + "\n";
         }
         Inputs.inputs = _list.ToArray();
-        _body = _body.Remove(_body.Length - 1, 1);
+        if (_body.Length > 0)
+            _body = _body.Remove(_body.Length - 1, 1);
         _TM.text = _body;
     }
 
@@ -270,6 +316,8 @@ public class PlayerController : BaseController
     {
         v3_camDir.y = T_model.eulerAngles.y;
         T_camHolder.transform.rotation = Quaternion.Euler(v3_camDir);
+
+        StartCoroutine(CanvasPivot());
     }
 
     public void Setup_Radial()
@@ -794,27 +842,39 @@ public class PlayerController : BaseController
             gun_Equipped.OnReload();
     }
 
+    float _radialTimer = 0;
     void RadialHandler()
     {
         if (Inputs.b_radial)
         {
-            if (!b_radialOpen)
+            _radialTimer += Time.deltaTime;
+            if (_radialTimer > 0.2f)
             {
-                Update_Radial();
-                Ref.RM_radial.Show();
-                b_radialOpen = true;
-                SetTimeScale(0.1f);
-                AH_agentAudioHolder.Play(AgentAudioHolder.type.radial);
+                if (!b_radialOpen)
+                {
+                    Update_Radial();
+                    Ref.RM_radial.Show();
+                    b_radialOpen = true;
+                    SetTimeScale(0.1f);
+                    AH_agentAudioHolder.Play(AgentAudioHolder.type.radial);
+                }
+                if (Inputs.b_isGamepad)
+                    Ref.RM_radial.MoveCursor_Gamepad(Inputs.v2_camInputDir);
+                else
+                    Ref.RM_radial.MoveCursor(Inputs.v2_camInputDir);
             }
-            if (Inputs.b_isGamepad)
-                Ref.RM_radial.MoveCursor_Gamepad(Inputs.v2_camInputDir);
-            else
-                Ref.RM_radial.MoveCursor(Inputs.v2_camInputDir);
         }
         else if (b_radialOpen)
         {
             Ref.RM_radial.Confirm();
             CloseRadial();
+            _radialTimer = 0;
+        }
+        else if (_radialTimer > 0)
+        {
+            if (gun_secondaryEquipped != null)
+                Gun_Equip(gun_secondaryEquipped);
+            _radialTimer = 0;
         }
     }
     void CloseRadial()
@@ -911,6 +971,9 @@ public class PlayerController : BaseController
                 T_camHolder.transform.eulerAngles += new Vector3(0, 360, 0);
             }
             v3_camDir.x = Mathf.Clamp(v3_camDir.x, -80, 80);
+
+            //Canvas Pivot
+            Ref.V3_canvasRot += new Vector3(Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0);
         }
 
         float _delta = _fixedDelta ?
@@ -1154,12 +1217,17 @@ public class PlayerController : BaseController
 
     public void Gun_Equip(int _invNum)
     {
+        Gun_Equip(gun_EquippedList[_invNum]);
+    }
+
+    public void Gun_Equip(GunClass _gun)
+    {
         if (gun_Equipped != null)
         {
             gun_secondaryEquipped = gun_Equipped;
             gun_Equipped.OnUnEquip();
         }
-        gun_Equipped = gun_EquippedList[_invNum];
+        gun_Equipped = _gun;
         gun_Equipped.OnEquip(this);
 
         Ref.GUI_gun.Equip(gun_Equipped, gun_secondaryEquipped);
@@ -1257,6 +1325,18 @@ public class PlayerController : BaseController
         T_model.localPosition = v3_modelLocalPos;
     }
 
+    IEnumerator CanvasPivot()
+    {
+        while (true)
+        {
+            Ref.V3_canvasRot = Vector3.ClampMagnitude(Ref.V3_canvasRot, 10);
+            Ref.RT_canvasPivot.localEulerAngles = Ref.V3_canvasRot;
+            Ref.RT_canvasPivot.anchoredPosition = new Vector3(Ref.V3_canvasRot.y, Ref.V3_canvasRot.x) * 3;
+            Ref.V3_canvasRot = Vector3.MoveTowards(Ref.V3_canvasRot, Vector3.zero, Time.deltaTime * 20);
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
     IEnumerator Idle_Anim(float _animWait = 20f)
     {
         while (true)
@@ -1264,7 +1344,7 @@ public class PlayerController : BaseController
             yield return new WaitForSeconds(_animWait);
             if (RB.linearVelocity.magnitude < 0.1f && !Inputs.IsInput())
             {
-                A_model.SetInteger("Idle", Random.Range(0, 4));
+                A_model.SetInteger("Idle", UnityEngine.Random.Range(0, 4));
                 A_model.Play("Idle");
             }
         }
@@ -1289,6 +1369,7 @@ public class PlayerController : BaseController
                 break;
         }
         base.GameState_Change(_state);
+        Setup_InteractStrings();
     }
 
     public void Input_Movement(InputAction.CallbackContext cxt) { Inputs.v2_inputDir = Input_GetVector2(cxt); }
