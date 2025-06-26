@@ -46,8 +46,12 @@ public class SpaceGenerator : MonoBehaviour
             {
                 for (int z = 0; z < segmentAmt.z; z++)
                 {
+                    if (activeSegments[x, y, z] == null)
+                        continue;
                     foreach (var item in activeSegments[x, y, z].landingSpots)
                     {
+                        if (item == null)
+                            continue;
                         if (item.landingID == _id)
                         {
                             _pos = item.exitTransform.position;
