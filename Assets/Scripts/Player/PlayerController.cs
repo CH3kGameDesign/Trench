@@ -558,6 +558,7 @@ public class PlayerController : BaseController
 
     void SprintStart()
     {
+        gun_Equipped.OnSprint(true);
         if (b_isSprinting)
             return;
         AH_agentAudioHolder.Play(AgentAudioHolder.type.sprint);
@@ -567,6 +568,7 @@ public class PlayerController : BaseController
     }
     void SprintStop()
     {
+        gun_Equipped.OnSprint(false);
         if (!b_isSprinting)
             return;
         AH_agentAudioHolder.Stop(AgentAudioHolder.type.sprint);
@@ -1077,8 +1079,15 @@ public class PlayerController : BaseController
     void FireManager()
     {
         Update_HitPoint();
-        if (Inputs.b_firing && !b_isSprinting)
-            gun_Equipped.OnFire();
+        if (Inputs.b_firing)
+        {
+            if (!b_isSprinting)
+                gun_Equipped.OnFire();
+            else
+                gun_Equipped.OnSprintFire();  
+        }
+        else
+
         if (Inputs.b_melee)
         {
             gun_Equipped.OnMelee(b_isSprinting);

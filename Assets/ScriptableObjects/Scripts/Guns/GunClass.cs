@@ -23,6 +23,8 @@ public class GunClass : ItemClass
     [HideInInspector]
     public bool b_aiming = false;
     [HideInInspector]
+    public bool b_sprinting = false;
+    [HideInInspector]
     public float f_fireTimer;
 
     private int i_burstRemaining;
@@ -46,6 +48,8 @@ public class GunClass : ItemClass
 
     [HideInInspector]
     public bool b_playerGun = false;
+
+    private float _damage = 10;
 
     [System.Serializable]
     public class audioClipClass
@@ -144,8 +148,13 @@ public class GunClass : ItemClass
             Fire(fireVariables);
         }
     }
+    public virtual void OnSprintFire()
+    {
+        
+    }
     public void Fire(fireClass _fireVariables)
     {
+        _damage = _fireVariables.damage;
         i_burstRemaining = Mathf.Max(_fireVariables.burstAmount, 1);
         f_fireTimer = _fireVariables.fireRate;
         f_recoilCam = _fireVariables.recoilCam;
@@ -190,6 +199,10 @@ public class GunClass : ItemClass
     public virtual void OnAim(bool _aiming)
     {
         b_aiming = _aiming;
+    }
+    public virtual void OnSprint(bool _sprinting)
+    {
+        b_sprinting = _sprinting;
     }
     public virtual void OnEquip(BaseController baseController)
     {
@@ -240,7 +253,7 @@ public class GunClass : ItemClass
             GO.transform.LookAt(_tarPos);
             if (b_playerGun)
             {
-                GO.OnCreate(fireVariables.damage, PM_player, this);
+                GO.OnCreate(_damage, PM_player, this);
                 PM_player.reticle.UpdateRoundCount(this);
 
                 T_camHolder.GetChild(0).position -= T_camHolder.forward * f_recoilCam;
@@ -248,7 +261,7 @@ public class GunClass : ItemClass
             }
             else
             {
-                GO.OnCreate(fireVariables.damage, AC_agent, this);
+                GO.OnCreate(_damage, AC_agent, this);
             }
             OnBullet(GO);
         }
