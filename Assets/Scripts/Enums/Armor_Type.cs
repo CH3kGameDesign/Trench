@@ -10,6 +10,7 @@ public enum Armor_Type
 	[Description ("Shaved")]	[InspectorName ("Helmet/Shaved")]	Helmet_Shaved,
 	[Description ("Empty")]	[InspectorName ("Chest/Empty")]	Chest_Empty,
 	[Description ("Basic")]	[InspectorName ("Chest/Basic")]	Chest_Basic,
+	[Description ("Ion")]	[InspectorName ("Chest/Ion")]	Chest_Ion,
 	[Description ("Recruit")]	[InspectorName ("Chest/Recruit")]	Chest_Recruit,
 	[Description ("Empty")]	[InspectorName ("Arm/Empty")]	Arm_Empty,
 	[Description ("Basic")]	[InspectorName ("Arm/Basic")]	Arm_Basic,
