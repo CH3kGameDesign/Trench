@@ -23,6 +23,14 @@ public static class SaveData
         Armor_Type.Material_Black
     };
 
+    public static Vector2Int i_equippedGunNum = new Vector2Int(0,1);
+    public static Gun_Type[] equippedGuns = new Gun_Type[]
+    {
+        Gun_Type.gun_Rifle,
+        Gun_Type.gun_Shotgun,
+        Gun_Type.gun_Rod
+    };
+
     public static ArmorManager.SetClass equippedArmorSet = new ArmorManager.SetClass();
 
     public static Resource.resourceClass GetResource(Resource_Type _type)

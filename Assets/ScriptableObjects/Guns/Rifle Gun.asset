@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0236976edc9f7b4428f20a7b51cf6bad, type: 3}
   m_Name: Rifle Gun
   m_EditorClassIdentifier: 
-  _id: gun_Rifle
+  _id: gun/Rifle
   _name: Rifle
-  image: {fileID: 2800000, guid: 760affdb2aeb03c4bbae9fccc64c19fb, type: 3}
+  image: {fileID: 2800000, guid: 935208c37eef86d43a0eb946e1f7169c, type: 3}
   _description: 
-  ownedAmt: 0
+  ownedAmt: 1
   rarity: 0
   cost:
     unlockAtStart: 1
@@ -56,6 +56,7 @@ MonoBehaviour:
   clipAmmo: 30
   reserveAmmo: 120
   b_aiming: 0
+  b_sprinting: 0
   f_fireTimer: 0
   LM_GunRay:
     serializedVersion: 2

@@ -111,8 +111,6 @@ public class PlayerController : BaseController
     [HideInInspector] public BaseController BC_equippedController = null;
     [HideInInspector] public Treasure T_equippedTreasure = null;
 
-    [Header("Debug Variables")]
-    public int[] DEBUG_EquippedGunNum = { 0, 1, 2 };
 
     [Header("Inputs")]
     [HideInInspector] public inputClass Inputs = new inputClass();
@@ -228,8 +226,8 @@ public class PlayerController : BaseController
         SetNavIDs();
 
         DebugGunList();
-        gun_secondaryEquipped = gun_EquippedList[1];
-        Gun_Equip(0);
+        gun_secondaryEquipped = gun_EquippedList[SaveData.i_equippedGunNum.y];
+        Gun_Equip(SaveData.i_equippedGunNum.x);
         reticle.UpdateRoundCount(gun_Equipped);
 
         NMA.updateRotation = false;
@@ -246,9 +244,9 @@ public class PlayerController : BaseController
     public void DebugGunList()
     {
         List<GunClass> _list = new List<GunClass>();
-        for (int i = 0; i < DEBUG_EquippedGunNum.Length; i++)
+        for (int i = 0; i < SaveData.equippedGuns.Length; i++)
         {
-            GunClass _temp = gunManager.GetGunByInt(DEBUG_EquippedGunNum[i], this);
+            GunClass _temp = gunManager.GetGunByType(SaveData.equippedGuns[i], this);
             if (_temp.ownedAmt > 0)
             {
                 _list.Add(_temp);
@@ -1226,6 +1224,8 @@ public class PlayerController : BaseController
 
     public void Gun_Equip(int _invNum)
     {
+        SaveData.i_equippedGunNum.y = SaveData.i_equippedGunNum.x;
+        SaveData.i_equippedGunNum.x = _invNum;
         Gun_Equip(gun_EquippedList[_invNum]);
     }
 

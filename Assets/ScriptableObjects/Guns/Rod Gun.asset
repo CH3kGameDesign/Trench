@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1193da42a97f48e4f8765beb63408398, type: 3}
   m_Name: Rod Gun
   m_EditorClassIdentifier: 
-  _id: gun_Rod
+  _id: gun/Rod
   _name: Rod
-  image: {fileID: 2800000, guid: 01e5895c7333a544c9475e84a981ec48, type: 3}
+  image: {fileID: 2800000, guid: 74c5ba57d2b716d428855cd78a13dce9, type: 3}
   _description: 
-  ownedAmt: 0
+  ownedAmt: 1
   rarity: 0
   cost:
     unlockAtStart: 1
@@ -56,6 +56,7 @@ MonoBehaviour:
   clipAmmo: 5
   reserveAmmo: 100
   b_aiming: 0
+  b_sprinting: 0
   f_fireTimer: 0
   LM_GunRay:
     serializedVersion: 2

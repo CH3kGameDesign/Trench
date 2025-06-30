@@ -12,9 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0d7dd9038a9209418e6ecb800b68afe, type: 3}
   m_Name: Rocket Gun
   m_EditorClassIdentifier: 
-  _id: gun_Rocket
+  _id: gun/Rocket
   _name: Rocket
-  image: {fileID: 2800000, guid: 31d5c220e24d4b14f8af325bbcc10ac7, type: 3}
+  image: {fileID: 2800000, guid: 544ac47b2dc83aa4f8e49722f6e589c0, type: 3}
+  _description: 
+  ownedAmt: 0
+  rarity: 0
   cost:
     unlockAtStart: 0
     coinCost: 0
@@ -53,6 +56,7 @@ MonoBehaviour:
   clipAmmo: 2
   reserveAmmo: 100
   b_aiming: 0
+  b_sprinting: 0
   f_fireTimer: 0
   LM_GunRay:
     serializedVersion: 2

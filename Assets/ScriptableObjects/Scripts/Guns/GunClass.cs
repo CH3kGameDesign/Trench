@@ -143,9 +143,12 @@ public class GunClass : ItemClass
 
     public virtual void OnFire()
     {
-        if (f_fireTimer <= 0 && clipAmmo > 0)
+        if (f_fireTimer <= 0)
         {
-            Fire(fireVariables);
+            if (clipAmmo > 0)
+                Fire(fireVariables);
+            else
+                OnReload();
         }
     }
     public virtual void OnSprintFire()

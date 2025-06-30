@@ -61,7 +61,28 @@ public class GunManager : ScriptableObject
             return _temp;
         }
     }
-
+    public GunClass GetGunByType(Gun_Type _type, PlayerController _player)
+    {
+        string _id = _type.ToString().Replace('_', '/');
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (list[i]._id == _id)
+                return list[i].Clone(_player);
+        }
+        Debug.LogError("Couldn't find gun of id: " + _id);
+        return null;
+    }
+    public GunClass GetGunByType(Gun_Type _type, AgentController _player)
+    {
+        string _id = _type.ToString().Replace('_', '/');
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (list[i]._id == _id)
+                return list[i].Clone(_player);
+        }
+        Debug.LogError("Couldn't find gun of id: " + _id);
+        return null;
+    }
     public GunClass GetGunByID(string _id, PlayerController _player)
     {
         for (int i = 0; i < list.Count; i++)
