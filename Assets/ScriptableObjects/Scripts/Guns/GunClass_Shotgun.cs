@@ -42,7 +42,27 @@ public class GunClass_Shotgun : GunClass
     }
     public override void OnSprintFire()
     {
-        OnMelee();
+        if (f_fireTimer <= 0)
+        {
+            f_fireTimer = meleeVariables.fireRate;
+            PM_player.reticle.UpdateRoundCount(this);
+            PM_player.reticle.RotateReticle(f_fireTimer);
+            A_charModel.Play("Melee_Swing", 1);
+            baseController.RM_ragdoll.DisableRig(2.1f);
+            baseController.AH_agentAudioHolder.Play(AgentAudioHolder.type.melee);
+
+            if (b_playerGun)
+                MusicHandler.AdjustVolume(MusicHandler.typeEnum.guitar, meleeVariables.fireRate / 4);
+            else
+                MusicHandler.AdjustVolume(MusicHandler.typeEnum.bass, meleeVariables.fireRate / 8);
+        }
+    }
+    public override void OnMelee(bool _isSprinting = false)
+    {
+        if (_isSprinting)
+            OnSprintFire();
+        else
+            base.OnMelee(false);
     }
     public override void OnReload()
     {

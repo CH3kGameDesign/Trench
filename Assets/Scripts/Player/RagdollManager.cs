@@ -17,7 +17,37 @@ public class RagdollManager : MonoBehaviour
     [HideInInspector] public bool agentController = false;
 
     public SkinnedMeshRenderer MR_skinnedMeshRenderer;
-    public Rig R_aimRig;
+    [System.Serializable]
+    public class RigClass
+    {
+        public Rig rig;
+        public MultiAimConstraint bodyAim;
+        public MultiAimConstraint aim;
+        public TwoBoneIKConstraint secondHand;
+
+        public IEnumerator Disable(float _timer = 0)
+        {
+            bodyAim.weight = 0;
+            aim.weight = 0;
+            secondHand.weight = 0;
+            if (_timer > 0)
+            {
+                yield return new WaitForSeconds(_timer);
+                Enable();
+            }
+        }
+        public void Enable()
+        {
+            bodyAim.weight = 1;
+            aim.weight = 1;
+            secondHand.weight = 1;
+        }
+    }
+    public void DisableRig(float _timer = 0)
+    {
+        StartCoroutine(R_Rig.Disable(_timer));
+    }
+    public RigClass R_Rig;
     public Transform T_secondHand;
     public Transform T_secondElbow;
 
@@ -36,7 +66,7 @@ public class RagdollManager : MonoBehaviour
         agentController = BaseController is AgentController;
         if (DisableOnStart)
             EnableRigidbodies(false);
-        R_aimRig.weight = 0;
+        R_Rig.rig.weight = 0;
         UpdateBaseTransforms();
     }
     void UpdateBaseTransforms()
@@ -158,7 +188,7 @@ public class RagdollManager : MonoBehaviour
                 else
                     f_timeTilChange = 0f;
                 _rigActive = _aim;
-                StartCoroutine(R_aimRig.Fade(_aim, _aim ? 0.02f : 0.25f));
+                StartCoroutine(R_Rig.rig.Fade(_aim, _aim ? 0.02f : 0.25f));
             }
         }
         else if (_aim && _rigActive)

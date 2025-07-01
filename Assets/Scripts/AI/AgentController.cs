@@ -700,7 +700,7 @@ public class AgentController : BaseController
         ChangeState(stateEnum.ragdoll);
         RM_ragdoll.EnableRigidbodies(true);
         GroundedUpdate(false);
-        RM_ragdoll.R_aimRig.weight = 0;
+        RM_ragdoll.R_Rig.rig.weight = 0;
         A_model.enabled = false;
         b_alive = false;
         LevelGen_Holder.Instance.AgentDeath(this);

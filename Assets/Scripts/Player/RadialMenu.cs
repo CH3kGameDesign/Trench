@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,10 +15,80 @@ public class RadialMenu : MonoBehaviour
         public RectTransform RT_radialHolder;
         public RectTransform RT_radialHolder_Sub;
         public RectTransform RT_cursor;
+        public LineRendererUI LR_cursor;
         [HideInInspector] public RectTransform[] rt_radialItems = new RectTransform[0];
         [HideInInspector] public List<RectTransform[]> rt_radialItems_Sub = new List<RectTransform[]>();
     }
     public RefClass Ref = new RefClass();
+
+    [System.Serializable]
+    public class ItemInfoRefClass
+    {
+        public GameObject G_holder;
+        public RawImage I_itemSprite;
+
+        public TextMeshProUGUI TM_name;
+        public TextMeshProUGUI TM_type;
+        public TextMeshProUGUI TM_ammo;
+
+        public TextMeshProUGUI TM_primary;
+        public TextMeshProUGUI TM_flavour;
+        [Space(10)]
+        public TextMeshProUGUI TM_Trigger1;
+        public TextMeshProUGUI TM_Description1;
+
+        public TextMeshProUGUI TM_Trigger2;
+        public TextMeshProUGUI TM_Description2;
+
+        public TextMeshProUGUI TM_Trigger3;
+        public TextMeshProUGUI TM_Description3;
+
+        public void Display(GunClass _gun)
+        {
+            G_holder.SetActive(true);
+            TM_name.text = _gun._name;
+            TM_type.text = "Weapon";
+            TM_ammo.text = "<color=#FF9500>" + _gun.clipAmmo + "</color><size=20>" + _gun.clipVariables.clipSize +"</size>";
+
+            TM_primary.text = "Primary";
+            TM_flavour.text = _gun._description;
+
+            TM_Trigger1.text = "Trigger 1";
+            TM_Description1.text = "Description 1";
+
+            TM_Trigger2.text = "Trigger 2";
+            TM_Description2.text = "Description 2";
+
+            TM_Trigger3.text = "Trigger 3";
+            TM_Description3.text = "Description 3";
+
+            I_itemSprite.texture = _gun.image;
+        }
+        public void Display(Consumable.save _item)
+        {
+            Item_Consumable _itemC = Consumable.GetConsumableType_Static(_item._type);
+
+            G_holder.SetActive(true);
+            TM_name.text = _itemC._name;
+            TM_type.text = "Item";
+            TM_ammo.text = "<color=#FF9500>" + _item._amt + "</color><size=20>" + _item._totalAmt + "</size>";
+
+            TM_primary.text = "Primary";
+            TM_flavour.text = _itemC._description;
+
+            TM_Trigger1.text = "";
+            TM_Description1.text = "";
+
+            TM_Trigger2.text = "";
+            TM_Description2.text = "";
+
+            TM_Trigger3.text = "";
+            TM_Description3.text = "";
+
+            I_itemSprite.texture = _itemC.image;
+        }
+    }
+    public ItemInfoRefClass ItemInfoRef = new ItemInfoRefClass();
 
     [System.Serializable]
     public class ValueClass
@@ -112,12 +183,19 @@ public class RadialMenu : MonoBehaviour
         {
             Ref.rt_radialItems[1].GetChild(0).GetComponent<Image>().sprite = _consumables[_first].Get_Item().sprite;
             Ref.rt_radialItems[1].GetChild(0).GetComponent<Image>().color = Color.white;
+            Ref.rt_radialItems[1].GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().color = Color.white;
         }
         else if (_consumables.Count > 0)
         {
             Ref.rt_radialItems[1].GetChild(0).GetComponent<Image>().sprite = _consumables[0].Get_Item().sprite;
             Ref.rt_radialItems[1].GetChild(0).GetComponent<Image>().color = _trans;
+            Ref.rt_radialItems[1].GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().color = _trans;
         }
+
+        if (Ref.rt_radialItems_Sub[1].Length == 1)
+            Ref.rt_radialItems[1].GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = _consumables[_first]._amt.ToString();
+        else
+            Ref.rt_radialItems[1].GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = "";
     }
 
     public void Setup_SubGroup(int _subGroup, int _childAmt)
@@ -165,18 +243,21 @@ public class RadialMenu : MonoBehaviour
     public void ResetCursor()
     {
         Ref.RT_cursor.anchoredPosition = Vector2.zero;
+        ItemInfoRef.G_holder.SetActive(false);
         UpdateSelected();
     }
     public void MoveCursor(Vector2 _pos)
     {
         _pos *= Values.F_sensitivity * Time.unscaledDeltaTime;
         Ref.RT_cursor.anchoredPosition = Vector2.ClampMagnitude(Ref.RT_cursor.anchoredPosition + _pos, Values.F_radial_BaseDistance);
+        Ref.LR_cursor.SetPosition(Ref.RT_cursor.anchoredPosition);
         UpdateSelected();
     }
     public void MoveCursor_Gamepad(Vector2 _pos)
     {
         _pos = Vector2.ClampMagnitude(_pos, 1);
         Ref.RT_cursor.anchoredPosition = _pos * Values.F_radial_BaseDistance;
+        Ref.LR_cursor.SetPosition(Ref.RT_cursor.anchoredPosition);
         UpdateSelected();
     }
 
@@ -186,6 +267,9 @@ public class RadialMenu : MonoBehaviour
         {
             Values.i_selChild = sel;
             PlayerController.Instance.AH_agentAudioHolder.Play(AgentAudioHolder.type.radialTick);
+
+            ItemInfoRef.G_holder.SetActive(sel != -1);
+            Set_selSubChild(-1);
         }
     }
     void Set_selSubChild(int sel)
@@ -194,6 +278,15 @@ public class RadialMenu : MonoBehaviour
         {
             Values.i_selSubChild = sel;
             PlayerController.Instance.AH_agentAudioHolder.Play(AgentAudioHolder.type.radialSubTick);
+
+            ItemInfoRef.G_holder.SetActive(sel != -1);
+            if (sel >= 0)
+            {
+                if (Values.i_selChild == 0)
+                    ItemInfoRef.Display(PlayerController.Instance.gun_EquippedList[sel]);
+                else if (Values.i_selChild == 1)
+                    ItemInfoRef.Display(SaveData.consumables[sel]);
+            }
         }
     }
 
@@ -218,34 +311,39 @@ public class RadialMenu : MonoBehaviour
             }
             else
             {
-                float _rot = (1f / Values.i_childAmt) * Values.i_selChild;
-                rot -= _rot;
-
-                float _subGroupDivisor = 360f / Values.F_subGroupRange;
-                rot += 1f / (_subGroupDivisor * 2f);
-
-                if (rot < 0) rot += 1;
-                if (rot > 1) rot -= 1;
-
-                rot *= (Ref.rt_radialItems_Sub[Values.i_selChild].Length * _subGroupDivisor) - 1;
-                float var = Mathf.Abs((rot % 1) - 0.5f);
-                if (var >= Values.F_itemSelectionGapPercent)
+                if (Ref.rt_radialItems_Sub[Values.i_selChild].Length > 1)
                 {
-                    int sel = Mathf.RoundToInt(rot);
-                    if (sel == Ref.rt_radialItems_Sub[Values.i_selChild].Length * _subGroupDivisor) Values.i_selSubChild = 0;
-                    else if (sel < Ref.rt_radialItems_Sub[Values.i_selChild].Length)
-                        Set_selSubChild(sel);
-                    else if (sel == Ref.rt_radialItems_Sub[Values.i_selChild].Length)
-                        Set_selSubChild(Ref.rt_radialItems_Sub[Values.i_selChild].Length - 1);
-                    else if (sel < (Ref.rt_radialItems_Sub[Values.i_selChild].Length * _subGroupDivisor) - 1)
-                        Set_selSubChild(0);
-                    else
+                    float _rot = (1f / Values.i_childAmt) * Values.i_selChild;
+                    rot -= _rot;
+
+                    float _subGroupDivisor = 360f / Values.F_subGroupRange;
+                    rot += 1f / (_subGroupDivisor * 2f);
+
+                    if (rot < 0) rot += 1;
+                    if (rot > 1) rot -= 1;
+
+                    rot *= (Ref.rt_radialItems_Sub[Values.i_selChild].Length * _subGroupDivisor) - 1;
+                    float var = Mathf.Abs((rot % 1) - 0.5f);
+                    if (var >= Values.F_itemSelectionGapPercent)
                     {
-                        Set_selSubChild(-1);
+                        int sel = Mathf.RoundToInt(rot);
+                        if (sel == Ref.rt_radialItems_Sub[Values.i_selChild].Length * _subGroupDivisor) Values.i_selSubChild = 0;
+                        else if (sel < Ref.rt_radialItems_Sub[Values.i_selChild].Length)
+                            Set_selSubChild(sel);
+                        else if (sel == Ref.rt_radialItems_Sub[Values.i_selChild].Length)
+                            Set_selSubChild(Ref.rt_radialItems_Sub[Values.i_selChild].Length - 1);
+                        else if (sel < (Ref.rt_radialItems_Sub[Values.i_selChild].Length * _subGroupDivisor) - 1)
+                            Set_selSubChild(0);
+                        else
+                        {
+                            Set_selSubChild(-1);
+                        }
                     }
+                    else
+                        Set_selSubChild(-1);
                 }
                 else
-                    Set_selSubChild(-1);
+                    Set_selSubChild(0);
             }
         }
         else Set_selChild(-1);
@@ -258,11 +356,14 @@ public class RadialMenu : MonoBehaviour
             if (i == Values.i_selChild)
             {
                 Ref.rt_radialItems[i].localScale = Vector3.Lerp(Ref.rt_radialItems[i].localScale, Vector3.one * 1.5f, Time.unscaledDeltaTime * 10);
+                if (Ref.rt_radialItems_Sub[i].Length > 1)
+                { 
                 for (int j = 0; j < Ref.rt_radialItems_Sub[i].Length; j++)
                 {
                     Ref.rt_radialItems_Sub[i][j].gameObject.SetActive(true);
                     if (j == Values.i_selSubChild) Ref.rt_radialItems_Sub[i][j].localScale = Vector3.Lerp(Ref.rt_radialItems_Sub[i][j].localScale, Vector3.one * 1.5f, Time.unscaledDeltaTime * 10);
                     else Ref.rt_radialItems_Sub[i][j].localScale = Vector3.Lerp(Ref.rt_radialItems_Sub[i][j].localScale, Vector3.one, Time.unscaledDeltaTime * 10);
+                }
                 }
             }
             else
@@ -272,13 +373,21 @@ public class RadialMenu : MonoBehaviour
                     item.gameObject.SetActive(false);
             }
         }
+        MovePivot();
+    }
 
-        if (Values.i_selChild == -1)
-            Ref.RT_radialHolder.anchoredPosition = Vector3.Lerp(Ref.RT_radialHolder.anchoredPosition, Vector3.zero, Time.unscaledDeltaTime * 10);
+    //Move Pivot to Sub Group
+    void MovePivot()
+    {
+        //Check if Subgroup with children is selected
+        bool _move = Values.i_selChild != -1;
+        if (_move)
+            _move = Ref.rt_radialItems_Sub[Values.i_selChild].Length > 1;
+        //Move if so
+        if (_move)
+            Ref.RT_radialHolder.anchoredPosition = Vector3.Lerp(Ref.RT_radialHolder.anchoredPosition, Quaternion.Euler(0, 0, (float)Values.i_selChild / (float)Values.i_childAmt * 360f) * -Vector3.up * 400, Time.unscaledDeltaTime * 10);
         else
-        {
-            Ref.RT_radialHolder.anchoredPosition = Vector3.Lerp(Ref.RT_radialHolder.anchoredPosition, Quaternion.Euler(0,0, (float)Values.i_selChild /(float)Values.i_childAmt * 360f) * -Vector3.up * 400, Time.unscaledDeltaTime * 10);
-        }
+            Ref.RT_radialHolder.anchoredPosition = Vector3.Lerp(Ref.RT_radialHolder.anchoredPosition, Vector3.zero, Time.unscaledDeltaTime * 10);
     }
     public void Confirm()
     {

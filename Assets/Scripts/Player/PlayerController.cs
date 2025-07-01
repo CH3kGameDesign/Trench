@@ -323,8 +323,7 @@ public class PlayerController : BaseController
         int[] _amt =
         {
             gun_EquippedList.Length,
-            SaveData.consumables.Count,
-            5
+            SaveData.consumables.Count
         };
         Ref.RM_radial.Setup(_amt);
         Update_Radial();
