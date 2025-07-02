@@ -4,6 +4,8 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.Rendering.DebugUI;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 public class RadialMenu : MonoBehaviour
 {
@@ -11,6 +13,7 @@ public class RadialMenu : MonoBehaviour
     public class RefClass
     {
         public GameObject G_radialMenu;
+        public GameObject G_radialSubBG;
         public GameObject PF_radialItem;
         public RectTransform RT_radialHolder;
         public RectTransform RT_radialHolder_Sub;
@@ -106,6 +109,8 @@ public class RadialMenu : MonoBehaviour
         [HideInInspector] public int i_childAmt = 0;
         [HideInInspector] public int i_selChild = -1;
         [HideInInspector] public int i_selSubChild = -1;
+        [HideInInspector] public int i_lastChild = -1;
+        [HideInInspector] public int i_lastSubChild = -1;
 
         public float F_radial_BaseDistance = 175;
         public float F_radial_SelDistance = 250;
@@ -118,6 +123,9 @@ public class RadialMenu : MonoBehaviour
         public float F_sensitivity = 100;
         public float F_deadzone = 75;
         public float F_itemSelectionGapPercent = 0.1f;
+        [Space(10)]
+        public float F_coyoteTime = 0.1f;
+        [HideInInspector] public Coroutine C_CoyoteTime = null;
     }
     public ValueClass Values = new ValueClass();
     // Start is called before the first frame update
@@ -277,7 +285,7 @@ public class RadialMenu : MonoBehaviour
         {
             Values.i_selChild = sel;
             PlayerController.Instance.AH_agentAudioHolder.Play(AgentAudioHolder.type.radialTick);
-
+            Ref.G_radialSubBG.transform.localEulerAngles = new Vector3(0, 0, 4.5f + (((float)sel / (float)Values.i_childAmt) * 360f));
             ItemInfoRef.RT_holder.gameObject.SetActive(sel != -1);
             Set_selSubChild(-1);
         }
@@ -292,12 +300,24 @@ public class RadialMenu : MonoBehaviour
             ItemInfoRef.RT_holder.gameObject.SetActive(sel != -1);
             if (sel >= 0)
             {
+                //Coyote Time
+                Values.i_lastChild = Values.i_selChild;
+                Values.i_lastSubChild = Values.i_selSubChild;
+                if (Values.C_CoyoteTime != null) StopCoroutine(Values.C_CoyoteTime);
+                Values.C_CoyoteTime = StartCoroutine(CoyoteTime(Values.F_coyoteTime));
+                //Display Info
                 if (Values.i_selChild == 0)
                     ItemInfoRef.Display(PlayerController.Instance.gun_EquippedList[sel]);
                 else if (Values.i_selChild == 1)
                     ItemInfoRef.Display(SaveData.consumables[sel]);
             }
         }
+    }
+    IEnumerator CoyoteTime(float _delay)
+    {
+        yield return new WaitForSeconds(_delay);
+        Values.i_lastChild = -1;
+        Values.i_lastSubChild = -1;
     }
 
     void UpdateSelected()
@@ -310,54 +330,98 @@ public class RadialMenu : MonoBehaviour
 
             if (Values.i_selChild == -1)
             {
-                rot *= Values.i_childAmt;
-                float var = Mathf.Abs((rot % 1) - 0.5f);
-                if (var >= Values.F_itemSelectionGapPercent)
-                {
-                    int sel = Mathf.RoundToInt(rot);
-                    if (sel == Values.i_childAmt) sel = 0;
-                    Set_selChild(sel);
-                }
+                UpdateSelected_Base(rot);
             }
             else
             {
                 if (Ref.rt_radialItems_Sub[Values.i_selChild].Length > 1)
                 {
-                    float _rot = (1f / Values.i_childAmt) * Values.i_selChild;
-                    rot -= _rot;
-
-                    float _subGroupDivisor = 360f / Values.F_subGroupRange;
-                    rot += 1f / (_subGroupDivisor * 2f);
-
-                    if (rot < 0) rot += 1;
-                    if (rot > 1) rot -= 1;
-
-                    rot *= (Ref.rt_radialItems_Sub[Values.i_selChild].Length * _subGroupDivisor) - 1;
-                    float var = Mathf.Abs((rot % 1) - 0.5f);
-                    if (var >= Values.F_itemSelectionGapPercent)
-                    {
-                        int sel = Mathf.RoundToInt(rot);
-                        if (sel == Ref.rt_radialItems_Sub[Values.i_selChild].Length * _subGroupDivisor) Values.i_selSubChild = 0;
-                        else if (sel < Ref.rt_radialItems_Sub[Values.i_selChild].Length)
-                            Set_selSubChild(sel);
-                        else if (sel == Ref.rt_radialItems_Sub[Values.i_selChild].Length)
-                            Set_selSubChild(Ref.rt_radialItems_Sub[Values.i_selChild].Length - 1);
-                        else if (sel < (Ref.rt_radialItems_Sub[Values.i_selChild].Length * _subGroupDivisor) - 1)
-                            Set_selSubChild(0);
-                        else
-                        {
-                            Set_selSubChild(-1);
-                        }
-                    }
-                    else
-                        Set_selSubChild(-1);
+                    Ref.G_radialSubBG.SetActive(true);
+                    UpdateSelected_Sub(rot);
                 }
                 else
+                {
+                    Ref.G_radialSubBG.SetActive(false);
                     Set_selSubChild(0);
+                    UpdateSelected_Base(rot);
+                }
             }
         }
-        else Set_selChild(-1);
+        else
+        {
+            Ref.G_radialSubBG.SetActive(false);
+            Set_selChild(-1);
+        }
         DisplaySelected();
+    }
+
+    void UpdateSelected_Base(float rot)
+    {
+        rot *= Values.i_childAmt;
+        float var = Mathf.Abs((rot % 1) - 0.5f);
+        if (var >= Values.F_itemSelectionGapPercent)
+        {
+            int sel = Mathf.RoundToInt(rot);
+            if (sel == Values.i_childAmt) sel = 0;
+            Set_selChild(sel);
+        }
+    }
+    void UpdateSelected_SubOLD(float rot)
+    {
+        float _rot = (1f / Values.i_childAmt) * Values.i_selChild;
+        rot -= _rot;
+
+        float _subGroupDivisor = 360f / Values.F_subGroupRange;
+        rot += 1f / (_subGroupDivisor * 2f);
+
+        if (rot < 0) rot += 1;
+        if (rot > 1) rot -= 1;
+
+        rot *= (Ref.rt_radialItems_Sub[Values.i_selChild].Length * _subGroupDivisor) - 1;
+        float var = Mathf.Abs((rot % 1) - 0.5f);
+        if (var >= Values.F_itemSelectionGapPercent)
+        {
+            int sel = Mathf.RoundToInt(rot);
+            if (sel == Ref.rt_radialItems_Sub[Values.i_selChild].Length * _subGroupDivisor) Values.i_selSubChild = 0;
+            else if (sel < Ref.rt_radialItems_Sub[Values.i_selChild].Length)
+                Set_selSubChild(sel);
+            else if (sel == Ref.rt_radialItems_Sub[Values.i_selChild].Length)
+                Set_selSubChild(Ref.rt_radialItems_Sub[Values.i_selChild].Length - 1);
+            else if (sel < (Ref.rt_radialItems_Sub[Values.i_selChild].Length * _subGroupDivisor) - 1)
+                Set_selSubChild(0);
+            else
+            {
+                Set_selSubChild(-1);
+            }
+        }
+        else
+            Set_selSubChild(-1);
+    }
+    void UpdateSelected_Sub(float rot)
+    {
+        //Adjust Rotation for SubGroup Arc
+        float offset = 1f + (0.25f - ((float)Values.i_selChild / (float)Values.i_childAmt));
+        rot = Mathf.Abs((rot + offset) % 1);
+
+        //Multiply Rotation by List Count + leeway for none selected
+        int count = (Ref.rt_radialItems_Sub[Values.i_selChild].Length * 2) - 1;
+        rot *= count;
+
+        //Round to Selection Int + adjust for start/end of active space
+        int sel = Mathf.RoundToInt(rot);
+        if (sel == count) sel = 0;
+        if (sel == Ref.rt_radialItems_Sub[Values.i_selChild].Length) sel -= 1;
+
+        //Select Selection
+        if (sel > Ref.rt_radialItems_Sub[Values.i_selChild].Length)
+            Set_selSubChild(-1);
+        else
+        {
+            //Check if selected between options
+            float var = Mathf.Abs((rot % 1) - 0.5f);
+            if (var >= Values.F_itemSelectionGapPercent)
+                Set_selSubChild(sel);
+        }
     }
     void DisplaySelected()
     {
@@ -401,15 +465,17 @@ public class RadialMenu : MonoBehaviour
     }
     public void Confirm()
     {
-        if (Values.i_selChild == 0)
+        if (Values.i_lastChild == 0)
         {
-            if (Values.i_selSubChild >= 0)
-                PlayerController.Instance.Gun_Equip(Values.i_selSubChild);
+            if (Values.i_lastSubChild >= 0)
+                PlayerController.Instance.Gun_Equip(Values.i_lastSubChild);
         }
-        else if (Values.i_selChild == 1)
+        else if (Values.i_lastChild == 1)
         {
-            if (Values.i_selSubChild >= 0)
-                PlayerController.Instance.Consumable_Use(SaveData.consumables[Values.i_selSubChild].Get_Item());
+            if (Values.i_lastSubChild >= 0)
+                PlayerController.Instance.Consumable_Use(SaveData.consumables[Values.i_lastSubChild].Get_Item());
         }
+        Values.i_lastChild = -1;
+        Values.i_lastSubChild = -1;
     }
 }

@@ -227,7 +227,7 @@ public class PlayerController : BaseController
 
         DebugGunList();
         gun_secondaryEquipped = gun_EquippedList[SaveData.i_equippedGunNum.y];
-        Gun_Equip(SaveData.i_equippedGunNum.x);
+        Gun_Equip(SaveData.i_equippedGunNum.x, true);
         reticle.UpdateRoundCount(gun_Equipped);
 
         NMA.updateRotation = false;
@@ -323,7 +323,7 @@ public class PlayerController : BaseController
         int[] _amt =
         {
             gun_EquippedList.Length,
-            SaveData.consumables.Count
+            SaveData.consumables.Count,
         };
         Ref.RM_radial.Setup(_amt);
         Update_Radial();
@@ -1221,11 +1221,15 @@ public class PlayerController : BaseController
         }
     }
 
-    public void Gun_Equip(int _invNum)
+    public void Gun_Equip(int _invNum, bool _force = false)
     {
-        SaveData.i_equippedGunNum.y = SaveData.i_equippedGunNum.x;
-        SaveData.i_equippedGunNum.x = _invNum;
-        Gun_Equip(gun_EquippedList[_invNum]);
+        //Check if already equipped
+        if (SaveData.i_equippedGunNum.x != _invNum || _force)
+        {
+            SaveData.i_equippedGunNum.y = SaveData.i_equippedGunNum.x;
+            SaveData.i_equippedGunNum.x = _invNum;
+            Gun_Equip(gun_EquippedList[_invNum]);
+        }
     }
 
     public void Gun_Equip(GunClass _gun)
