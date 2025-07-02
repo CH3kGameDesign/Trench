@@ -4262,7 +4262,6 @@ RectTransform:
   m_Children:
   - {fileID: 8681277736345553280}
   - {fileID: 6724433137853294673}
-  - {fileID: 7005702727115567893}
   - {fileID: 1684508961817727578}
   - {fileID: 6260271991115517573}
   m_Father: {fileID: 5910682776017220029}
@@ -6207,7 +6206,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5839150205505198066}
-  m_Father: {fileID: 1430794514401509821}
+  m_Father: {fileID: 6724433137853294673}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -7821,6 +7820,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5541316558291381164}
+  - {fileID: 7005702727115567893}
   m_Father: {fileID: 1430794514401509821}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -9172,6 +9172,8 @@ MonoBehaviour:
     i_childAmt: 0
     i_selChild: 0
     i_selSubChild: -1
+    i_lastChild: -1
+    i_lastSubChild: -1
     F_radial_BaseDistance: 175
     F_radial_SelDistance: 250
     F_radialSub_BaseDistance: 175
@@ -9180,6 +9182,7 @@ MonoBehaviour:
     F_sensitivity: 2000
     F_deadzone: 75
     F_itemSelectionGapPercent: 0
+    F_coyoteTime: 0.1
 --- !u!1 &8871071911968204976
 GameObject:
   m_ObjectHideFlags: 0

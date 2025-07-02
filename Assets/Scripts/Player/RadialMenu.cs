@@ -286,6 +286,7 @@ public class RadialMenu : MonoBehaviour
             Values.i_selChild = sel;
             PlayerController.Instance.AH_agentAudioHolder.Play(AgentAudioHolder.type.radialTick);
             Ref.G_radialSubBG.transform.localEulerAngles = new Vector3(0, 0, 4.5f + (((float)sel / (float)Values.i_childAmt) * 360f));
+            Ref.RT_radialHolder_Sub.anchoredPosition = Quaternion.Euler(0, 0, (float)Values.i_selChild / (float)Values.i_childAmt * 360f) * Vector3.up * 400;
             ItemInfoRef.RT_holder.gameObject.SetActive(sel != -1);
             Set_selSubChild(-1);
         }
