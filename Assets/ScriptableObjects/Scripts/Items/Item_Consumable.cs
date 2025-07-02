@@ -5,6 +5,7 @@ public class Item_Consumable : ItemClass
 {
     public override enumType GetEnumType() { return enumType.consumable; }
 
+    public string primary;
     public GameObject model;
     public Sprite sprite;
     public enum itemEnum { radial, contextual}
@@ -51,6 +52,7 @@ public class Item_Consumable : ItemClass
         _temp._id = _id;
         _temp._name = _name;
         _temp.image = image;
+        _temp.primary = primary;
         _temp._description = _description;
         _temp.ownedAmt = ownedAmt;
         _temp.rarity = rarity;

@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: Rod Gun
   m_EditorClassIdentifier: 
   _id: gun/Rod
-  _name: Rod
+  _name: Rod-Knocker
   image: {fileID: 2800000, guid: 74c5ba57d2b716d428855cd78a13dce9, type: 3}
-  _description: 
+  _description: It was made for cracking asteroids so it shouldn't have any issue
+    against facists\n-Randy
   ownedAmt: 1
   rarity: 0
   cost:
@@ -23,6 +24,14 @@ MonoBehaviour:
     coinCost: 0
     list: []
   sortOrder: 0
+  functionText:
+    primary: Bolt Action Rod Launcher
+    trigger1: Mid Air/Aim
+    description1: <b>Levitates</b> the user, slowing their fall
+    trigger2: On Reload
+    description2: <b>Explodes</b> each of the previously fired rounds
+    trigger3: ???
+    description3: '-'
   prefab: {fileID: 7164603078148759310, guid: 488f69c6c9967dc43ab519082b3d6ffe, type: 3}
   bullet: {fileID: 3411593917391162664, guid: d7390d13c9ba5f54cae859ecd0d35d56, type: 3}
   sprite: {fileID: 21300000, guid: 01e5895c7333a544c9475e84a981ec48, type: 3}

@@ -24,8 +24,9 @@ public class RadialMenu : MonoBehaviour
     [System.Serializable]
     public class ItemInfoRefClass
     {
-        public GameObject G_holder;
-        public RawImage I_itemSprite;
+        public RectTransform RT_holder;
+        public RawImage I_itemSprite_Weapon;
+        public RawImage I_itemSprite_Item;
 
         public TextMeshProUGUI TM_name;
         public TextMeshProUGUI TM_type;
@@ -33,6 +34,7 @@ public class RadialMenu : MonoBehaviour
 
         public TextMeshProUGUI TM_primary;
         public TextMeshProUGUI TM_flavour;
+        public GameObject G_Functions;
         [Space(10)]
         public TextMeshProUGUI TM_Trigger1;
         public TextMeshProUGUI TM_Description1;
@@ -45,35 +47,41 @@ public class RadialMenu : MonoBehaviour
 
         public void Display(GunClass _gun)
         {
-            G_holder.SetActive(true);
+            RT_holder.gameObject.SetActive(true);
+            G_Functions.SetActive(true);
+            RT_holder.sizeDelta = new Vector2(300, 520);
             TM_name.text = _gun._name;
             TM_type.text = "Weapon";
-            TM_ammo.text = "<color=#FF9500>" + _gun.clipAmmo + "</color><size=20>" + _gun.clipVariables.clipSize +"</size>";
+            TM_ammo.text = _gun.clipAmmo.ToString_Clip() + "<size=20><color=#B0B0B0>" + _gun.clipVariables.clipSize +"</color></size>";
 
-            TM_primary.text = "Primary";
+            TM_primary.text = _gun.functionText.primary;
             TM_flavour.text = _gun._description;
 
-            TM_Trigger1.text = "Trigger 1";
-            TM_Description1.text = "Description 1";
+            TM_Trigger1.text = _gun.functionText.trigger1;
+            TM_Description1.text = _gun.functionText.description1;
 
-            TM_Trigger2.text = "Trigger 2";
-            TM_Description2.text = "Description 2";
+            TM_Trigger2.text = _gun.functionText.trigger2;
+            TM_Description2.text = _gun.functionText.description2;
 
-            TM_Trigger3.text = "Trigger 3";
-            TM_Description3.text = "Description 3";
+            TM_Trigger3.text = _gun.functionText.trigger3;
+            TM_Description3.text = _gun.functionText.description3;
 
-            I_itemSprite.texture = _gun.image;
+            I_itemSprite_Weapon.texture = _gun.image;
+            I_itemSprite_Weapon.gameObject.SetActive(true);
+            I_itemSprite_Item.gameObject.SetActive(false);
         }
         public void Display(Consumable.save _item)
         {
             Item_Consumable _itemC = Consumable.GetConsumableType_Static(_item._type);
 
-            G_holder.SetActive(true);
+            RT_holder.gameObject.SetActive(true);
+            G_Functions.SetActive(false);
+            RT_holder.sizeDelta = new Vector2(300, 220);
             TM_name.text = _itemC._name;
             TM_type.text = "Item";
-            TM_ammo.text = "<color=#FF9500>" + _item._amt + "</color><size=20>" + _item._totalAmt + "</size>";
+            TM_ammo.text = _item._amt.ToString_Clip() + "<size=20><color=#B0B0B0>" + _item._totalAmt + "</color></size>";
 
-            TM_primary.text = "Primary";
+            TM_primary.text = _itemC.primary;
             TM_flavour.text = _itemC._description;
 
             TM_Trigger1.text = "";
@@ -85,7 +93,9 @@ public class RadialMenu : MonoBehaviour
             TM_Trigger3.text = "";
             TM_Description3.text = "";
 
-            I_itemSprite.texture = _itemC.image;
+            I_itemSprite_Item.texture = _itemC.image;
+            I_itemSprite_Weapon.gameObject.SetActive(false);
+            I_itemSprite_Item.gameObject.SetActive(true);
         }
     }
     public ItemInfoRefClass ItemInfoRef = new ItemInfoRefClass();
@@ -243,7 +253,7 @@ public class RadialMenu : MonoBehaviour
     public void ResetCursor()
     {
         Ref.RT_cursor.anchoredPosition = Vector2.zero;
-        ItemInfoRef.G_holder.SetActive(false);
+        ItemInfoRef.RT_holder.gameObject.SetActive(false);
         UpdateSelected();
     }
     public void MoveCursor(Vector2 _pos)
@@ -268,7 +278,7 @@ public class RadialMenu : MonoBehaviour
             Values.i_selChild = sel;
             PlayerController.Instance.AH_agentAudioHolder.Play(AgentAudioHolder.type.radialTick);
 
-            ItemInfoRef.G_holder.SetActive(sel != -1);
+            ItemInfoRef.RT_holder.gameObject.SetActive(sel != -1);
             Set_selSubChild(-1);
         }
     }
@@ -279,7 +289,7 @@ public class RadialMenu : MonoBehaviour
             Values.i_selSubChild = sel;
             PlayerController.Instance.AH_agentAudioHolder.Play(AgentAudioHolder.type.radialSubTick);
 
-            ItemInfoRef.G_holder.SetActive(sel != -1);
+            ItemInfoRef.RT_holder.gameObject.SetActive(sel != -1);
             if (sel >= 0)
             {
                 if (Values.i_selChild == 0)

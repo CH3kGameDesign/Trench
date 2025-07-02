@@ -44,7 +44,7 @@ public class GunClass_Shotgun : GunClass
     {
         if (f_fireTimer <= 0)
         {
-            f_fireTimer = meleeVariables.fireRate;
+            f_fireTimer = fireVariablesOnSprint.fireRate;
             PM_player.reticle.UpdateRoundCount(this);
             PM_player.reticle.RotateReticle(f_fireTimer);
             A_charModel.Play("Melee_Swing", 1);
@@ -52,9 +52,9 @@ public class GunClass_Shotgun : GunClass
             baseController.AH_agentAudioHolder.Play(AgentAudioHolder.type.melee);
 
             if (b_playerGun)
-                MusicHandler.AdjustVolume(MusicHandler.typeEnum.guitar, meleeVariables.fireRate / 4);
+                MusicHandler.AdjustVolume(MusicHandler.typeEnum.guitar, fireVariablesOnSprint.fireRate / 4);
             else
-                MusicHandler.AdjustVolume(MusicHandler.typeEnum.bass, meleeVariables.fireRate / 8);
+                MusicHandler.AdjustVolume(MusicHandler.typeEnum.bass, fireVariablesOnSprint.fireRate / 8);
         }
     }
     public override void OnMelee(bool _isSprinting = false)

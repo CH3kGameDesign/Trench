@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: Shotgun Gun
   m_EditorClassIdentifier: 
   _id: gun/Shotgun
-  _name: Shotgun
+  _name: Homerunner
   image: {fileID: 2800000, guid: 4462f33bbbcbbec44ac508b150b63758, type: 3}
-  _description: 
+  _description: Legendary weapon from a bygone era, there's nobody left alive to
+    claim it\n-Pimm
   ownedAmt: 1
   rarity: 0
   cost:
@@ -23,6 +24,14 @@ MonoBehaviour:
     coinCost: 0
     list: []
   sortOrder: 0
+  functionText:
+    primary: Double Barrel Shotgun
+    trigger1: Aim
+    description1: <b>Long range</b> condensed sniper round
+    trigger2: Sprint Fire
+    description2: <b>Swing</b> the weapon like a baseball bat, launching enemies
+    trigger3: ???
+    description3: '-'
   prefab: {fileID: 7164603078148759310, guid: bfb35e4a5786e3b4f96c54b525e1ce3e, type: 3}
   bullet: {fileID: 7857619870900032349, guid: 94f26101f86c3194699d76d9df0d42af, type: 3}
   sprite: {fileID: 21300000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
@@ -36,10 +45,10 @@ MonoBehaviour:
     equip:
     - {fileID: 8300000, guid: e5ad5050060307c43975f1e94d4d6906, type: 3}
   fireVariables:
-    fireRate: 0.2
+    fireRate: 0.6
     damage: 10
     burstAmount: 2
-    burstRate: 0
+    burstRate: 0.1
     recoilCam: 0.25
     recoilUpwards: 1
   meleeVariables:
@@ -74,7 +83,7 @@ MonoBehaviour:
     recoilCam: 0.25
     recoilUpwards: 1
   fireVariablesOnSprint:
-    fireRate: 1
+    fireRate: 2.2
     damage: 10
     burstAmount: 1
     burstRate: 0.1

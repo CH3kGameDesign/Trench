@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,19 @@ using UnityEngine;
 public class GunClass : ItemClass
 {
     public override enumType GetEnumType() { return enumType.gun; }
+    [Space(10)]
+    public descriptionClass functionText;
+    [System.Serializable]
+    public class descriptionClass
+    {
+        [TextArea] public string primary;
+        public string trigger1;
+        [TextArea] public string description1;
+        public string trigger2;
+        [TextArea] public string description2;
+        public string trigger3;
+        [TextArea] public string description3;
+    }
     [Space(10)]
     public GunPrefab prefab;
     public Bullet bullet;
@@ -81,6 +95,8 @@ public class GunClass : ItemClass
     {
         _temp._name = _name;
         _temp._id = _id;
+
+        _temp.functionText = functionText;
 
         _temp.prefab = prefab;
         _temp.bullet = bullet;

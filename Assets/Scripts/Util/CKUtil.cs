@@ -24,6 +24,7 @@ public static class CKUtil
         if (_value == 0)
             _temp += "<color=#E44F4C>";
         _temp += _value.ToString();
+        _temp += "</color>";
         return _temp;
     }
 
