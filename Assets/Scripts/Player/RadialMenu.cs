@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.Rendering.DebugUI;
@@ -14,13 +15,13 @@ public class RadialMenu : MonoBehaviour
     {
         public GameObject G_radialMenu;
         public GameObject G_radialSubBG;
-        public GameObject PF_radialItem;
+        public RadialMenu_Child PF_radialItem;
         public RectTransform RT_radialHolder;
         public RectTransform RT_radialHolder_Sub;
         public RectTransform RT_cursor;
         public LineRendererUI LR_cursor;
-        [HideInInspector] public RectTransform[] rt_radialItems = new RectTransform[0];
-        [HideInInspector] public List<RectTransform[]> rt_radialItems_Sub = new List<RectTransform[]>();
+        [HideInInspector] public RadialMenu_Child[] rt_radialItems = new RadialMenu_Child[0];
+        [HideInInspector] public List<RadialMenu_Child[]> rt_radialItems_Sub = new List<RadialMenu_Child[]>();
     }
     public RefClass Ref = new RefClass();
 
@@ -144,24 +145,24 @@ public class RadialMenu : MonoBehaviour
     {
         ClearChildren();
         Values.i_childAmt = _childAmt.Length;
-        Ref.rt_radialItems = new RectTransform[_childAmt.Length];
+        Ref.rt_radialItems = new RadialMenu_Child[_childAmt.Length];
         float _rot = 0;
         float _rotIncrease = 360 / _childAmt.Length;
         for (int i = 0; i < _childAmt.Length; i++)
         {
-            GameObject GO = Instantiate(Ref.PF_radialItem, Ref.RT_radialHolder);
-            RectTransform RT = GO.GetComponent<RectTransform>();
-            Ref.rt_radialItems[i] = RT;
-            RT.anchoredPosition = Vector2.zero;
-            RT.localEulerAngles = new Vector3(0, 0, _rot);
-            RT.GetChild(0).eulerAngles = Vector3.zero;
+            RadialMenu_Child GO = Instantiate(Ref.PF_radialItem, Ref.RT_radialHolder);
+            
+            Ref.rt_radialItems[i] = GO;
+            GO.RT.anchoredPosition = Vector2.zero;
+            GO.RT.localEulerAngles = new Vector3(0, 0, _rot);
+            GO.RT.GetChild(0).eulerAngles = Vector3.zero;
             _rot += _rotIncrease;
         }
 
         int _amt = 0;
         foreach (var item in _childAmt)
         {
-            Ref.rt_radialItems_Sub.Add(new RectTransform[item]);
+            Ref.rt_radialItems_Sub.Add(new RadialMenu_Child[item]);
             Setup_SubGroup(_amt, item);
             _amt++;
         }
@@ -169,11 +170,9 @@ public class RadialMenu : MonoBehaviour
 
     public void Setup_Guns(GunClass _equippedGun, GunClass[] _gunList)
     {
-        Ref.rt_radialItems[0].GetChild(0).GetComponent<Image>().sprite = _equippedGun.sprite;
+        Ref.rt_radialItems[0].Setup(_equippedGun, true);
         for (int i = 0; i < Mathf.Min(_gunList.Length, Ref.rt_radialItems_Sub[0].Length); i++)
-        {
-            Ref.rt_radialItems_Sub[0][i].GetChild(0).GetComponent<Image>().sprite = _gunList[i].sprite;
-        }
+            Ref.rt_radialItems_Sub[0][i].Setup(_gunList[i], _equippedGun == _gunList[i]);
     }
     public void Setup_Consumables(List<Consumable.save> _consumables)
     {
@@ -182,38 +181,13 @@ public class RadialMenu : MonoBehaviour
 
         for (int i = 0; i < Mathf.Min(_consumables.Count, Ref.rt_radialItems_Sub[1].Length); i++)
         {
-            Ref.rt_radialItems_Sub[1][i].GetChild(0).GetComponent<Image>().sprite = _consumables[i].Get_Item().sprite;
-            Ref.rt_radialItems_Sub[1][i].GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = _consumables[i]._amt.ToString();
-
-            if (_consumables[i]._amt > 0)
-            {
-                Ref.rt_radialItems_Sub[1][i].GetChild(0).GetComponent<Image>().color = Color.white;
-                Ref.rt_radialItems_Sub[1][i].GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().color = Color.white;
+            if (Ref.rt_radialItems_Sub[1][i].Setup(_consumables[i]))
                 _first = Mathf.Min(i, _first);
-            }
-            else
-            {
-                Ref.rt_radialItems_Sub[1][i].GetChild(0).GetComponent<Image>().color = _trans;
-                Ref.rt_radialItems_Sub[1][i].GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().color = _trans;
-            }
         }
         if (_first < _consumables.Count)
-        {
-            Ref.rt_radialItems[1].GetChild(0).GetComponent<Image>().sprite = _consumables[_first].Get_Item().sprite;
-            Ref.rt_radialItems[1].GetChild(0).GetComponent<Image>().color = Color.white;
-            Ref.rt_radialItems[1].GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().color = Color.white;
-        }
+            Ref.rt_radialItems[1].Setup(_consumables[_first], true);
         else if (_consumables.Count > 0)
-        {
-            Ref.rt_radialItems[1].GetChild(0).GetComponent<Image>().sprite = _consumables[0].Get_Item().sprite;
-            Ref.rt_radialItems[1].GetChild(0).GetComponent<Image>().color = _trans;
-            Ref.rt_radialItems[1].GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().color = _trans;
-        }
-
-        if (Ref.rt_radialItems_Sub[1].Length == 1)
-            Ref.rt_radialItems[1].GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = _consumables[_first]._amt.ToString();
-        else
-            Ref.rt_radialItems[1].GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = "";
+            Ref.rt_radialItems[1].Setup(_consumables[0], true);
     }
 
     public void Setup_SubGroup(int _subGroup, int _childAmt)
@@ -223,13 +197,12 @@ public class RadialMenu : MonoBehaviour
         float _rotIncrease = Values.F_subGroupRange / (_childAmt - 1);
         for (int i = 0; i < _childAmt; i++)
         {
-            GameObject GO = Instantiate(Ref.PF_radialItem, Ref.RT_radialHolder_Sub);
-            RectTransform RT = GO.GetComponent<RectTransform>();
-            Ref.rt_radialItems_Sub[_subGroup][i] = RT;
-            RT.anchoredPosition = Vector2.zero;
-            RT.localEulerAngles = new Vector3(0, 0, _rot);
-            RT.GetChild(0).eulerAngles = Vector3.zero;
-            RT.localScale = Vector3.one * 2.5f;
+            RadialMenu_Child GO = Instantiate(Ref.PF_radialItem, Ref.RT_radialHolder_Sub);
+            Ref.rt_radialItems_Sub[_subGroup][i] = GO;
+            GO.RT.anchoredPosition = Vector2.zero;
+            GO.RT.localEulerAngles = new Vector3(0, 0, _rot);
+            GO.RT.GetChild(0).eulerAngles = Vector3.zero;
+            GO.RT.localScale = Vector3.one * 2.5f;
             _rot += _rotIncrease;
         }
     }
@@ -245,7 +218,7 @@ public class RadialMenu : MonoBehaviour
 
         for (int i = Ref.rt_radialItems.Length - 1; i >= 0; i--)
             Destroy(Ref.rt_radialItems[i].gameObject);
-        Ref.rt_radialItems = new RectTransform[0];
+        Ref.rt_radialItems = new RadialMenu_Child[0];
         Values.i_childAmt = 0;
     }
 
@@ -430,20 +403,20 @@ public class RadialMenu : MonoBehaviour
         {
             if (i == Values.i_selChild)
             {
-                Ref.rt_radialItems[i].localScale = Vector3.Lerp(Ref.rt_radialItems[i].localScale, Vector3.one * 1.5f, Time.unscaledDeltaTime * 10);
+                Ref.rt_radialItems[i].RT.localScale = Vector3.Lerp(Ref.rt_radialItems[i].RT.localScale, Vector3.one * 1.5f, Time.unscaledDeltaTime * 10);
                 if (Ref.rt_radialItems_Sub[i].Length > 1)
                 { 
                 for (int j = 0; j < Ref.rt_radialItems_Sub[i].Length; j++)
                 {
                     Ref.rt_radialItems_Sub[i][j].gameObject.SetActive(true);
-                    if (j == Values.i_selSubChild) Ref.rt_radialItems_Sub[i][j].localScale = Vector3.Lerp(Ref.rt_radialItems_Sub[i][j].localScale, Vector3.one * 1.5f, Time.unscaledDeltaTime * 10);
-                    else Ref.rt_radialItems_Sub[i][j].localScale = Vector3.Lerp(Ref.rt_radialItems_Sub[i][j].localScale, Vector3.one, Time.unscaledDeltaTime * 10);
+                    if (j == Values.i_selSubChild) Ref.rt_radialItems_Sub[i][j].RT.localScale = Vector3.Lerp(Ref.rt_radialItems_Sub[i][j].RT.localScale, Vector3.one * 1.5f, Time.unscaledDeltaTime * 10);
+                    else Ref.rt_radialItems_Sub[i][j].RT.localScale = Vector3.Lerp(Ref.rt_radialItems_Sub[i][j].RT.localScale, Vector3.one, Time.unscaledDeltaTime * 10);
                 }
                 }
             }
             else
             {
-                Ref.rt_radialItems[i].localScale = Vector3.Lerp(Ref.rt_radialItems[i].localScale, Vector3.one, Time.unscaledDeltaTime * 10);
+                Ref.rt_radialItems[i].RT.localScale = Vector3.Lerp(Ref.rt_radialItems[i].RT.localScale, Vector3.one, Time.unscaledDeltaTime * 10);
                 foreach (var item in Ref.rt_radialItems_Sub[i])
                     item.gameObject.SetActive(false);
             }
