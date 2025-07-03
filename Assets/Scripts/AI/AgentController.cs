@@ -641,6 +641,7 @@ public class AgentController : BaseController
                 _bullet.con_Gun.Damage_Objective(Mathf.FloorToInt(_bullet.F_damage));
                 attackTarget.FollowPlayer(_bullet.con_Player);
                 behaviour.OnHit(this, _bullet);
+                _bullet.con_Player.AggroAllies(this);
             }
             else if (b_friendly)
                 Conversation.Instance.StartMessage(ConversationID.Banter_FriendlyFire_001, T_messageHook);
@@ -743,6 +744,7 @@ public class AgentController : BaseController
 
         RM_ragdoll.EnableRigidbodies(false);
 
+        gun_Equipped.OnEquip(this);
         NavMeshHit navHit;
         if (NavMesh.SamplePosition(NMA.transform.position, out navHit, 2f, -1))
         {

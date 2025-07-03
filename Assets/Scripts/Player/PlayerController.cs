@@ -1194,6 +1194,17 @@ public class PlayerController : BaseController
             }
         }
     }
+    public void AggroAllies(AgentController _AC)
+    {
+        foreach (var item in followers)
+        {
+            if (item is AgentController)
+            {
+                AgentController AC = (AgentController)item;
+                AC.AssignTarget_Attack(_AC);
+            }
+        }
+    }
     public override void OnHeal(float _amt)
     {
         F_curHealth = Mathf.Clamp(F_curHealth + _amt, 0, F_maxHealth);
