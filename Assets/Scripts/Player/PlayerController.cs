@@ -1167,6 +1167,8 @@ public class PlayerController : BaseController
 
         Ref.HUI_health.UpdateHealth();
 
+        AggroAllies(_bullet);
+
         if (F_curHealth <= 0)
             OnDeath();
         else
@@ -1175,6 +1177,22 @@ public class PlayerController : BaseController
         }
         float _scale = Mathf.Clamp(Mathf.Pow((F_curHealth / F_maxHealth), 2) * 2, 0, 1);
         Ref.hurtFace.SetMaskScale(_scale, 0.05f);
+    }
+
+    void AggroAllies(GunManager.bulletClass _bullet)
+    {
+        if (_bullet.B_player)
+            return;
+        if (_bullet.con_Agent.b_friendly)
+            return;
+        foreach (var item in followers)
+        {
+            if (item is AgentController)
+            {
+                AgentController AC = (AgentController)item;
+                AC.AssignTarget_Attack(_bullet.con_Agent);
+            }
+        }
     }
     public override void OnHeal(float _amt)
     {

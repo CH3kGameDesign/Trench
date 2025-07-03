@@ -808,6 +808,18 @@ public class AgentController : BaseController
         }
         state = _state;
     }
+    public void AssignTarget_Attack(PlayerController _con, bool _force = false)
+    {
+        if (attackTarget.Check() && !_force)
+            return;
+        attackTarget.FollowPlayer(_con);
+    }
+    public void AssignTarget_Attack(AgentController _con, bool _force = false)
+    {
+        if (attackTarget.Check() && !_force)
+            return;
+        attackTarget.FollowAgent(_con);
+    }
     void ExitState(stateEnum _state)
     {
         switch (_state)

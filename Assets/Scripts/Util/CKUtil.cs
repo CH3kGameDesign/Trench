@@ -33,6 +33,20 @@ public static class CKUtil
         string _temp = "$" + _value.ToString();
         return _temp;
     }
+    public static string ToString_Duration(this int _value)
+    {
+        int minutes = _value / 60;
+        int seconds = _value % 60;
+        string _temp = "";
+        if (minutes > 0)
+        {
+            if (minutes < 10) _temp += "0";
+            _temp += minutes.ToString() + ":";
+        }
+        if (seconds < 10) _temp += "0";
+        _temp += seconds.ToString();
+        return _temp;
+    }
 
     public static string ToString_Distance(this float _value)
     {

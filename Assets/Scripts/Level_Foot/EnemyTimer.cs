@@ -9,6 +9,7 @@ public class EnemyTimer : MonoBehaviour
     private float f_curTimer = 0;
     public GameObject PF_bigBoss;
     public TextMeshProUGUI TM_timer;
+    public GameObject G_timerBG;
     [HideInInspector] public Transform T_spawn;
 
     private bool timerActive = false;
@@ -16,6 +17,7 @@ public class EnemyTimer : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        G_timerBG.SetActive(false);
     }
 
     public void Setup(Transform _spawn)
@@ -26,7 +28,10 @@ public class EnemyTimer : MonoBehaviour
     public void StartTimer()
     {
         if (!timerActive && SaveData.themeCurrent == Themes.themeEnum._default)
+        {
+            G_timerBG.SetActive(true);
             StartCoroutine(Timer());
+        }
     }
 
     IEnumerator Timer()
@@ -35,7 +40,7 @@ public class EnemyTimer : MonoBehaviour
         f_curTimer = F_timerLength;
         while (f_curTimer > 0)
         {
-            TM_timer.text = Mathf.Floor(f_curTimer).ToString();
+            TM_timer.text = Mathf.FloorToInt(f_curTimer).ToString_Duration();
             f_curTimer -= Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
@@ -43,7 +48,10 @@ public class EnemyTimer : MonoBehaviour
     }
     void SpawnBigBoss()
     {
-        GameObject GO = Instantiate(PF_bigBoss);
-        GO.transform.position = T_spawn.position;
+        if (T_spawn != null)
+        {
+            GameObject GO = Instantiate(PF_bigBoss);
+            GO.transform.position = T_spawn.position;
+        }
     }
 }
