@@ -9,4 +9,5 @@ public enum CharacterID
 	[InspectorName ("Player")]	Player,
 	[InspectorName ("NPC/Pimm")]	NPC_Pimm,
 	[InspectorName ("NPC/Bochi")]	NPC_Bochi,
+	[InspectorName ("NPC/Henry")]	NPC_Henry,
 }

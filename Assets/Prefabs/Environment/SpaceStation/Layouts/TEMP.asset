@@ -15,22 +15,66 @@ MonoBehaviour:
   data:
   - d:
     - type: 0
+      roomtype: 5
+      entryType: 0
+    - type: 1
+      roomtype: 0
+      entryType: 0
+    - type: 0
+      roomtype: 0
+      entryType: 0
+  - d:
+    - type: 1
+      roomtype: 0
+      entryType: 1
+    - type: 2
+      roomtype: 0
+      entryType: 0
+    - type: 1
+      roomtype: 0
+      entryType: 0
+  - d:
+    - type: 0
       roomtype: 6
+      entryType: 0
+    - type: 1
+      roomtype: 0
+      entryType: 2
+    - type: 0
+      roomtype: 9
       entryType: 0
   - d:
     - type: 1
       roomtype: 0
       entryType: 2
+    - type: 2
+      roomtype: 0
+      entryType: 0
+    - type: 1
+      roomtype: 0
+      entryType: 0
   - d:
     - type: 0
       roomtype: 2
       entryType: 0
+    - type: 1
+      roomtype: 0
+      entryType: 0
+    - type: 0
+      roomtype: 0
+      entryType: 0
   recipe:
-    roomType: 6
+    roomType: 5
     connectedRooms:
-    - roomType: 2
-      connectedRooms: []
-      entryTypes: 
-    entryTypes: 02000000
-  totalRoomAmount: 2
+    - roomType: 6
+      connectedRooms:
+      - roomType: 2
+        connectedRooms: []
+        entryTypes: 
+      - roomType: 9
+        connectedRooms: []
+        entryTypes: 
+      entryTypes: 0200000002000000
+    entryTypes: 01000000
+  totalRoomAmount: 4
   extraRoom_Amount: {x: 0, y: 0}
