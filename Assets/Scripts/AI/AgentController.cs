@@ -103,7 +103,10 @@ public class AgentController : BaseController
         public void OnFound(AgentController AC)
         {
             if (AC.b_alive && (int)AC.state < 10)
+            {
+                EnemyTimer.Instance.StartTimer();
                 onFound.Activate(AC);
+            }
         }
         public void OnHit(AgentController AC, GunManager.bulletClass _bullet)
         {
@@ -118,6 +121,7 @@ public class AgentController : BaseController
                 //Surprised
                 if ((int)AC.state < 3)
                 {
+                    EnemyTimer.Instance.StartTimer();
                     onHit_Surprise.Activate(AC);
                     return;
                 }
@@ -650,6 +654,8 @@ public class AgentController : BaseController
                     attackTarget.FollowAgent(_bullet.con_Agent);
                     behaviour.OnHit(this, _bullet);
                 }
+                else
+                    return;
             }
         }
         

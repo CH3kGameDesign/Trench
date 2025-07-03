@@ -101,6 +101,7 @@ MonoBehaviour:
   F_maxHealth: 100
   F_curHealth: 100
   gun_Equipped: {fileID: 0}
+  gun_secondaryEquipped: {fileID: 0}
   gun_EquippedList:
   - {fileID: 0}
   - {fileID: 0}
@@ -164,30 +165,30 @@ MonoBehaviour:
     onFound:
       state: -10
       B_voiceLine: 0
-      banter: 7
+      banter: 8
     onHit_Surprise:
       state: -10
       B_voiceLine: 0
-      banter: 8
+      banter: 9
     onHit_FriendlyFire:
       state: -10
       B_voiceLine: 1
-      banter: 10
+      banter: 11
     f_healthPercent: 0.5
     onHit_LowHealth:
       state: -10
       B_voiceLine: 0
-      banter: 8
+      banter: 9
     f_allyDeathRange: 3
     onDeath_Ally:
       state: -10
       B_voiceLine: 0
-      banter: 8
+      banter: 9
     f_enemyDeathRange: 15
     onDeath_Enemy:
       state: -10
       B_voiceLine: 0
-      banter: 8
+      banter: 9
 --- !u!1 &2238208043467293688
 GameObject:
   m_ObjectHideFlags: 0

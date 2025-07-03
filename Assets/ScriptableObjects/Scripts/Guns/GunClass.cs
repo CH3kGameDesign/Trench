@@ -131,6 +131,10 @@ public class GunClass : ItemClass
 
         public float recoilCam = 0.25f;
         public float recoilUpwards = 1f;
+        [Space(10)]
+        public float bulletSprayPlayer = 0;
+        public float bulletSprayAI = 15;
+
     }
     [System.Serializable]
     public class clipClass
@@ -272,6 +276,7 @@ public class GunClass : ItemClass
             GO.transform.LookAt(_tarPos);
             if (b_playerGun)
             {
+                BulletSpray(GO, fireVariables.bulletSprayPlayer);
                 GO.OnCreate(_damage, PM_player, this);
                 PM_player.reticle.UpdateRoundCount(this);
 
@@ -280,12 +285,20 @@ public class GunClass : ItemClass
             }
             else
             {
+                BulletSpray(GO, fireVariables.bulletSprayAI);
                 GO.OnCreate(_damage, AC_agent, this);
             }
             OnBullet(GO);
         }
         if (f_burstTimer > 0) f_burstTimer -= Time.deltaTime;
         if (f_fireTimer > 0) f_fireTimer -= Time.deltaTime;
+    }
+
+    void BulletSpray(Bullet GO, float _maxSpray)
+    {
+        Vector2 v2 = Random.insideUnitCircle;
+        v2 *= Random.Range(0, _maxSpray);
+        GO.transform.rotation *= Quaternion.Euler(v2.x, v2.y, 0);
     }
 
     public virtual void OnBullet(Bullet _bullet)

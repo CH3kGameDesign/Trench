@@ -209,7 +209,7 @@ public class LevelGen : MonoBehaviour
                         break;
                     case LevelGen_Spawn.spawnTypeEnum.enemy:
                         if (spawn.PF_override != null) prefab = spawn.PF_override;
-                        else prefab = LG_Theme.GetEnemy(Random_Seeded);
+                        else prefab = LG_Theme.GetEnemy(Random_Seeded); 
 
                         Random_Seeded.NextInt();
                         if (prefab != null)
@@ -228,6 +228,9 @@ public class LevelGen : MonoBehaviour
                         Random_Seeded.NextInt();
                         if (prefab != null)
                             GO = Instantiate(prefab, spawn.transform.position, spawn.transform.rotation, transform);
+                        break;
+                    case LevelGen_Spawn.spawnTypeEnum.boss:
+                        EnemyTimer.Instance.Setup(spawn.transform);
                         break;
                     default:
                         break;

@@ -26,7 +26,9 @@ public class GunClass_Rod : GunClass
     }
     public override void OnUnEquip()
     {
-        Detonate();
+        if (baseController.F_curHealth > 0) Detonate();
+        else Destroy();
+
         baseController.RB.linearDamping = 0;
         base.OnUnEquip();
     }
@@ -46,6 +48,15 @@ public class GunClass_Rod : GunClass
         {
             if (item != null)
                 item.Detonate();
+        }
+        firedRods.Clear();
+    }
+    private void Destroy()
+    {
+        foreach (var item in firedRods)
+        {
+            if (item != null)
+                Destroy(item.gameObject);
         }
         firedRods.Clear();
     }
