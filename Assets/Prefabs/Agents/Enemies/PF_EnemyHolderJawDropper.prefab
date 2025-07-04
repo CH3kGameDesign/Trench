@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7197547650496893999}
-  - component: {fileID: 4076457481858739809}
+  - component: {fileID: 549521836531451379}
   m_Layer: 3
   m_Name: PF_EnemyHolderJawDropper
   m_TagString: Character
@@ -33,7 +33,7 @@ Transform:
   - {fileID: 2209772506566351489}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4076457481858739809
+--- !u!114 &549521836531451379
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -42,7 +42,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 153541626221342559}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1071c985a1eacf1418fc42041cbf71bc, type: 3}
+  m_Script: {fileID: 11500000, guid: 09dbeef4d2ae94843960c92306359045, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   NMA: {fileID: 4794220531658604334}
@@ -110,9 +110,9 @@ MonoBehaviour:
     - _type: 1
       _chance: 100
     - _type: 1
-      _chance: 50
+      _chance: 100
     - _type: 1
-      _chance: 50
+      _chance: 100
   DEBUG_EquippedGunNum: 1
   DEBUG_FollowPlayerImmediately: 0
   DEBUG_TargetAgent: {fileID: 0}
@@ -139,12 +139,15 @@ MonoBehaviour:
     onDeath_Ally:
       state: -10
       B_voiceLine: 0
-      banter: 8
+      banter: 9
     f_enemyDeathRange: 15
     onDeath_Enemy:
       state: -10
       B_voiceLine: 0
       banter: 9
+  PF_enemySpawn: {fileID: 4076457481858739809, guid: 82f5513339279654db5d3a8a00c5f048, type: 3}
+  F_spawnTimer: 5
+  I_spawnLimit: 10
 --- !u!1 &799992256305119704
 GameObject:
   m_ObjectHideFlags: 0
@@ -764,7 +767,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffc2e457bb23a924292e9415ad1b005c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controller: {fileID: 4076457481858739809}
+  controller: {fileID: 549521836531451379}
 --- !u!1 &6877985217339918725
 GameObject:
   m_ObjectHideFlags: 0
@@ -1034,7 +1037,7 @@ PrefabInstance:
     - target: {fileID: 2034379172178741162, guid: 2f8ce15955bcf2945acfaa515f856a24, type: 3}
       propertyPath: BaseController
       value: 
-      objectReference: {fileID: 4076457481858739809}
+      objectReference: {fileID: 549521836531451379}
     - target: {fileID: 2117959251555041975, guid: 2f8ce15955bcf2945acfaa515f856a24, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.8

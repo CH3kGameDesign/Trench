@@ -10,8 +10,8 @@ public class AgentController : BaseController
     public GunManager gunManager;
     public FieldOfView fieldOfView;
 
-    private TargetClass followTarget = new TargetClass();
-    private TargetClass attackTarget = new TargetClass();
+    [HideInInspector] public TargetClass followTarget = new TargetClass();
+    [HideInInspector] public TargetClass attackTarget = new TargetClass();
 
     [Header("Relationship Variables")]
     public string S_characterID;
@@ -174,7 +174,7 @@ public class AgentController : BaseController
     }
 
 
-    class TargetClass
+    public class TargetClass
     {
         public targetTypeEnum targetType = targetTypeEnum.none;
 

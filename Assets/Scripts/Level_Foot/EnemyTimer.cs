@@ -50,8 +50,9 @@ public class EnemyTimer : MonoBehaviour
     {
         if (T_spawn != null)
         {
-            GameObject GO = Instantiate(PF_bigBoss);
-            GO.transform.position = T_spawn.position;
+            GameObject GO = Instantiate(PF_bigBoss, T_spawn.transform.position, T_spawn.transform.rotation);
+            AgentController AC = GO.GetComponent<AgentController>();
+            AC.NMA.transform.rotation = T_spawn.transform.rotation;
         }
     }
 }

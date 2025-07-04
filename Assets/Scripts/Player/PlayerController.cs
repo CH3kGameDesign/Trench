@@ -1256,7 +1256,8 @@ public class PlayerController : BaseController
         //Check if already equipped
         if (SaveData.i_equippedGunNum.x != _invNum || _force)
         {
-            SaveData.i_equippedGunNum.y = SaveData.i_equippedGunNum.x;
+            if (SaveData.i_equippedGunNum.x != _invNum)
+                SaveData.i_equippedGunNum.y = SaveData.i_equippedGunNum.x;
             SaveData.i_equippedGunNum.x = _invNum;
             Gun_Equip(gun_EquippedList[_invNum]);
         }
