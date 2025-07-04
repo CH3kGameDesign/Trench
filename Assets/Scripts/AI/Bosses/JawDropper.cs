@@ -9,11 +9,14 @@ public class JawDropper : AgentController
     public float F_spawnTimer = 5;
     public int I_spawnLimit = 10;
 
+    private Coroutine spawnEnemies = null;
 
-    public override void Start()
+
+    public override void OnHit(GunManager.bulletClass _bullet)
     {
-        base.Start();
-        StartCoroutine(SpawnEnemies());
+        base.OnHit(_bullet);
+        if (spawnEnemies == null)
+            spawnEnemies = StartCoroutine(SpawnEnemies());
     }
 
     IEnumerator SpawnEnemies()

@@ -44,6 +44,7 @@ public class EnemyTimer : MonoBehaviour
             f_curTimer -= Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
+        TM_timer.text = "RUN";
         SpawnBigBoss();
     }
     void SpawnBigBoss()
