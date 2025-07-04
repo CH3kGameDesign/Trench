@@ -5,12 +5,14 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Trench/AssetLists/Gun/Shotgun", fileName = "New Shotgun Gun")]
 public class GunClass_Shotgun : GunClass
 {
+    public Bullet sprintMelee;
     public fireClass fireVariablesOnAim;
     public fireClass fireVariablesOnSprint;
 
     public override GunClass Clone()
     {
         GunClass_Shotgun _temp = CreateInstance<GunClass_Shotgun>();
+        _temp.sprintMelee = sprintMelee;
         _temp.fireVariablesOnAim = fireVariablesOnAim;
         _temp.fireVariablesOnSprint = fireVariablesOnSprint;
         base.Clone(_temp);
@@ -50,6 +52,15 @@ public class GunClass_Shotgun : GunClass
             A_charModel.Play("Melee_Swing", 1);
             baseController.RM_ragdoll.DisableRig(2.1f);
             baseController.AH_agentAudioHolder.Play(AgentAudioHolder.type.melee);
+
+            Transform _barrel;
+            _barrel = baseController.T_barrelHook;
+            Bullet GO = Instantiate(sprintMelee, _barrel.position, _barrel.rotation);
+            if (b_playerGun)
+                GO.OnCreate(fireVariablesOnSprint.damage, PM_player, this);
+            else
+                GO.OnCreate(fireVariablesOnSprint.damage, AC_agent, this);
+
 
             if (b_playerGun)
                 MusicHandler.AdjustVolume(MusicHandler.typeEnum.guitar, fireVariablesOnSprint.fireRate / 4);

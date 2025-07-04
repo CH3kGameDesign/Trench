@@ -41,4 +41,10 @@ public class HitObject : MonoBehaviour
     {
         UE_OnDestroy.Invoke(_bullet, _source);
     }    
+    public GameObject GetParent()
+    {
+        if (RM_ragdollManager != null)
+            return RM_ragdollManager.gameObject;
+        return gameObject;
+    }
 }

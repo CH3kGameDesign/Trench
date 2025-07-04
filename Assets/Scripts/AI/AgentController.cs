@@ -659,14 +659,37 @@ public class AgentController : BaseController
                     return;
             }
         }
-        
+
+        if (_bullet.ragdollHitTimer > 0 && state != stateEnum.ragdoll)
+        {
+            StartCoroutine(ChangeState(state, _bullet.ragdollHitTimer));
+            ChangeState(stateEnum.ragdoll);
+        }
+        if (_bullet.pushBackForce > 0)
+        {
+            Vector3 dir;
+            if (_bullet.B_player) dir = _bullet.con_Player.NMA.transform.forward;
+            else dir = _bullet.con_Agent.NMA.transform.forward;
+            dir *= _bullet.pushBackForce;
+            dir += Vector3.up;
+            if (state != stateEnum.ragdoll)
+            {
+                GroundedUpdate(false);
+                RB.AddForce(dir, ForceMode.VelocityChange);
+            }
+            else
+                RM_ragdoll.RB_rigidbodies[0].AddForce(dir, ForceMode.VelocityChange);
+        }
+
         F_curHealth -= _bullet.F_damage;
         if (F_curHealth <= 0)
             OnDeath(_bullet);
         else
             AH_agentAudioHolder.Play(AgentAudioHolder.type.hurt);
         FollowerHealthUpdate();
+        base.OnHit(_bullet);
     }
+
     public override void OnHeal(float _amt)
     {
         if (b_alive)
@@ -705,10 +728,6 @@ public class AgentController : BaseController
 
         ResourceDrop.Drop(T_model.position);
         ChangeState(stateEnum.ragdoll);
-        RM_ragdoll.EnableRigidbodies(true);
-        GroundedUpdate(false);
-        RM_ragdoll.R_Rig.rig.weight = 0;
-        A_model.enabled = false;
         b_alive = false;
         LevelGen_Holder.Instance.AgentDeath(this);
         AH_agentAudioHolder.Play(AgentAudioHolder.type.death);
@@ -724,7 +743,12 @@ public class AgentController : BaseController
 
     void GroundedUpdate(bool _grounded)
     {
+        b_grounded = _grounded;
+        //NMA_player.updateRotation = _grounded;
         NMA.updatePosition = _grounded;
+        //NMA_player.isStopped = !_grounded;
+        RB.isKinematic = _grounded;
+        RB.useGravity = !_grounded;
     }
 
     bool IsHostile()
@@ -735,27 +759,7 @@ public class AgentController : BaseController
 
     public override void Revive()
     {
-
-        RM_ragdoll.transform.position = RM_ragdoll.T_transforms[0].position;
-        //RM_ragdoll.T_transforms[0].localPosition = Vector3.zero;
-        RB.transform.position = RM_ragdoll.transform.position;
-        RM_ragdoll.transform.localPosition = Vector3.down;
-        RM_ragdoll.transform.localRotation = new Quaternion();
-
-        RM_ragdoll.EnableRigidbodies(false);
-
         gun_Equipped.OnEquip(this);
-        NavMeshHit navHit;
-        if (NavMesh.SamplePosition(NMA.transform.position, out navHit, 2f, -1))
-        {
-            Vector3 _pos = navHit.position;
-            _pos.y = NMA.transform.position.y;
-            NMA.Warp(_pos);
-            T_surface_Update(NMA.navMeshOwner.GetComponent<Transform>());
-        }
-        GroundedUpdate(true);
-        RM_ragdoll.ApplyBaseTransforms();
-        A_model.enabled = true;
         b_alive = true;
 
         ChangeState(stateEnum.protect);
@@ -802,6 +806,12 @@ public class AgentController : BaseController
         ExitState(state);
         switch (_state)
         {
+            case stateEnum.ragdoll:
+                RM_ragdoll.EnableRigidbodies(true);
+                GroundedUpdate(false);
+                RM_ragdoll.R_Rig.rig.weight = 0;
+                A_model.enabled = false;
+                break;
             case stateEnum.kamikaze:
                 NMA.stoppingDistance = 0.1f;
                 break;
@@ -809,6 +819,11 @@ public class AgentController : BaseController
                 break;
         }
         state = _state;
+    }
+    public IEnumerator ChangeState(stateEnum _state, float _timer)
+    {
+        yield return new WaitForSeconds(_timer);
+        ChangeState(_state);
     }
     public void AssignTarget_Attack(PlayerController _con, bool _force = false)
     {
@@ -826,6 +841,26 @@ public class AgentController : BaseController
     {
         switch (_state)
         {
+            case stateEnum.ragdoll:
+                RM_ragdoll.transform.position = RM_ragdoll.T_transforms[0].position;
+                //RM_ragdoll.T_transforms[0].localPosition = Vector3.zero;
+                RB.transform.position = RM_ragdoll.transform.position;
+                RM_ragdoll.transform.localPosition = Vector3.down;
+                RM_ragdoll.transform.localRotation = new Quaternion();
+
+                RM_ragdoll.EnableRigidbodies(false);
+                NavMeshHit navHit;
+                if (NavMesh.SamplePosition(NMA.transform.position, out navHit, 2f, -1))
+                {
+                    Vector3 _pos = navHit.position;
+                    _pos.y = NMA.transform.position.y;
+                    NMA.Warp(_pos);
+                    T_surface_Update(NMA.navMeshOwner.GetComponent<Transform>());
+                }
+                GroundedUpdate(true);
+                RM_ragdoll.ApplyBaseTransforms();
+                A_model.enabled = true;
+                break;
             case stateEnum.kamikaze:
                 NMA.stoppingDistance = 5;
                 break;

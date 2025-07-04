@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -8,6 +9,8 @@ public class Bullet : DamageSource
     public GunManager.bulletClass B_info;
     public LayerMask LM_targets;
     private Transform t_lockOnTarget;
+
+    private List<GameObject> hitObjects = new List<GameObject>();
     public void OnCreate(float _damage, PlayerController _player, GunClass _gun)
     {
         B_info.con_Gun = _gun;
@@ -34,37 +37,77 @@ public class Bullet : DamageSource
     }
     public virtual void Update()
     {
-        RaycastHit hit;
-        float _dist = B_info.F_speed * Time.deltaTime;
-        if (Physics.SphereCast(transform.position, B_info.F_radius, transform.forward, out hit, _dist, LM_targets))
+        if (B_info.F_speed > 0)
         {
-            DamageObject(hit);
-            B_info.con_Gun.OnHit(this);
-            HitPoint(hit);
-            Destroy();
-        }
-        else
-            transform.position += transform.forward * _dist;
-        if (t_lockOnTarget != null)
-        {
-            Quaternion _tarRotation = Quaternion.LookRotation(t_lockOnTarget.position - transform.position);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, _tarRotation, B_info.F_lockOnTurnSpeed * Time.deltaTime);
+            RaycastHit hit;
+            float _dist = B_info.F_speed * Time.deltaTime;
+            if (Physics.SphereCast(transform.position, B_info.F_radius, transform.forward, out hit, _dist, LM_targets))
+            {
+                if (DamageObject(hit))
+                {
+                    B_info.con_Gun.OnHit(this);
+                    HitPoint(hit);
+                    if (B_info.breakOnImpact)
+                        Destroy();
+                }
+            }
+            else
+                transform.position += transform.forward * _dist;
+            if (t_lockOnTarget != null)
+            {
+                Quaternion _tarRotation = Quaternion.LookRotation(t_lockOnTarget.position - transform.position);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, _tarRotation, B_info.F_lockOnTurnSpeed * Time.deltaTime);
+            }
         }
     }
 
-    public void DamageObject(RaycastHit hit)
+    public bool DamageObject(Collider collider)
+    {
+        HitObject hitObject;
+        if (collider.TryGetComponent<HitObject>(out hitObject))
+        {
+            if (DamageObject(hitObject))
+            {
+                return true;
+            }
+            return false;
+        }
+        if (hitObjects.Contains(collider.gameObject))
+            return false;
+        hitObjects.Add(collider.gameObject);
+        return true;
+    }
+
+    public bool DamageObject(RaycastHit hit)
     {
         HitObject hitObject;
         if (hit.transform.TryGetComponent<HitObject>(out hitObject))
         {
-            hitObject.OnDamage(B_info, this);
-            HitMarker();
-            if (hitObject.PF_hitParticles != null)
+            if (DamageObject(hitObject))
             {
-                GameObject GO = Instantiate(hitObject.PF_hitParticles, hit.point, B_info.PF_impactHit.transform.rotation);
-                GO.transform.forward = hit.normal;
+                if (hitObject.PF_hitParticles != null)
+                {
+                    GameObject GO = Instantiate(hitObject.PF_hitParticles, hit.point, B_info.PF_impactHit.transform.rotation);
+                    GO.transform.forward = hit.normal;
+                }
+                return true;
             }
+            return false;
         }
+        if (hitObjects.Contains(hit.transform.gameObject))
+            return false;
+        hitObjects.Add(hit.transform.gameObject);
+        return true;
+    }
+    public bool DamageObject(HitObject hitObject)
+    {
+        GameObject _parent = hitObject.GetParent();
+        if (hitObjects.Contains(_parent))
+            return false;
+        hitObjects.Add(_parent);
+        hitObject.OnDamage(B_info, this);
+        HitMarker();
+        return true;
     }
 
     void HitMarker()
@@ -94,5 +137,15 @@ public class Bullet : DamageSource
     public virtual void Detonate()
     {
         
+    }
+
+    public virtual void OnTriggerEnter(Collider _collider)
+    {
+        if (DamageObject(_collider))
+        {
+            B_info.con_Gun.OnHit(this);
+            if (B_info.breakOnImpact)
+                Destroy();
+        }
     }
 }

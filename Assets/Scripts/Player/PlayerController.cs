@@ -1177,6 +1177,7 @@ public class PlayerController : BaseController
         }
         float _scale = Mathf.Clamp(Mathf.Pow((F_curHealth / F_maxHealth), 2) * 2, 0, 1);
         Ref.hurtFace.SetMaskScale(_scale, 0.05f);
+        base.OnHit(_bullet);
     }
 
     void AggroAllies(GunManager.bulletClass _bullet)

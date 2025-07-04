@@ -34,6 +34,7 @@ MonoBehaviour:
     description3: '-'
   prefab: {fileID: 7164603078148759310, guid: bfb35e4a5786e3b4f96c54b525e1ce3e, type: 3}
   bullet: {fileID: 7857619870900032349, guid: 94f26101f86c3194699d76d9df0d42af, type: 3}
+  melee: {fileID: 7857619870900032349, guid: 2177d7bb76e4f9340a8571078a30b98f, type: 3}
   sprite: {fileID: 21300000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
   audioClips:
     fire:
@@ -51,13 +52,17 @@ MonoBehaviour:
     burstRate: 0.1
     recoilCam: 0.25
     recoilUpwards: 1
+    bulletSprayPlayer: 0
+    bulletSprayAI: 15
   meleeVariables:
     fireRate: 1
-    damage: 10
+    damage: 50
     burstAmount: 1
     burstRate: 0.1
     recoilCam: 0.25
     recoilUpwards: 1
+    bulletSprayPlayer: 0
+    bulletSprayAI: 15
   clipVariables:
     reloadSpeed: 2
     clipSize: 8
@@ -75,6 +80,7 @@ MonoBehaviour:
   baseController: {fileID: 0}
   A_charModel: {fileID: 0}
   b_playerGun: 0
+  sprintMelee: {fileID: 7857619870900032349, guid: 13448a1cd1dfb12498644d82ec63dc34, type: 3}
   fireVariablesOnAim:
     fireRate: 1
     damage: 100
@@ -82,10 +88,14 @@ MonoBehaviour:
     burstRate: 0.1
     recoilCam: 0.25
     recoilUpwards: 1
+    bulletSprayPlayer: 0
+    bulletSprayAI: 15
   fireVariablesOnSprint:
     fireRate: 2.2
-    damage: 10
+    damage: 50
     burstAmount: 1
     burstRate: 0.1
     recoilCam: 0.25
     recoilUpwards: 1
+    bulletSprayPlayer: 0
+    bulletSprayAI: 15

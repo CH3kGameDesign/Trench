@@ -23,6 +23,7 @@ public class GunClass : ItemClass
     [Space(10)]
     public GunPrefab prefab;
     public Bullet bullet;
+    public Bullet melee;
     public Sprite sprite;
     [Space(10)]
     public audioClipClass audioClips = new audioClipClass();
@@ -100,6 +101,7 @@ public class GunClass : ItemClass
 
         _temp.prefab = prefab;
         _temp.bullet = bullet;
+        _temp.melee = melee;
         _temp.sprite = sprite;
 
         _temp.fireVariables = fireVariables;
@@ -199,6 +201,15 @@ public class GunClass : ItemClass
             PM_player.reticle.RotateReticle(f_fireTimer);
             A_charModel.Play("Melee_Rifle", 1);
             baseController.AH_agentAudioHolder.Play(AgentAudioHolder.type.melee);
+
+            Transform _barrel;
+            _barrel = baseController.T_barrelHook;
+            Bullet GO = Instantiate(melee, _barrel.position, baseController.NMA.transform.rotation);
+            if (b_playerGun)
+                GO.OnCreate(meleeVariables.damage, PM_player, this);
+            else
+                GO.OnCreate(meleeVariables.damage, AC_agent, this);
+
 
             if (b_playerGun)
                 MusicHandler.AdjustVolume(MusicHandler.typeEnum.guitar, meleeVariables.fireRate / 4);

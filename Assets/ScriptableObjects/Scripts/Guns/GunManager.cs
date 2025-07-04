@@ -42,6 +42,11 @@ public class GunManager : ScriptableObject
 
         public HitObject.damageTypeEnum D_damageType = HitObject.damageTypeEnum.bullet;
 
+        public bool breakOnImpact = true;
+        public float ragdollHitTimer = -1;
+        public float pushBackForce = -1;
+
+
         public bulletClass Clone()
         {
             bulletClass _temp = new bulletClass();
@@ -58,6 +63,10 @@ public class GunManager : ScriptableObject
             _temp.PF_impactHit = PF_impactHit;
             _temp.F_damage = F_damage;
             _temp.D_damageType = D_damageType;
+
+            _temp.breakOnImpact = breakOnImpact;
+            _temp.ragdollHitTimer = ragdollHitTimer;
+            _temp.pushBackForce = pushBackForce;
             return _temp;
         }
     }
