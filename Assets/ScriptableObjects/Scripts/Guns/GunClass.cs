@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using PurrNet;
 
 [CreateAssetMenu(menuName = "Trench/AssetLists/Gun", fileName = "New Default Gun")]
 public class GunClass : ItemClass
@@ -57,7 +58,7 @@ public class GunClass : ItemClass
     [HideInInspector]
     public BaseController baseController;
     [HideInInspector]
-    public Animator A_charModel;
+    public NetworkAnimator A_charModel;
 
     private GunPrefab G_gunModel = null;
 
@@ -358,8 +359,8 @@ public class GunClass : ItemClass
         Gun_Type _enum = GetEnum();
         if (!SaveData.ownedGun.Contains(_enum))
             SaveData.ownedGun.Add(_enum);
-        PlayerController.Instance.DebugGunList();
-        PlayerController.Instance.Setup_Radial();
+        PlayerManager.Main.DebugGunList();
+        PlayerManager.Main.Setup_Radial();
     }
 
     public void Damage_Objective(int _damage = -1)

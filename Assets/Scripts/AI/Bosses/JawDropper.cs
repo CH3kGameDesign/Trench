@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class JawDropper : AgentController
 {
+    [Space(10)]
+    public Slider S_hpSlider;
+    [Space(10)]
     public AgentController PF_enemySpawn;
     private List<AgentController> activeChildren = new List<AgentController>();
     public float F_spawnTimer = 5;
@@ -12,11 +16,25 @@ public class JawDropper : AgentController
     private Coroutine spawnEnemies = null;
 
 
+    public override void AssignSlider(Slider _slider)
+    {
+        S_hpSlider = _slider;
+        S_hpSlider.gameObject.SetActive(true);
+        S_hpSlider.maxValue = F_maxHealth;
+        S_hpSlider.minValue = 0;
+        S_hpSlider.value = F_curHealth;
+    }
+
     public override void OnHit(GunManager.bulletClass _bullet)
     {
         base.OnHit(_bullet);
         if (spawnEnemies == null)
             spawnEnemies = StartCoroutine(SpawnEnemies());
+    }
+    public override void HealthUpdate()
+    {
+        base.HealthUpdate();
+        S_hpSlider.value = F_curHealth;
     }
 
     IEnumerator SpawnEnemies()

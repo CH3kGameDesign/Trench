@@ -22,8 +22,8 @@ public class Item_RevivePotion : Item_Consumable
         {
             if (item.F_curHealth <= 0)
             {
-                if (item == PlayerController.Instance.BC_equippedController)
-                    PlayerController.Instance.DropController();
+                if (item == PlayerManager.Main.BC_equippedController)
+                    PlayerManager.Main.DropController();
                 item.Revive();
             }
         }

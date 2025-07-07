@@ -47,6 +47,6 @@ public class SS_MessageObject : MonoBehaviour
         rect = GetComponent<RectTransform>();
         c_canvas = _canvas;
         t_target = _target;
-        t_player = PlayerController.Instance.RB.transform;
+        t_player = PlayerManager.Main.RB.transform;
     }
 }

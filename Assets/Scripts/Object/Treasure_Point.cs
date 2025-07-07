@@ -52,7 +52,7 @@ public class Treasure_Point : MonoBehaviour
             if (!t_treasure.Contains(_temp))
             {
                 t_treasure.Add(_temp);
-                PlayerController.Instance.Update_Objectives(Objective_Type.Collect_Value, _temp.I_value);
+                PlayerManager.Main.Update_Objectives(Objective_Type.Collect_Value, _temp.I_value);
                 other.gameObject.SetActive(false);
                 UpdatePoints(_temp.I_value);
             }
@@ -81,8 +81,8 @@ public class Treasure_Point : MonoBehaviour
                             if (!ac_collected.Contains(AC))
                             {
                                 ac_collected.Add(AC);
-                                PlayerController.Instance.Update_Objectives(Objective_Type.Collect_Value, 50);
-                                PlayerController.Instance.Update_Objectives(Objective_Type.Collect_Enemy, 1);
+                                PlayerManager.Main.Update_Objectives(Objective_Type.Collect_Value, 50);
+                                PlayerManager.Main.Update_Objectives(Objective_Type.Collect_Enemy, 1);
                                 AC.gameObject.SetActive(false);
                                 UpdatePoints(50);
                             }

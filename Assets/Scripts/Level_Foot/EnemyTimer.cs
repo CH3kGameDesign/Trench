@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using UnityEngine.UI;
 
 public class EnemyTimer : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class EnemyTimer : MonoBehaviour
     public TextMeshProUGUI TM_timer;
     public GameObject G_timerBG;
     [HideInInspector] public Transform T_spawn;
+    public Slider S_healthSlider;
 
     private bool timerActive = false;
 
@@ -54,6 +56,7 @@ public class EnemyTimer : MonoBehaviour
             GameObject GO = Instantiate(PF_bigBoss, T_spawn.transform.position, T_spawn.transform.rotation);
             AgentController AC = GO.GetComponent<AgentController>();
             AC.NMA.transform.rotation = T_spawn.transform.rotation;
+            AC.AssignSlider(S_healthSlider);
         }
     }
 }

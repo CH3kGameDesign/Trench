@@ -62,7 +62,7 @@ public class Conversation : MonoBehaviour
             foreach (ConversationManager.characterClass c in characters)
             {
                 RagdollManager rm = Instantiate(c.PF_ragdoll, c_speakerCamera.transform);
-
+                rm.transform.parent = c_speakerCamera.transform;
                 rm.transform.localPosition = new Vector3(0,-1.5f,10f);
                 rm.transform.localPosition += Vector3.forward * i;
 
@@ -181,7 +181,8 @@ public class Conversation : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+            Instance = this;
     }
 
     private void Update()
@@ -245,7 +246,7 @@ public class Conversation : MonoBehaviour
             }
             else
                 HideDialogueChoices(false);
-            PlayerController.Instance.GameState_Change(PlayerController.gameStateEnum.dialogue);
+            PlayerManager.Main.GameState_Change(PlayerController.gameStateEnum.dialogue);
 
             A_speaker_L.PlayClip("Transition_Inactive");
             A_speaker_R.PlayClip("Transition_New");
@@ -287,7 +288,7 @@ public class Conversation : MonoBehaviour
 
     void ShowDialogueChoices()
     {
-        PlayerController.Instance.GameState_Change(PlayerController.gameStateEnum.dialogueResponse);
+        PlayerManager.Main.GameState_Change(PlayerController.gameStateEnum.dialogueResponse);
         A_speaker_L.PlayClip("Transition_New");
         A_speaker_R.PlayClip("Transition_Inactive");
         A_bouncer.Play("Idle_Hidden");
@@ -399,7 +400,7 @@ public class Conversation : MonoBehaviour
         StartCoroutine(CG_dialogueHolder.Fade(false));
         StartCoroutine(V_dialogueVolume.Fade(false));
         StartCoroutine(CG_banterHolder.Fade(true));
-        PlayerController.Instance.GameState_Change(PlayerController.gameStateEnum.active);
+        PlayerManager.Main.GameState_Change(PlayerController.gameStateEnum.active);
     }
     void TypeMessage()
     {

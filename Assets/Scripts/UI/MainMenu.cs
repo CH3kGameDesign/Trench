@@ -54,7 +54,7 @@ public class MainMenu : MonoBehaviour
         }
         public virtual void Open(AnimCurve _curve, Vector3 v3_camMenuLocalPos, Quaternion q_camLastLocalRot)
         {
-            Instance.StartCoroutine(PlayerController.Instance.T_camHolder.GetChild(0).Move(v3_camMenuLocalPos, q_camLastLocalRot, true, 0.4f, _curve));
+            Instance.StartCoroutine(PlayerManager.Main.T_camHolder.GetChild(0).Move(v3_camMenuLocalPos, q_camLastLocalRot, true, 0.4f, _curve));
         }
     }
     [System.Serializable]
@@ -86,8 +86,8 @@ public class MainMenu : MonoBehaviour
         }
         public override void Open(AnimCurve _curve, Vector3 v3_camMenuLocalPos, Quaternion q_camLastLocalRot)
         {
-            Transform _pivot = PlayerController.Instance.T_camHookArmorEquip;
-            Instance.StartCoroutine(PlayerController.Instance.T_camHolder.GetChild(0).Move(_pivot.position, _pivot.rotation, false, 0.4f, _curve));
+            Transform _pivot = PlayerManager.Main.T_camHookArmorEquip;
+            Instance.StartCoroutine(PlayerManager.Main.T_camHolder.GetChild(0).Move(_pivot.position, _pivot.rotation, false, 0.4f, _curve));
         }
     }
     [System.Serializable]
@@ -290,8 +290,8 @@ public class MainMenu : MonoBehaviour
         public override void Open(AnimCurve _curve, Vector3 v3_camMenuLocalPos, Quaternion q_camLastLocalRot)
         {
             UpdateTabs();
-            Transform _pivot = PlayerController.Instance.T_camHookStore;
-            Instance.StartCoroutine(PlayerController.Instance.T_camHolder.GetChild(0).Move(_pivot.position, _pivot.rotation, false, 0.4f, _curve));
+            Transform _pivot = PlayerManager.Main.T_camHookStore;
+            Instance.StartCoroutine(PlayerManager.Main.T_camHolder.GetChild(0).Move(_pivot.position, _pivot.rotation, false, 0.4f, _curve));
         }
     }
     [System.Serializable]
@@ -412,9 +412,9 @@ public class MainMenu : MonoBehaviour
     public void ChooseArmor(ArmorPiece _armor)
     {
         SaveData.equippedArmor[customize.I_armorType] = _armor.GetEnum();
-        _armor.Equip(PlayerController.Instance.RM_ragdoll, customize.I_armorType != 3);
+        _armor.Equip(PlayerManager.Main.RM_ragdoll, customize.I_armorType != 3);
         _armor.AssignToPlayer(customize.I_armorType != 3);
-        EquipParticles(_armor.Hooks(PlayerController.Instance.RM_ragdoll));
+        EquipParticles(_armor.Hooks(PlayerManager.Main.RM_ragdoll));
     }
     void EquipParticles(Transform[] _points)
     {
@@ -466,8 +466,8 @@ public class MainMenu : MonoBehaviour
     {
         menuOpen = true;
         _panel.UpdateCurrency(SaveData.i_currency);
-        v3_camLastLocalPos = PlayerController.Instance.T_camHolder.GetChild(0).localPosition;
-        q_camLastLocalRot = PlayerController.Instance.T_camHolder.GetChild(0).localRotation;
+        v3_camLastLocalPos = PlayerManager.Main.T_camHolder.GetChild(0).localPosition;
+        q_camLastLocalRot = PlayerManager.Main.T_camHolder.GetChild(0).localRotation;
 
         v3_camMenuLocalPos = v3_camLastLocalPos;
         v3_camMenuLocalPos.x = -v3_camMenuLocalPos.x;
@@ -479,12 +479,12 @@ public class MainMenu : MonoBehaviour
         Time.timeScale = _timeScale;
 
         _prevGameState = PlayerController.GameState;
-        PlayerController.Instance.GameState_Change(BaseController.gameStateEnum.menu);
+        PlayerManager.Main.GameState_Change(BaseController.gameStateEnum.menu);
     }
     public void Close()
     {
         _current._anim.Play("Close");
-        StartCoroutine(PlayerController.Instance.T_camHolder.GetChild(0).Move(v3_camLastLocalPos, q_camLastLocalRot, true, 0.2f, AC_smooth, CloseFinish));
+        StartCoroutine(PlayerManager.Main.T_camHolder.GetChild(0).Move(v3_camLastLocalPos, q_camLastLocalRot, true, 0.2f, AC_smooth, CloseFinish));
         StartCoroutine(V_postProcess.Fade(false));
     }
     public void BackButton()
@@ -523,7 +523,7 @@ public class MainMenu : MonoBehaviour
     }
     public void CheckSelectedButton()
     {
-        if (PlayerController.Instance.Inputs.b_isGamepad)
+        if (PlayerManager.Main.Inputs.b_isGamepad)
         {
             if (EventSystem.current.currentSelectedGameObject == null)
                 EventSystem.current.SetSelectedGameObject(_current.DefaultButton(false));
@@ -546,7 +546,7 @@ public class MainMenu : MonoBehaviour
         if (menuOpen)
         {
             EventSystem.current.UpdateModules();
-            if (!PlayerController.Instance.Inputs.b_isGamepad)
+            if (!PlayerManager.Main.Inputs.b_isGamepad)
             {
                 EventSystem.current.SetSelectedGameObject(null);
                 Cursor.lockState = CursorLockMode.None;
@@ -577,7 +577,7 @@ public class MainMenu : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        PlayerController.Instance.GameState_Change(_prevGameState);
+        PlayerManager.Main.GameState_Change(_prevGameState);
 
         menuOpen = false;
     }

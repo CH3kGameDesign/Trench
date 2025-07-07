@@ -1,3 +1,4 @@
+using PurrNet;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +10,6 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : BaseController
 {
-    public static PlayerController Instance;
     public GunManager gunManager;
 
     public RefClass Ref = new RefClass();
@@ -83,7 +83,7 @@ public class PlayerController : BaseController
     private int i_crouchingNavID = 0;
 
     [Header("Animations")]
-    public Animator A_model;
+    public NetworkAnimator A_model;
     private Vector2 v2_animMove = Vector2.zero;
 
     [Header("Combat Refs")]
@@ -209,9 +209,20 @@ public class PlayerController : BaseController
 
     void Awake()
     {
-        Instance = this;
+        PlayerManager.Instance.AddPlayer(this);
+        SetRecallPos();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+    }
+
+    public void SetRecallPos()
+    {
+        Transform t = NetworkManager.main.GetComponent<PlayerSpawner>().GetSpawn();
+        if (t == null)
+            return;
+        Ref.R_recall.SetRecallPos(t);
+        transform.rotation = Quaternion.Euler(Vector3.zero);
+        NMA.transform.rotation = t.rotation;
     }
 
     public override void Start()
@@ -257,7 +268,7 @@ public class PlayerController : BaseController
 
     void Setup_InteractStrings()
     {
-        if (Instance == null) Instance = this;
+        PlayerManager.Instance.AddPlayer(this);
         Inputs.playerInput = GetComponent<PlayerInput>();
 
         TextMeshProUGUI _TM = Ref.TM_controlText;
@@ -1341,6 +1352,8 @@ public class PlayerController : BaseController
         Ref.GUI_gun.UpdateClip(gun_Equipped);
     }
 
+    
+
     IEnumerator TimeScale (float _scale)
     {
         float _timer = 0;
@@ -1387,7 +1400,7 @@ public class PlayerController : BaseController
             yield return new WaitForSeconds(_animWait);
             if (RB.linearVelocity.magnitude < 0.1f && !Inputs.IsInput())
             {
-                A_model.SetInteger("Idle", UnityEngine.Random.Range(0, 4));
+                A_model.SetInt("Idle", UnityEngine.Random.Range(0, 4));
                 A_model.Play("Idle");
             }
         }

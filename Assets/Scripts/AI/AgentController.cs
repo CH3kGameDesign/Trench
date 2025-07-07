@@ -1,3 +1,4 @@
+using PurrNet;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -28,7 +29,7 @@ public class AgentController : BaseController
     private bool b_firing = false;
 
     [Header("Animations")]
-    public Animator A_model;
+    public NetworkAnimator A_model;
     private Vector2 v2_animMove = Vector2.zero;
     public ArmorManager.SetClass Armor;
 
@@ -38,7 +39,6 @@ public class AgentController : BaseController
     [Header("Debug Variables")]
     public int DEBUG_EquippedGunNum = 0;
     public bool DEBUG_FollowPlayerImmediately = true;
-    public AgentController DEBUG_TargetAgent;
 
     private Coroutine Coroutine_Relationship;
     private Coroutine Coroutine_Target;
@@ -332,16 +332,7 @@ public class AgentController : BaseController
         Armor.Equip(RM_ragdoll);
 
         if (DEBUG_FollowPlayerImmediately)
-        {
-            if (b_friendly)
-            {
-                followTarget.FollowPlayer(PlayerController.Instance);
-                PlayerController.Instance.AddFollower(this);
-            }
-            else
-                attackTarget.FollowPlayer(PlayerController.Instance);
-        }
-        attackTarget.FollowAgent(DEBUG_TargetAgent);
+            PlayerManager.Instance.FollowPlayer(this, b_friendly);
     }
 
     void NavSurface_Update(bool _override = false)
@@ -686,7 +677,7 @@ public class AgentController : BaseController
             OnDeath(_bullet);
         else
             AH_agentAudioHolder.Play(AgentAudioHolder.type.hurt);
-        FollowerHealthUpdate();
+        HealthUpdate();
         base.OnHit(_bullet);
     }
 
@@ -696,7 +687,7 @@ public class AgentController : BaseController
         {
             F_curHealth = Mathf.Max(F_curHealth, 0);
             F_curHealth = Mathf.Min(F_curHealth + _amt, F_maxHealth);
-            FollowerHealthUpdate();
+            HealthUpdate();
         }
     }
 
@@ -719,7 +710,7 @@ public class AgentController : BaseController
             if (_bullet.con_Agent != null)
             {
                 if (_bullet.con_Agent.b_friendly)
-                    PlayerController.Instance.OnKill(this, false);
+                    PlayerManager.Main.OnKill(this, false);
             }
         }
 
@@ -735,10 +726,14 @@ public class AgentController : BaseController
         //gameObject.SetActive(false);
     }
 
-    void FollowerHealthUpdate()
+    public virtual void HealthUpdate()
     {
         if (followTarget.PC_tarPlayer != null)
             followTarget.PC_tarPlayer.UpdateFollowerHealth(this);
+    }
+    public virtual void AssignSlider(UnityEngine.UI.Slider _slider)
+    {
+
     }
 
     void GroundedUpdate(bool _grounded)
@@ -762,8 +757,8 @@ public class AgentController : BaseController
         gun_Equipped.OnEquip(this);
         b_alive = true;
 
-        ChangeState(stateEnum.protect);
         OnHeal(F_maxHealth / 2);
+        ChangeState(stateEnum.protect);
     }
 
     Relationship.meterClass GetRelationship()
@@ -798,10 +793,15 @@ public class AgentController : BaseController
                 break;
         }
     }
-    public void ChangeState(stateEnum _state)
+    public void ChangeState(stateEnum _state, bool _force = false)
     {
         if (_state == stateEnum.unchanged ||
             _state == state) return;
+
+        if (F_curHealth <= 0 && 
+            _state != stateEnum.ragdoll && 
+            !_force)
+            return;
 
         ExitState(state);
         switch (_state)

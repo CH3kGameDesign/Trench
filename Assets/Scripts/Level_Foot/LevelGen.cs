@@ -6,10 +6,12 @@ using Unity.Mathematics;
 using static Layout_Basic;
 using static UnityEngine.EventSystems.EventTrigger;
 using static Themes;
+using PurrNet;
+using System;
 
+[RequireComponent(typeof(LevelGen_Seed))]
 public class LevelGen : MonoBehaviour
 {
-    public uint seed = new uint();
     private Unity.Mathematics.Random Random_Seeded;
 
     [SerializeField] private holderTypesClass holderTypes = new holderTypesClass();
@@ -29,6 +31,8 @@ public class LevelGen : MonoBehaviour
 
     private int i_series = 2;
     private int i_attempts = 10;
+    [Space(10)]
+    public PlayerSpawner playerSpawner;
 
     [System.Serializable]
     private class holderTypesClass
@@ -40,14 +44,12 @@ public class LevelGen : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Setup();
+
     }
 
-    void Setup()
+    public void Setup(uint _seed)
     {
-        if (seed == uint.MinValue)
-            seed = (uint)UnityEngine.Random.Range(0, int.MaxValue);
-        Random_Seeded = new Unity.Mathematics.Random(seed);
+        Random_Seeded = new Unity.Mathematics.Random(_seed);
 
         LG_Theme = themeHolder.GetTheme(SaveData.themeCurrent);
         if (LG_Theme.Layouts.Count > 0)
@@ -176,6 +178,7 @@ public class LevelGen : MonoBehaviour
         GameObject prefab;
         GameObject GO;
         bool playerSpawned = false;
+        List<Transform> spawnPoints = new List<Transform>();
         foreach (var item in LG_Blocks)
         {
             foreach (var spawn in item.LGS_Spawns)
@@ -183,6 +186,8 @@ public class LevelGen : MonoBehaviour
                 switch (spawn.spawnType)
                 {
                     case LevelGen_Spawn.spawnTypeEnum.player:
+                        spawnPoints.Add(spawn.transform);
+                        /*
                         prefab = LG_Theme.PF_Player;
                         if (prefab != null && playerSpawned == false)
                         {
@@ -192,6 +197,7 @@ public class LevelGen : MonoBehaviour
                             PC.Ref.R_recall.SetRecallPos(spawn.transform);
                             playerSpawned = true;
                         }
+                        */
                         break;
                     case LevelGen_Spawn.spawnTypeEnum.companion:
                         if (spawn.PF_override != null) prefab = spawn.PF_override;
@@ -237,6 +243,7 @@ public class LevelGen : MonoBehaviour
                 }
             }
         }
+        playerSpawner.SetSpawns(spawnPoints);
     }
     GameObject GetHolderTypePrefab(themeEnum _theme)
     {

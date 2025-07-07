@@ -137,7 +137,7 @@ MonoBehaviour:
   LM_hitScan:
     serializedVersion: 2
     m_Bits: 16385
-  A_model: {fileID: 7695503518489228931}
+  A_model: {fileID: 3727426164504592449}
   Armor:
     helmet: {fileID: 11400000, guid: 5fafa1458b238a149aa1b2b42d773ae5, type: 2}
     chest: {fileID: 11400000, guid: 033cdf44d538c6a489dbfdd47dea052d, type: 2}
@@ -159,7 +159,6 @@ MonoBehaviour:
       _chance: 50
   DEBUG_EquippedGunNum: 0
   DEBUG_FollowPlayerImmediately: 1
-  DEBUG_TargetAgent: {fileID: 0}
   state: 3
   behaviour:
     onFound:
@@ -1351,6 +1350,17 @@ PrefabInstance:
       addedObject: {fileID: 6728177349458334553}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
+--- !u!114 &3727426164504592449 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -4121429721930306985, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
+  m_PrefabInstance: {fileID: 8464453755668032022}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7b598b9d8509d64abb9fdaf07fa3f6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &4335778392909311225 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5286100758049851119, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
@@ -1369,11 +1379,6 @@ Transform:
 --- !u!4 &7441005982632738702 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1311678185765672344, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
-  m_PrefabInstance: {fileID: 8464453755668032022}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &7695503518489228931 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 2286751593682558101, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
   m_PrefabInstance: {fileID: 8464453755668032022}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &8332344335361575136 stripped

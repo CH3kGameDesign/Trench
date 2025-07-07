@@ -70,7 +70,7 @@ public static class CKUtil
     }
     public static string ToString_InputSetup(this string _interactable, PlayerController.inputActions _input, Interactable.enumType _type = Interactable.enumType.interact)
     {
-        PlayerController.inputClass _IC = PlayerController.Instance.Inputs;
+        PlayerController.inputClass _IC = PlayerManager.Main.Inputs;
         string _sprite = _IC.playerInput.actions.FindAction(_input.ToString()).GetBindingDisplayString(0, _IC.b_isGamepad ? "Gamepad": "Keyboard");
         if (_sprite.Length > 6)
             if (_sprite.Substring(0, 6) == "Press ")
@@ -212,7 +212,7 @@ public static class CKUtil
     }
     public static void SetupInputSpriteSheet(this TMP_Text _TM)
     {
-        PlayerController.inputClass _IC = PlayerController.Instance.Inputs;
+        PlayerController.inputClass _IC = PlayerManager.Main.Inputs;
         switch (_IC.s_inputType)
         {
             case "Keyboard":
@@ -252,7 +252,7 @@ public static class CKUtil
     }
     public static string ToString_Input(this string _interactable, PlayerController.inputActions _input, TMP_Text _TM, Interactable.enumType _type = Interactable.enumType.interact)
     {
-        PlayerController.inputClass _IC = PlayerController.Instance.Inputs;
+        PlayerController.inputClass _IC = PlayerManager.Main.Inputs;
         string _sprite = _IC.inputs[(int)_input];
         _TM.SetupInputSpriteSheet();
         string _temp = Interactable.interactText[(int)_type];

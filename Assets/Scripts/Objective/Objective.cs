@@ -109,9 +109,9 @@ public class Objective : ScriptableObject
             _objectives.Add(GetObjective_Random(_list));
 
         SaveData.objectives = _objectives;
-        PlayerController.Instance.Update_Objectives();
+        PlayerManager.Main.Update_Objectives();
 
-        PlayerController.Instance.AH_agentAudioHolder.Play(AgentAudioHolder.type.objectiveGain);
+        PlayerManager.Main.AH_agentAudioHolder.Play(AgentAudioHolder.type.objectiveGain);
     }
 
 #if UNITY_EDITOR
