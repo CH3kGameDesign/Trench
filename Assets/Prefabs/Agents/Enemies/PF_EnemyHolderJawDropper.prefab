@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7197547650496893999}
   - component: {fileID: 549521836531451379}
-  - component: {fileID: 27121952177849967}
   m_Layer: 3
   m_Name: PF_EnemyHolderJawDropper
   m_TagString: Character
@@ -149,35 +148,6 @@ MonoBehaviour:
   PF_enemySpawn: {fileID: 4076457481858739809, guid: 82f5513339279654db5d3a8a00c5f048, type: 3}
   F_spawnTimer: 5
   I_spawnLimit: 10
---- !u!114 &27121952177849967
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 153541626221342559}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 39d5e4b97b1615f4aae984a3d5f4235f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _isSetup: 0
-  _prefabId: -2147483648
-  _componentIndex: -2147483648
-  _shouldBePooled: 0
-  _parent: {fileID: 0}
-  _invertedPathToNearestParent: 
-  _directChildren: []
-  _networkRules: {fileID: 0}
-  _visitiblityRules: {fileID: 0}
-  _components:
-  - target: {fileID: 549521836531451379}
-    activeAsOwner: 0
-  _gameObjects: []
-  _toActivate: []
-  _toDeactivate: []
-  _toEnable: []
-  _toDisable: []
 --- !u!1 &799992256305119704
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,7 +10,6 @@ using UnityEngine.UI;
 public class Conversation : MonoBehaviour
 {
     [Header("Important thingies")]
-    public static Conversation Instance;
     public ConversationManager C_Manager;
 
     [Header("Conversation References")]
@@ -179,12 +178,6 @@ public class Conversation : MonoBehaviour
     private bool b_typing = false;
 
 
-    private void Awake()
-    {
-        if (Instance == null)
-            Instance = this;
-    }
-
     private void Update()
     {
         UpdateMessageText();
@@ -246,7 +239,7 @@ public class Conversation : MonoBehaviour
             }
             else
                 HideDialogueChoices(false);
-            PlayerManager.Main.GameState_Change(PlayerController.gameStateEnum.dialogue);
+            PlayerManager.main.GameState_Change(PlayerController.gameStateEnum.dialogue);
 
             A_speaker_L.PlayClip("Transition_Inactive");
             A_speaker_R.PlayClip("Transition_New");
@@ -288,7 +281,7 @@ public class Conversation : MonoBehaviour
 
     void ShowDialogueChoices()
     {
-        PlayerManager.Main.GameState_Change(PlayerController.gameStateEnum.dialogueResponse);
+        PlayerManager.main.GameState_Change(PlayerController.gameStateEnum.dialogueResponse);
         A_speaker_L.PlayClip("Transition_New");
         A_speaker_R.PlayClip("Transition_Inactive");
         A_bouncer.Play("Idle_Hidden");
@@ -400,7 +393,7 @@ public class Conversation : MonoBehaviour
         StartCoroutine(CG_dialogueHolder.Fade(false));
         StartCoroutine(V_dialogueVolume.Fade(false));
         StartCoroutine(CG_banterHolder.Fade(true));
-        PlayerManager.Main.GameState_Change(PlayerController.gameStateEnum.active);
+        PlayerManager.main.GameState_Change(PlayerController.gameStateEnum.active);
     }
     void TypeMessage()
     {

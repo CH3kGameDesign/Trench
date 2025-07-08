@@ -33,6 +33,7 @@ public class LevelGen : MonoBehaviour
     private int i_attempts = 10;
     [Space(10)]
     public PlayerSpawner playerSpawner;
+    [HideInInspector] public bool isHost = false;
 
     [System.Serializable]
     private class holderTypesClass
@@ -200,6 +201,8 @@ public class LevelGen : MonoBehaviour
                         */
                         break;
                     case LevelGen_Spawn.spawnTypeEnum.companion:
+                        if (!isHost)
+                            break;
                         if (spawn.PF_override != null) prefab = spawn.PF_override;
                         else prefab = LG_Theme.GetCompanion(Random_Seeded);
 
@@ -214,6 +217,8 @@ public class LevelGen : MonoBehaviour
                         }
                         break;
                     case LevelGen_Spawn.spawnTypeEnum.enemy:
+                        if (!isHost)
+                            break;
                         if (spawn.PF_override != null) prefab = spawn.PF_override;
                         else prefab = LG_Theme.GetEnemy(Random_Seeded); 
 
@@ -228,6 +233,8 @@ public class LevelGen : MonoBehaviour
                         }
                         break;
                     case LevelGen_Spawn.spawnTypeEnum.treasure:
+                        if (!isHost)
+                            break;
                         if (spawn.PF_override != null) prefab = spawn.PF_override;
                         else prefab = LG_Theme.GetTreasure(Random_Seeded);
 

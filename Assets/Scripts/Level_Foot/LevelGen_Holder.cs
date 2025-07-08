@@ -1,3 +1,4 @@
+using PurrNet;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -30,6 +31,7 @@ public class LevelGen_Holder : MonoBehaviour
         return _value;
     }
 
+    [ObserversRpc]
     public static void LoadTheme(Themes.themeEnum _theme)
     {
         SaveData.themeCurrent = _theme;

@@ -359,8 +359,8 @@ public class GunClass : ItemClass
         Gun_Type _enum = GetEnum();
         if (!SaveData.ownedGun.Contains(_enum))
             SaveData.ownedGun.Add(_enum);
-        PlayerManager.Main.DebugGunList();
-        PlayerManager.Main.Setup_Radial();
+        PlayerManager.main.DebugGunList();
+        PlayerManager.main.Setup_Radial();
     }
 
     public void Damage_Objective(int _damage = -1)

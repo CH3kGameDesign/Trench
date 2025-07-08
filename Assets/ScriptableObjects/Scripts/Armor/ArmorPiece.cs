@@ -49,7 +49,7 @@ public class ArmorPiece : ItemClass
         Armor_Type _enum = GetEnum();
         if (!SaveData.ownedArmor.Contains(_enum))
             SaveData.ownedArmor.Add(_enum);
-        PlayerManager.Main.DebugGunList();
-        PlayerManager.Main.Setup_Radial();
+        PlayerManager.main.DebugGunList();
+        PlayerManager.main.Setup_Radial();
     }
 }

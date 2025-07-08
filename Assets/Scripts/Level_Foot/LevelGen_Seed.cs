@@ -6,17 +6,18 @@ using UnityEngine;
 public class LevelGen_Seed : NetworkBehaviour
 {
     public SyncVar<uint> seed = new();
+    LevelGen levelGen;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        levelGen = GetComponent<LevelGen>();
         StartCoroutine(WaitForHost());
-        seed.onChanged += GetComponent<LevelGen>().Setup;
+        seed.onChanged += levelGen.Setup;
     }
 
     protected override void OnDestroy()
     {
-        seed.onChanged -= GetComponent<LevelGen>().Setup;
-        base.OnDestroy();
+        
     }
 
     IEnumerator WaitForHost()
@@ -24,7 +25,10 @@ public class LevelGen_Seed : NetworkBehaviour
         while (seed == uint.MinValue)
         {
             if (isHost)
+            {
+                levelGen.isHost = true;
                 seed.value = (uint)UnityEngine.Random.Range(1, int.MaxValue);
+            }
             yield return new WaitForEndOfFrame();
         }
     }

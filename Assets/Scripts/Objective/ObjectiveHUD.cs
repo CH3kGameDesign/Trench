@@ -61,6 +61,6 @@ public class ObjectiveHUD : MonoBehaviour
     void CompleteObjective(Objective.objectiveClass _obj)
     {
         _obj.completed = true;
-        PlayerManager.Main.AH_agentAudioHolder.Play(AgentAudioHolder.type.objectiveComplete);
+        PlayerManager.main.AH_agentAudioHolder.Play(AgentAudioHolder.type.objectiveComplete);
     }
 }

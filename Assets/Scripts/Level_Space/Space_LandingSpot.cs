@@ -1,3 +1,4 @@
+using PurrNet;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -43,18 +44,18 @@ public class Space_LandingSpot : MonoBehaviour
         LevelGen_Holder.LoadTheme(_theme);
     }
 
-    void Start()
+    protected void Start()
     {
-        SetupMessage();
+        PlayerManager.Instance.CheckMain(SetupMessage);
     }
     void SetupMessage()
     {
-        Canvas _canvas = Conversation.Instance.C_canvas;
-        RectTransform _holder = Conversation.Instance.RT_messageHolder;
+        Canvas _canvas = PlayerManager.conversation.C_canvas;
+        RectTransform _holder = PlayerManager.conversation.RT_messageHolder;
         _activeMessage = Instantiate(PF_message, _holder);
         _activeMessage.Setup(S_sprite, transform, _canvas, true);
     }
-    private void OnDestroy()
+    protected void OnDisable()
     {
         Destroy(_activeMessage.gameObject);
     }

@@ -103,7 +103,7 @@ public class GunClass_Rocket : GunClass
             if (t_lockOnTarget != null)
             {
                 Vector3 _tarPos = Camera.main.WorldToScreenPoint(t_lockOnTarget.position);
-                _tarPos /= Conversation.Instance.C_canvas.scaleFactor;
+                _tarPos /= PlayerManager.conversation.C_canvas.scaleFactor;
 
                 PM_player.RT_lockOnPoint.anchoredPosition = _tarPos;
                 PM_player.RT_lockOnPoint.gameObject.SetActive(true);

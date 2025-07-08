@@ -167,7 +167,7 @@ public class AgentController : BaseController
             if (state != AC.state)
             {
                 if (B_voiceLine)
-                    Conversation.Instance.StartMessage(banter, AC.T_messageHook);
+                    PlayerManager.conversation.StartMessage(banter, AC.T_messageHook);
                 AC.ChangeState(state);
             }
         }
@@ -496,7 +496,7 @@ public class AgentController : BaseController
 
     void SetDestination(Vector3 _destination)
     {
-        if (V_curVehicle == null)
+        if (V_curVehicle == null && NMA.isOnNavMesh)
             NMA.SetDestination(_destination);
     }
 
@@ -532,7 +532,7 @@ public class AgentController : BaseController
 
     void ModelRotate(bool _attacking)
     {
-        if (V_curVehicle == null)
+        if (V_curVehicle == null && NMA.isOnNavMesh)
         {
             RM_ragdoll.Aiming(_attacking);
             if (_attacking)
@@ -635,7 +635,7 @@ public class AgentController : BaseController
                 _bullet.con_Player.AggroAllies(this);
             }
             else if (b_friendly)
-                Conversation.Instance.StartMessage(ConversationID.Banter_FriendlyFire_001, T_messageHook);
+                PlayerManager.conversation.StartMessage(ConversationID.Banter_FriendlyFire_001, T_messageHook);
         }
         else
         {
@@ -710,7 +710,7 @@ public class AgentController : BaseController
             if (_bullet.con_Agent != null)
             {
                 if (_bullet.con_Agent.b_friendly)
-                    PlayerManager.Main.OnKill(this, false);
+                    PlayerManager.main.OnKill(this, false);
             }
         }
 

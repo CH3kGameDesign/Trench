@@ -10,7 +10,9 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : BaseController
 {
+    #region References
     public GunManager gunManager;
+    public Conversation conversation;
 
     public RefClass Ref = new RefClass();
     [System.Serializable]
@@ -206,13 +208,26 @@ public class PlayerController : BaseController
     [HideInInspector] public BaseController BC_curBaseController = null;
     [HideInInspector] public Space_LandingSpot I_curLandingSpot = null;
 
+    private NetworkOwnershipToggle NetworkOwner;
+    #endregion
 
     void Awake()
     {
-        PlayerManager.Instance.AddPlayer(this);
-        SetRecallPos();
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        SetNetworkOwner();
+        StartCoroutine(AwakeLate());
+    }
+
+    IEnumerator AwakeLate()
+    {
+        while (!NetworkOwner.isFullySpawned)
+            yield return new WaitForEndOfFrame();
+        if (NetworkOwner.isOwner)
+        {
+            PlayerManager.Instance.AddPlayer(this);
+            SetRecallPos();
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
 
     public void SetRecallPos()
@@ -227,29 +242,39 @@ public class PlayerController : BaseController
 
     public override void Start()
     {
-        base.Start();
-        ArmorManager.EquipArmor_Static(RM_ragdoll, SaveData.equippedArmor);
-        Ref.HUI_health.Setup(this);
-        Ref.GUI_gun.Setup(this);
-        v3_camDir = T_camHolder.localEulerAngles;
-        v3_camDir.z = 0;
-        f_camDistance = V3_camOffset.magnitude;
-        SetNavIDs();
+        SetNetworkOwner();
+        StartCoroutine(StartLate());
+    }
+    IEnumerator StartLate()
+    {
+        while (PlayerManager.main == null)
+            yield return new WaitForEndOfFrame();
+        if (PlayerManager.main == this)
+        {
+            base.Start();
+            ArmorManager.EquipArmor_Static(RM_ragdoll, SaveData.equippedArmor);
+            Ref.HUI_health.Setup(this);
+            Ref.GUI_gun.Setup(this);
+            v3_camDir = T_camHolder.localEulerAngles;
+            v3_camDir.z = 0;
+            f_camDistance = V3_camOffset.magnitude;
+            SetNavIDs();
 
-        DebugGunList();
-        gun_secondaryEquipped = gun_EquippedList[SaveData.i_equippedGunNum.y];
-        Gun_Equip(SaveData.i_equippedGunNum.x, true);
-        reticle.UpdateRoundCount(gun_Equipped);
+            DebugGunList();
+            gun_secondaryEquipped = gun_EquippedList[SaveData.i_equippedGunNum.y];
+            Gun_Equip(SaveData.i_equippedGunNum.x, true);
+            reticle.UpdateRoundCount(gun_Equipped);
 
-        NMA.updateRotation = false;
-        Setup_Camera();
-        Setup_Consumables();
-        Setup_Radial();
-        Update_Objectives();
+            NMA.updateRotation = false;
+            Setup_Camera();
+            Setup_Consumables();
+            Setup_Radial();
+            Update_Objectives();
 
-        Ref.R_recall.Setup(this);
+            Ref.R_recall.Setup(this);
 
-        GameState_Change(gameStateEnum.active);
+            GameState_Change(gameStateEnum.active);
+        }
     }
 
     public void DebugGunList()
@@ -394,6 +419,8 @@ public class PlayerController : BaseController
 
     public override void Update()
     {
+        if (PlayerManager.main == null)
+            return;
         switch (GameState)
         {
             case gameStateEnum.inactive:
@@ -423,6 +450,8 @@ public class PlayerController : BaseController
 
     public override void FixedUpdate()
     {
+        if (PlayerManager.main == null)
+            return;
         switch (GameState)
         {
             case gameStateEnum.inactive:
@@ -1137,13 +1166,13 @@ public class PlayerController : BaseController
         {
             T_aimPoint.position = hit.point;
             Vector3 _tarPos = Camera.main.WorldToScreenPoint(hit.point);
-            _tarPos /= Conversation.Instance.C_canvas.scaleFactor;
+            _tarPos /= PlayerManager.conversation.C_canvas.scaleFactor;
 
             RT_hitPoint.anchoredPosition = _tarPos;
         }
         else
         {
-            RT_hitPoint.anchoredPosition = new Vector2(Screen.width / 2, Screen.height / 2) / Conversation.Instance.C_canvas.scaleFactor;
+            RT_hitPoint.anchoredPosition = new Vector2(Screen.width / 2, Screen.height / 2) / PlayerManager.conversation.C_canvas.scaleFactor;
             T_aimPoint.position = Camera.main.transform.position + (Camera.main.transform.forward * (f_camDistance + 100.5f));
         }
     }
@@ -1152,7 +1181,7 @@ public class PlayerController : BaseController
     {
         if (Inputs.b_confirm)
         {
-            Conversation.Instance.NextLine();
+            PlayerManager.conversation.NextLine();
         }
     }
 
@@ -1160,14 +1189,14 @@ public class PlayerController : BaseController
     {
         if (Inputs.b_confirm)
         {
-            Conversation.Instance.ConfirmDialogueChoice();
+            PlayerManager.conversation.ConfirmDialogueChoice();
             gun_Equipped.f_fireTimer = 0.4f;
         }
 
         if (Inputs.v2_inputDir.y > 0.1f)
-            Conversation.Instance.MoveDialogueChoice(-1);
+            PlayerManager.conversation.MoveDialogueChoice(-1);
         if (Inputs.v2_inputDir.y < -0.1f)
-            Conversation.Instance.MoveDialogueChoice(1);
+            PlayerManager.conversation.MoveDialogueChoice(1);
     }
 
     public override void OnHit(GunManager.bulletClass _bullet)
@@ -1351,20 +1380,29 @@ public class PlayerController : BaseController
     {
         Ref.GUI_gun.UpdateClip(gun_Equipped);
     }
-
     
+    protected void OnDisable()
+    {
+        PlayerManager.Instance.RemovePlayer(this);
+    }
+
+    public void SetNetworkOwner()
+    {
+        if (NetworkOwner == null)
+            NetworkOwner = GetComponent<NetworkOwnershipToggle>();
+    }
 
     IEnumerator TimeScale (float _scale)
     {
         float _timer = 0;
-        float _oldScale = Time.timeScale;
+        float _oldScale = TimeManager.TimeScale.value;
         while (_timer < 1)
         {
-            Time.timeScale = Mathf.Lerp(_oldScale, _scale, _timer);
+            TimeManager.TimeScale.value = Mathf.Lerp(_oldScale, _scale, _timer);
             _timer += Time.deltaTime / 0.1f;
             yield return new WaitForEndOfFrame();
         }
-        Time.timeScale = _scale;
+        TimeManager.TimeScale.value = _scale;
     }
 
     IEnumerator MoveModel(Vector3 startPos)
@@ -1409,6 +1447,8 @@ public class PlayerController : BaseController
     #region Input Actions
     public override void GameState_Change(gameStateEnum _state)
     {
+        if (PlayerManager.main == null)
+            return;
         switch (_state)
         {
             case gameStateEnum.dialogue:
@@ -1471,12 +1511,23 @@ public class PlayerController : BaseController
 
     public void Input_ChangedInput(PlayerInput input)
     {
-        Inputs.s_inputType = input.devices[0].displayName;
-        Inputs.b_isGamepad = input.currentControlScheme == "Gamepad";
-        Setup_InteractStrings();
-        MainMenu.Instance.GamepadSwitch();
-        Ref.R_recall.TextUpdate();
-        Ref.GUI_gun.UpdateControl();
+        SetNetworkOwner();
+        StartCoroutine(Input_ChangedInputLate(input));
+    }
+
+    IEnumerator Input_ChangedInputLate(PlayerInput input)
+    {
+        while (!NetworkOwner.isFullySpawned)
+            yield return new WaitForEndOfFrame();
+        if (NetworkOwner.isOwner)
+        {
+            Inputs.s_inputType = input.devices[0].displayName;
+            Inputs.b_isGamepad = input.currentControlScheme == "Gamepad";
+            Setup_InteractStrings();
+            MainMenu.Instance.GamepadSwitch();
+            Ref.R_recall.TextUpdate();
+            Ref.GUI_gun.UpdateControl();
+        }
     }
 
     bool Input_GetPressed(InputAction.CallbackContext cxt)

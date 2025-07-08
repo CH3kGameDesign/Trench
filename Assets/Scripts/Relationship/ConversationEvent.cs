@@ -7,7 +7,7 @@ public class ConversationEvent : MonoBehaviour
     public ConversationID eventID;
     public void ApplyEffect()
     {
-        Conversation _conversation = Conversation.Instance;
+        Conversation _conversation = PlayerManager.conversation;
         _conversation.StartDialogue(eventID);
     }
 }

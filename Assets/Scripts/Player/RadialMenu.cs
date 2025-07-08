@@ -1,12 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEngine.Rendering.DebugUI;
-using static UnityEngine.Rendering.DebugUI.Table;
 
 public class RadialMenu : MonoBehaviour
 {
@@ -257,7 +253,7 @@ public class RadialMenu : MonoBehaviour
         if (sel != Values.i_selChild)
         {
             Values.i_selChild = sel;
-            PlayerManager.Main.AH_agentAudioHolder.Play(AgentAudioHolder.type.radialTick);
+            PlayerManager.main.AH_agentAudioHolder.Play(AgentAudioHolder.type.radialTick);
             Ref.G_radialSubBG.transform.localEulerAngles = new Vector3(0, 0, 4.5f + (((float)sel / (float)Values.i_childAmt) * 360f));
             Ref.RT_radialHolder_Sub.anchoredPosition = Quaternion.Euler(0, 0, (float)Values.i_selChild / (float)Values.i_childAmt * 360f) * Vector3.up * 400;
             ItemInfoRef.RT_holder.gameObject.SetActive(sel != -1);
@@ -269,7 +265,7 @@ public class RadialMenu : MonoBehaviour
         if (sel != Values.i_selSubChild)
         {
             Values.i_selSubChild = sel;
-            PlayerManager.Main.AH_agentAudioHolder.Play(AgentAudioHolder.type.radialSubTick);
+            PlayerManager.main.AH_agentAudioHolder.Play(AgentAudioHolder.type.radialSubTick);
 
             ItemInfoRef.RT_holder.gameObject.SetActive(sel != -1);
             if (sel >= 0)
@@ -281,7 +277,7 @@ public class RadialMenu : MonoBehaviour
                 Values.C_CoyoteTime = StartCoroutine(CoyoteTime(Values.F_coyoteTime));
                 //Display Info
                 if (Values.i_selChild == 0)
-                    ItemInfoRef.Display(PlayerManager.Main.gun_EquippedList[sel]);
+                    ItemInfoRef.Display(PlayerManager.main.gun_EquippedList[sel]);
                 else if (Values.i_selChild == 1)
                     ItemInfoRef.Display(SaveData.consumables[sel]);
             }
@@ -442,12 +438,12 @@ public class RadialMenu : MonoBehaviour
         if (Values.i_lastChild == 0)
         {
             if (Values.i_lastSubChild >= 0)
-                PlayerManager.Main.Gun_Equip(Values.i_lastSubChild);
+                PlayerManager.main.Gun_Equip(Values.i_lastSubChild);
         }
         else if (Values.i_lastChild == 1)
         {
             if (Values.i_lastSubChild >= 0)
-                PlayerManager.Main.Consumable_Use(SaveData.consumables[Values.i_lastSubChild].Get_Item());
+                PlayerManager.main.Consumable_Use(SaveData.consumables[Values.i_lastSubChild].Get_Item());
         }
         Values.i_lastChild = -1;
         Values.i_lastSubChild = -1;
