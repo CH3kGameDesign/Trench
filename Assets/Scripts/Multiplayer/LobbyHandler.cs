@@ -34,7 +34,7 @@ public class LobbyHandler : MonoBehaviour
     }
     void SetupSteamServer()
     {
-        networkManager.transport = steamTransport;
+        //networkManager.transport = steamTransport;
         LM.CreateRoom();
     }
 
@@ -55,8 +55,11 @@ public class LobbyHandler : MonoBehaviour
 
     bool isServer()
     {
-        bool isServer = !_lobbyDataHolder &&
-            !ParrelSync.ClonesManager.IsClone();
+        bool isServer = !_lobbyDataHolder;
+
+#if UNITY_EDITOR
+        isServer = isServer && !ParrelSync.ClonesManager.IsClone();
+#endif
         return isServer;
     }
 
@@ -85,7 +88,7 @@ public class LobbyHandler : MonoBehaviour
     }
     public void OnPlayerListUpdated(List<LobbyUser> _list)
     {
-
+        Debug.Log(_list.Count);
     }
     public void OnRoomSearchResults(List<Lobby> _list)
     {
