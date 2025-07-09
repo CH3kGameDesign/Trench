@@ -2197,8 +2197,6 @@ GameObject:
   m_Component:
   - component: {fileID: 507243186}
   - component: {fileID: 507243188}
-  - component: {fileID: 507243190}
-  - component: {fileID: 507243192}
   - component: {fileID: 507243187}
   - component: {fileID: 507243191}
   - component: {fileID: 507243189}
@@ -2254,11 +2252,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _stopPlayingOnDisconnect: 0
-  _startServerFlags: 9
-  _startClientFlags: 7
+  _startServerFlags: 0
+  _startClientFlags: 0
   _cookieScope: 1
   _dontDestroyOnLoad: 0
-  _transport: {fileID: 507243190}
+  _transport: {fileID: 507243187}
   _networkPrefabs: {fileID: 11400000, guid: fd665484650f8eb438353202f5a78e19, type: 2}
   _networkAssets: {fileID: 0}
   _networkRules: {fileID: 11400000, guid: d8799083b96579a42b8b2d03e4ceae98, type: 2}
@@ -2282,23 +2280,6 @@ MonoBehaviour:
   _playerPrefab: {fileID: 5489375939780082022, guid: e6692192cc79f59479e7585a229144db, type: 3}
   _ignoreNetworkRules: 0
   spawnPoints: []
---- !u!114 &507243190
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 507243185}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8236d3bdb4b232c4e86ae303902bd5db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _ensureAllServersStart: 0
-  _transports:
-  - {fileID: 507243192}
-  - {fileID: 507243187}
-  - {fileID: 507243191}
 --- !u!114 &507243191
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2314,19 +2295,7 @@ MonoBehaviour:
   _serverPort: 5003
   _dedicatedServer: 0
   _peerToPeer: 1
-  _address: 76561199862098427
---- !u!114 &507243192
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 507243185}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cfcb920b5e3b7924ea4f2b8a047e2edf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  _address: 127.0.0.1
 --- !u!1 &509754120
 GameObject:
   m_ObjectHideFlags: 0
@@ -12231,6 +12200,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LM: {fileID: 2028625152}
+  SLP: {fileID: 2028625151}
+  networkManager: {fileID: 507243188}
+  udpTransport: {fileID: 507243187}
+  steamTransport: {fileID: 507243191}
 --- !u!1 &2074421643
 GameObject:
   m_ObjectHideFlags: 0
