@@ -76,12 +76,13 @@ namespace PurrLobby
                 _lobbyDataHolder = newObject.AddComponent<LobbyDataHolder>();
                 return;
             }
-
+            /*
             if (_lobbyDataHolder.CurrentLobby.IsValid)
             {
                 LeaveLobby(_lobbyDataHolder.CurrentLobby.LobbyId);
                 _lobbyDataHolder.SetCurrentLobby(default);
             }
+            */
         }
 
         private void Update()

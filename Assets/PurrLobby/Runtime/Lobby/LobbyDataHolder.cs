@@ -10,6 +10,7 @@ namespace PurrLobby
 
         public void SetCurrentLobby(Lobby newLobby)
         {
+            //Debug.Log("SetCurrentLobby: " + newLobby != null);
             CurrentLobby = newLobby;
             serializedLobby = newLobby;
         }

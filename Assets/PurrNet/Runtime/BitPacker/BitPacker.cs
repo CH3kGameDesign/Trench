@@ -1,6 +1,8 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using System.Text;
 using JetBrains.Annotations;
 using K4os.Compression.LZ4;
@@ -289,7 +291,13 @@ namespace PurrNet.Packing
             if (value != null)
                 return true;
 
-            value = Activator.CreateInstance<T>();
+            if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+            {
+                if (typeof(T).GetConstructor(Type.EmptyTypes) != null)
+                     value = Activator.CreateInstance<T>();
+                else value = (T)FormatterServices.GetUninitializedObject(typeof(T));
+            }
+
             return true;
         }
 

@@ -2200,6 +2200,8 @@ GameObject:
   - component: {fileID: 507243187}
   - component: {fileID: 507243191}
   - component: {fileID: 507243189}
+  - component: {fileID: 507243193}
+  - component: {fileID: 507243192}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -2256,7 +2258,7 @@ MonoBehaviour:
   _startClientFlags: 0
   _cookieScope: 1
   _dontDestroyOnLoad: 0
-  _transport: {fileID: 507243187}
+  _transport: {fileID: 507243192}
   _networkPrefabs: {fileID: 11400000, guid: fd665484650f8eb438353202f5a78e19, type: 2}
   _networkAssets: {fileID: 0}
   _networkRules: {fileID: 11400000, guid: d8799083b96579a42b8b2d03e4ceae98, type: 2}
@@ -2296,6 +2298,35 @@ MonoBehaviour:
   _dedicatedServer: 0
   _peerToPeer: 1
   _address: 127.0.0.1
+--- !u!114 &507243192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 507243185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 332e746c3c3253246aacad4d5559f1fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _masterServer: https://purrbalancer.riten.dev:8080/
+  _roomName: b86ca026ac9d4403bee3967236408e82
+  _region: eu-central
+  _host: eu1.purrlay.riten.dev
+  _pollEventsInUpdate: 0
+--- !u!114 &507243193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 507243185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5c476fd9733ed148b4631bd99c76108, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &509754120
 GameObject:
   m_ObjectHideFlags: 0
@@ -12194,7 +12225,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2028625148}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ee0ef07e6f4d69e41ad45d7750079601, type: 3}
   m_Name: 

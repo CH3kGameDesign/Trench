@@ -48,6 +48,9 @@ namespace PurrNet.Codegen
         {
             var name = compiledAssembly.Name;
 
+            if (name.Contains("NuGetForUnity"))
+                return false;
+
             if (name.StartsWith("Unity."))
                 return false;
 
@@ -2748,6 +2751,9 @@ namespace PurrNet.Codegen
                 return true;
 
             if (IsGeneric(typeReference, typeof(DisposableHashSet<>)))
+                return true;
+
+            if (IsGeneric(typeReference, typeof(DisposableDictionary<,>)))
                 return true;
 
             if (IsGeneric(typeReference, typeof(Queue<>)))

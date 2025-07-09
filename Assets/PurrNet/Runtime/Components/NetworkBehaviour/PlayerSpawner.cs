@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Collections;
 using PurrNet.Logging;
 using PurrNet.Modules;
 using UnityEngine;
@@ -13,7 +12,7 @@ namespace PurrNet
         [Tooltip("Even if rules are to not despawn on disconnect, this will ignore that and always spawn a player.")]
         [SerializeField] private bool _ignoreNetworkRules;
 
-        [SerializeField] private List<Transform> spawnPoints = new ();
+        [SerializeField] private List<Transform> spawnPoints = new List<Transform>();
         private int _currentSpawnPoint;
 
         private void Awake()
@@ -82,58 +81,45 @@ namespace PurrNet
 
         private void OnPlayerLoadedScene(PlayerID player, SceneID scene, bool asServer)
         {
-            StartCoroutine(OnPlayerLoadedScene_Co(player, scene, asServer));
-        }
-        private IEnumerator OnPlayerLoadedScene_Co(PlayerID player, SceneID scene, bool asServer)
-        {
-            while (spawnPoints.Count == 0)
-            {
-                yield return new WaitForEndOfFrame();
-            }
-
             var main = NetworkManager.main;
-            ScenesModule scenes = null;
-            bool _continue = true;
-            if (!main || !main.TryGetModule(out scenes, true))
-                _continue = false;
+
+            if (!main || !main.TryGetModule(out ScenesModule scenes, true))
+                return;
 
             var unityScene = gameObject.scene;
 
             if (!scenes.TryGetSceneID(unityScene, out var sceneID))
-                _continue = false;
+                return;
 
             if (sceneID != scene)
-                _continue = false;
+                return;
 
             if (!asServer)
-                _continue = false;
+                return;
 
             bool isDestroyOnDisconnectEnabled = main.networkRules.ShouldDespawnOnOwnerDisconnect();
             if (!_ignoreNetworkRules && !isDestroyOnDisconnectEnabled && main.TryGetModule(out GlobalOwnershipModule ownership, true) &&
                 ownership.PlayerOwnsSomething(player))
-                _continue = false;
+                return;
 
-            if (_continue)
+            GameObject newPlayer;
+
+            CleanupSpawnPoints();
+
+            if (spawnPoints.Count > 0)
             {
-                GameObject newPlayer;
-
-                CleanupSpawnPoints();
-
-                if (spawnPoints.Count > 0)
-                {
-                    var spawnPoint = spawnPoints[_currentSpawnPoint];
-                    _currentSpawnPoint = (_currentSpawnPoint + 1) % spawnPoints.Count;
-                    newPlayer = UnityProxy.Instantiate(_playerPrefab, spawnPoint.position, spawnPoint.rotation, unityScene);
-                }
-                else
-                {
-                    _playerPrefab.transform.GetPositionAndRotation(out var position, out var rotation);
-                    newPlayer = UnityProxy.Instantiate(_playerPrefab, position, rotation, unityScene);
-                }
-
-                if (newPlayer.TryGetComponent(out NetworkIdentity identity))
-                    identity.GiveOwnership(player);
+                var spawnPoint = spawnPoints[_currentSpawnPoint];
+                _currentSpawnPoint = (_currentSpawnPoint + 1) % spawnPoints.Count;
+                newPlayer = UnityProxy.Instantiate(_playerPrefab, spawnPoint.position, spawnPoint.rotation, unityScene);
             }
+            else
+            {
+                _playerPrefab.transform.GetPositionAndRotation(out var position, out var rotation);
+                newPlayer = UnityProxy.Instantiate(_playerPrefab, position, rotation, unityScene);
+            }
+
+            if (newPlayer.TryGetComponent(out NetworkIdentity identity))
+                identity.GiveOwnership(player);
         }
         public void SetSpawns(List<Transform> _spawns)
         {
