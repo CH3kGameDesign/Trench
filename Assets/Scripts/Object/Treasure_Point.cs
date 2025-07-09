@@ -63,7 +63,7 @@ public class Treasure_Point : MonoBehaviour
             if (_HO.RM_ragdollManager != null)
             {
                 RagdollManager RM = _HO.RM_ragdollManager;
-                if (RM.BaseController.F_curHealth <= 0)
+                if (RM.BaseController.info.F_curHealth <= 0)
                 {
                     if (RM.BaseController is PlayerController)
                     {

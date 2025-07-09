@@ -5244,9 +5244,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6262852023350476777}
+  - component: {fileID: 9101613183747756507}
   - component: {fileID: 668208048646576681}
   - component: {fileID: 701157055829192457}
   - component: {fileID: 8375205382227809296}
+  - component: {fileID: 6241842195829888346}
   m_Layer: 3
   m_Name: PF_PlayerHolder
   m_TagString: Player
@@ -5274,6 +5276,31 @@ Transform:
   - {fileID: 6625819221860278169}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9101613183747756507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5489375939780082022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94b517a0cbb47b6499edc47f78d6789d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isSetup: 0
+  _prefabId: 0
+  _componentIndex: 0
+  _shouldBePooled: 0
+  _parent: {fileID: 0}
+  _invertedPathToNearestParent: 
+  _directChildren: []
+  _networkRules: {fileID: 0}
+  _visitiblityRules: {fileID: 0}
+  controller: {fileID: 668208048646576681}
+  F_maxHealth: 1000
+  equippedGun: 0
+  equippedArmor: 01000000080000000c0000000c0000000f00000011000000
 --- !u!114 &668208048646576681
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5286,6 +5313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb3522fb226d0954e8df0fe5a4155033, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  info: {fileID: 0}
   NMA: {fileID: 2806240414845446853}
   T_model: {fileID: 1073136819019016012}
   T_gunHook: {fileID: 5202432690253969818}
@@ -5299,8 +5327,6 @@ MonoBehaviour:
   LM_TerrainRay:
     serializedVersion: 2
     m_Bits: 148032
-  F_maxHealth: 500
-  F_curHealth: 100
   gun_Equipped: {fileID: 0}
   gun_secondaryEquipped: {fileID: 0}
   gun_EquippedList:
@@ -5774,6 +5800,38 @@ MonoBehaviour:
   _toDeactivate: []
   _toEnable: []
   _toDisable: []
+--- !u!114 &6241842195829888346
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5489375939780082022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5cb763cfb0fbf2c44b3587223c4aad1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isSetup: 0
+  _prefabId: -2147483648
+  _componentIndex: -2147483648
+  _shouldBePooled: 0
+  _parent: {fileID: 0}
+  _invertedPathToNearestParent: 
+  _directChildren: []
+  _networkRules: {fileID: 0}
+  _visitiblityRules: {fileID: 0}
+  _trackedBehaviour: {fileID: 9101613183747756507}
+  _trackedFields:
+  - type: 1
+    name: F_curHealth
+  - type: 1
+    name: F_maxHealth
+  - type: 1
+    name: equippedGun
+  - type: 1
+    name: equippedArmor
+  _ownerAuth: 1
 --- !u!1 &5525592636948621909
 GameObject:
   m_ObjectHideFlags: 0

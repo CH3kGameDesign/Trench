@@ -211,8 +211,9 @@ public class PlayerController : BaseController
     private NetworkOwnershipToggle NetworkOwner;
     #endregion
 
-    void Awake()
+    public override void Awake()
     {
+        base.Awake();
         SetNetworkOwner();
         StartCoroutine(AwakeLate());
     }
@@ -252,7 +253,6 @@ public class PlayerController : BaseController
         if (PlayerManager.main == this)
         {
             base.Start();
-            ArmorManager.EquipArmor_Static(RM_ragdoll, SaveData.equippedArmor);
             Ref.HUI_health.Setup(this);
             Ref.GUI_gun.Setup(this);
             v3_camDir = T_camHolder.localEulerAngles;
@@ -652,7 +652,7 @@ public class PlayerController : BaseController
                     if (C_interactCoyote != null) { StopCoroutine(C_interactCoyote); C_interactCoyote = null; }
 
                     BaseController _bc = _hit.collider.GetComponent<HitObject>().RM_ragdollManager.BaseController;
-                    if (_bc != BC_curBaseController && _bc.F_curHealth <= 0)
+                    if (_bc != BC_curBaseController && _bc.info.F_curHealth <= 0)
                     {
                         BC_curBaseController = _bc;
                         string _temp = _bc.name.ToString_Input(inputActions.Interact, Ref.TM_interactText, Interactable.enumType.interact);
@@ -1203,19 +1203,19 @@ public class PlayerController : BaseController
     {
         if (_bullet.B_player && !_bullet.D_damageType.isSelfHittable())
             return;
-        F_curHealth -= _bullet.F_damage;
+        info.Hurt(_bullet.F_damage);
 
         Ref.HUI_health.UpdateHealth();
 
         AggroAllies(_bullet);
 
-        if (F_curHealth <= 0)
+        if (info.F_curHealth <= 0)
             OnDeath();
         else
         {
             AH_agentAudioHolder.Play(AgentAudioHolder.type.hurt);
         }
-        float _scale = Mathf.Clamp(Mathf.Pow((F_curHealth / F_maxHealth), 2) * 2, 0, 1);
+        float _scale = Mathf.Clamp(Mathf.Pow((info.F_curHealth / info.F_maxHealth), 2) * 2, 0, 1);
         Ref.hurtFace.SetMaskScale(_scale, 0.05f);
         base.OnHit(_bullet);
     }
@@ -1248,11 +1248,11 @@ public class PlayerController : BaseController
     }
     public override void OnHeal(float _amt)
     {
-        F_curHealth = Mathf.Clamp(F_curHealth + _amt, 0, F_maxHealth);
+        info.Heal(_amt);
 
         Ref.HUI_health.UpdateHealth();
 
-        float _scale = Mathf.Clamp(Mathf.Pow((F_curHealth / F_maxHealth), 2) * 2, 0, 1);
+        float _scale = Mathf.Clamp(Mathf.Pow((info.F_curHealth / info.F_maxHealth), 2) * 2, 0, 1);
         Ref.hurtFace.SetMaskScale(_scale, 0.05f);
 
         base.OnHeal(_amt);

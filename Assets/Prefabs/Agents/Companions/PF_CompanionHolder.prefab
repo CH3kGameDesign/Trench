@@ -49,6 +49,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5542370794538587218}
+  - component: {fileID: 3736831779614752406}
   - component: {fileID: 943015360836498631}
   m_Layer: 3
   m_Name: PF_CompanionHolder
@@ -73,6 +74,31 @@ Transform:
   - {fileID: 6849873132892928614}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3736831779614752406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769648362584213684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94b517a0cbb47b6499edc47f78d6789d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isSetup: 0
+  _prefabId: -2147483648
+  _componentIndex: -2147483648
+  _shouldBePooled: 0
+  _parent: {fileID: 0}
+  _invertedPathToNearestParent: 
+  _directChildren: []
+  _networkRules: {fileID: 0}
+  _visitiblityRules: {fileID: 0}
+  controller: {fileID: 943015360836498631}
+  F_maxHealth: 100
+  equippedGun: 0
+  equippedArmor: 01000000080000000c0000000c0000000f00000012000000
 --- !u!114 &943015360836498631
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85,6 +111,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1071c985a1eacf1418fc42041cbf71bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  info: {fileID: 0}
   NMA: {fileID: 1284363051418628405}
   T_model: {fileID: 3340136924810737307}
   T_gunHook: {fileID: 6728177349458334553}
@@ -98,8 +125,6 @@ MonoBehaviour:
   LM_TerrainRay:
     serializedVersion: 2
     m_Bits: 16960
-  F_maxHealth: 100
-  F_curHealth: 100
   gun_Equipped: {fileID: 0}
   gun_secondaryEquipped: {fileID: 0}
   gun_EquippedList:
@@ -138,13 +163,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 16385
   A_model: {fileID: 3727426164504592449}
-  Armor:
-    helmet: {fileID: 11400000, guid: 5fafa1458b238a149aa1b2b42d773ae5, type: 2}
-    chest: {fileID: 11400000, guid: 033cdf44d538c6a489dbfdd47dea052d, type: 2}
-    armL: {fileID: 11400000, guid: 9e7d43f0e1470be4eaf2a24316374fea, type: 2}
-    armR: {fileID: 11400000, guid: 9e7d43f0e1470be4eaf2a24316374fea, type: 2}
-    legs: {fileID: 11400000, guid: 8aa784c28a5cba147a8c8e7171a7104a, type: 2}
-    material: {fileID: 11400000, guid: a9ea68d7b90763742a05fd9adab30092, type: 2}
   ResourceDrop:
     list:
     - _type: 0

@@ -26,7 +26,7 @@ public class GunClass_Rod : GunClass
     }
     public override void OnUnEquip()
     {
-        if (baseController.F_curHealth > 0) Detonate();
+        if (baseController.info.F_curHealth > 0) Detonate();
         else Destroy();
 
         baseController.RB.linearDamping = 0;

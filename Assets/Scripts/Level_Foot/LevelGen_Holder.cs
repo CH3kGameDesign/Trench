@@ -36,7 +36,7 @@ public class LevelGen_Holder : MonoBehaviour
     {
         SaveData.themeCurrent = _theme;
         SaveData.i_currency += Instance.GetCollectedValue();
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(1);
     }
 
     public void AddDecal(Decal_Handler handler)

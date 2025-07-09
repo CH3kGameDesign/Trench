@@ -20,9 +20,9 @@ public class JawDropper : AgentController
     {
         S_hpSlider = _slider;
         S_hpSlider.gameObject.SetActive(true);
-        S_hpSlider.maxValue = F_maxHealth;
+        S_hpSlider.maxValue = info.F_maxHealth;
         S_hpSlider.minValue = 0;
-        S_hpSlider.value = F_curHealth;
+        S_hpSlider.value = info.F_curHealth;
     }
 
     public override void OnHit(GunManager.bulletClass _bullet)
@@ -34,7 +34,7 @@ public class JawDropper : AgentController
     public override void HealthUpdate()
     {
         base.HealthUpdate();
-        S_hpSlider.value = F_curHealth;
+        S_hpSlider.value = info.F_curHealth;
     }
 
     IEnumerator SpawnEnemies()

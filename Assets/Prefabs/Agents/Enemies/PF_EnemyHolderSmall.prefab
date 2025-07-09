@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7197547650496893999}
   - component: {fileID: 4076457481858739809}
+  - component: {fileID: 5634558188436798141}
   m_Layer: 3
   m_Name: PF_EnemyHolderSmall
   m_TagString: Character
@@ -45,6 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1071c985a1eacf1418fc42041cbf71bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  info: {fileID: 0}
   NMA: {fileID: 4794220531658604334}
   T_model: {fileID: 4132479939592027811}
   T_gunHook: {fileID: 2991855455887746037}
@@ -58,8 +60,6 @@ MonoBehaviour:
   LM_TerrainRay:
     serializedVersion: 2
     m_Bits: 16960
-  F_maxHealth: 50
-  F_curHealth: 100
   gun_Equipped: {fileID: 0}
   gun_secondaryEquipped: {fileID: 0}
   gun_EquippedList:
@@ -98,13 +98,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 16385
   A_model: {fileID: 4559141757719903042}
-  Armor:
-    helmet: {fileID: 11400000, guid: 624e5d81af21b9945a1c2c908f7c9064, type: 2}
-    chest: {fileID: 11400000, guid: 033cdf44d538c6a489dbfdd47dea052d, type: 2}
-    armL: {fileID: 11400000, guid: 2ff4d90fdabda724fb608414ecdeb634, type: 2}
-    armR: {fileID: 11400000, guid: 2ff4d90fdabda724fb608414ecdeb634, type: 2}
-    legs: {fileID: 11400000, guid: 8aa784c28a5cba147a8c8e7171a7104a, type: 2}
-    material: {fileID: 11400000, guid: 5a2be178e0572ba498990fe2cc14b22f, type: 2}
   ResourceDrop:
     list:
     - _type: 0
@@ -144,6 +137,31 @@ MonoBehaviour:
       state: -10
       B_voiceLine: 0
       banter: 9
+--- !u!114 &5634558188436798141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 153541626221342559}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94b517a0cbb47b6499edc47f78d6789d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isSetup: 0
+  _prefabId: -2147483648
+  _componentIndex: -2147483648
+  _shouldBePooled: 0
+  _parent: {fileID: 0}
+  _invertedPathToNearestParent: 
+  _directChildren: []
+  _networkRules: {fileID: 0}
+  _visitiblityRules: {fileID: 0}
+  controller: {fileID: 4076457481858739809}
+  F_maxHealth: 100
+  equippedGun: 0
+  equippedArmor: 00000000070000000b0000000b0000000e00000014000000
 --- !u!1 &446909121369230874
 GameObject:
   m_ObjectHideFlags: 0

@@ -55,12 +55,12 @@ public class HealthUI : MonoBehaviour
 
         if (_instant)
         {
-            _health = _controller.F_curHealth;
-            _mat.SetFloat("_Value", _health / _controller.F_maxHealth);
-            TM_healthText.text = Mathf.RoundToInt(_controller.F_curHealth).ToString();
+            _health = _controller.info.F_curHealth;
+            _mat.SetFloat("_Value", _health / _controller.info.F_maxHealth);
+            TM_healthText.text = Mathf.RoundToInt(_controller.info.F_curHealth).ToString();
         }
         else
-            _healthUpdate = StartCoroutine(Health_Update(_controller.F_curHealth));
+            _healthUpdate = StartCoroutine(Health_Update(_controller.info.F_curHealth));
     }
     IEnumerator Health_Update(float _tarHealth)
     {
@@ -69,12 +69,12 @@ public class HealthUI : MonoBehaviour
         while (_timer < 1)
         {
             _health = Mathf.Lerp(_oldHealth, _tarHealth, _timer);
-            _mat.SetFloat("_Value", _health / _controller.F_maxHealth);
+            _mat.SetFloat("_Value", _health / _controller.info.F_maxHealth);
             TM_healthText.text = Mathf.RoundToInt(_health).ToString();
             _timer += Time.deltaTime / 0.2f;
             yield return new WaitForEndOfFrame();
         }
-        _mat.SetFloat("_Value", _tarHealth / _controller.F_maxHealth);
+        _mat.SetFloat("_Value", _tarHealth / _controller.info.F_maxHealth);
         TM_healthText.text = Mathf.RoundToInt(_tarHealth).ToString();
     }
 }

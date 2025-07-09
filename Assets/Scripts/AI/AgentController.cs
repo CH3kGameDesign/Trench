@@ -31,7 +31,6 @@ public class AgentController : BaseController
     [Header("Animations")]
     public NetworkAnimator A_model;
     private Vector2 v2_animMove = Vector2.zero;
-    public ArmorManager.SetClass Armor;
 
     [Header("Loot Table")]
     public Resource.resourceDrop ResourceDrop = new Resource.resourceDrop();
@@ -126,7 +125,7 @@ public class AgentController : BaseController
                     return;
                 }
                 //Low Health
-                if ((AC.F_curHealth / AC.F_maxHealth) <= f_healthPercent)
+                if ((AC.info.F_curHealth / AC.info.F_maxHealth) <= f_healthPercent)
                 {
                     onHit_LowHealth.Activate(AC);
                     return;
@@ -312,8 +311,9 @@ public class AgentController : BaseController
         }
     }
 
-    public void Awake()
+    public override void Awake()
     {
+        base.Awake();
         NMA.updateRotation = false;
     }
 
@@ -329,7 +329,6 @@ public class AgentController : BaseController
 
         gun_Equipped = gunManager.GetGunByInt(DEBUG_EquippedGunNum, this);
         gun_Equipped.OnEquip(this);
-        Armor.Equip(RM_ragdoll);
 
         if (DEBUG_FollowPlayerImmediately)
             PlayerManager.Instance.FollowPlayer(this, b_friendly);
@@ -672,8 +671,8 @@ public class AgentController : BaseController
                 RM_ragdoll.RB_rigidbodies[0].AddForce(dir, ForceMode.VelocityChange);
         }
 
-        F_curHealth -= _bullet.F_damage;
-        if (F_curHealth <= 0)
+        info.Hurt(_bullet.F_damage);
+        if (info.F_curHealth <= 0)
             OnDeath(_bullet);
         else
             AH_agentAudioHolder.Play(AgentAudioHolder.type.hurt);
@@ -685,8 +684,7 @@ public class AgentController : BaseController
     {
         if (b_alive)
         {
-            F_curHealth = Mathf.Max(F_curHealth, 0);
-            F_curHealth = Mathf.Min(F_curHealth + _amt, F_maxHealth);
+            info.Heal(_amt);
             HealthUpdate();
         }
     }
@@ -757,7 +755,7 @@ public class AgentController : BaseController
         gun_Equipped.OnEquip(this);
         b_alive = true;
 
-        OnHeal(F_maxHealth / 2);
+        OnHeal(info.F_maxHealth / 2);
         ChangeState(stateEnum.protect);
     }
 
@@ -798,7 +796,7 @@ public class AgentController : BaseController
         if (_state == stateEnum.unchanged ||
             _state == state) return;
 
-        if (F_curHealth <= 0 && 
+        if (info.F_curHealth <= 0 && 
             _state != stateEnum.ragdoll && 
             !_force)
             return;

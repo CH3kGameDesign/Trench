@@ -2197,6 +2197,7 @@ GameObject:
   m_Component:
   - component: {fileID: 507243186}
   - component: {fileID: 507243188}
+  - component: {fileID: 507243192}
   - component: {fileID: 507243187}
   - component: {fileID: 507243191}
   - component: {fileID: 507243189}
@@ -2253,10 +2254,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _stopPlayingOnDisconnect: 0
   _startServerFlags: 0
-  _startClientFlags: 0
+  _startClientFlags: 2
   _cookieScope: 1
   _dontDestroyOnLoad: 0
-  _transport: {fileID: 507243187}
+  _transport: {fileID: 507243192}
   _networkPrefabs: {fileID: 11400000, guid: fd665484650f8eb438353202f5a78e19, type: 2}
   _networkAssets: {fileID: 0}
   _networkRules: {fileID: 11400000, guid: d8799083b96579a42b8b2d03e4ceae98, type: 2}
@@ -2296,6 +2297,22 @@ MonoBehaviour:
   _dedicatedServer: 0
   _peerToPeer: 1
   _address: 127.0.0.1
+--- !u!114 &507243192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 507243185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8236d3bdb4b232c4e86ae303902bd5db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _ensureAllServersStart: 0
+  _transports:
+  - {fileID: 507243187}
+  - {fileID: 507243191}
 --- !u!1 &509754120
 GameObject:
   m_ObjectHideFlags: 0

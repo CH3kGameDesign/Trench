@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7197547650496893999}
   - component: {fileID: 549521836531451379}
+  - component: {fileID: 5634558188436798141}
   m_Layer: 3
   m_Name: PF_EnemyHolderJawDropper
   m_TagString: Character
@@ -45,6 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09dbeef4d2ae94843960c92306359045, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  info: {fileID: 0}
   NMA: {fileID: 4794220531658604334}
   T_model: {fileID: 4132479939592027811}
   T_gunHook: {fileID: 7268363627458689336}
@@ -58,8 +60,6 @@ MonoBehaviour:
   LM_TerrainRay:
     serializedVersion: 2
     m_Bits: 16960
-  F_maxHealth: 10000
-  F_curHealth: 100
   gun_Equipped: {fileID: 0}
   gun_secondaryEquipped: {fileID: 0}
   gun_EquippedList:
@@ -98,13 +98,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 16385
   A_model: {fileID: 4807618225388642037}
-  Armor:
-    helmet: {fileID: 11400000, guid: 624e5d81af21b9945a1c2c908f7c9064, type: 2}
-    chest: {fileID: 11400000, guid: c0c939e1eb272f1449e367897341fed7, type: 2}
-    armL: {fileID: 11400000, guid: 2ff4d90fdabda724fb608414ecdeb634, type: 2}
-    armR: {fileID: 11400000, guid: 2ff4d90fdabda724fb608414ecdeb634, type: 2}
-    legs: {fileID: 11400000, guid: be8450f93fe7f9a428365658e1af67a0, type: 2}
-    material: {fileID: 0}
   ResourceDrop:
     list:
     - _type: 1
@@ -148,6 +141,31 @@ MonoBehaviour:
   PF_enemySpawn: {fileID: 4076457481858739809, guid: 82f5513339279654db5d3a8a00c5f048, type: 3}
   F_spawnTimer: 5
   I_spawnLimit: 10
+--- !u!114 &5634558188436798141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 153541626221342559}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94b517a0cbb47b6499edc47f78d6789d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isSetup: 0
+  _prefabId: -2147483648
+  _componentIndex: -2147483648
+  _shouldBePooled: 0
+  _parent: {fileID: 0}
+  _invertedPathToNearestParent: 
+  _directChildren: []
+  _networkRules: {fileID: 0}
+  _visitiblityRules: {fileID: 0}
+  controller: {fileID: 549521836531451379}
+  F_maxHealth: 10000
+  equippedGun: 0
+  equippedArmor: 00000000070000000b0000000b0000000e00000014000000
 --- !u!1 &799992256305119704
 GameObject:
   m_ObjectHideFlags: 0

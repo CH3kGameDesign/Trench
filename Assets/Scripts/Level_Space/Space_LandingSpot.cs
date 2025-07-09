@@ -57,6 +57,6 @@ public class Space_LandingSpot : MonoBehaviour
     }
     protected void OnDisable()
     {
-        Destroy(_activeMessage.gameObject);
+        //Destroy(_activeMessage.gameObject);
     }
 }

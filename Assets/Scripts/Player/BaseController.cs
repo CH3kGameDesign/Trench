@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+[RequireComponent(typeof(BaseInfo))]
 public class BaseController : MonoBehaviour
 {
+    [HideInInspector] public BaseInfo info;
     public NavMeshAgent NMA;
     public Transform T_model;
     public Transform T_gunHook;
@@ -17,9 +19,6 @@ public class BaseController : MonoBehaviour
     [HideInInspector] public Transform T_surface = null;
     private Vector3 v3_surfacePos;
     public LayerMask LM_TerrainRay;
-    [Header("Combat Variables")]
-    public float F_maxHealth = 100;
-    [HideInInspector] public float F_curHealth = 100;
 
     [HideInInspector] public Texture2D T_icon { get; private set;}
 
@@ -36,9 +35,15 @@ public class BaseController : MonoBehaviour
 
     public static gameStateEnum GameState = gameStateEnum.active;
     public enum gameStateEnum { inactive, active, dialogue, vehicle, ragdoll, dialogueResponse, menu }
+
+    public virtual void Awake()
+    {
+        info = GetComponent<BaseInfo>();
+    }
+
     public virtual void Start()
     {
-        F_curHealth = F_maxHealth;
+
     }
 
     public virtual void Update()
