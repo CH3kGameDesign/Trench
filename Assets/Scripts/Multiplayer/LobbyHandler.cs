@@ -48,6 +48,8 @@ public class LobbyHandler : MonoBehaviour
         yield return new WaitForSecondsRealtime(1);
         if (_lobbyDataHolder)
         {
+            while (_lobbyDataHolder.CurrentLobby.IsValid == false)
+                yield return new WaitForEndOfFrame();
             steamTransport.address = _lobbyDataHolder.CurrentLobby.Members[0].Id;
         }
         networkManager.StartClient();
