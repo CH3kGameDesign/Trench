@@ -24,18 +24,19 @@ public class LobbyHandler : MonoBehaviour
     void Start()
     {
         _lobbyDataHolder = FindFirstObjectByType<LobbyDataHolder>();
-        if (!isServer())
+        if (!isClone())
         {
             if (SLP.IsSteamClientAvailable) SetupSteamServer();
             else SetupUDPServer();
-            networkManager.StartServer();
+            if (isServer())
+                networkManager.StartServer();
         }
         StartCoroutine(StartClient());
     }
     void SetupSteamServer()
     {
-        //networkManager.transport = steamTransport;
-        LM.CreateRoom();
+        networkManager.transport = steamTransport;
+          //  LM.CreateRoom();
     }
 
     void SetupUDPServer()
@@ -57,12 +58,21 @@ public class LobbyHandler : MonoBehaviour
 
     bool isServer()
     {
-        bool isServer = !_lobbyDataHolder;
+        bool isServer = true;
+        if (_lobbyDataHolder)
+            isServer = _lobbyDataHolder.CurrentLobby.IsOwner;
+
+        return isServer;
+    }
+
+    bool isClone()
+    {
+        bool isClone = false;
 
 #if UNITY_EDITOR
-        isServer = isServer && !ParrelSync.ClonesManager.IsClone();
+        isClone = ParrelSync.ClonesManager.IsClone();
 #endif
-        return isServer;
+        return isClone;
     }
 
     // Update is called once per frame
