@@ -45,6 +45,8 @@ public class Explosion : DamageSource
 
     private void OnTriggerEnter(Collider other)
     {
+        if (!B_info.con_Gun)
+            return;
         for (int i = 0; i < g_affectedObjects.Count; i++)
         {
             if (other.gameObject == g_affectedObjects[i])

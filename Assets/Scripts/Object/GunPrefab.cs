@@ -1,6 +1,7 @@
+using PurrNet;
 using UnityEngine;
 
-public class GunPrefab : MonoBehaviour
+public class GunPrefab : NetworkBehaviour
 {
     public Transform T_barrelHook;
     public ParticleSystem PS_muzzleFire;
@@ -13,6 +14,13 @@ public class GunPrefab : MonoBehaviour
     {
         if (T_barrelHook == null)
             T_barrelHook = transform;
+    }
+
+    protected override void OnSpawned()
+    {
+        base.OnSpawned();
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.Euler(Vector3.zero);
     }
 
     public void Shoot()

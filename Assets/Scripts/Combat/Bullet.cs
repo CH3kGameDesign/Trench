@@ -37,6 +37,8 @@ public class Bullet : DamageSource
     }
     public virtual void Update()
     {
+        if (!B_info.con_Gun)
+            return;
         if (B_info.F_speed > 0)
         {
             RaycastHit hit;

@@ -204,24 +204,37 @@ public class ArmorManager : ScriptableObject
         {
             string _path = "Assets" + path.Substring(Application.dataPath.Length);    
             ItemClass _temp = (ItemClass)AssetDatabase.LoadAssetAtPath(_path, typeof(ItemClass));
-            if (_temp != null)
+                if (_temp != null)
             {
                 switch (_temp.GetEnumType())
                 {
                     case ItemClass.enumType.armorHead:
-                        helmets.Add((Armor_Helmet)_temp);
+                        Armor_Helmet _helmet = (Armor_Helmet)_temp;
+                        AddArmorPrefab(_helmet.modelHelmet);
+                        helmets.Add(_helmet);
                         break;
                     case ItemClass.enumType.armorChest:
-                        chests.Add((Armor_Chest)_temp);
+                        Armor_Chest _chest = (Armor_Chest)_temp;
+                        chests.Add(_chest);
+                        AddArmorPrefab(_chest.modelChest);
+                        AddArmorPrefab(_chest.modelBelt);
                         break;
                     case ItemClass.enumType.armorArm:
-                        arms.Add((Armor_Arm)_temp);
+                        Armor_Arm _arm = (Armor_Arm)_temp;
+                        arms.Add(_arm);
+                        AddArmorPrefab(_arm.modelArm);
+                        AddArmorPrefab(_arm.modelWrist);
                         break;
                     case ItemClass.enumType.armorLeg:
-                        legs.Add((Armor_Leg)_temp);
+                        Armor_Leg _leg = (Armor_Leg)_temp;
+                        legs.Add(_leg);
+                        AddArmorPrefab(_leg.modelKnee);
+                        AddArmorPrefab(_leg.modelShin);
+                        AddArmorPrefab(_leg.modelFoot);
                         break;
                     case ItemClass.enumType.armorMat:
-                        materials.Add((Armor_Material)_temp);
+                        Armor_Material _mat = (Armor_Material)_temp;
+                        materials.Add(_mat);
                         break;
                     default:
                         break;
@@ -234,6 +247,16 @@ public class ArmorManager : ScriptableObject
         legs = legs.OrderByDescending(h => h.sortOrder).ToList();
         materials = materials.OrderByDescending(h => h.sortOrder).ToList();
         EditorUtility.SetDirty(this);
+    }
+
+    void AddArmorPrefab(GameObject GO)
+    {
+        if (GO == null)
+            return;
+        ArmorPrefab _prefab;
+        if (GO.TryGetComponent<ArmorPrefab>(out _prefab))
+            return;
+        GO.AddComponent<ArmorPrefab>();
     }
     [ContextMenu("Tools/GenerateEnum")]
     public void GenerateEnum()

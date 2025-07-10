@@ -7,6 +7,8 @@ public class Rod : Bullet
     private bool b_hitTarget = false;
     public override void Update()
     {
+        if (!B_info.con_Gun)
+            return;
         if (!b_hitTarget)
         {
             RaycastHit hit;

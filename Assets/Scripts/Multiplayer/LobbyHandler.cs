@@ -19,6 +19,7 @@ public class LobbyHandler : MonoBehaviour
     [SerializeField] private NetworkManager networkManager;
     [SerializeField] private UDPTransport udpTransport;
     [SerializeField] private SteamTransport steamTransport;
+    [SerializeField] private bool ignoreLobby = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -44,6 +45,7 @@ public class LobbyHandler : MonoBehaviour
 
     void SetupUDPServer()
     {
+        ignoreLobby = true;
         //networkManager.transport = udpTransport;
     }
 
@@ -55,7 +57,7 @@ public class LobbyHandler : MonoBehaviour
     IEnumerator StartClient()
     {
         yield return new WaitForSecondsRealtime(1);
-        if (_lobbyDataHolder)
+        if (_lobbyDataHolder && !ignoreLobby)
         {
             while (_lobbyDataHolder.CurrentLobby.IsValid == false)
                 yield return new WaitForEndOfFrame();

@@ -31,39 +31,37 @@ public class BaseInfo : NetworkBehaviour
     protected override void OnSpawned()
     {
         base.OnSpawned();
-        isPlayer = controller is PlayerController && isOwner;
-        if (isOwner)
+        if (isController)
+        {
             F_curHealth = F_maxHealth;
-        if (isPlayer)
-        {
-            Equip(SaveData.equippedArmor);
-            Equip(SaveData.equippedGuns[SaveData.i_equippedGunNum.x]);
-        }
-        else
-        {
+            if (controller is PlayerController)
+            {
+                equippedArmor = SaveData.equippedArmor;
+                equippedGun = SaveData.equippedGuns[SaveData.i_equippedGunNum.x];
+            }
             EquipArmor();
             EquipGun();
         }
     }
 
-    [ObserversRpc]
+    [ServerRpc]
     public void Hurt(float _amt)
     {
         F_curHealth -= _amt;
     }
-    [ObserversRpc]
+    [ServerRpc]
     public void Heal(float _amt)
     {
         F_curHealth = Mathf.Max(F_curHealth, 0);
         F_curHealth = Mathf.Min(F_curHealth + _amt, F_maxHealth);
     }
-    [ObserversRpc]
+
     public void Equip(Gun_Type _gun)
     {
         equippedGun = _gun;
         EquipGun();
     }
-    [ObserversRpc]
+
     public void Equip(Armor_Type[] _armor)
     {
         equippedArmor = _armor;

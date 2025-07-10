@@ -151,7 +151,7 @@ public class RadialMenu : MonoBehaviour
             Ref.rt_radialItems[i] = GO;
             GO.RT.anchoredPosition = Vector2.zero;
             GO.RT.localEulerAngles = new Vector3(0, 0, _rot);
-            GO.RT.GetChild(0).eulerAngles = Vector3.zero;
+            GO.RT.GetChild(0).localEulerAngles = new Vector3(0, 0, -_rot);
             _rot += _rotIncrease;
         }
 
@@ -197,7 +197,7 @@ public class RadialMenu : MonoBehaviour
             Ref.rt_radialItems_Sub[_subGroup][i] = GO;
             GO.RT.anchoredPosition = Vector2.zero;
             GO.RT.localEulerAngles = new Vector3(0, 0, _rot);
-            GO.RT.GetChild(0).eulerAngles = Vector3.zero;
+            GO.RT.GetChild(0).localEulerAngles = new Vector3(0, 0, -_rot);
             GO.RT.localScale = Vector3.one * 2.5f;
             _rot += _rotIncrease;
         }
@@ -271,16 +271,17 @@ public class RadialMenu : MonoBehaviour
             if (sel >= 0)
             {
                 //Coyote Time
+                if (Values.C_CoyoteTime != null) StopCoroutine(Values.C_CoyoteTime);
                 Values.i_lastChild = Values.i_selChild;
                 Values.i_lastSubChild = Values.i_selSubChild;
-                if (Values.C_CoyoteTime != null) StopCoroutine(Values.C_CoyoteTime);
-                Values.C_CoyoteTime = StartCoroutine(CoyoteTime(Values.F_coyoteTime));
                 //Display Info
                 if (Values.i_selChild == 0)
                     ItemInfoRef.Display(PlayerManager.main.gun_EquippedList[sel]);
                 else if (Values.i_selChild == 1)
                     ItemInfoRef.Display(SaveData.consumables[sel]);
             }
+            else if (Values.C_CoyoteTime == null)
+                Values.C_CoyoteTime = StartCoroutine(CoyoteTime(Values.F_coyoteTime));
         }
     }
     IEnumerator CoyoteTime(float _delay)
