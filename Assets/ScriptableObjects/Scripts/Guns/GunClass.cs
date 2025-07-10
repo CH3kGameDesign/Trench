@@ -260,7 +260,7 @@ public class GunClass : ItemClass
     }
     public virtual void OnUnEquip()
     {
-        if (G_gunModel != null)
+        if (G_gunModel)
         {
             Destroy(G_gunModel.gameObject);
             G_gunModel = null;
@@ -278,7 +278,8 @@ public class GunClass : ItemClass
             clipAmmo--;
             baseController.Weapon_Fired();
 
-            G_gunModel.Shoot();
+            if (G_gunModel)
+                G_gunModel.Shoot();
 
             Vector3 _tarPos;
             Transform _barrel;

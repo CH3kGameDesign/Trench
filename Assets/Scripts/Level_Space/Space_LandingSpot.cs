@@ -40,7 +40,7 @@ public class Space_LandingSpot : MonoBehaviour
                 _theme = Themes.themeEnum.ship;
                 break;
         }
-        SaveData.lastLandingSpot = landingID;
+        SaveData.lastLandingSpot.value = landingID;
         LevelGen_Holder.LoadTheme(_theme);
     }
 

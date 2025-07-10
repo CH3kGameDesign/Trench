@@ -52,6 +52,9 @@ public class LobbyHandler : MonoBehaviour
     private void OnApplicationQuit()
     {
         LM.LeaveLobby();
+        if (isServer())
+            NetworkManager.main.StopServer();
+        NetworkManager.main.StopClient();
     }
 
     IEnumerator StartClient()

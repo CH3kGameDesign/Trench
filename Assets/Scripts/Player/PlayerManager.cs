@@ -9,7 +9,7 @@ public class PlayerManager : MonoBehaviour
     public static PlayerController main;
     public static Conversation conversation;
     public static PlayerManager Instance;
-    public List<PlayerController> Players = new List<PlayerController>();
+    public List<BaseInfo> Players = new List<BaseInfo>();
     private void Awake()
     {
         Instance = this;
@@ -26,25 +26,25 @@ public class PlayerManager : MonoBehaviour
         
     }
 
-    public void AddPlayer(PlayerController _player)
+    public void AddPlayer(BaseInfo _player)
     {
         if (!Players.Contains(_player))
         {
             Players.Add(_player);
-            if (_player.GetComponent<NetworkOwnershipToggle>().isOwner)
+            if (_player.isOwner)
             {
-                conversation = _player.conversation;
-                main = _player;
+                main = _player.GetController();
+                conversation = main.conversation;
                 OnMainSet?.Invoke();
             }
         }
     }
-    public void RemovePlayer(PlayerController _player)
+    public void RemovePlayer(BaseInfo _player)
     {
         if (Players.Contains(_player))
         {
             Players.Remove(_player);
-            if (main == _player)
+            if (main == _player.GetController())
             {
                 main = null;
             }

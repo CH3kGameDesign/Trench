@@ -15,6 +15,7 @@ public class HealthUI : MonoBehaviour
     Coroutine _healthUpdate = null;
 
     private Material _mat = null;
+    private bool _setup = false;
 
     [HideInInspector]public BaseController _controller;
 
@@ -32,6 +33,7 @@ public class HealthUI : MonoBehaviour
 
     public void Setup(BaseController _con)
     {
+        _setup = true;
         UpdateMaterialRef();
         _controller = _con;
         TM_nameText.text = _con.GetName();
@@ -50,6 +52,8 @@ public class HealthUI : MonoBehaviour
 
     public void UpdateHealth(bool _instant = false)
     {
+        if (!_setup)
+            return;
         if (_healthUpdate != null)
             StopCoroutine(_healthUpdate);
 

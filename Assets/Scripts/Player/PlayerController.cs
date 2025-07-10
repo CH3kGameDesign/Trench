@@ -7,10 +7,14 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
+using static AgentController;
 
 public class PlayerController : BaseController
 {
     #region References
+    [HideInInspector] public gameStateEnum GameState = gameStateEnum.active;
+    public enum gameStateEnum { inactive, active, dialogue, dialogueResponse, menu }
+
     public GunManager gunManager;
     public Conversation conversation;
 
@@ -84,9 +88,6 @@ public class PlayerController : BaseController
     private int i_humanoidNavID = 0;
     private int i_crouchingNavID = 0;
 
-    [Header("Animations")]
-    public NetworkAnimator A_model;
-    private Vector2 v2_animMove = Vector2.zero;
 
     [Header("Combat Refs")]
     public Reticle reticle;
@@ -224,7 +225,7 @@ public class PlayerController : BaseController
             yield return new WaitForEndOfFrame();
         if (NetworkOwner.isOwner)
         {
-            PlayerManager.Instance.AddPlayer(this);
+            PlayerManager.Instance.AddPlayer(info);
             SetRecallPos();
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
@@ -274,6 +275,7 @@ public class PlayerController : BaseController
             Ref.R_recall.Setup(this);
 
             GameState_Change(gameStateEnum.active);
+            ChangeState(stateEnum.idle);
         }
     }
 
@@ -293,8 +295,9 @@ public class PlayerController : BaseController
 
     void Setup_InteractStrings()
     {
-        PlayerManager.Instance.AddPlayer(this);
-        Inputs.playerInput = GetComponent<PlayerInput>();
+        PlayerManager.Instance.AddPlayer(info);
+        if (!Inputs.playerInput)
+            Inputs.playerInput = GetComponent<PlayerInput>();
 
         TextMeshProUGUI _TM = Ref.TM_controlText;
         _TM.SetupInputSpriteSheet();
@@ -308,15 +311,15 @@ public class PlayerController : BaseController
             string _input = "".ToString_InputSetup((inputActions)i, _E);
             _list.Add(_input);
             inputActions[] _inputListed;
-            switch (GameState)
+            switch (state)
             {
-                case gameStateEnum.active:
+                case stateEnum.idle:
                     if (SaveData.themeCurrent == Themes.themeEnum.ship)
                         _inputListed = Inputs.spaceInputs;
                     else
                         _inputListed = Inputs.baseInputs;
                         break;
-                case gameStateEnum.vehicle:
+                case stateEnum.vehicle:
                     _inputListed = Inputs.vehicleInputs;
                     break;
                 default:
@@ -416,10 +419,9 @@ public class PlayerController : BaseController
         if (_temp != null) i_crouchingNavID = _temp.Value;
     }
 
-
     public override void Update()
     {
-        if (PlayerManager.main == null)
+        if (PlayerManager.main != this)
             return;
         switch (GameState)
         {
@@ -427,7 +429,19 @@ public class PlayerController : BaseController
                 AnimationEnd();
                 break;
             case gameStateEnum.active:
-                Update_Active();
+                switch (state)
+                {
+                    case stateEnum.idle:
+                        Update_Active();
+                        break;
+                    case stateEnum.ragdoll:
+                        break;
+                    case stateEnum.vehicle:
+                        Update_Vehicle();
+                        break;
+                    default:
+                        break;
+                }
                 break;
             case gameStateEnum.dialogue:
                 Update_Dialogue();
@@ -436,9 +450,6 @@ public class PlayerController : BaseController
             case gameStateEnum.dialogueResponse:
                 Update_DialogueResponse();
                 AnimationEnd();
-                break;
-            case gameStateEnum.vehicle:
-                Update_Vehicle();
                 break;
             default:
                 break;
@@ -450,19 +461,29 @@ public class PlayerController : BaseController
 
     public override void FixedUpdate()
     {
-        if (PlayerManager.main == null)
+        if (PlayerManager.main != this)
             return;
         switch (GameState)
         {
             case gameStateEnum.inactive:
                 break;
             case gameStateEnum.active:
-                FixedUpdate_Active();
+                switch (state)
+                {
+                    case stateEnum.idle:
+                        FixedUpdate_Active();
+                        break;
+                    case stateEnum.ragdoll:
+                        FixedUpdate_Ragdoll();
+                        break;
+                    case stateEnum.vehicle:
+                        FixedUpdate_Vehicle();
+                        break;
+                    default:
+                        break;
+                }
                 break;
             case gameStateEnum.dialogue:
-                break;
-            case gameStateEnum.vehicle:
-                FixedUpdate_Vehicle();
                 break;
             default:
                 break;
@@ -515,6 +536,11 @@ public class PlayerController : BaseController
         JumpHandler();
         CrouchHandler();
         AerialMovement();
+        CamMovement(true);
+        CamCollision(true);
+    }
+    void FixedUpdate_Ragdoll()
+    {
         CamMovement(true);
         CamCollision(true);
     }
@@ -949,16 +975,6 @@ public class PlayerController : BaseController
         Debug.LogError("Couldn't Find NavMeshSettingID for: " + name);
         return null;
     }
-
-    void GroundedUpdate(bool _grounded)
-    {
-        b_grounded = _grounded;
-        //NMA_player.updateRotation = _grounded;
-        NMA.updatePosition = _grounded;
-        //NMA_player.isStopped = !_grounded;
-        RB.isKinematic = _grounded;
-        RB.useGravity = !_grounded;
-    }    
     
     void ModelRotate()
     {
@@ -1038,7 +1054,7 @@ public class PlayerController : BaseController
                         AgentController AC;
                         if (HO.RM_ragdollManager.GetAgentController(out AC))
                         {
-                            if (AC.b_friendly || !AC.b_alive)
+                            if (AC.b_friendly || !AC.info.b_alive)
                                 continue;
                         }
                         else
@@ -1115,6 +1131,8 @@ public class PlayerController : BaseController
 
     void FireManager()
     {
+        if (!gun_Equipped)
+            return;
         Update_HitPoint();
         if (Inputs.b_firing)
         {
@@ -1205,24 +1223,17 @@ public class PlayerController : BaseController
             return;
         info.Hurt(_bullet.F_damage);
 
-        Ref.HUI_health.UpdateHealth();
-
         AggroAllies(_bullet);
+        AH_agentAudioHolder.Play(AgentAudioHolder.type.hurt);
 
-        if (info.F_curHealth <= 0)
-            OnDeath();
-        else
-        {
-            AH_agentAudioHolder.Play(AgentAudioHolder.type.hurt);
-        }
-        float _scale = Mathf.Clamp(Mathf.Pow((info.F_curHealth / info.F_maxHealth), 2) * 2, 0, 1);
-        Ref.hurtFace.SetMaskScale(_scale, 0.05f);
         base.OnHit(_bullet);
     }
 
     void AggroAllies(GunManager.bulletClass _bullet)
     {
         if (_bullet.B_player)
+            return;
+        if (!_bullet.con_Agent)
             return;
         if (_bullet.con_Agent.b_friendly)
             return;
@@ -1250,12 +1261,27 @@ public class PlayerController : BaseController
     {
         info.Heal(_amt);
 
-        Ref.HUI_health.UpdateHealth();
+        base.OnHeal(_amt);
+    }
+    public override void Revive()
+    {
+        if (PlayerManager.main != this)
+            return;
+        gun_Equipped.OnEquip(this);
+        info.Revive();
 
+        GameState_Change(gameStateEnum.active);
+        ChangeState(stateEnum.idle);
+    }
+
+    public override void HealthUpdate()
+    {
+        base.HealthUpdate();
+        if (PlayerManager.main != this)
+            return;
+        Ref.HUI_health.UpdateHealth();
         float _scale = Mathf.Clamp(Mathf.Pow((info.F_curHealth / info.F_maxHealth), 2) * 2, 0, 1);
         Ref.hurtFace.SetMaskScale(_scale, 0.05f);
-
-        base.OnHeal(_amt);
     }
 
     public override void AddFollower(BaseController _base)
@@ -1333,12 +1359,9 @@ public class PlayerController : BaseController
             reticle.Kill();
     }
 
-    void OnDeath()
+    public override void OnDeath()
     {
-        GameState_Change(gameStateEnum.ragdoll);
-        GroundedUpdate(false);
-        RM_ragdoll.EnableRigidbodies(true);
-        A_model.enabled = false;
+        ChangeState(stateEnum.ragdoll);
         Invoke(nameof(Restart), 3f);
         CloseRadial();
 
@@ -1351,8 +1374,7 @@ public class PlayerController : BaseController
 
     void Restart()
     {
-        GameState_Change(gameStateEnum.active);
-        UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+        info.Restart();
     }
 
     void SetTimeScale(float _scale)
@@ -1383,7 +1405,7 @@ public class PlayerController : BaseController
     
     protected void OnDisable()
     {
-        PlayerManager.Instance.RemovePlayer(this);
+        PlayerManager.Instance.RemovePlayer(info);
     }
 
     public void SetNetworkOwner()
@@ -1445,10 +1467,12 @@ public class PlayerController : BaseController
     }
 
     #region Input Actions
-    public override void GameState_Change(gameStateEnum _state)
+    public void GameState_Change(gameStateEnum _state)
     {
-        if (PlayerManager.main == null)
+        if (PlayerManager.main != this)
             return;
+        if (!Inputs.playerInput)
+            Inputs.playerInput = GetComponent<PlayerInput>();
         switch (_state)
         {
             case gameStateEnum.dialogue:
@@ -1464,7 +1488,7 @@ public class PlayerController : BaseController
                 Inputs.playerInput.SwitchCurrentActionMap("Base");
                 break;
         }
-        base.GameState_Change(_state);
+        GameState = _state;
         Setup_InteractStrings();
     }
 

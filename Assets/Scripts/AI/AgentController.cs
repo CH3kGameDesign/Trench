@@ -1,9 +1,9 @@
-using PurrNet;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using PurrNet;
 
 
 public class AgentController : BaseController
@@ -28,9 +28,6 @@ public class AgentController : BaseController
     private float f_searchDelay = 0.2f;
     private bool b_firing = false;
 
-    [Header("Animations")]
-    public NetworkAnimator A_model;
-    private Vector2 v2_animMove = Vector2.zero;
 
     [Header("Loot Table")]
     public Resource.resourceDrop ResourceDrop = new Resource.resourceDrop();
@@ -43,14 +40,6 @@ public class AgentController : BaseController
     private Coroutine Coroutine_Target;
     private Coroutine Coroutine_RandomPathing;
 
-    public stateEnum state = stateEnum.protect;
-    public enum stateEnum
-    {
-        idle = 0, wander = 1, patrol = 2, protect = 3,
-        hunt = 10, scared = 11, tactical = 12, loud = 13, aggressive = 14, kamikaze = 15,
-        ragdoll = -1,
-        unchanged = -10
-    };
     public behaviourClass behaviour = new behaviourClass();
     [System.Serializable]
     public class behaviourClass
@@ -101,7 +90,7 @@ public class AgentController : BaseController
 
         public void OnFound(AgentController AC)
         {
-            if (AC.b_alive && (int)AC.state < 10)
+            if (AC.info.b_alive && (int)AC.state < 10)
             {
                 EnemyTimer.Instance.StartTimer();
                 onFound.Activate(AC);
@@ -109,7 +98,7 @@ public class AgentController : BaseController
         }
         public void OnHit(AgentController AC, GunManager.bulletClass _bullet)
         {
-            if (AC.b_alive)
+            if (AC.info.b_alive)
             {
                 //Friendly Fire
                 if (AC.b_friendly && _bullet.B_player)
@@ -134,7 +123,7 @@ public class AgentController : BaseController
         }
         public void OnDeath(AgentController AC, AgentController _dead)
         {
-            if (AC.b_alive)
+            if (AC.info.b_alive)
             {
                 float _dist = Vector3.Distance(AC.NMA.transform.position, _dead.NMA.transform.position);
                 //Ally Death
@@ -223,7 +212,7 @@ public class AgentController : BaseController
         {
             if (targetType != targetTypeEnum.none)
             {
-                if (_base.b_alive)
+                if (_base.info.b_alive)
                     return true;
                 else
                 {
@@ -610,7 +599,7 @@ public class AgentController : BaseController
 
     public override void OnHit(GunManager.bulletClass _bullet)
     {
-        if (!b_alive)
+        if (!info.b_alive)
             return;
 
         if (_bullet.B_player)
@@ -682,14 +671,14 @@ public class AgentController : BaseController
 
     public override void OnHeal(float _amt)
     {
-        if (b_alive)
+        if (info.b_alive)
         {
             info.Heal(_amt);
             HealthUpdate();
         }
     }
 
-    void OnDeath(GunManager.bulletClass _bullet)
+    public void OnDeath(GunManager.bulletClass _bullet)
     {
         if (_bullet.B_player)
         {
@@ -715,17 +704,23 @@ public class AgentController : BaseController
         if (gun_Equipped != null)
             gun_Equipped.OnUnEquip();
 
-        ResourceDrop.Drop(T_model.position);
         ChangeState(stateEnum.ragdoll);
-        b_alive = false;
-        LevelGen_Holder.Instance.AgentDeath(this);
-        AH_agentAudioHolder.Play(AgentAudioHolder.type.death);
+
         MusicHandler.AdjustVolume(MusicHandler.typeEnum.brass, 0.5f);
         //gameObject.SetActive(false);
     }
 
-    public virtual void HealthUpdate()
+    public override void OnDeath_Server()
     {
+        ResourceDrop.Drop(T_model.position);
+        ChangeState(stateEnum.ragdoll);
+        LevelGen_Holder.Instance.AgentDeath(this);
+        AH_agentAudioHolder.Play(AgentAudioHolder.type.death);
+    }
+
+    public override void HealthUpdate()
+    {
+        base.HealthUpdate();
         if (followTarget.PC_tarPlayer != null)
             followTarget.PC_tarPlayer.UpdateFollowerHealth(this);
     }
@@ -734,15 +729,6 @@ public class AgentController : BaseController
 
     }
 
-    void GroundedUpdate(bool _grounded)
-    {
-        b_grounded = _grounded;
-        //NMA_player.updateRotation = _grounded;
-        NMA.updatePosition = _grounded;
-        //NMA_player.isStopped = !_grounded;
-        RB.isKinematic = _grounded;
-        RB.useGravity = !_grounded;
-    }
 
     bool IsHostile()
     {
@@ -753,9 +739,8 @@ public class AgentController : BaseController
     public override void Revive()
     {
         gun_Equipped.OnEquip(this);
-        b_alive = true;
+        info.Revive();
 
-        OnHeal(info.F_maxHealth / 2);
         ChangeState(stateEnum.protect);
     }
 
@@ -791,33 +776,6 @@ public class AgentController : BaseController
                 break;
         }
     }
-    public void ChangeState(stateEnum _state, bool _force = false)
-    {
-        if (_state == stateEnum.unchanged ||
-            _state == state) return;
-
-        if (info.F_curHealth <= 0 && 
-            _state != stateEnum.ragdoll && 
-            !_force)
-            return;
-
-        ExitState(state);
-        switch (_state)
-        {
-            case stateEnum.ragdoll:
-                RM_ragdoll.EnableRigidbodies(true);
-                GroundedUpdate(false);
-                RM_ragdoll.R_Rig.rig.weight = 0;
-                A_model.enabled = false;
-                break;
-            case stateEnum.kamikaze:
-                NMA.stoppingDistance = 0.1f;
-                break;
-            default:
-                break;
-        }
-        state = _state;
-    }
     public IEnumerator ChangeState(stateEnum _state, float _timer)
     {
         yield return new WaitForSeconds(_timer);
@@ -834,37 +792,6 @@ public class AgentController : BaseController
         if (attackTarget.Check() && !_force)
             return;
         attackTarget.FollowAgent(_con);
-    }
-    void ExitState(stateEnum _state)
-    {
-        switch (_state)
-        {
-            case stateEnum.ragdoll:
-                RM_ragdoll.transform.position = RM_ragdoll.T_transforms[0].position;
-                //RM_ragdoll.T_transforms[0].localPosition = Vector3.zero;
-                RB.transform.position = RM_ragdoll.transform.position;
-                RM_ragdoll.transform.localPosition = Vector3.down;
-                RM_ragdoll.transform.localRotation = new Quaternion();
-
-                RM_ragdoll.EnableRigidbodies(false);
-                NavMeshHit navHit;
-                if (NavMesh.SamplePosition(NMA.transform.position, out navHit, 2f, -1))
-                {
-                    Vector3 _pos = navHit.position;
-                    _pos.y = NMA.transform.position.y;
-                    NMA.Warp(_pos);
-                    T_surface_Update(NMA.navMeshOwner.GetComponent<Transform>());
-                }
-                GroundedUpdate(true);
-                RM_ragdoll.ApplyBaseTransforms();
-                A_model.enabled = true;
-                break;
-            case stateEnum.kamikaze:
-                NMA.stoppingDistance = 5;
-                break;
-            default:
-                break;
-        }
     }
     public override string GetName()
     {

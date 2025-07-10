@@ -1,5 +1,7 @@
+using PurrNet;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -26,16 +28,93 @@ public class BaseController : MonoBehaviour
     [HideInInspector] public GunClass gun_secondaryEquipped;
     [HideInInspector] public GunClass[] gun_EquippedList = new GunClass[3];
 
-    [HideInInspector] public bool b_alive = true;
     [HideInInspector] public bool b_grounded = false;
 
     [HideInInspector] public int I_curRoom = -1;
 
     [HideInInspector] public List<BaseController> followers = new List<BaseController>();
 
-    public static gameStateEnum GameState = gameStateEnum.active;
-    public enum gameStateEnum { inactive, active, dialogue, vehicle, ragdoll, dialogueResponse, menu }
+    [Header("Animations")]
+    public NetworkAnimator A_model;
+    [HideInInspector]public Vector2 v2_animMove = Vector2.zero;
 
+    public stateEnum state = stateEnum.protect;
+    public enum stateEnum
+    {
+        idle = 0, wander = 1, patrol = 2, protect = 3,
+        hunt = 10, scared = 11, tactical = 12, loud = 13, aggressive = 14, kamikaze = 15,
+        ragdoll = -1,
+        vehicle = -2,
+        unchanged = -10
+    };
+    public virtual void ChangeState(stateEnum _state, bool _force = false)
+    {
+        if (_state == stateEnum.unchanged ||
+            _state == state) return;
+
+        if (info.F_curHealth <= 0 &&
+            _state != stateEnum.ragdoll &&
+            !_force)
+            return;
+
+        ExitState(state);
+        switch (_state)
+        {
+            case stateEnum.ragdoll:
+                RM_ragdoll.SetRigidBodies(true);
+                GroundedUpdate(false);
+                RM_ragdoll.R_Rig.rig.weight = 0;
+                A_model.enabled = false;
+                break;
+            case stateEnum.kamikaze:
+                NMA.stoppingDistance = 0.1f;
+                break;
+            default:
+                break;
+        }
+        state = _state;
+    }
+    void ExitState(stateEnum _state)
+    {
+        switch (_state)
+        {
+            case stateEnum.ragdoll:
+                RM_ragdoll.transform.position = RM_ragdoll.T_transforms[0].position;
+                //RM_ragdoll.T_transforms[0].localPosition = Vector3.zero;
+                RB.transform.position = RM_ragdoll.transform.position;
+                RM_ragdoll.transform.localPosition = Vector3.down;
+                RM_ragdoll.transform.localRotation = new Quaternion();
+
+                RM_ragdoll.SetRigidBodies(false);
+                NavMeshHit navHit;
+                if (NavMesh.SamplePosition(NMA.transform.position, out navHit, 2f, -1))
+                {
+                    Vector3 _pos = navHit.position;
+                    _pos.y = NMA.transform.position.y;
+                    NMA.Warp(_pos);
+                    T_surface_Update(NMA.navMeshOwner.GetComponent<Transform>());
+                }
+                GroundedUpdate(true);
+                RM_ragdoll.ApplyBaseTransforms();
+                A_model.enabled = true;
+                break;
+            case stateEnum.kamikaze:
+                NMA.stoppingDistance = 5;
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void GroundedUpdate(bool _grounded)
+    {
+        b_grounded = _grounded;
+        //NMA_player.updateRotation = _grounded;
+        NMA.updatePosition = _grounded;
+        //NMA_player.isStopped = !_grounded;
+        RB.isKinematic = _grounded;
+        RB.useGravity = !_grounded;
+    }
     public virtual void Awake()
     {
         info = GetComponent<BaseInfo>();
@@ -92,11 +171,11 @@ public class BaseController : MonoBehaviour
     {
 
     }
-
-    public virtual void GameState_Change(gameStateEnum _state)
+    public virtual void HealthUpdate()
     {
-        GameState = _state;
+
     }
+
     public virtual void Pickup_Treasure(Treasure _treasure)
     {
 
@@ -121,6 +200,14 @@ public class BaseController : MonoBehaviour
 
     }
     public virtual void Revive()
+    {
+
+    }
+    public virtual void OnDeath()
+    {
+
+    }
+    public virtual void OnDeath_Server()
     {
 
     }

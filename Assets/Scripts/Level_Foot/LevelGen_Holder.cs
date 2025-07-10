@@ -34,7 +34,7 @@ public class LevelGen_Holder : MonoBehaviour
     [ObserversRpc]
     public static void LoadTheme(Themes.themeEnum _theme)
     {
-        SaveData.themeCurrent = _theme;
+        SaveData.themeCurrent.value = _theme;
         SaveData.i_currency += Instance.GetCollectedValue();
         SceneManager.LoadScene(1);
     }

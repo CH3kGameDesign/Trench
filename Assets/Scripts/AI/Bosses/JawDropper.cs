@@ -1,3 +1,4 @@
+using PurrNet;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -41,7 +42,7 @@ public class JawDropper : AgentController
     {
         while (true)
         {
-            if (!b_alive)
+            if (!info.b_alive)
                 break;
             SpawnChild();
             yield return new WaitForSeconds(F_spawnTimer);
@@ -87,7 +88,7 @@ public class JawDropper : AgentController
         int i = 0;
         for (int ii = activeChildren.Count - 1; ii >= 0; ii--)
         {
-            if (activeChildren[ii].b_alive)
+            if (activeChildren[ii].info.b_alive)
                 i++;
             else
             {

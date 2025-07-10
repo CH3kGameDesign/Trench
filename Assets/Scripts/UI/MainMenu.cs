@@ -449,7 +449,7 @@ public class MainMenu : MonoBehaviour
         else Open();
     }
 
-    private BaseController.gameStateEnum _prevGameState;
+    private PlayerController.gameStateEnum _prevGameState;
     public void Open(panelEnum _enum = panelEnum.main)
     {
         openedPanel = _enum;
@@ -478,8 +478,8 @@ public class MainMenu : MonoBehaviour
         SwitchTo(_panel);
         TimeManager.TimeScale.value = _timeScale;
 
-        _prevGameState = PlayerController.GameState;
-        PlayerManager.main.GameState_Change(BaseController.gameStateEnum.menu);
+        _prevGameState = PlayerManager.main.GameState;
+        PlayerManager.main.GameState_Change(PlayerController.gameStateEnum.menu);
     }
     public void Close()
     {

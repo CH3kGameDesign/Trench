@@ -1,10 +1,11 @@
+using PurrNet;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
-public class RagdollManager : MonoBehaviour
+public class RagdollManager : NetworkBehaviour
 {
     public bool DisableOnStart = true;
     public Transform[] T_transforms = new Transform[0];
@@ -15,6 +16,9 @@ public class RagdollManager : MonoBehaviour
     public Transform[] T_armorPoints = new Transform[0];
     public BaseController BaseController;
     [HideInInspector] public bool agentController = false;
+
+    public SyncVar<bool> colliderEnabled { get; private set; } = new SyncVar<bool>(true);
+    public SyncVar<bool> rbEnabled { get; private set; } = new SyncVar<bool>(true);
 
     public SkinnedMeshRenderer MR_skinnedMeshRenderer;
     [System.Serializable]
@@ -60,14 +64,29 @@ public class RagdollManager : MonoBehaviour
     private float f_timeTilChange = 0;
 
     private List<DamageSource> PrevDamageSpurces = new List<DamageSource>();
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
+        rbEnabled.onChanged += EnableRigidbodies;
+        colliderEnabled.onChanged += EnableColliders;
+    }
+
+    // Start is called before the first frame update
+    protected override void OnSpawned()
+    {
+        base.OnSpawned();
         agentController = BaseController is AgentController;
-        if (DisableOnStart)
-            EnableRigidbodies(false);
         R_Rig.rig.weight = 0;
         UpdateBaseTransforms();
+        if (!isController)
+            return;
+        if (DisableOnStart)
+            SetRigidBodies(false);
+    }
+    protected override void OnDestroy()
+    {
+        rbEnabled.onChanged -= EnableRigidbodies;
+        colliderEnabled.onChanged -= EnableColliders;
+        base.OnDestroy();
     }
     void UpdateBaseTransforms()
     {
@@ -137,10 +156,14 @@ public class RagdollManager : MonoBehaviour
             PrevDamageSpurces.RemoveAt(0);
     }
 
+    [ServerRpc]
+    public void SetColliders(bool _enable) { colliderEnabled.value = _enable; }
+    [ServerRpc]
+    public void SetRigidBodies(bool _enable) { rbEnabled.value = _enable; }
     public void Attach(Rigidbody _target)
     {
-        EnableColliders(false);
-        EnableRigidbodies(true);
+        SetColliders(false);
+        SetRigidBodies(true);
         if (FJ_backJoint != null)
         {
             Destroy(FJ_backJoint);
@@ -163,8 +186,8 @@ public class RagdollManager : MonoBehaviour
         foreach (var item in C_colliders)
             item.excludeLayers = LM_ignoreLayersThrown;
 
-        EnableColliders(true);
-        EnableRigidbodies(true);
+        SetColliders(true);
+        SetRigidBodies(true);
 
         StartCoroutine(Detach_Delay());
     }

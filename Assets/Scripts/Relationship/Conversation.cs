@@ -228,8 +228,8 @@ public class Conversation : MonoBehaviour
         ConversationManager.dialogueClass _convo;
         if (C_Manager.GetConversation(_dialogueID, out _convo))
         {
-            if (PlayerController.GameState != PlayerController.gameStateEnum.dialogue &&
-                PlayerController.GameState != PlayerController.gameStateEnum.dialogueResponse)
+            if (PlayerManager.main.GameState != PlayerController.gameStateEnum.dialogue &&
+                PlayerManager.main.GameState != PlayerController.gameStateEnum.dialogueResponse)
             {
                 PlayAudio(audioEnum.showDialogue);
                 StartCoroutine(CG_dialogueHolder.Fade(true));

@@ -143,6 +143,8 @@ public class Bullet : DamageSource
 
     public virtual void OnTriggerEnter(Collider _collider)
     {
+        if (!B_info.con_Gun)
+            return;
         if (DamageObject(_collider))
         {
             B_info.con_Gun.OnHit(this);

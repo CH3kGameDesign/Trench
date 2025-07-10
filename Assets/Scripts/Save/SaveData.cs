@@ -1,9 +1,10 @@
 using UnityEngine;
 using System.Collections.Generic;
+using PurrNet;
 
 public static class SaveData
 {
-    public static Themes.themeEnum themeCurrent = Themes.themeEnum.spaceStation;
+    public static SyncVar<Themes.themeEnum> themeCurrent = new SyncVar<Themes.themeEnum>(Themes.themeEnum.spaceStation, 0, false);
 
     public static int i_currency = 200;
     public static List<Objective.objectiveClass> objectives = new List<Objective.objectiveClass>();
@@ -43,5 +44,5 @@ public static class SaveData
         return null;
     }
 
-    public static string lastLandingSpot = "tavern";
+    public static SyncVar<string> lastLandingSpot = new("tavern", 0, false);
 }

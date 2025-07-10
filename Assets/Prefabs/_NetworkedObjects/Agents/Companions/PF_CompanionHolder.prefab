@@ -132,7 +132,6 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  b_alive: 1
   b_grounded: 0
   I_curRoom: -1
   followers: []
@@ -232,6 +231,7 @@ MonoBehaviour:
   _toDeactivate: []
   _toEnable:
   - {fileID: 943015360836498631}
+  - {fileID: 1284363051418628405}
   _toDisable: []
 --- !u!1 &2238208043467293688
 GameObject:
@@ -684,6 +684,7 @@ GameObject:
   - component: {fileID: 8741451782662131216}
   - component: {fileID: 8949253357783398663}
   - component: {fileID: 5746809852669633563}
+  - component: {fileID: 3542115019817479784}
   m_Layer: 3
   m_Name: Companion
   m_TagString: Character
@@ -715,7 +716,7 @@ NavMeshAgent:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4885962304612941317}
-  m_Enabled: 1
+  m_Enabled: 0
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 3
@@ -820,6 +821,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 943015360836498631}
+--- !u!114 &3542115019817479784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4885962304612941317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5cb763cfb0fbf2c44b3587223c4aad1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isSetup: 0
+  _prefabId: -2147483648
+  _componentIndex: -2147483648
+  _shouldBePooled: 0
+  _parent: {fileID: 0}
+  _invertedPathToNearestParent: 
+  _directChildren: []
+  _networkRules: {fileID: 0}
+  _visitiblityRules: {fileID: 0}
+  _trackedBehaviour: {fileID: 7125570264134322029}
+  _trackedFields:
+  - type: 1
+    name: isKinematic
+  _ownerAuth: 1
 --- !u!1 &5396332000081247479
 GameObject:
   m_ObjectHideFlags: 0
