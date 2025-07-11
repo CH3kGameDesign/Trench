@@ -25,6 +25,8 @@ public class SS_MessageObject : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (t_target == null)
+            return;
         rect.FollowObject(c_canvas, t_target);
         if (showDistance)
             Update_DistanceText();

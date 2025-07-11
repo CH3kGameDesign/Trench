@@ -9,7 +9,7 @@ using static Themes;
 using PurrNet;
 using System;
 
-[RequireComponent(typeof(LevelGen_Seed))]
+
 public class LevelGen : MonoBehaviour
 {
     private Unity.Mathematics.Random Random_Seeded;
@@ -119,6 +119,7 @@ public class LevelGen : MonoBehaviour
             UpdateNavMeshes();
             SpawnObjects();
             SetupVehicle(_theme, _layout, lHolder);
+            LevelGen_Holder.Instance.isReady = true;
         }
     }
 
@@ -178,7 +179,6 @@ public class LevelGen : MonoBehaviour
     {
         GameObject prefab;
         GameObject GO;
-        bool playerSpawned = false;
         List<Transform> spawnPoints = new List<Transform>();
         foreach (var item in LG_Blocks)
         {

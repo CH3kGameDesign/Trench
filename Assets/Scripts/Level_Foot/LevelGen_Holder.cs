@@ -11,6 +11,9 @@ public class LevelGen_Holder : MonoBehaviour
     public int I_maxDecals = 100;
     private List<Decal_Handler> d_Handlers = new List<Decal_Handler>();
 
+
+    [HideInInspector] public bool isReady = false;
+
     void Awake()
     {
         Instance = this;
@@ -34,7 +37,7 @@ public class LevelGen_Holder : MonoBehaviour
     [ObserversRpc]
     public static void LoadTheme(Themes.themeEnum _theme)
     {
-        SaveData.themeCurrent.value = _theme;
+        SaveData.themeCurrent = _theme;
         SaveData.i_currency += Instance.GetCollectedValue();
         SceneManager.LoadScene(1);
     }

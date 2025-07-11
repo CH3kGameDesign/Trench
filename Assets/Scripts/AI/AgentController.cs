@@ -18,7 +18,7 @@ public class AgentController : BaseController
     public string S_characterID;
     [HideInInspector] public Relationship.characterClass C_character = null;
     public List<Relationship.groupEnum> G_backupGroups = new List<Relationship.groupEnum>();
-    [HideInInspector] public bool b_friendly = true;
+    [HideInInspector] public SyncVar<bool> b_friendly = new(true);
     public Transform T_messageHook;
 
     [Header("Combat Variables")]
@@ -96,12 +96,12 @@ public class AgentController : BaseController
                 onFound.Activate(AC);
             }
         }
-        public void OnHit(AgentController AC, GunManager.bulletClass _bullet)
+        public void OnHit(AgentController AC, bool b_player)
         {
             if (AC.info.b_alive)
             {
                 //Friendly Fire
-                if (AC.b_friendly && _bullet.B_player)
+                if (AC.b_friendly && b_player)
                 {
                     onHit_FriendlyFire.Activate(AC);
                     return;
@@ -283,6 +283,7 @@ public class AgentController : BaseController
             RaycastHit hit;
             foreach (var item in _potTargets)
             {
+                if (item == null) continue;
                 Vector3 _dir = item.position - _fromPos;
                 float _dist = Vector3.Distance(item.position, _fromPos);
                 if (Physics.Raycast(_fromPos, _dir, out hit, _dist, _mask))
@@ -386,7 +387,8 @@ public class AgentController : BaseController
     {
         while (true)
         {
-            b_friendly = !IsHostile();
+            Relationship.meterClass _temp = GetRelationship();
+            b_friendly.value = _temp.hostile <= _temp.friendly;
             yield return new WaitForSeconds(1f);
         }
     }
@@ -397,6 +399,8 @@ public class AgentController : BaseController
             switch (state)
             {
                 case stateEnum.idle:
+                    if (fieldOfView != null)
+                        FindTarget();
                     yield return new WaitForSeconds(0.5f);
                     break;
                 case stateEnum.wander:
@@ -465,7 +469,7 @@ public class AgentController : BaseController
             {
                 if (!b_friendly)
                 {
-                    attackTarget.FollowPlayer(_PC);
+                    info.AttackTarget(_PC.info.owner);
                     behaviour.OnFound(this);
                     break;
                 }
@@ -615,24 +619,24 @@ public class AgentController : BaseController
                     _group.relationship.hostile += 1;
                 }
             }
-            if (IsHostile())
+            if (!b_friendly)
             {
                 _bullet.con_Gun.Damage_Objective(Mathf.FloorToInt(_bullet.F_damage));
-                attackTarget.FollowPlayer(_bullet.con_Player);
-                behaviour.OnHit(this, _bullet);
+                info.AttackTarget(_bullet.con_Player.info.owner);
                 _bullet.con_Player.AggroAllies(this);
+                OnHit_Behaviour(true);
             }
-            else if (b_friendly)
+            else
                 PlayerManager.conversation.StartMessage(ConversationID.Banter_FriendlyFire_001, T_messageHook);
         }
         else
         {
             if (_bullet.con_Agent != null)
             {
-                if (IsHostile() != _bullet.con_Agent.IsHostile())
+                if (b_friendly != _bullet.con_Agent.b_friendly)
                 {
                     attackTarget.FollowAgent(_bullet.con_Agent);
-                    behaviour.OnHit(this, _bullet);
+                    OnHit_Behaviour(false);
                 }
                 else
                     return;
@@ -667,6 +671,11 @@ public class AgentController : BaseController
             AH_agentAudioHolder.Play(AgentAudioHolder.type.hurt);
         HealthUpdate();
         base.OnHit(_bullet);
+    }
+    [ServerRpc]
+    public void OnHit_Behaviour(bool _player)
+    {
+        behaviour.OnHit(this, _player);
     }
 
     public override void OnHeal(float _amt)
@@ -710,6 +719,20 @@ public class AgentController : BaseController
         //gameObject.SetActive(false);
     }
 
+    public override void AttackTarget(PlayerID? _playerID)
+    {
+        if (_playerID == null)
+            return;
+        base.AttackTarget(_playerID);
+        foreach (var item in PlayerManager.Instance.Players)
+        {
+            if(item.owner == _playerID)
+            {
+                attackTarget.FollowPlayer(item.GetController());
+            }
+        }
+    }
+
     public override void OnDeath_Server()
     {
         ResourceDrop.Drop(T_model.position);
@@ -729,16 +752,10 @@ public class AgentController : BaseController
 
     }
 
-
-    bool IsHostile()
-    {
-        Relationship.meterClass _temp = GetRelationship();
-        return (_temp.hostile > _temp.friendly);
-    }
-
     public override void Revive()
     {
-        gun_Equipped.OnEquip(this);
+        if (gun_Equipped)
+            gun_Equipped.OnEquip(this);
         info.Revive();
 
         ChangeState(stateEnum.protect);

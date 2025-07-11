@@ -34,11 +34,13 @@ public class LobbyHandler : MonoBehaviour
         if (isServer())
             networkManager.StartServer();
 
+        networkManager.onServerConnectionState += ChangedState;
+
         StartCoroutine(StartClient());
     }
     void SetupSteamServer()
     {
-        //networkManager.transport = steamTransport;
+        networkManager.transport = steamTransport;
         if (!LM.CurrentLobby.IsValid)
             LM.CreateRoom();
     }
@@ -46,7 +48,20 @@ public class LobbyHandler : MonoBehaviour
     void SetupUDPServer()
     {
         ignoreLobby = true;
-        //networkManager.transport = udpTransport;
+        networkManager.transport = udpTransport;
+    }
+    private void OnDisable()
+    {
+        networkManager.onServerConnectionState -= ChangedState;
+    }
+    void ChangedState(ConnectionState _state)
+    {
+        if (_state == ConnectionState.Disconnected)
+        {
+            Debug.Log("Server Disconnected");
+            LM.LeaveLobby();
+            SceneManager.LoadScene(0);
+        }
     }
 
     private void OnApplicationQuit()
@@ -107,7 +122,7 @@ public class LobbyHandler : MonoBehaviour
     }
     public void OnPlayerListUpdated(List<LobbyUser> _list)
     {
-        Debug.Log(_list.Count);
+
     }
     public void OnRoomSearchResults(List<Lobby> _list)
     {

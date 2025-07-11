@@ -2,6 +2,7 @@ using PurrNet;
 using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.UIElements;
 using static UnityEngine.GraphicsBuffer;
 
 public class BaseInfo : NetworkBehaviour
@@ -23,7 +24,6 @@ public class BaseInfo : NetworkBehaviour
         Armor_Type.Material_Black
     };
 
-    private bool isPlayer = false;
 
     private void Awake()
     {
@@ -76,6 +76,13 @@ public class BaseInfo : NetworkBehaviour
         }
     }
     [ServerRpc]
+    public void AttackTarget(PlayerID? _PlayerID = null)
+    {
+        if (!b_alive)
+            return;
+        controller.AttackTarget(_PlayerID);
+    }
+    [ServerRpc]
     void SetHealth(float _amt) { F_curHealth.value = _amt; }
     [ServerRpc]
     public void Heal(float _amt)
@@ -101,7 +108,11 @@ public class BaseInfo : NetworkBehaviour
         }
         LevelGen_Holder.LoadTheme(SaveData.themeCurrent);
     }
-
+    [ServerRpc]
+    public void Land(string _landingID)
+    {
+        SaveData.lastLandingSpot = _landingID;
+    }
     void HealthUpdate(float _amt)
     {
         controller.HealthUpdate();

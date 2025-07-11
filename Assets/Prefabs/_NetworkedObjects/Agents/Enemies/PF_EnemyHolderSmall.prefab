@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7197547650496893999}
   - component: {fileID: 5634558188436798141}
   - component: {fileID: 4076457481858739809}
-  - component: {fileID: -1623409275007313816}
+  - component: {fileID: 441194779795057514}
   m_Layer: 3
   m_Name: PF_EnemyHolderSmall
   m_TagString: Character
@@ -57,9 +57,9 @@ MonoBehaviour:
   _networkRules: {fileID: 0}
   _visitiblityRules: {fileID: 0}
   controller: {fileID: 4076457481858739809}
-  F_maxHealth: 100
+  F_maxHealth: 50
   equippedGun: 0
-  equippedArmor: 00000000070000000b0000000b0000000e00000014000000
+  equippedArmor: 00000000080000000b0000000b0000000f00000014000000
 --- !u!114 &4076457481858739809
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -72,6 +72,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1071c985a1eacf1418fc42041cbf71bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _isSetup: 0
+  _prefabId: -2147483648
+  _componentIndex: -2147483648
+  _shouldBePooled: 0
+  _parent: {fileID: 0}
+  _invertedPathToNearestParent: 
+  _directChildren: []
+  _networkRules: {fileID: 0}
+  _visitiblityRules: {fileID: 0}
   info: {fileID: 0}
   NMA: {fileID: 4794220531658604334}
   T_model: {fileID: 4132479939592027811}
@@ -95,6 +104,9 @@ MonoBehaviour:
   b_grounded: 0
   I_curRoom: -1
   followers: []
+  A_model: {fileID: 4559141757719903042}
+  v2_animMove: {x: 0, y: 0}
+  state: 1
   gunManager: {fileID: 11400000, guid: 1e3b59fdefa93a743beff3357901afa0, type: 2}
   fieldOfView: {fileID: 6328522580476208218}
   S_characterID: Lido_Police
@@ -115,14 +127,16 @@ MonoBehaviour:
       loud: 0
       quiet: 0
   G_backupGroups: 01000000
-  b_friendly: 1
+  b_friendly:
+    _value: 1
+    _ownerAuth: 0
+    _sendIntervalInSeconds: 0
   T_messageHook: {fileID: 3737595237735131386}
   F_attackDistance: 20
   T_targetTransforms: []
   LM_hitScan:
     serializedVersion: 2
     m_Bits: 16385
-  A_model: {fileID: 4559141757719903042}
   ResourceDrop:
     list:
     - _type: 0
@@ -133,7 +147,6 @@ MonoBehaviour:
       _chance: 50
   DEBUG_EquippedGunNum: -1
   DEBUG_FollowPlayerImmediately: 0
-  state: 1
   behaviour:
     onFound:
       state: 10
@@ -162,7 +175,7 @@ MonoBehaviour:
       state: -10
       B_voiceLine: 0
       banter: 9
---- !u!114 &-1623409275007313816
+--- !u!114 &441194779795057514
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -186,7 +199,7 @@ MonoBehaviour:
   _toActivate: []
   _toDeactivate: []
   _toEnable:
-  - {fileID: -1623409275007313816}
+  - {fileID: 4076457481858739809}
   - {fileID: 4794220531658604334}
   _toDisable: []
 --- !u!1 &446909121369230874
@@ -734,8 +747,8 @@ GameObject:
   - component: {fileID: 642101389629788198}
   - component: {fileID: 6328522580476208218}
   - component: {fileID: 856952303997979374}
-  - component: {fileID: 1674729153667573055}
-  - component: {fileID: 5302320736969073313}
+  - component: {fileID: 8516097355408228839}
+  - component: {fileID: 8405236909273339834}
   m_Layer: 3
   m_Name: Enemy
   m_TagString: Character
@@ -859,7 +872,7 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1674729153667573055
+--- !u!114 &8516097355408228839
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -872,7 +885,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 4076457481858739809}
---- !u!114 &5302320736969073313
+--- !u!114 &8405236909273339834
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1330,6 +1343,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4132479939592027811}
     m_Modifications:
+    - target: {fileID: 492485408440410870, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
+      propertyPath: controller
+      value: 
+      objectReference: {fileID: 4076457481858739809}
     - target: {fileID: 492485408440410870, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
       propertyPath: BaseController
       value: 

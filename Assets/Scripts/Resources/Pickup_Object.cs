@@ -1,7 +1,8 @@
+using PurrNet;
 using System.Collections;
 using UnityEngine;
 
-public class Pickup_Object : MonoBehaviour
+public class Pickup_Object : NetworkBehaviour
 {
     public Transform T_modelHolder;
     public TrailRenderer TR_trailRenderer;
@@ -18,7 +19,6 @@ public class Pickup_Object : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            C_collider.enabled = false;
             switch (_PickUpType)
             {
                 case pickupEnum.resource:
@@ -30,8 +30,8 @@ public class Pickup_Object : MonoBehaviour
                 default:
                     break;
             }
-            StartCoroutine(Collect());
         }
+        Collect();
     }
 
     public void Setup(Resource_Type _type)
@@ -73,7 +73,13 @@ public class Pickup_Object : MonoBehaviour
         yield return new WaitForSeconds(TR_trailRenderer.time);
         TR_trailRenderer.enabled = false;
     }
-    IEnumerator Collect()
+    [ObserversRpc]
+    void Collect()
+    {
+        C_collider.enabled = false;
+        StartCoroutine(Collect_Co());
+    }
+    IEnumerator Collect_Co()
     {
         float timer = 0;
         Vector3 startPos = transform.localPosition;

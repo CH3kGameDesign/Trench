@@ -9,7 +9,7 @@ public class Themes : ScriptableObject
     public LevelGen_Theme theme_Default;
     public LevelGen_Theme theme_SpaceStation;
     public LevelGen_Theme theme_Ship;
-    public enum themeEnum { _default, spaceStation, ship};
+    public enum themeEnum { none = -1, _default, spaceStation, ship};
 
 
     public LevelGen_Theme GetTheme (themeEnum _theme)

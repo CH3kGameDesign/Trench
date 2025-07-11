@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
 using static AgentController;
+using static Unity.Burst.Intrinsics.X86;
 
 public class PlayerController : BaseController
 {
@@ -221,7 +222,7 @@ public class PlayerController : BaseController
 
     IEnumerator AwakeLate()
     {
-        while (!NetworkOwner.isFullySpawned)
+        while (!NetworkOwner.isFullySpawned || !LevelGen_Holder.Instance.isReady)
             yield return new WaitForEndOfFrame();
         if (NetworkOwner.isOwner)
         {
@@ -238,7 +239,9 @@ public class PlayerController : BaseController
         if (t == null)
             return;
         Ref.R_recall.SetRecallPos(t);
+        transform.position = t.position;
         transform.rotation = Quaternion.Euler(Vector3.zero);
+        NMA.Warp(t.position);
         NMA.transform.rotation = t.rotation;
     }
 
@@ -246,6 +249,7 @@ public class PlayerController : BaseController
     {
         SetNetworkOwner();
         StartCoroutine(StartLate());
+        Ref.R_recall.Setup(this);
     }
     IEnumerator StartLate()
     {
@@ -272,7 +276,6 @@ public class PlayerController : BaseController
             Setup_Radial();
             Update_Objectives();
 
-            Ref.R_recall.Setup(this);
 
             GameState_Change(gameStateEnum.active);
             ChangeState(stateEnum.idle);
@@ -677,7 +680,7 @@ public class PlayerController : BaseController
                 {
                     if (C_interactCoyote != null) { StopCoroutine(C_interactCoyote); C_interactCoyote = null; }
 
-                    BaseController _bc = _hit.collider.GetComponent<HitObject>().RM_ragdollManager.BaseController;
+                    BaseController _bc = _hit.collider.GetComponent<HitObject>().RM_ragdollManager.controller;
                     if (_bc != BC_curBaseController && _bc.info.F_curHealth <= 0)
                     {
                         BC_curBaseController = _bc;
@@ -1541,9 +1544,9 @@ public class PlayerController : BaseController
 
     IEnumerator Input_ChangedInputLate(PlayerInput input)
     {
-        while (!NetworkOwner.isFullySpawned)
+        while (PlayerManager.main == null)
             yield return new WaitForEndOfFrame();
-        if (NetworkOwner.isOwner)
+        if (PlayerManager.main == this)
         {
             Inputs.s_inputType = input.devices[0].displayName;
             Inputs.b_isGamepad = input.currentControlScheme == "Gamepad";

@@ -14,7 +14,7 @@ public class RagdollManager : NetworkBehaviour
     public Rigidbody[] RB_rigidbodies = new Rigidbody[0];
     public Collider[] C_colliders = new Collider[0];
     public Transform[] T_armorPoints = new Transform[0];
-    public BaseController BaseController;
+    public BaseController controller;
     [HideInInspector] public bool agentController = false;
 
     public SyncVar<bool> colliderEnabled { get; private set; } = new SyncVar<bool>(true);
@@ -74,7 +74,7 @@ public class RagdollManager : NetworkBehaviour
     protected override void OnSpawned()
     {
         base.OnSpawned();
-        agentController = BaseController is AgentController;
+        agentController = controller is AgentController;
         R_Rig.rig.weight = 0;
         UpdateBaseTransforms();
         if (!isController)
@@ -137,8 +137,8 @@ public class RagdollManager : NetworkBehaviour
     {
         if (!PrevDamageSpurces.Contains(_source) || _source == null)
         {
-            if (BaseController != null)
-                BaseController.OnHit(_bullet);
+            if (controller != null)
+                controller.OnHit(_bullet);
             AddSource(_source);
         }
     }
@@ -175,7 +175,20 @@ public class RagdollManager : NetworkBehaviour
         FJ_backJoint = RB_backJoint.AddComponent<FixedJoint>();
         FJ_backJoint.connectedBody = _target;
     }
-    public void Detach()
+    [ServerRpc]
+    public void Attach(PlayerID _playerID)
+    {
+        foreach (var item in PlayerManager.Instance.Players)
+        {
+            if (item.owner == _playerID)
+            {
+                Attach(item.GetController().RM_ragdoll.RB_backJoint);
+                return;
+            }
+        }
+    }
+    [ServerRpc]
+    public void Detach(Vector3 _force)
     {
         if (FJ_backJoint != null)
         {
@@ -190,6 +203,7 @@ public class RagdollManager : NetworkBehaviour
         SetRigidBodies(true);
 
         StartCoroutine(Detach_Delay());
+        RB_backJoint.AddForce(_force, ForceMode.Impulse);
     }
 
     IEnumerator Detach_Delay()
@@ -221,7 +235,7 @@ public class RagdollManager : NetworkBehaviour
     {
         if (agentController)
         {
-            _controller = BaseController as AgentController;
+            _controller = controller as AgentController;
             return true;
         }
         _controller = null;

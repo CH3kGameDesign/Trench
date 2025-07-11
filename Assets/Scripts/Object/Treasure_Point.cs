@@ -63,15 +63,15 @@ public class Treasure_Point : MonoBehaviour
             if (_HO.RM_ragdollManager != null)
             {
                 RagdollManager RM = _HO.RM_ragdollManager;
-                if (RM.BaseController.info.F_curHealth <= 0)
+                if (RM.controller.info.F_curHealth <= 0)
                 {
-                    if (RM.BaseController is PlayerController)
+                    if (RM.controller is PlayerController)
                     {
-                        Revive(RM.BaseController);
+                        Revive(RM.controller);
                     }
                     else
                     {
-                        AgentController AC = (AgentController)RM.BaseController;
+                        AgentController AC = (AgentController)RM.controller;
                         if (AC.b_friendly)
                         {
                             Revive(AC);

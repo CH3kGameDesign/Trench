@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(BaseInfo))]
-public class BaseController : MonoBehaviour
+public class BaseController : NetworkBehaviour
 {
     [HideInInspector] public BaseInfo info;
     public NavMeshAgent NMA;
@@ -182,15 +182,15 @@ public class BaseController : MonoBehaviour
     }
     public virtual void PickedUp(PlayerController _pc)
     {
-        RM_ragdoll.Attach(_pc.RM_ragdoll.RB_backJoint);
+        if (_pc.info.owner != null)
+            RM_ragdoll.Attach((PlayerID)_pc.info.owner);
     }
     public void OnDrop(PlayerController _player, bool _isSprinting = false)
     {
-        RM_ragdoll.Detach();
         Vector3 _forceDir = _player.C_camera.transform.forward;
         _forceDir += _player.C_camera.transform.up * 0.5f;
         float _mult = _isSprinting ? 2 : 1;
-        RM_ragdoll.RB_backJoint.AddForce(_forceDir * 400 * _mult, ForceMode.Impulse);
+        RM_ragdoll.Detach(_forceDir * _mult * 400);
     }
 
 
@@ -208,6 +208,10 @@ public class BaseController : MonoBehaviour
 
     }
     public virtual void OnDeath_Server()
+    {
+
+    }
+    public virtual void AttackTarget(PlayerID? _playerID)
     {
 
     }

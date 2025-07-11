@@ -1,3 +1,4 @@
+using PurrNet;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,13 +9,10 @@ public class SpaceGenerator : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        if (SaveData.themeCurrent == Themes.themeEnum.ship)
-        {
-            Generate();
-        }
+        
     }
 
-    void Generate()
+    public void Generate()
     {
         SpaceSegment _prefab;
         SpaceSegment GO;

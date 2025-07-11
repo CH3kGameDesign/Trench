@@ -3975,6 +3975,7 @@ GameObject:
   - component: {fileID: 5634573469513103511}
   - component: {fileID: 4687438752052238142}
   - component: {fileID: 26762560937256653}
+  - component: {fileID: 909895355018480432}
   m_Layer: 3
   m_Name: Mover
   m_TagString: Player
@@ -4109,6 +4110,37 @@ MonoBehaviour:
   - type: 1
     name: isKinematic
   _ownerAuth: 1
+--- !u!114 &909895355018480432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4218579458554171712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 817fe5016bd0a2a49a95b6eb338bb132, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isSetup: 0
+  _prefabId: -2147483648
+  _componentIndex: -2147483648
+  _shouldBePooled: 0
+  _parent: {fileID: 0}
+  _invertedPathToNearestParent: 
+  _directChildren: []
+  _networkRules: {fileID: 0}
+  _visitiblityRules: {fileID: 0}
+  _syncPosition: 1
+  _syncRotation: 1
+  _syncScale: 1
+  _syncParent: 1
+  _interpolateSettings: 7
+  _minBufferSize: 1
+  _maxBufferSize: 2
+  _characterControllerPatch: 0
+  _ownerAuth: 1
+  _interpolationTiming: 0
 --- !u!1 &4348839166574037118
 GameObject:
   m_ObjectHideFlags: 0
@@ -5334,7 +5366,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5489375939780082022}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bb3522fb226d0954e8df0fe5a4155033, type: 3}
   m_Name: 
@@ -5811,8 +5843,6 @@ MonoBehaviour:
   _networkRules: {fileID: 0}
   _visitiblityRules: {fileID: 0}
   _components:
-  - target: {fileID: 668208048646576681}
-    activeAsOwner: 1
   - target: {fileID: 701157055829192457}
     activeAsOwner: 1
   - target: {fileID: 2806240414845446853}
@@ -10562,6 +10592,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 492485408440410870, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
+      propertyPath: controller
+      value: 
+      objectReference: {fileID: 668208048646576681}
     - target: {fileID: 492485408440410870, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
       propertyPath: BaseController
       value: 

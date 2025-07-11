@@ -135,6 +135,9 @@ MonoBehaviour:
   b_grounded: 0
   I_curRoom: -1
   followers: []
+  A_model: {fileID: 3727426164504592449}
+  v2_animMove: {x: 0, y: 0}
+  state: 3
   gunManager: {fileID: 11400000, guid: 1e3b59fdefa93a743beff3357901afa0, type: 2}
   fieldOfView: {fileID: 8741451782662131216}
   S_characterID: Companion_Mance
@@ -162,7 +165,6 @@ MonoBehaviour:
   LM_hitScan:
     serializedVersion: 2
     m_Bits: 16385
-  A_model: {fileID: 3727426164504592449}
   ResourceDrop:
     list:
     - _type: 0
@@ -177,7 +179,6 @@ MonoBehaviour:
       _chance: 50
   DEBUG_EquippedGunNum: 0
   DEBUG_FollowPlayerImmediately: 1
-  state: 3
   behaviour:
     onFound:
       state: -10
@@ -1334,6 +1335,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3340136924810737307}
     m_Modifications:
+    - target: {fileID: 492485408440410870, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
+      propertyPath: controller
+      value: 
+      objectReference: {fileID: 943015360836498631}
     - target: {fileID: 492485408440410870, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
       propertyPath: BaseController
       value: 
