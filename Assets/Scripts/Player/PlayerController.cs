@@ -1293,6 +1293,18 @@ public class PlayerController : BaseController
         HealthUI _GO = Instantiate(PF_followerHealth, RT_followerHealthHolder);
         FollowerHealthList.Add(_GO);
         _GO.Setup(_base);
+        _base.info.F_curHealth.onChanged += delegate { UpdateFollowerHealth(_base); };
+    }
+    public bool CheckFollower(BaseController _base)
+    {
+        for (int i = 0; i < followers.Count; ++i)
+        {
+            if (followers[i] == _base)
+            {
+                return true;
+            }
+        }
+        return false;
     }
     public override void RemoveFollower(BaseController _base)
     {

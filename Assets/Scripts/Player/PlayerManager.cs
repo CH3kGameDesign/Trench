@@ -37,6 +37,7 @@ public class PlayerManager : MonoBehaviour
                 conversation = main.conversation;
                 OnMainSet?.Invoke();
             }
+            CheckMain(UpdatePlayerFollowers);
         }
     }
     public void RemovePlayer(BaseInfo _player)
@@ -48,6 +49,18 @@ public class PlayerManager : MonoBehaviour
             {
                 main = null;
             }
+            else
+                main.RemoveFollower(_player.GetController());
+        }
+    }
+    void UpdatePlayerFollowers()
+    {
+        foreach (BaseInfo _player in Players)
+        {
+            PlayerController PC = _player.GetController();
+            if (PC != null && PC != main)
+                if (!main.CheckFollower(PC))
+                    main.AddFollower(PC);
         }
     }
 

@@ -25,13 +25,20 @@ public class JawDropper : AgentController
         S_hpSlider.minValue = 0;
         S_hpSlider.value = info.F_curHealth;
     }
+    public override void Awake()
+    {
+        base.Awake();
+        if (!S_hpSlider)
+            AssignSlider(EnemyTimer.Instance.S_healthSlider);
+    }
 
     public override void OnHit(GunManager.bulletClass _bullet)
     {
         base.OnHit(_bullet);
-        if (spawnEnemies == null)
+        if (spawnEnemies == null && isController)
             spawnEnemies = StartCoroutine(SpawnEnemies());
     }
+    [ObserversRpc]
     public override void HealthUpdate()
     {
         base.HealthUpdate();

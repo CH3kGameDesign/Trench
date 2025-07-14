@@ -49,6 +49,6 @@ public class LevelGen_Seed : NetworkBehaviour
         SaveData.lastLandingSpot = lastLandingSpot.value;
         if (SaveData.themeCurrent == Themes.themeEnum.ship)
             spaceGen.Generate();
-        levelGen.Setup(seed);
+        levelGen.Setup(seed, 0);
     }
 }

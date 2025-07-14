@@ -330,7 +330,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 140771292}
   - {fileID: 38620770}
   m_Father: {fileID: 790322585}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -346,78 +345,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6fb34501369d044ea19fd932b766a4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  List:
-  - {fileID: 140771293}
-  I_maxDecals: 100
---- !u!1 &140771291
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 140771292}
-  - component: {fileID: 140771293}
-  - component: {fileID: 140771294}
-  m_Layer: 0
-  m_Name: LevelGen_Manager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &140771292
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 140771291}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 66495421}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &140771293
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 140771291}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40440a97461a3a94c843cc58642ed3d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  holderTypes:
-    layoutHolder_Default: {fileID: 4238844766277362592, guid: a35cdaa6772b5ea44812b495b51a442a, type: 3}
-    layoutHolder_Ship: {fileID: 407907345362264402, guid: 9f0d8dcb0dd9acd4ea80ad6cf03fa2ca, type: 3}
-  themeHolder: {fileID: 11400000, guid: 64b028c4f926b2d46b7c96485c4f0ded, type: 2}
-  LG_Theme: {fileID: 11400000, guid: d7db867ad37fd76429e995b669975e38, type: 2}
-  spaceGenerator: {fileID: 38620771}
-  AC_agents: []
-  LM_mask:
-    serializedVersion: 2
-    m_Bits: 4096
-  playerSpawner: {fileID: 507243189}
-  isHost: 0
---- !u!114 &140771294
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 140771291}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f2f9a8ba6e2ee2d44814a55b5c0fb113, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
   _isSetup: 0
   _prefabId: -2147483648
   _componentIndex: -2147483648
@@ -427,20 +354,24 @@ MonoBehaviour:
   _directChildren: []
   _networkRules: {fileID: 0}
   _visitiblityRules: {fileID: 0}
-  seed:
-    _value: 0
-    _ownerAuth: 0
-    _sendIntervalInSeconds: 0
-  themeCurrent:
-    _value: -1
+  PF_levelGen: {fileID: 328246133662043546, guid: 0749db2a3a3cf6e49bf60fd17228715f, type: 3}
+  spaceGen: {fileID: 38620771}
+  playerSpawner: {fileID: 507243189}
+  List: []
+  Transforms:
+    _value: []
     _ownerAuth: 0
     _sendIntervalInSeconds: 0
   lastLandingSpot:
     _value: 
     _ownerAuth: 0
     _sendIntervalInSeconds: 0
-  levelGen: {fileID: 140771293}
-  spaceGen: {fileID: 38620771}
+  theme:
+    _value: -1
+    _ownerAuth: 0
+    _sendIntervalInSeconds: 0
+  I_maxDecals: 100
+  isReady: 0
 --- !u!1 &142928455
 GameObject:
   m_ObjectHideFlags: 0

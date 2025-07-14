@@ -56,6 +56,8 @@ public class LobbyHandler : MonoBehaviour
     }
     void ChangedState(ConnectionState _state)
     {
+        if (!SLP.IsSteamClientAvailable)
+            return;
         if (_state == ConnectionState.Disconnected)
         {
             Debug.Log("Server Disconnected");

@@ -8,6 +8,7 @@ using static UnityEngine.EventSystems.EventTrigger;
 using static Themes;
 using PurrNet;
 using System;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 
 public class LevelGen : MonoBehaviour
@@ -19,11 +20,12 @@ public class LevelGen : MonoBehaviour
     public Themes themeHolder;
     [HideInInspector] public LevelGen_Theme LG_Theme;
 
+    [HideInInspector] public Transform T_Holder;
+    [HideInInspector] public Ship ship = null;
+
     private NavMeshSurface[] nm_Surfaces;
 
     private List<LevelGen_Block> LG_Blocks = new List<LevelGen_Block>();
-
-    public SpaceGenerator spaceGenerator;
 
     [HideInInspector] public List<AgentController> AC_agents = new List<AgentController>();
 
@@ -32,8 +34,8 @@ public class LevelGen : MonoBehaviour
     private int i_series = 2;
     private int i_attempts = 10;
     [Space(10)]
-    public PlayerSpawner playerSpawner;
     [HideInInspector] public bool isHost = false;
+    [HideInInspector] public int id = -1;
 
     [System.Serializable]
     private class holderTypesClass
@@ -48,8 +50,10 @@ public class LevelGen : MonoBehaviour
 
     }
 
-    public void Setup(uint _seed)
+    public void Setup(uint _seed, int _id)
     {
+        id = _id;
+
         Random_Seeded = new Unity.Mathematics.Random(_seed);
 
         LG_Theme = themeHolder.GetTheme(SaveData.themeCurrent);
@@ -79,16 +83,17 @@ public class LevelGen : MonoBehaviour
     public void GenerateLayout_Series(LevelGen_Theme _theme)
     {
         LG_Blocks = new List<LevelGen_Block>();
-        Transform lHolder = Instantiate(GetHolderTypePrefab(SaveData.themeCurrent)).transform;
-        lHolder.parent = transform;
-        lHolder.localPosition = Vector3.zero;
-        nm_Surfaces = lHolder.GetComponents<NavMeshSurface>();
+        T_Holder = Instantiate(GetHolderTypePrefab(SaveData.themeCurrent)).transform;
 
-        LevelGen_Block _bridge = Instantiate(_theme.GetBlock(LevelGen_Block.blockTypeEnum.bridge, LevelGen_Block.entryTypeEnum.any, Random_Seeded), lHolder);
+        T_Holder.parent = transform;
+        T_Holder.localPosition = Vector3.zero;
+        nm_Surfaces = T_Holder.GetComponents<NavMeshSurface>();
+
+        LevelGen_Block _bridge = Instantiate(_theme.GetBlock(LevelGen_Block.blockTypeEnum.bridge, LevelGen_Block.entryTypeEnum.any, Random_Seeded), T_Holder);
         _bridge.transform.localPosition = Vector3.zero;
         LG_Blocks.Add(_bridge);
 
-        GenerateBuildings_Series(LG_Blocks, _theme, lHolder, i_series);
+        GenerateBuildings_Series(LG_Blocks, _theme, T_Holder, i_series);
         SetDoors();
         UpdateNavMeshes();
         SpawnObjects();
@@ -97,51 +102,55 @@ public class LevelGen : MonoBehaviour
     public IEnumerator GenerateLayout_Smart(LevelGen_Theme _theme, Layout_Basic _layout)
     {
         LG_Blocks = new List<LevelGen_Block>();
-        Transform lHolder = Instantiate(GetHolderTypePrefab(SaveData.themeCurrent)).transform;
-        
-        lHolder.parent = transform;
-        UpdatePosition(lHolder);
+        T_Holder = Instantiate(GetHolderTypePrefab(SaveData.themeCurrent)).transform;
 
-        nm_Surfaces = lHolder.GetComponents<NavMeshSurface>();
+        T_Holder.parent = transform;
+        UpdatePosition(T_Holder);
 
-        GenerateBuildings_Smart_FirstRoom(_layout.recipe, _theme, lHolder);
+        nm_Surfaces = T_Holder.GetComponents<NavMeshSurface>();
+
+        GenerateBuildings_Smart_FirstRoom(_layout.recipe, _theme, T_Holder);
         if (LG_Blocks.Count < _layout.totalRoomAmount)
         {
             yield return new WaitForEndOfFrame();
             Debug.Log("Retry Generation");
-            GameObject.Destroy(lHolder.gameObject);
+            GameObject.Destroy(T_Holder.gameObject);
             StartCoroutine(GenerateLayout_Smart(_theme, _layout));
         }
         else
         {
-            GenerateBuildings_Extra(_theme, _layout, lHolder);
+            GenerateBuildings_Extra(_theme, _layout, T_Holder);
             SetDoors();
             UpdateNavMeshes();
             SpawnObjects();
-            SetupVehicle(_theme, _layout, lHolder);
+            SetupVehicle(_theme, _layout, T_Holder);
             LevelGen_Holder.Instance.isReady = true;
         }
     }
 
     void UpdatePosition(Transform lHolder)
     {
+        if (!NetworkManager.isServerStatic)
+            return;
         if (SaveData.themeCurrent == themeEnum.ship)
         {
             Vector3 pos;
-            if (spaceGenerator.GetExitPos(out pos, SaveData.lastLandingSpot))
+            if (LevelGen_Holder.Instance.spaceGen.GetExitPos(out pos, SaveData.lastLandingSpot))
                 lHolder.position = pos;
             else
                 lHolder.localPosition = Vector3.zero;
         }
         else
             lHolder.localPosition = Vector3.zero;
+        LevelGen_Holder.Instance.UpdateTransform(this);
     }
 
     void SetupVehicle(LevelGen_Theme _theme, Layout_Basic _layout, Transform lHolder)
     {
         if (SaveData.themeCurrent == themeEnum.ship)
         {
-            Ship _ship = lHolder.GetComponent<Ship>();
+            ship = lHolder.GetComponent<Ship>();
+            ship.LG = this;
             Vector3 offset = Vector3.zero;
             foreach (var item in LG_Blocks)
             {
@@ -152,7 +161,7 @@ public class LevelGen : MonoBehaviour
                 }
             }
             offset /= LG_Blocks.Count;
-            _ship.T_camHook.position = offset;
+            ship.T_camHook.position = offset;
         }
     }
 
@@ -250,7 +259,7 @@ public class LevelGen : MonoBehaviour
                 }
             }
         }
-        playerSpawner.SetSpawns(spawnPoints);
+        LevelGen_Holder.Instance.playerSpawner.SetSpawns(spawnPoints);
     }
     GameObject GetHolderTypePrefab(themeEnum _theme)
     {

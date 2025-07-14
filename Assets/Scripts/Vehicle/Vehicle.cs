@@ -173,4 +173,16 @@ using UnityEngine;
         }
         return false;
     }
+    public bool DriverIsMain()
+    {
+        if (PlayerManager.main == null)
+            return false;
+        foreach (var seat in SeatInUse)
+        {
+            if (Seats[seat].seatType == seatTypeEnum.driver)
+                if (Seats[seat].BC_agent == PlayerManager.main)
+                    return true;
+        }
+        return false;
+    }
 }

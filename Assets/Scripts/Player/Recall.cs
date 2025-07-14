@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.AI;
 
 public class Recall : MonoBehaviour
 {
@@ -81,8 +82,11 @@ public class Recall : MonoBehaviour
 
         if (t_recallPos != null)
         {
+            PC.RB.linearVelocity = Vector3.zero;
             PC.NMA.transform.rotation = t_recallPos.rotation;
-            PC.NMA.Warp(t_recallPos.position);
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(t_recallPos.position, out hit, 5, -1))
+                PC.NMA.Warp(hit.position + Vector3.up);
         }
     }
 }

@@ -8,6 +8,7 @@ public class Ship : Vehicle
 {
     public override string Type() { return "Ship"; }
     [HideInInspector] public Transform T_pilotSeat;
+    [HideInInspector] public LevelGen LG = null;
 
     //CAR SETUP
 
@@ -252,6 +253,7 @@ public class Ship : Vehicle
 
             }
         }
+        LevelGen_Holder.Instance.UpdateTransform(LG);
     }
 
     public override void OnFixedUpdate_Driver(BaseController _player)
@@ -279,7 +281,8 @@ public class Ship : Vehicle
     // Update is called once per frame
     public override void Update()
     {
-
+        if (T_pilotSeat == null)
+            return;
         //CAR DATA
 
         // We determine the speed of the car.

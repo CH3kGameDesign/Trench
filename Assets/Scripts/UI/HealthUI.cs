@@ -37,8 +37,14 @@ public class HealthUI : MonoBehaviour
         UpdateMaterialRef();
         _controller = _con;
         TM_nameText.text = _con.GetName();
-        S_icon.texture = _con.T_icon;
+        UpdateInfo();
+        _con.info.icon.onChanged += UpdateInfo;
         UpdateHealth(true);
+    }
+    void UpdateInfo<T>(T _temp) { UpdateInfo(); }
+    public void UpdateInfo()
+    {
+        S_icon.texture = ArmorManager.Instance.GetArmorType(_controller.info.icon).image;
     }
 
     void UpdateMaterialRef()

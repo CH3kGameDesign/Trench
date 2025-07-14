@@ -14,6 +14,8 @@ public class BaseInfo : NetworkBehaviour
 
     public Gun_Type equippedGun;
 
+    public SyncVar<Armor_Type> icon = new SyncVar<Armor_Type>(ownerAuth:true);
+
     public Armor_Type[] equippedArmor = new Armor_Type[]
     {
         Armor_Type.Helmet_Basic,
@@ -140,6 +142,7 @@ public class BaseInfo : NetworkBehaviour
     void EquipArmor()
     {
         ArmorManager.EquipArmor_Static(controller.RM_ragdoll, equippedArmor);
+        icon.value = equippedArmor[0];
     }
 
     void EquipGun()
