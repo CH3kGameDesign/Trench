@@ -334,7 +334,6 @@ public class AgentController : BaseController
                 NavMeshHit navHit;
                 if (NavMesh.SamplePosition(NMA.transform.position, out navHit, 2f, -1))
                 {
-                    T_surface_Update(NMA.navMeshOwner.GetComponent<Transform>());
                     b_grounded = true;
                 }
             }
@@ -531,12 +530,12 @@ public class AgentController : BaseController
             {
                 Quaternion _look = Quaternion.LookRotation(T_aimPoint.position - NMA.transform.position);
                 _look = Quaternion.Euler(new Vector3(0, _look.eulerAngles.y, 0));
-                NMA.transform.localRotation = Quaternion.Lerp(NMA.transform.localRotation, _look, Time.deltaTime * 6);
+                NMA.transform.rotation = Quaternion.Lerp(NMA.transform.rotation, _look, Time.deltaTime * 6);
             }
             else if (NMA.remainingDistance > NMA.stoppingDistance)
             {
                 Quaternion _look = Quaternion.LookRotation(NMA.desiredVelocity);
-                NMA.transform.localRotation = Quaternion.Lerp(NMA.transform.localRotation, _look, Time.deltaTime * 4);
+                NMA.transform.rotation = Quaternion.Lerp(NMA.transform.rotation, _look, Time.deltaTime * 4);
             }
         }
     }
@@ -775,22 +774,30 @@ public class AgentController : BaseController
 
         return _temp;
     }
-    public override void UpdateRoom(int _roomNum)
+    public override void UpdateRoom(LevelGen_Bounds _bounds, bool _enter = true)
     {
         if (I_curRoom <= -1)
         {
-            I_curRoom = _roomNum;
-            return;
+            base.UpdateRoom(_bounds, _enter);
+            I_curRoom = _bounds.I_roomNum;
+            if (V_curVehicle == null)
+                AttachToBound();
         }
-        switch (state)
+        else
         {
-            case stateEnum.idle:
-                break;
-            case stateEnum.wander:
-                break;
-            default:
-                I_curRoom = _roomNum;
-                break;
+            switch (state)
+            {
+                case stateEnum.idle:
+                    break;
+                case stateEnum.wander:
+                    break;
+                default:
+                    base.UpdateRoom(_bounds, _enter);
+                    I_curRoom = _bounds.I_roomNum;
+                    if (V_curVehicle == null)
+                        AttachToBound();
+                    break;
+            }
         }
     }
     public IEnumerator ChangeState(stateEnum _state, float _timer)

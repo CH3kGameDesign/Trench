@@ -18,8 +18,7 @@ public class BaseController : NetworkBehaviour
     public RagdollManager RM_ragdoll;
     public AgentAudioHolder AH_agentAudioHolder;
     [HideInInspector] public Vehicle V_curVehicle = null;
-    [HideInInspector] public Transform T_surface = null;
-    private Vector3 v3_surfacePos;
+    [HideInInspector] public LevelGen_Bounds LGB_curBounds = null;
     public LayerMask LM_TerrainRay;
 
     [HideInInspector] public Texture2D T_icon { get; private set;}
@@ -29,6 +28,9 @@ public class BaseController : NetworkBehaviour
     [HideInInspector] public GunClass[] gun_EquippedList = new GunClass[3];
 
     [HideInInspector] public bool b_grounded = false;
+
+    private bool b_updateNav = true;
+    private Vector3 prevPos = Vector3.zero;
 
     [HideInInspector] public int I_curRoom = -1;
 
@@ -92,7 +94,6 @@ public class BaseController : NetworkBehaviour
                     Vector3 _pos = navHit.position;
                     _pos.y = NMA.transform.position.y;
                     NMA.Warp(_pos);
-                    T_surface_Update(NMA.navMeshOwner.GetComponent<Transform>());
                 }
                 GroundedUpdate(true);
                 RM_ragdoll.ApplyBaseTransforms();
@@ -109,8 +110,9 @@ public class BaseController : NetworkBehaviour
     public void GroundedUpdate(bool _grounded)
     {
         b_grounded = _grounded;
+        b_updateNav = _grounded;
         //NMA_player.updateRotation = _grounded;
-        NMA.updatePosition = _grounded;
+        //NMA.updatePosition = _grounded;
         //NMA_player.isStopped = !_grounded;
         RB.isKinematic = _grounded;
         RB.useGravity = !_grounded;
@@ -118,6 +120,8 @@ public class BaseController : NetworkBehaviour
     public virtual void Awake()
     {
         info = GetComponent<BaseInfo>();
+        NMA.updatePosition = false;
+        prevPos = NMA.transform.position;
     }
 
     public virtual void Start()
@@ -127,39 +131,22 @@ public class BaseController : NetworkBehaviour
 
     public virtual void Update()
     {
-
+        if (b_updateNav && NMA.isOnNavMesh)
+        {
+            NMA.Move(NMA.transform.position - prevPos);
+            NMA.transform.position = NMA.nextPosition;
+            prevPos = NMA.transform.position;
+        }
     }
-
+    public void SetPosition(Vector3 pos)
+    {
+        NMA.transform.position = pos;
+        prevPos = pos;
+        NMA.Warp(pos);
+    }
     public virtual void FixedUpdate()
     {
-        UpdateParentPosition();
-    }
-
-    bool onSurface = false;
-    public void UpdateParentPosition()
-    {
-        if (T_surface != null && V_curVehicle == null)
-        {
-            if (onSurface)
-            {
-                NMA.Move(T_surface.position - v3_surfacePos);
-                RB.transform.position += T_surface.position - v3_surfacePos;
-            }
-            T_surface_Update();
-        }
-        else
-            onSurface = false;
-    }
-    public void T_surface_Update()
-    {
-        v3_surfacePos = T_surface.position;
-        onSurface = true;
-    }
-    public void T_surface_Update(Transform _temp)
-    {
-        T_surface = _temp;
-        v3_surfacePos = _temp.position;
-        onSurface = true;
+        
     }
 
     public virtual void OnHit(GunManager.bulletClass _bullet)
@@ -227,9 +214,25 @@ public class BaseController : NetworkBehaviour
     {
 
     }
-    public virtual void UpdateRoom(int _roomNum)
+    public virtual void UpdateRoom(LevelGen_Bounds _bounds, bool _enter = true)
     {
+        LGB_curBounds = _bounds;
+    }
 
+    public virtual void AttachToBound()
+    {
+        if (LGB_curBounds != null)
+        {
+            RB.transform.parent = LGB_curBounds.transform;
+        }
+        else
+        {
+            RB.transform.parent = transform;
+        }
+    }
+    public virtual void AttachToBound(Transform T)
+    {
+        RB.transform.parent = T;
     }
 
     public virtual void AddFollower(BaseController _base)

@@ -59,6 +59,10 @@ MonoBehaviour:
   controller: {fileID: 4076457481858739809}
   F_maxHealth: 100
   equippedGun: 0
+  icon:
+    _value: 0
+    _ownerAuth: 1
+    _sendIntervalInSeconds: 0
   equippedArmor: 06000000080000000b0000000b0000000f00000014000000
 --- !u!114 &4076457481858739809
 MonoBehaviour:
@@ -72,6 +76,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1071c985a1eacf1418fc42041cbf71bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _isSetup: 0
+  _prefabId: -2147483648
+  _componentIndex: -2147483648
+  _shouldBePooled: 0
+  _parent: {fileID: 0}
+  _invertedPathToNearestParent: 
+  _directChildren: []
+  _networkRules: {fileID: 0}
+  _visitiblityRules: {fileID: 0}
   info: {fileID: 0}
   NMA: {fileID: 4794220531658604334}
   T_model: {fileID: 4132479939592027811}
@@ -82,7 +95,7 @@ MonoBehaviour:
   RM_ragdoll: {fileID: 9177568694328849379}
   AH_agentAudioHolder: {fileID: 7773844298950623271}
   V_curVehicle: {fileID: 0}
-  T_surface: {fileID: 0}
+  LGB_curBounds: {fileID: 0}
   LM_TerrainRay:
     serializedVersion: 2
     m_Bits: 16960
@@ -118,7 +131,10 @@ MonoBehaviour:
       loud: 0
       quiet: 0
   G_backupGroups: 01000000
-  b_friendly: 1
+  b_friendly:
+    _value: 1
+    _ownerAuth: 0
+    _sendIntervalInSeconds: 0
   T_messageHook: {fileID: 3737595237735131386}
   F_attackDistance: 20
   T_targetTransforms: []
@@ -852,7 +868,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2

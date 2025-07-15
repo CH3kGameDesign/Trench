@@ -108,7 +108,7 @@ using UnityEngine;
         _player.RB.isKinematic = true;
         _player.RB.gameObject.layer = 8;
         _player.RM_ragdoll.SetLayer(8);
-        _player.RB.transform.parent = _seat.T_seatPos;
+        _player.AttachToBound(_seat.T_seatPos);
         _player.RB.transform.position = _seat.T_seatPos.position;
         _player.RB.transform.rotation = _seat.T_seatPos.rotation;
         _player.NMA.enabled = false;
@@ -117,10 +117,12 @@ using UnityEngine;
     public virtual void Seat_DetachPlayer(seatClass _seat)
     {
         BaseController _player = _seat.BC_agent;
-        _player.RB.transform.parent = _player.transform;
+        _player.AttachToBound();
         _player.RB.transform.position = _seat.T_exitPos.position;
         _player.RB.transform.rotation = _seat.T_seatPos.rotation;
-        _player.RB.isKinematic = false;
+        _player.RB.linearVelocity = Vector3.zero;
+        _player.RB.angularVelocity = Vector3.zero;
+        _player.GroundedUpdate(false);
         _player.RB.gameObject.layer = 3;
         _player.RM_ragdoll.SetLayer(11);
         _player.NMA.enabled = true;

@@ -9,6 +9,8 @@ using UnityEngine.AI;
 using UnityEngine.InputSystem;
 using static AgentController;
 using static Unity.Burst.Intrinsics.X86;
+using static UnityEditor.Experimental.GraphView.GraphView;
+using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 public class PlayerController : BaseController
 {
@@ -581,8 +583,9 @@ public class PlayerController : BaseController
         {
             Vector3 _tarPos = new Vector3(Inputs.v2_inputDir.x, 0, Inputs.v2_inputDir.y);
             v3_moveDir = Quaternion.Euler(0, v3_camDir.y, 0) * _tarPos;
-            if (T_surface != null)
-                v3_moveDir = Vector3.ProjectOnPlane(v3_moveDir, T_surface.up);
+            //v3_moveDir = NMA.transform.parent.rotation * v3_moveDir;
+            if (LGB_curBounds != null)
+                v3_moveDir = Vector3.ProjectOnPlane(v3_moveDir, LGB_curBounds.transform.up);
             b_isMoving = true;
 
             if (b_grounded)
@@ -591,6 +594,7 @@ public class PlayerController : BaseController
                 {
                     _tarPos = new Vector3(Inputs.v2_inputDir.x / 2, 0, 1);
                     v3_moveDir = Quaternion.Euler(0, v3_camDir.y, 0) * _tarPos;
+                    //v3_moveDir = NMA.transform.parent.rotation * v3_moveDir;
                     v3_moveDir *= F_sprintModifier;
                     SprintStart();
                 }
@@ -843,7 +847,6 @@ public class PlayerController : BaseController
                         Vector3 _pos = navHit.position;
                         _pos.y = NMA.transform.position.y;
                         NMA.Warp(_pos);
-                        T_surface_Update(NMA.navMeshOwner.GetComponent<Transform>());
                     }
                     StartCoroutine(MoveModel(_modelPos));
                     AH_agentAudioHolder.Play(AgentAudioHolder.type.land);
@@ -981,33 +984,34 @@ public class PlayerController : BaseController
     
     void ModelRotate()
     {
-        Vector3 _temp = NMA.transform.localEulerAngles;
+        Vector3 _temp = NMA.transform.eulerAngles;
         _temp.y = v3_camDir.y;
         if (Inputs.b_aiming || Inputs.b_firing)
         {
-            NMA.transform.localEulerAngles = _temp;
+            NMA.transform.eulerAngles = _temp;
             RM_ragdoll.Aiming(true);
         }
         else
         {
-            float f = Quaternion.Angle(NMA.transform.localRotation, Quaternion.Euler(_temp));
+            float f = Quaternion.Angle(NMA.transform.rotation, Quaternion.Euler(_temp));
             RM_ragdoll.Aiming(false, f > 90);
             if (b_isMoving)
             {
                 Quaternion lookRot = Quaternion.LookRotation(v3_moveDir, Local_Up());
-                NMA.transform.localRotation = Quaternion.Lerp(NMA.transform.localRotation, lookRot, Time.deltaTime * 4);
+                NMA.transform.rotation = Quaternion.Lerp(NMA.transform.rotation, lookRot, Time.deltaTime * 4);
             }
         }
     }
 
     Vector3 Local_Up()
     {
-        if (T_surface != null)
-            return T_surface.up;
+        if (LGB_curBounds != null)
+            return LGB_curBounds.transform.up;
         else
             return Vector3.up;
     }
 
+    Quaternion _lastOffset = Quaternion.identity;
     void CamMovement(bool _fixedDelta = false)
     {
         if (!b_radialOpen)
@@ -1018,20 +1022,25 @@ public class PlayerController : BaseController
             else _mult *= F_camRotSpeed;
             if (AutoAim()) _mult *= autoAim.slowMultiplier;
             v3_camDir += new Vector3(-Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0) * _mult;
-            if (v3_camDir.y > 180)
-            {
-                v3_camDir.y -= 360;
-                T_camHolder.transform.eulerAngles += new Vector3(0, -360, 0);
-            }
-            if (v3_camDir.y < -180)
-            {
-                v3_camDir.y += 360;
-                T_camHolder.transform.eulerAngles += new Vector3(0, 360, 0);
-            }
+
             v3_camDir.x = Mathf.Clamp(v3_camDir.x, -80, 80);
 
             //Canvas Pivot
             Ref.V3_canvasRot += new Vector3(Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0);
+        }
+        Vector3 _offset = (T_camHolder.parent.rotation * Quaternion.Inverse(_lastOffset)).eulerAngles;
+        v3_camDir.y += _offset.y;
+        _lastOffset = T_camHolder.parent.rotation;
+
+        if (v3_camDir.y > 180)
+        {
+            v3_camDir.y -= 360;
+            T_camHolder.transform.localEulerAngles += new Vector3(0, -360, 0);
+        }
+        if (v3_camDir.y < -180)
+        {
+            v3_camDir.y += 360;
+            T_camHolder.transform.localEulerAngles += new Vector3(0, 360, 0);
         }
 
         float _delta = _fixedDelta ?
@@ -1479,6 +1488,34 @@ public class PlayerController : BaseController
                 A_model.Play("Idle");
             }
         }
+    }
+
+    public override void UpdateRoom(LevelGen_Bounds _bounds, bool _enter = true)
+    {
+        base.UpdateRoom(_bounds, _enter);
+        I_curRoom = _bounds.I_roomNum;
+        if (V_curVehicle == null)
+            AttachToBound();
+    }
+    public override void AttachToBound()
+    {
+        if (LGB_curBounds != null)
+        {
+            RB.transform.parent = LGB_curBounds.transform;
+            T_camHolder.parent = LGB_curBounds.transform;
+        }
+        else
+        {
+            RB.transform.parent = transform;
+            T_camHolder.parent = transform;
+        }
+        _lastOffset = T_camHolder.parent.rotation;
+    }
+    public override void AttachToBound(Transform T)
+    {
+        RB.transform.parent = T;
+        T_camHolder.parent = transform;
+        _lastOffset = T_camHolder.parent.rotation;
     }
 
     #region Input Actions

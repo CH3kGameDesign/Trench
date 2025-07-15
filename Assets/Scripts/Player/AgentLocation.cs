@@ -19,6 +19,6 @@ public class AgentLocation : MonoBehaviour
     {
         LevelGen_Bounds LGB;
         if (other.TryGetComponent<LevelGen_Bounds>(out LGB))
-            controller.UpdateRoom(LGB.I_roomNum);
+            controller.UpdateRoom(LGB);
     }
 }
