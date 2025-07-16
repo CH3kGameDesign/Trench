@@ -238,7 +238,7 @@ public class PlayerController : BaseController
             return;
         Ref.R_recall.SetRecallPos(t);
         transform.position = t.position;
-        transform.rotation = Quaternion.Euler(Vector3.zero);
+        transform.rotation = Quaternion.identity;
         NMA.Warp(t.position);
         NMA.transform.rotation = t.rotation;
     }

@@ -45,12 +45,13 @@ public class PlayerManager : MonoBehaviour
         if (Players.Contains(_player))
         {
             Players.Remove(_player);
-            if (main == _player.GetController())
+            PlayerController PC = _player.GetController();
+            if (main == PC)
             {
                 main = null;
             }
-            else
-                main.RemoveFollower(_player.GetController());
+            else if (PC)
+                main.RemoveFollower(PC);
         }
     }
     void UpdatePlayerFollowers()
