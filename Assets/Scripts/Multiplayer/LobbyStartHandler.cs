@@ -79,9 +79,10 @@ public class LobbyStartHandler : MonoBehaviour
         Camera_MainMenu.Instance.MoveTo(Camera_MainMenu.points.main);
         HidePlayers();
     }
-    public void PlayerJoin(List<LobbyUser> _players)
+
+    public void LobbyUpdate(Lobby _lobby)
     {
-        UpdatePlayers(_players);
+        UpdatePlayers(_lobby.Members);
     }
 
     public void UpdateArmors()
