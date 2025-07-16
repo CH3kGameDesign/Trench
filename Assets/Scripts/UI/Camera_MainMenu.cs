@@ -1,6 +1,9 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
+using UnityEngine.UI;
 using UnityEngine.Windows;
 
 public class Camera_MainMenu : MonoBehaviour
@@ -15,12 +18,18 @@ public class Camera_MainMenu : MonoBehaviour
     public pointClass Main;
     public pointClass Lobby;
     public pointClass Search;
+    [Space(10)]
+    public Playlist P_playlist;
+    public AgentAudioHolder AudioHolder;
+    public EventSystem ES;
+    private bool b_isGamepad = false;
     [System.Serializable]
     public class pointClass
     {
         public Transform T_point;
 
         [Range(0,1.0f)]public float F_moveDur = 0.2f;
+        public Button B_default;
         [Header("Hover")]
         public float hoverScale = 0.2f;
         public float hoverSpeed = 0.2f;
@@ -36,10 +45,17 @@ public class Camera_MainMenu : MonoBehaviour
                 item.SetActive(_enable);
             }
         }
+
+        public void SetDefault(bool _controller, EventSystem ES)
+        {
+            if (_controller)
+                ES.SetSelectedGameObject(B_default.gameObject);
+            else
+                ES.SetSelectedGameObject(null);
+        }
     }
     private pointClass activePoint = null;
     public enum points {main, lobby, search};
-
 
     private Coroutine C_move = null;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -56,6 +72,8 @@ public class Camera_MainMenu : MonoBehaviour
         MoveTo(Main);
         StartCoroutine(CameraHoverPos());
         StartCoroutine(CameraRot());
+
+        MusicHandler.Instance.SetupPlaylist(P_playlist);
     }
 
     // Update is called once per frame
@@ -84,6 +102,16 @@ public class Camera_MainMenu : MonoBehaviour
             activePoint.Enable(false);
         activePoint = _point;
         _point.Enable();
+        _point.SetDefault(b_isGamepad, ES);
+    }
+
+    public void OnSelected(BaseEventData eventData)
+    {
+        AudioHolder.Play(AgentAudioHolder.type.radialSubTick);
+    }
+    public void OnClicked(BaseEventData eventData)
+    {
+        AudioHolder.Play(AgentAudioHolder.type.radialTick);
     }
 
     IEnumerator MoveTo_Co(pointClass _point)
@@ -165,7 +193,9 @@ public class Camera_MainMenu : MonoBehaviour
     }
     public void Input_ChangedInput(PlayerInput input)
     {
-
+        b_isGamepad = input.currentControlScheme == "Gamepad";
+        if (activePoint != null)
+            activePoint.SetDefault(b_isGamepad, ES);
     }
     Vector2 Input_GetVector2(InputAction.CallbackContext cxt)
     {
