@@ -31,7 +31,7 @@ namespace PurrLobby
         private WaitForSeconds _waitToReturn = new (1f);
         private IEnumerator ClickEffect()
         {
-            codeText.text = "Copied!"; 
+            codeText.text = "Copied"; 
 
             yield return _waitToReturn;
             
