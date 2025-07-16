@@ -1,3 +1,5 @@
+using PurrLobby;
+using PurrNet;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,12 +10,15 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Windows;
 
 public class MainMenu : MonoBehaviour
 {
     public static MainMenu Instance;
+
+    [SerializeField] private LobbyManager LM;
     public mainRefClass main;
     public customizeRefClass customize;
     public panelRefClass load;
@@ -584,11 +589,12 @@ public class MainMenu : MonoBehaviour
 
     public void Quit()
     {
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
+        TimeManager.TimeScale.value = 1;
+        LM.LeaveLobby();
+        if (NetworkManager.main.isServer)
+            NetworkManager.main.StopServer();
+        NetworkManager.main.StopClient();
+        SceneManager.LoadScene(0);
     }
     #endregion
 }
