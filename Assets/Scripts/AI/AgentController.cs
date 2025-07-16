@@ -460,26 +460,35 @@ public class AgentController : BaseController
 
     void FindTarget()
     {
-        PlayerController _PC;
-        AgentController _AC;
+        AgentLocation _AL;
         foreach (var item in fieldOfView.visibleTargets)
         {
-            if (item.parent.TryGetComponent<PlayerController>(out _PC))
+            if (item.TryGetComponent<AgentLocation>(out _AL))
             {
-                if (!b_friendly)
+                if (!_AL.RM) continue;
+                if (!_AL.RM.controller) continue;
+                if (_AL.RM.controller == this) continue;
+                if (!_AL.RM.controller.info.b_alive) continue;
+                if (_AL.RM.controller is PlayerController)
                 {
-                    info.AttackTarget(_PC.info.owner);
-                    behaviour.OnFound(this);
-                    break;
+                    PlayerController _PC = (PlayerController)_AL.RM.controller;
+                    if (!b_friendly.value)
+                    {
+                        info.AttackTarget(_PC.info.owner);
+                        behaviour.OnFound(this);
+                        break;
+                    }
                 }
-            }
-            if (item.TryGetComponent<AgentController>(out _AC))
-            {
-                if (b_friendly != _AC.b_friendly)
+                else
                 {
-                    attackTarget.FollowAgent(_AC);
-                    behaviour.OnFound(this);
-                    break;
+                    AgentController _AC = (AgentController)_AL.RM.controller;
+
+                    if (b_friendly.value != _AC.b_friendly.value)
+                    {
+                        attackTarget.FollowAgent(_AC);
+                        behaviour.OnFound(this);
+                        break;
+                    }
                 }
             }
         }

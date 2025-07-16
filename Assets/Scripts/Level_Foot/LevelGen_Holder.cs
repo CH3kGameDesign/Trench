@@ -1,5 +1,6 @@
 using PurrNet;
 using PurrNet.Packing;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
@@ -16,6 +17,8 @@ public class LevelGen_Holder : NetworkBehaviour
     public SyncVar<List<_networkTransform>> Transforms = new SyncVar<List<_networkTransform>>();
     public SyncVar<string> lastLandingSpot = new SyncVar<string>();
     public SyncVar<Themes.themeEnum> theme = new SyncVar<Themes.themeEnum>(Themes.themeEnum.none);
+
+    public CanvasGroup CG_loadingScreen;
 
     bool _setup = false;
     [System.Serializable]
@@ -47,6 +50,10 @@ public class LevelGen_Holder : NetworkBehaviour
         Transforms.onChanged += UpdateNetworkTransforms;
         theme.onChanged += Setup;
         lastLandingSpot.onChanged += Setup;
+
+
+        CG_loadingScreen.gameObject.SetActive(true);
+        CG_loadingScreen.alpha = 1;
     }
 
     private void FixedUpdate()
@@ -245,5 +252,27 @@ public class LevelGen_Holder : NetworkBehaviour
         {
             LG.AgentDeath(_AC);
         }
+    }
+    public void IsReady()
+    {
+        if (isReady)
+            return;
+        isReady = true;
+
+        playerSpawner.canSpawn = true;
+        StartCoroutine(FadeLoadingScreen());
+    }
+
+    IEnumerator FadeLoadingScreen(float _dur = 1f)
+    {
+        float _timer = 0f;
+        while (_timer < 1f)
+        {
+            CG_loadingScreen.alpha = Mathf.Lerp(1f, 0f, _timer);
+            yield return new WaitForEndOfFrame();
+            _timer += Time.deltaTime / _dur;
+        }
+        CG_loadingScreen.alpha = 0f;
+        CG_loadingScreen.gameObject.SetActive(false);
     }
 }

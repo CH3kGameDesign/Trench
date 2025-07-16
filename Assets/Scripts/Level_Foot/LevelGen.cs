@@ -109,22 +109,25 @@ public class LevelGen : MonoBehaviour
 
         nm_Surfaces = T_Holder.GetComponents<NavMeshSurface>();
 
-        GenerateBuildings_Smart_FirstRoom(_layout.recipe, _theme, T_Holder);
+        yield return GenerateBuildings_Smart_FirstRoom(_layout.recipe, _theme, T_Holder);
         if (LG_Blocks.Count < _layout.totalRoomAmount)
         {
-            yield return new WaitForEndOfFrame();
             Debug.Log("Retry Generation");
             GameObject.Destroy(T_Holder.gameObject);
             StartCoroutine(GenerateLayout_Smart(_theme, _layout));
         }
         else
         {
-            GenerateBuildings_Extra(_theme, _layout, T_Holder);
+            yield return StartCoroutine(GenerateBuildings_Extra(_theme, _layout, T_Holder));
             SetDoors();
+            yield return new WaitForEndOfFrame();
             UpdateNavMeshes();
-            SpawnObjects();
+            yield return new WaitForEndOfFrame();
             SetupVehicle(_theme, _layout, T_Holder);
-            LevelGen_Holder.Instance.isReady = true;
+            yield return new WaitForEndOfFrame();
+            SpawnObjects();
+            yield return new WaitForEndOfFrame();
+            LevelGen_Holder.Instance.IsReady();
         }
     }
 
@@ -319,7 +322,7 @@ public class LevelGen : MonoBehaviour
             UpdateNavMeshes();
         }
     }
-    void GenerateBuildings_Smart_FirstRoom(Layout_Basic.room _room, LevelGen_Theme _theme, Transform lHolder)
+    IEnumerator GenerateBuildings_Smart_FirstRoom(Layout_Basic.room _room, LevelGen_Theme _theme, Transform lHolder)
     {
         Transform _holder = new GameObject().transform;
         _holder.gameObject.name = "First Room " + lHolder.position.ToString();
@@ -334,10 +337,13 @@ public class LevelGen : MonoBehaviour
         LG_Blocks.Add(_temp);
         foreach (var bound in _temp.B_bounds)
             bound.B_Bounds.enabled = true;
+        yield return new WaitForEndOfFrame();
         for (int j = 0; j < _room.connectedRooms.Count; j++)
-            GenerateBuildings_Smart(_room.connectedRooms[j], LG_Theme, lHolder, _temp, _room.entryTypes[j]);
+        {
+            yield return StartCoroutine(GenerateBuildings_Smart(_room.connectedRooms[j], LG_Theme, lHolder, _temp, _room.entryTypes[j]));
+        }
     }
-    void GenerateBuildings_Smart(Layout_Basic.room _room, LevelGen_Theme _theme, Transform lHolder, LevelGen_Block _parent, Layout_Basic.entryTypeEnum _entryType = Layout_Basic.entryTypeEnum.any)
+    IEnumerator GenerateBuildings_Smart(Layout_Basic.room _room, LevelGen_Theme _theme, Transform lHolder, LevelGen_Block _parent, Layout_Basic.entryTypeEnum _entryType = Layout_Basic.entryTypeEnum.any)
     {
         bool _completed = false;
         List<LevelGen_Door> _doors = new List<LevelGen_Door>();
@@ -378,17 +384,18 @@ public class LevelGen : MonoBehaviour
                     foreach (var bound in _temp.B_bounds)
                         bound.B_Bounds.enabled = true;
                     for (int j = 0; j < _room.connectedRooms.Count; j++)
-                        GenerateBuildings_Smart(_room.connectedRooms[j], LG_Theme, lHolder, _temp, _room.entryTypes[j]);
+                        yield return StartCoroutine(GenerateBuildings_Smart(_room.connectedRooms[j], LG_Theme, lHolder, _temp, _room.entryTypes[j]));
                     _completed = true;
                     break;
                 }
             }
+            yield return new WaitForEndOfFrame();
             if (_completed)
                 break;
         }
     }
 
-    void GenerateBuildings_Extra(LevelGen_Theme _theme, Layout_Basic _layout, Transform lHolder)
+    IEnumerator GenerateBuildings_Extra(LevelGen_Theme _theme, Layout_Basic _layout, Transform lHolder)
     {
         List<LevelGen_Door> entries = new List<LevelGen_Door>();
         int roomAmt = 0;
@@ -450,6 +457,7 @@ public class LevelGen : MonoBehaviour
                     break;
                 }
             }
+            yield return new WaitForEndOfFrame();
         }
     }
 

@@ -3973,7 +3973,6 @@ GameObject:
   - component: {fileID: 2806240414845446853}
   - component: {fileID: 748759331089592094}
   - component: {fileID: 5634573469513103511}
-  - component: {fileID: 4687438752052238142}
   - component: {fileID: 26762560937256653}
   - component: {fileID: 909895355018480432}
   m_Layer: 3
@@ -4063,7 +4062,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -4071,19 +4070,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &4687438752052238142
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4218579458554171712}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ffc2e457bb23a924292e9415ad1b005c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  controller: {fileID: 668208048646576681}
 --- !u!114 &26762560937256653
 MonoBehaviour:
   m_ObjectHideFlags: 0

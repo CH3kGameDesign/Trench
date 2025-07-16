@@ -17,21 +17,29 @@ public class Pickup_Object : NetworkBehaviour
     private enum pickupEnum { none, resource, consumable};
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Character"))
         {
+            AgentLocation AL;
+            if (!other.TryGetComponent<AgentLocation>(out AL))
+                return;
+            if (!AL.RM)
+                return;
+            if (!(AL.RM.controller is PlayerController))
+                return;
+            PlayerController PC = (PlayerController)AL.RM.controller;
             switch (_PickUpType)
             {
                 case pickupEnum.resource:
-                    other.GetComponentInParent<PlayerController>().Pickup_Resource(_Resource);
+                    PC.Pickup_Resource(_Resource);
                     break;
                 case pickupEnum.consumable:
-                    other.GetComponentInParent<PlayerController>().Pickup_Consumable(_Consumable);
+                    PC.Pickup_Consumable(_Consumable);
                     break;
                 default:
                     break;
             }
+            Collect();
         }
-        Collect();
     }
 
     public void Setup(Resource_Type _type)

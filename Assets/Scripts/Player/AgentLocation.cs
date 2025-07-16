@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class AgentLocation : MonoBehaviour
 {
-    public BaseController controller;
+    public RagdollManager RM;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -19,6 +19,6 @@ public class AgentLocation : MonoBehaviour
     {
         LevelGen_Bounds LGB;
         if (other.TryGetComponent<LevelGen_Bounds>(out LGB))
-            controller.UpdateRoom(LGB);
+            RM.controller.UpdateRoom(LGB);
     }
 }

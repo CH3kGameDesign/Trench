@@ -83,7 +83,7 @@ public class Treasure_Point : MonoBehaviour
                                 ac_collected.Add(AC);
                                 PlayerManager.main.Update_Objectives(Objective_Type.Collect_Value, 50);
                                 PlayerManager.main.Update_Objectives(Objective_Type.Collect_Enemy, 1);
-                                AC.gameObject.SetActive(false);
+                                Destroy(AC.gameObject);
                                 UpdatePoints(50);
                             }
                         }

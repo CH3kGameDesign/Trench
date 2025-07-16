@@ -700,7 +700,6 @@ GameObject:
   - component: {fileID: 7125570264134322029}
   - component: {fileID: 8741451782662131216}
   - component: {fileID: 8949253357783398663}
-  - component: {fileID: 5746809852669633563}
   - component: {fileID: 3542115019817479784}
   m_Layer: 3
   m_Name: Companion
@@ -791,7 +790,7 @@ MonoBehaviour:
   viewAngle: 80
   targetMask:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 262144
   obstacleMask:
     serializedVersion: 2
     m_Bits: 1
@@ -817,7 +816,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -825,19 +824,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &5746809852669633563
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4885962304612941317}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ffc2e457bb23a924292e9415ad1b005c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  controller: {fileID: 943015360836498631}
 --- !u!114 &3542115019817479784
 MonoBehaviour:
   m_ObjectHideFlags: 0

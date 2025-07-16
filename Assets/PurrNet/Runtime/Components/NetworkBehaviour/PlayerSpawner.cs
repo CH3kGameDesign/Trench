@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using PurrNet.Logging;
 using PurrNet.Modules;
@@ -14,6 +15,8 @@ namespace PurrNet
 
         [SerializeField] private List<Transform> spawnPoints = new List<Transform>();
         private int _currentSpawnPoint;
+
+        [HideInInspector] public bool canSpawn = false;
 
         private void Awake()
         {
@@ -81,26 +84,34 @@ namespace PurrNet
 
         private void OnPlayerLoadedScene(PlayerID player, SceneID scene, bool asServer)
         {
+            StartCoroutine(OnPlayerLoadedSceneCo(player, scene, asServer));
+        }
+        IEnumerator OnPlayerLoadedSceneCo(PlayerID player, SceneID scene, bool asServer)
+        {
+            while (!canSpawn)
+            {
+                yield return new WaitForEndOfFrame();
+            }
             var main = NetworkManager.main;
 
             if (!main || !main.TryGetModule(out ScenesModule scenes, true))
-                return;
+                yield break;
 
             var unityScene = gameObject.scene;
 
             if (!scenes.TryGetSceneID(unityScene, out var sceneID))
-                return;
+                yield break;
 
             if (sceneID != scene)
-                return;
+                yield break;
 
             if (!asServer)
-                return;
+                yield break;
 
             bool isDestroyOnDisconnectEnabled = main.networkRules.ShouldDespawnOnOwnerDisconnect();
             if (!_ignoreNetworkRules && !isDestroyOnDisconnectEnabled && main.TryGetModule(out GlobalOwnershipModule ownership, true) &&
                 ownership.PlayerOwnsSomething(player))
-                return;
+                yield break;
 
             GameObject newPlayer;
 

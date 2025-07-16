@@ -7,10 +7,6 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
-using static AgentController;
-using static Unity.Burst.Intrinsics.X86;
-using static UnityEditor.Experimental.GraphView.GraphView;
-using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 public class PlayerController : BaseController
 {
@@ -498,6 +494,12 @@ public class PlayerController : BaseController
 
     void Update_Active()
     {
+        Movement();
+
+
+        CamMovement(false);
+        CamCollision(false);
+
         ModelRotate();
         AnimationUpdate();
 
@@ -525,7 +527,7 @@ public class PlayerController : BaseController
     {
         V_curVehicle.OnUpdate(this);
         LandingHandler();
-        CamCollision(V_curVehicle.T_camHook, V_curVehicle.V3_camOffset, true, true, false);
+        CamCollision(V_curVehicle.T_camHook, V_curVehicle.V3_camOffset, false, true, false);
 
         if (Inputs.b_interact) V_curVehicle.OnInteract(this);
     }
@@ -537,12 +539,9 @@ public class PlayerController : BaseController
 
     void FixedUpdate_Active()
     {
-        Movement();
         JumpHandler();
         CrouchHandler();
         AerialMovement();
-        CamMovement(true);
-        CamCollision(true);
     }
     void FixedUpdate_Ragdoll()
     {
@@ -1061,6 +1060,8 @@ public class PlayerController : BaseController
                 if (!Physics.Raycast(Camera.main.transform.position, dirToTarget, dstToTarget, LM_CameraRay))
                 {
                     HitObject HO;
+                    if (!item.rigidbody)
+                        continue;
                     if (item.rigidbody.TryGetComponent<HitObject>(out HO))
                     {
                         AgentController AC;
@@ -1101,9 +1102,9 @@ public class PlayerController : BaseController
     void CamCollision(bool _fixedDelta = false)
     { 
         if (b_isCrouching || b_isSprinting)
-            CamCollision(T_camHookCrouching, V3_camOffset_Crouch, _fixedDelta);
+            CamCollision(T_camHookCrouching, V3_camOffset_Crouch, true, false, _fixedDelta);
         else
-            CamCollision(T_camHook, V3_camOffset, _fixedDelta);
+            CamCollision(T_camHook, V3_camOffset, true, false, _fixedDelta);
     }
     void CamCollision(Transform _camHook, Vector3 _camOffset, bool _canAim = true, bool _inVehicle = false, bool _fixedDelta = false)
     {

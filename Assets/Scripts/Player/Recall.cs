@@ -86,7 +86,7 @@ public class Recall : MonoBehaviour
             PC.NMA.transform.rotation = t_recallPos.rotation;
             NavMeshHit hit;
             if (NavMesh.SamplePosition(t_recallPos.position, out hit, 1, -1))
-                PC.SetPosition(hit.position);
+                PC.SetPosition(hit.position + Vector3.up);
         }
     }
 }
