@@ -74,7 +74,7 @@ public class Recall : MonoBehaviour
         }
     }
 
-    void Activate()
+    public void Activate()
     {
         f_timer = 0;
         f_timerCoolDown = F_coolDown;

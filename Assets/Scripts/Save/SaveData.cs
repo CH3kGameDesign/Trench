@@ -29,7 +29,8 @@ public static class SaveData
     {
         Gun_Type.gun_Rifle,
         Gun_Type.gun_Shotgun,
-        Gun_Type.gun_Rod
+        Gun_Type.gun_Rod,
+        Gun_Type.gun_Rocket
     };
 
     public static ArmorManager.SetClass equippedArmorSet = new ArmorManager.SetClass();

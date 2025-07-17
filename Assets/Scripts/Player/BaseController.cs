@@ -135,8 +135,8 @@ public class BaseController : NetworkBehaviour
         {
             NMA.Move(NMA.transform.position - prevPos);
             NMA.transform.position = NMA.nextPosition;
-            prevPos = NMA.transform.position;
         }
+        prevPos = NMA.transform.position;
     }
     public void SetPosition(Vector3 pos)
     {

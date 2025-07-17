@@ -225,9 +225,9 @@ public class PlayerController : BaseController
         if (NetworkOwner.isOwner)
         {
             PlayerManager.Instance.AddPlayer(info);
-            SetRecallPos();
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+            SetRecallPos();
         }
     }
 
@@ -237,17 +237,13 @@ public class PlayerController : BaseController
         if (t == null)
             return;
         Ref.R_recall.SetRecallPos(t);
-        transform.position = t.position;
-        transform.rotation = Quaternion.identity;
-        NMA.Warp(t.position);
-        NMA.transform.rotation = t.rotation;
     }
 
     public override void Start()
     {
         SetNetworkOwner();
-        StartCoroutine(StartLate());
         Ref.R_recall.Setup(this);
+        StartCoroutine(StartLate());
     }
     IEnumerator StartLate()
     {
@@ -277,6 +273,8 @@ public class PlayerController : BaseController
 
             GameState_Change(gameStateEnum.active);
             ChangeState(stateEnum.idle);
+
+            Ref.R_recall.Activate();
         }
     }
 
