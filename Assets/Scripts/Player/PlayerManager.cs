@@ -50,7 +50,7 @@ public class PlayerManager : MonoBehaviour
             {
                 main = null;
             }
-            else if (PC)
+            else if (PC && main)
                 main.RemoveFollower(PC);
         }
     }

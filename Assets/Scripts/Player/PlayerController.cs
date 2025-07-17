@@ -1198,9 +1198,45 @@ public class PlayerController : BaseController
             _tarPos /= PlayerManager.conversation.C_canvas.scaleFactor;
 
             RT_hitPoint.anchoredPosition = _tarPos;
+
+            HitObject HO;
+            Interactable I;
+            if (hit.collider.TryGetComponent<HitObject>(out HO))
+            {
+                if (!HO.RM_ragdollManager)
+                {
+                    reticle.ColorReticle(Reticle.colorEnum.none);
+                    return;
+                }
+                if (!HO.RM_ragdollManager.controller)
+                {
+                    reticle.ColorReticle(Reticle.colorEnum.none);
+                    return;
+                }
+                if (!HO.RM_ragdollManager.controller.info.b_alive)
+                {
+                    if (hit.distance <= 5)
+                        reticle.ColorReticle(Reticle.colorEnum.interactable);
+                    else
+                        reticle.ColorReticle(Reticle.colorEnum.none);
+                }
+                else if (HO.RM_ragdollManager.controller is PlayerController)
+                    reticle.ColorReticle(Reticle.colorEnum.ally);
+                else if (((AgentController)HO.RM_ragdollManager.controller).b_friendly)
+                    reticle.ColorReticle(Reticle.colorEnum.ally);
+                else
+                    reticle.ColorReticle(Reticle.colorEnum.enemy);
+            }
+            else if (hit.collider.TryGetComponent<Interactable>(out I) && hit.distance <= 5)
+            {
+                reticle.ColorReticle(Reticle.colorEnum.interactable);
+            }
+            else
+                reticle.ColorReticle(Reticle.colorEnum.none);
         }
         else
         {
+            reticle.ColorReticle(Reticle.colorEnum.none);
             RT_hitPoint.anchoredPosition = new Vector2(Screen.width / 2, Screen.height / 2) / PlayerManager.conversation.C_canvas.scaleFactor;
             T_aimPoint.position = Camera.main.transform.position + (Camera.main.transform.forward * (f_camDistance + 100.5f));
         }

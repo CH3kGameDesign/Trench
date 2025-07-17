@@ -180,6 +180,7 @@ public class GunClass : ItemClass
     }
     public void Fire(fireClass _fireVariables)
     {
+        G_gunModel.FireReady(false);
         _damage = _fireVariables.damage;
         i_burstRemaining = Mathf.Max(_fireVariables.burstAmount, 1);
         f_fireTimer = _fireVariables.fireRate;
@@ -197,6 +198,7 @@ public class GunClass : ItemClass
     {
         if (f_fireTimer <= 0)
         {
+            G_gunModel.FireReady(false);
             f_fireTimer = meleeVariables.fireRate;
             PM_player.reticle.UpdateRoundCount(this);
             PM_player.reticle.RotateReticle(f_fireTimer);
@@ -222,6 +224,7 @@ public class GunClass : ItemClass
     {
         if (f_fireTimer <= 0 && clipAmmo < clipVariables.clipSize)
         {
+            G_gunModel.FireReady(false);
             f_fireTimer = clipVariables.reloadSpeed;
             if (b_playerGun)
                 PM_player.reticle.ReloadReticle(f_fireTimer, this);
@@ -304,7 +307,10 @@ public class GunClass : ItemClass
             OnBullet(GO);
         }
         if (f_burstTimer > 0) f_burstTimer -= Time.deltaTime;
-        if (f_fireTimer > 0) f_fireTimer -= Time.deltaTime;
+        if (f_fireTimer > 0)
+            f_fireTimer -= Time.deltaTime;
+        else
+            G_gunModel.FireReady(true);
     }
 
     void BulletSpray(Bullet GO, float _maxSpray)

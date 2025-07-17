@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
+using static UnityEditor.Progress;
 
 public class Reticle : MonoBehaviour
 {
@@ -75,6 +77,46 @@ public class Reticle : MonoBehaviour
         c_rotate = StartCoroutine(RotateReticle_Coroutine(_duration, new Vector3(0, 0, 45),_gun));
     }
 
+    public enum colorEnum { none, enemy, ally, interactable}
+    colorEnum _active = colorEnum.none;
+    Coroutine C_colorCo = null;
+    public void ColorReticle(colorEnum _enum)
+    {
+        if (_active == _enum)
+            return;
+        _active = _enum;
+        Color32 _color = new Color32(0x23, 0x23, 0x23, 255);
+        switch (_enum)
+        {
+            case colorEnum.enemy: _color = new Color32(0xE4, 0x4F, 0x4C, 255); break;
+            case colorEnum.ally: _color = new Color32(0x28, 0x85, 0x27, 255); break;
+            case colorEnum.interactable: _color = new Color32(0xB0, 0x67, 0x00, 255); break;
+            default: break;
+        }
+        if (C_colorCo != null)
+            StopCoroutine(C_colorCo);
+        C_colorCo = StartCoroutine(ColorReticle_Co(_color));
+    }
+
+    IEnumerator ColorReticle_Co(Color _color, float _dur = 0.1f)
+    {
+        float _timer = 0;
+        Color _prev = I_Reticle.color;
+        Color _cur;
+        while (_timer < 1)
+        {
+            _cur = Color.Lerp(_prev, _color, _dur);
+            I_Reticle.color = _cur;
+            foreach (var item in TM_roundCounter)
+                item.color = _cur;
+
+            yield return new WaitForEndOfFrame();
+            _timer += Time.deltaTime / _dur;
+        }
+        I_Reticle.color = _color;
+        foreach (var item in TM_roundCounter)
+            item.color = _color;
+    }
     IEnumerator RotateReticle_Coroutine(float _duration, Vector3 _rot, GunClass _gun)
     {
         //I_Reticle.rectTransform.eulerAngles = new Vector3(0, 0, -45);

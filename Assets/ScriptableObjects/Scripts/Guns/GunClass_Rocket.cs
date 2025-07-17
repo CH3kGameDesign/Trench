@@ -12,6 +12,7 @@ public class GunClass_Rocket : GunClass
     private bool b_lockedOn = false;
     private Transform t_lockOnTarget;
     public string[] S_lockOnTags;
+    
     public override GunClass Clone()
     {
         GunClass_Rocket _temp = CreateInstance<GunClass_Rocket>();

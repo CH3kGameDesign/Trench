@@ -80,10 +80,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cdf8d9738ba9f645b03bfb007e50080, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _isSetup: 0
+  _prefabId: -2147483648
+  _componentIndex: -2147483648
+  _shouldBePooled: 0
+  _parent: {fileID: 0}
+  _invertedPathToNearestParent: 
+  _directChildren: []
+  _networkRules: {fileID: 0}
+  _visitiblityRules: {fileID: 0}
   T_barrelHook: {fileID: 33433170231428053}
   PS_muzzleFire: {fileID: 1762402057478176128}
   T_secondHandPoint: {fileID: 227719647147452886}
   T_secondElbowPoint: {fileID: 7588757385650121991}
+  G_activeOnFireReady:
+  - {fileID: 14055404949664517}
 --- !u!1 &5856450884452892015
 GameObject:
   m_ObjectHideFlags: 0
@@ -258,6 +269,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 11
       objectReference: {fileID: 0}
+    - target: {fileID: 1187909408505256769, guid: 111947176a8fe034a86071c52ba1931f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1385988922119310879, guid: 111947176a8fe034a86071c52ba1931f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.0286
@@ -299,6 +314,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 111947176a8fe034a86071c52ba1931f, type: 3}
+--- !u!1 &14055404949664517 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1187909408505256769, guid: 111947176a8fe034a86071c52ba1931f, type: 3}
+  m_PrefabInstance: {fileID: 1174773202262304836}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1713368409787551663 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 111947176a8fe034a86071c52ba1931f, type: 3}
