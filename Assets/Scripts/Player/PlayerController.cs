@@ -1531,7 +1531,10 @@ public class PlayerController : BaseController
         if (!isController)
             return;
         base.UpdateRoom(_bounds, _enter);
-        I_curRoom = _bounds.I_roomNum;
+
+        if (_bounds) I_curRoom = _bounds.I_roomNum;
+        else I_curRoom = -1;
+
         if (V_curVehicle == null)
             CheckReady(AttachToBound);
     }

@@ -283,7 +283,7 @@ public class BaseController : NetworkBehaviour
             //if (_V3ID.y >= LevelGen_Holder.Instance.List[_V3ID.x].LG_Blocks.Count) return;
             //if (_V3ID.z >= LevelGen_Holder.Instance.List[_V3ID.x].LG_Blocks[_V3ID.y].B_bounds.Count) return;
             //T = LevelGen_Holder.Instance.List[_V3ID.x].LG_Blocks[_V3ID.y].B_bounds[_V3ID.z].transform;
-            T = LevelGen_Holder.Instance.List[_V3ID.x].T_Holder;
+            T = LevelGen_Holder.Instance.List[V3ID.value.x].T_Holder;
         }
         RB.transform.parent = T;
     }

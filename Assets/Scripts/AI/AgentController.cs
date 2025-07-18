@@ -806,7 +806,10 @@ public class AgentController : BaseController
         if (I_curRoom <= -1)
         {
             base.UpdateRoom(_bounds, _enter);
-            I_curRoom = _bounds.I_roomNum;
+
+            if (_bounds) I_curRoom = _bounds.I_roomNum;
+            else I_curRoom = -1;
+
             if (V_curVehicle == null)
                 CheckReady(AttachToBound);
         }
@@ -820,7 +823,10 @@ public class AgentController : BaseController
                     break;
                 default:
                     base.UpdateRoom(_bounds, _enter);
-                    I_curRoom = _bounds.I_roomNum;
+
+                    if (_bounds) I_curRoom = _bounds.I_roomNum;
+                    else I_curRoom = -1;
+
                     if (V_curVehicle == null)
                         CheckReady(AttachToBound);
                     break;
