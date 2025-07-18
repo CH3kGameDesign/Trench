@@ -18,6 +18,8 @@ public class LevelGen_Holder : NetworkBehaviour
     public SyncVar<string> lastLandingSpot = new SyncVar<string>();
     public SyncVar<Themes.themeEnum> theme = new SyncVar<Themes.themeEnum>(Themes.themeEnum.none);
 
+    public SyncVar<int> I_value = new(0);
+
     public CanvasGroup CG_loadingScreen;
 
     bool _setup = false;
@@ -50,6 +52,7 @@ public class LevelGen_Holder : NetworkBehaviour
         Transforms.onChanged += UpdateNetworkTransforms;
         theme.onChanged += Setup;
         lastLandingSpot.onChanged += Setup;
+        I_value.onChanged += I_valueChanged;
 
 
         CG_loadingScreen.gameObject.SetActive(true);
@@ -79,6 +82,7 @@ public class LevelGen_Holder : NetworkBehaviour
         Transforms.onChanged -= UpdateNetworkTransforms;
         theme.onChanged -= Setup;
         lastLandingSpot.onChanged -= Setup;
+        I_value.onChanged -= I_valueChanged;
     }
 
     public int GetCollectedValue()
@@ -89,6 +93,21 @@ public class LevelGen_Holder : NetworkBehaviour
             _value += LG.GetCollectedValue();
         }
         return _value;
+    }
+
+    public void I_valueChanged(int _amt) { CheckReady(UpdateCollectedValueDisplay); }
+    public void UpdateCollectedValueDisplay()
+    {
+        foreach (var LG in List)
+        {
+            foreach (var block in LG.LG_Blocks)
+            {
+                foreach (var point in block.TP_TreasurePoints)
+                {
+                    point.DisplayPoints(I_value.value);
+                }
+            }
+        }
     }
 
     [ObserversRpc]

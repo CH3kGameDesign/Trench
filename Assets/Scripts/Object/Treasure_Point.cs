@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using PurrNet;
 
 public class Treasure_Point : MonoBehaviour
 {
@@ -38,10 +39,20 @@ public class Treasure_Point : MonoBehaviour
 
     public void UpdatePoints(int _value)
     {
+        if (!NetworkManager.main.isHost)
+            return;
+        int _new = LevelGen_Holder.Instance.I_value.value;
+        _new -= I_value;
         I_value = Mathf.Max(0, I_value + _value);
+        _new += I_value;
+        LevelGen_Holder.Instance.I_value.value = _new;
+    }
+
+    public void DisplayPoints(int _amt)
+    {
         if (_sizeCoroutine != null)
             StopCoroutine(_sizeCoroutine);
-        _sizeCoroutine = StartCoroutine(C_ValueChange(I_value));
+        _sizeCoroutine = StartCoroutine(C_ValueChange(_amt));
     }
 
     private void OnTriggerEnter(Collider other)
@@ -49,11 +60,13 @@ public class Treasure_Point : MonoBehaviour
         Treasure _temp;
         if (other.TryGetComponent<Treasure>(out _temp))
         {
+            if (!_temp.networkTreasure.isController)
+                return;
             if (!t_treasure.Contains(_temp))
             {
                 t_treasure.Add(_temp);
                 PlayerManager.main.Update_Objectives(Objective_Type.Collect_Value, _temp.I_value);
-                other.gameObject.SetActive(false);
+                Destroy(other.gameObject);
                 UpdatePoints(_temp.I_value);
             }
         }
@@ -63,6 +76,8 @@ public class Treasure_Point : MonoBehaviour
             if (_HO.RM_ragdollManager != null)
             {
                 RagdollManager RM = _HO.RM_ragdollManager;
+                if (!RM.isController)
+                    return;
                 if (RM.controller.info.F_curHealth <= 0)
                 {
                     if (RM.controller is PlayerController)
