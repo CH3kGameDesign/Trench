@@ -9,9 +9,9 @@ public class Interactable : MonoBehaviour
     public enum enumType { interact, talk, landing, combine, combineReverse, input}
     public static string[] interactText =
     {
-        "Press [0] to interact with [1]",
-        "Press [0] to talk to [1]",
-        "Press [0] to land at [1]",
+        "[0] interact\n<b>[1]</b>",
+        "[0] talk\n<b>[1]</b>",
+        "[0] land\n<b>[1]</b>",
         "[0] [1]",
         "[1] [0]",
         "[0]"

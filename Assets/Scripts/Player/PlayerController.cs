@@ -685,7 +685,7 @@ public class PlayerController : BaseController
                     if (_bc != BC_curBaseController && _bc.info.F_curHealth <= 0)
                     {
                         BC_curBaseController = _bc;
-                        string _temp = _bc.name.ToString_Input(inputActions.Interact, Ref.TM_interactText, Interactable.enumType.interact);
+                        string _temp = _bc.GetName().ToString_Input(inputActions.Interact, Ref.TM_interactText, Interactable.enumType.interact);
                         Ref.TM_interactText.gameObject.SetActive(true);
                         Ref.TM_interactText.text = _temp;
 
