@@ -833,11 +833,6 @@ public class AgentController : BaseController
             }
         }
     }
-    public IEnumerator ChangeState(stateEnum _state, float _timer)
-    {
-        yield return new WaitForSeconds(_timer);
-        ChangeState(_state);
-    }
     public void AssignTarget_Attack(PlayerController _con, bool _force = false)
     {
         if (attackTarget.Check() && !_force)

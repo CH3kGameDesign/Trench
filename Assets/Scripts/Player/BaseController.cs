@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.InputSystem.XR;
 
 [RequireComponent(typeof(BaseInfo))]
 public class BaseController : NetworkBehaviour
@@ -55,6 +56,12 @@ public class BaseController : NetworkBehaviour
         vehicle = -2,
         unchanged = -10
     };
+    public IEnumerator ChangeState(stateEnum _state, float _timer)
+    {
+        yield return new WaitForSeconds(_timer);
+        ChangeState(_state);
+    }
+
     public virtual void ChangeState(stateEnum _state, bool _force = false)
     {
         if (_state == stateEnum.unchanged ||

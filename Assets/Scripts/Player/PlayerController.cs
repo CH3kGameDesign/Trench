@@ -1266,14 +1266,46 @@ public class PlayerController : BaseController
 
     public override void OnHit(GunManager.bulletClass _bullet)
     {
-        if (_bullet.B_player && !_bullet.D_damageType.isSelfHittable())
+        if (_bullet.con_Player == this && !_bullet.D_damageType.isSelfHittable())
             return;
+
+        if (_bullet.ragdollHitTimer > 0 && state != stateEnum.ragdoll)
+            Ragdoll(_bullet.ragdollHitTimer);
+        if (_bullet.pushBackForce > 0)
+        {
+            Vector3 dir;
+            if (_bullet.B_player) dir = _bullet.con_Player.NMA.transform.forward;
+            else dir = _bullet.con_Agent.NMA.transform.forward;
+            dir *= _bullet.pushBackForce;
+            dir += Vector3.up;
+            if (owner != null)
+                Push((PlayerID)owner, dir);
+        }
+
         info.Hurt(_bullet.F_damage);
 
         AggroAllies(_bullet);
         AH_agentAudioHolder.Play(AgentAudioHolder.type.hurt);
 
         base.OnHit(_bullet);
+    }
+
+    [ObserversRpc]
+    void Ragdoll(float _ragdollHitTimer)
+    {
+        StartCoroutine(ChangeState(state, _ragdollHitTimer));
+        ChangeState(stateEnum.ragdoll);
+    }
+    [TargetRpc]
+    void Push(PlayerID _player, Vector3 _dir)
+    {
+        if (state != stateEnum.ragdoll)
+        {
+            GroundedUpdate(false);
+            RB.AddForce(_dir, ForceMode.VelocityChange);
+        }
+        else
+            RM_ragdoll.RB_rigidbodies[0].AddForce(_dir, ForceMode.VelocityChange);
     }
 
     void AggroAllies(GunManager.bulletClass _bullet)
