@@ -311,6 +311,12 @@ public class AgentController : BaseController
     public override void Start()
     {
         base.Start();
+    }
+
+    protected override void OnSpawned()
+    {
+        base.OnSpawned();
+        if (!isController) return;
         C_character = Relationship.Instance.GetCharacterFromID(S_characterID);
         ChangeState(state);
 
@@ -322,6 +328,8 @@ public class AgentController : BaseController
 
         if (DEBUG_FollowPlayerImmediately)
             PlayerManager.Instance.FollowPlayer(this, b_friendly);
+        Coroutine_Relationship = StartCoroutine(UpdateIsFriendly());
+        Coroutine_Target = StartCoroutine(UpdateTarget());
     }
 
     void NavSurface_Update(bool _override = false)
@@ -340,19 +348,25 @@ public class AgentController : BaseController
         }
     }
 
-    private void OnEnable()
+    protected override void OnEnable()
     {
-        Coroutine_Relationship = StartCoroutine(UpdateIsFriendly());
-        Coroutine_Target = StartCoroutine(UpdateTarget());
+        base.OnEnable();
     }
-    private void OnDisable()
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+    }
+    protected override void OnDestroy()
     {
         StopAllCoroutines();
+        base.OnDestroy();
     }
 
     // Update is called once per frame
     public override void Update()
     {
+        if (!isController)
+            return;
         switch (state)
         {
             case stateEnum.idle:
@@ -570,6 +584,8 @@ public class AgentController : BaseController
 
     bool FireManager()
     {
+        if (!gun_Equipped)
+            return false;
         Vector3 _tarPos;
         bool _firing = false;
         bool _startShot = false;
@@ -785,12 +801,14 @@ public class AgentController : BaseController
     }
     public override void UpdateRoom(LevelGen_Bounds _bounds, bool _enter = true)
     {
+        if (!isController)
+            return;
         if (I_curRoom <= -1)
         {
             base.UpdateRoom(_bounds, _enter);
             I_curRoom = _bounds.I_roomNum;
             if (V_curVehicle == null)
-                AttachToBound();
+                CheckReady(AttachToBound);
         }
         else
         {
@@ -804,7 +822,7 @@ public class AgentController : BaseController
                     base.UpdateRoom(_bounds, _enter);
                     I_curRoom = _bounds.I_roomNum;
                     if (V_curVehicle == null)
-                        AttachToBound();
+                        CheckReady(AttachToBound);
                     break;
             }
         }

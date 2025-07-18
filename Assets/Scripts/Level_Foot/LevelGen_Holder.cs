@@ -260,7 +260,19 @@ public class LevelGen_Holder : NetworkBehaviour
         isReady = true;
 
         playerSpawner.canSpawn = true;
+        onReadyEvent?.Invoke();
         StartCoroutine(FadeLoadingScreen());
+    }
+
+
+    public delegate void OnReadyEvent();
+    public event OnReadyEvent onReadyEvent;
+    public void CheckReady(OnReadyEvent _event)
+    {
+        if (!isReady)
+            onReadyEvent += _event;
+        else
+            _event.Invoke();
     }
 
     IEnumerator FadeLoadingScreen(float _dur = 1f)

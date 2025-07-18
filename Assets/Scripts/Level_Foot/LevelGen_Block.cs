@@ -48,11 +48,11 @@ public class LevelGen_Block : MonoBehaviour
         TP_TreasurePoints = GetComponentsInChildren<Treasure_Point>();
     }
 
-    public void Setup(int roomNum)
+    public void Setup(int levelGenNum, int roomNum)
     {
         I_roomNum = roomNum;
-        foreach (var item in B_bounds)
-            item.I_roomNum = roomNum;
+        for (int i = 0; i < B_bounds.Count; i++)
+            B_bounds[i].SetID(new Vector3Int(levelGenNum, roomNum, i));
     }
 
     public void UpdateBoundingBox()

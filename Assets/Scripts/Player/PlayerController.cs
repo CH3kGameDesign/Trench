@@ -241,6 +241,7 @@ public class PlayerController : BaseController
 
     public override void Start()
     {
+        base.Start();
         SetNetworkOwner();
         Ref.R_recall.Setup(this);
         StartCoroutine(StartLate());
@@ -251,7 +252,6 @@ public class PlayerController : BaseController
             yield return new WaitForEndOfFrame();
         if (PlayerManager.main == this)
         {
-            base.Start();
             Ref.HUI_health.Setup(this);
             Ref.GUI_gun.Setup(this);
             v3_camDir = T_camHolder.localEulerAngles;
@@ -1462,9 +1462,10 @@ public class PlayerController : BaseController
         Ref.GUI_gun.UpdateClip(gun_Equipped);
     }
     
-    protected void OnDisable()
+    protected override void OnDisable()
     {
         PlayerManager.Instance.RemovePlayer(info);
+        base.OnDisable();
     }
 
     public void SetNetworkOwner()
@@ -1527,20 +1528,30 @@ public class PlayerController : BaseController
 
     public override void UpdateRoom(LevelGen_Bounds _bounds, bool _enter = true)
     {
+        if (!isController)
+            return;
         base.UpdateRoom(_bounds, _enter);
         I_curRoom = _bounds.I_roomNum;
         if (V_curVehicle == null)
-            AttachToBound();
+            CheckReady(AttachToBound);
     }
     public override void AttachToBound()
     {
+        if (!isController) return;
         if (LGB_curBounds != null)
         {
-            RB.transform.parent = LGB_curBounds.transform;
-            T_camHolder.parent = LGB_curBounds.transform;
+            V3ID.value = LGB_curBounds.V3ID;
+
+            //RB.transform.parent = LGB_curBounds.transform;
+            //T_camHolder.parent = LGB_curBounds.transform;
+            Transform T = LevelGen_Holder.Instance.List[V3ID.value.x].T_Holder;
+            RB.transform.parent = T;
+            T_camHolder.parent = T;
         }
         else
         {
+            V3ID.value = Vector3Int.left;
+
             RB.transform.parent = transform;
             T_camHolder.parent = transform;
         }
@@ -1548,6 +1559,7 @@ public class PlayerController : BaseController
     }
     public override void AttachToBound(Transform T)
     {
+        if (!isController) return;
         RB.transform.parent = T;
         T_camHolder.parent = transform;
         _lastOffset = T_camHolder.parent.rotation;

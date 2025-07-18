@@ -1,4 +1,6 @@
 using PurrNet;
+using PurrNet.Packing;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -39,6 +41,10 @@ public class BaseController : NetworkBehaviour
     [Header("Animations")]
     public NetworkAnimator A_model;
     [HideInInspector]public Vector2 v2_animMove = Vector2.zero;
+
+    public SyncVar<Vector3Int> V3ID = new (Vector3Int.left,0,true);
+
+    protected bool isReady = false;
 
     public stateEnum state = stateEnum.protect;
     public enum stateEnum
@@ -122,6 +128,8 @@ public class BaseController : NetworkBehaviour
         info = GetComponent<BaseInfo>();
         NMA.updatePosition = false;
         prevPos = NMA.transform.position;
+        V3ID.onChanged += AttachToBound;
+        //NT_agent.onParentEvent += AttachToBound;
     }
 
     public virtual void Start()
@@ -147,6 +155,24 @@ public class BaseController : NetworkBehaviour
     public virtual void FixedUpdate()
     {
         
+    }
+    protected override void OnSpawned()
+    {
+        base.OnSpawned();
+        isReady = true;
+        onReadyEvent?.Invoke();
+    }
+    protected virtual void OnEnable()
+    {
+    }
+    protected virtual void OnDisable()
+    {
+    }
+    protected override void OnDestroy()
+    {
+        V3ID.onChanged -= AttachToBound;
+        //NT_agent.onParentEvent -= AttachToBound;
+        base.OnDestroy();
     }
 
     public virtual void OnHit(GunManager.bulletClass _bullet)
@@ -221,17 +247,44 @@ public class BaseController : NetworkBehaviour
 
     public virtual void AttachToBound()
     {
+        if (!isController) return;
         if (LGB_curBounds != null)
         {
-            RB.transform.parent = LGB_curBounds.transform;
+            V3ID.value = LGB_curBounds.V3ID;
+            //RB.transform.parent = LGB_curBounds.transform;
+            RB.transform.parent = LevelGen_Holder.Instance.List[V3ID.value.x].T_Holder;
         }
         else
         {
+            V3ID.value = Vector3Int.left;
             RB.transform.parent = transform;
         }
     }
     public virtual void AttachToBound(Transform T)
     {
+        if (!isController) return;
+        RB.transform.parent = T;
+    }
+
+    public void AttachToBound(Vector3Int _V3ID)
+    {
+        if (isController)
+           return;
+        LevelGen_Holder.Instance.CheckReady(AttachToBound_Obs);
+    }
+    public void AttachToBound_Obs()
+    {
+        Transform T = transform;
+        Vector3Int _V3ID = V3ID.value;
+        ///Vector3Int _V3ID = NT_agent.V3ID;
+        if (_V3ID.x >= 0)
+        {
+            if (_V3ID.x >= LevelGen_Holder.Instance.List.Count) return;
+            //if (_V3ID.y >= LevelGen_Holder.Instance.List[_V3ID.x].LG_Blocks.Count) return;
+            //if (_V3ID.z >= LevelGen_Holder.Instance.List[_V3ID.x].LG_Blocks[_V3ID.y].B_bounds.Count) return;
+            //T = LevelGen_Holder.Instance.List[_V3ID.x].LG_Blocks[_V3ID.y].B_bounds[_V3ID.z].transform;
+            T = LevelGen_Holder.Instance.List[_V3ID.x].T_Holder;
+        }
         RB.transform.parent = T;
     }
 
@@ -258,5 +311,14 @@ public class BaseController : NetworkBehaviour
     public virtual void Weapon_Fired()
     {
 
+    }
+    public delegate void OnReadyEvent();
+    public event OnReadyEvent onReadyEvent;
+    public void CheckReady(OnReadyEvent _event)
+    {
+        if (!isReady)
+            onReadyEvent += _event;
+        else
+            _event.Invoke();
     }
 }

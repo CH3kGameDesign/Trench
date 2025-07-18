@@ -3974,7 +3974,7 @@ GameObject:
   - component: {fileID: 748759331089592094}
   - component: {fileID: 5634573469513103511}
   - component: {fileID: 26762560937256653}
-  - component: {fileID: 909895355018480432}
+  - component: {fileID: 9146513229761340059}
   m_Layer: 3
   m_Name: Mover
   m_TagString: Player
@@ -4096,7 +4096,7 @@ MonoBehaviour:
   - type: 1
     name: isKinematic
   _ownerAuth: 1
---- !u!114 &909895355018480432
+--- !u!114 &9146513229761340059
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4117,8 +4117,8 @@ MonoBehaviour:
   _directChildren: []
   _networkRules: {fileID: 0}
   _visitiblityRules: {fileID: 0}
-  _syncPosition: 1
-  _syncRotation: 1
+  _syncPosition: 2
+  _syncRotation: 2
   _syncScale: 1
   _syncParent: 0
   _interpolateSettings: 7
@@ -5395,6 +5395,7 @@ MonoBehaviour:
   followers: []
   A_model: {fileID: 8877287654793028688}
   v2_animMove: {x: 0, y: 0}
+  NT_agent: {fileID: 0}
   state: 0
   GameState: 1
   gunManager: {fileID: 11400000, guid: 1e3b59fdefa93a743beff3357901afa0, type: 2}

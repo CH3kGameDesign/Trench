@@ -19,6 +19,6 @@ public class AgentLocation : MonoBehaviour
     {
         LevelGen_Bounds LGB;
         if (other.TryGetComponent<LevelGen_Bounds>(out LGB))
-            RM.controller.UpdateRoom(LGB);
+            RM.controller.CheckReady(delegate { RM.controller.UpdateRoom(LGB); });
     }
 }

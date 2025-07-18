@@ -25,7 +25,7 @@ public class LevelGen : MonoBehaviour
 
     private NavMeshSurface[] nm_Surfaces;
 
-    private List<LevelGen_Block> LG_Blocks = new List<LevelGen_Block>();
+    [HideInInspector] public List<LevelGen_Block> LG_Blocks = new List<LevelGen_Block>();
 
     [HideInInspector] public List<AgentController> AC_agents = new List<AgentController>();
 
@@ -221,8 +221,9 @@ public class LevelGen : MonoBehaviour
                         Random_Seeded.NextInt();
                         if (prefab != null)
                         {
-                            GO = Instantiate(prefab, spawn.transform.position, Quaternion.Euler(Vector3.zero), transform);
+                            GO = Instantiate(prefab);
                             AgentController AC = GO.GetComponent<AgentController>();
+                            AC.NMA.transform.position = spawn.transform.position;
                             AC.NMA.transform.rotation = spawn.transform.rotation;
                             AC.ChangeState(spawn._state);
                             AC_agents.Add(AC);
@@ -237,8 +238,9 @@ public class LevelGen : MonoBehaviour
                         Random_Seeded.NextInt();
                         if (prefab != null)
                         {
-                            GO = Instantiate(prefab, spawn.transform.position, Quaternion.Euler(Vector3.zero), transform);
+                            GO = Instantiate(prefab);
                             AgentController AC = GO.GetComponent<AgentController>();
+                            AC.NMA.transform.position = spawn.transform.position;
                             AC.NMA.transform.rotation = spawn.transform.rotation;
                             AC.ChangeState(spawn._state);
                             AC_agents.Add(AC);
@@ -333,7 +335,7 @@ public class LevelGen : MonoBehaviour
         LevelGen_Block _temp = Instantiate(_prefab, _holder);
         _temp.transform.localPosition = Vector3.zero;
 
-        _temp.Setup(LG_Blocks.Count);
+        _temp.Setup(id, LG_Blocks.Count);
         LG_Blocks.Add(_temp);
         foreach (var bound in _temp.B_bounds)
             bound.B_Bounds.enabled = true;
@@ -379,7 +381,7 @@ public class LevelGen : MonoBehaviour
                 {
                     entry.OnConnect();
 
-                    _temp.Setup(LG_Blocks.Count);
+                    _temp.Setup(id, LG_Blocks.Count);
                     LG_Blocks.Add(_temp);
                     foreach (var bound in _temp.B_bounds)
                         bound.B_Bounds.enabled = true;
@@ -450,7 +452,7 @@ public class LevelGen : MonoBehaviour
                 else
                 {
                     entry.OnConnect();
-                    _temp.Setup(LG_Blocks.Count);
+                    _temp.Setup(id, LG_Blocks.Count);
                     LG_Blocks.Add(_temp);
                     foreach (var bound in _temp.B_bounds)
                         bound.B_Bounds.enabled = true;
