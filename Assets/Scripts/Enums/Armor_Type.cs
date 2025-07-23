@@ -4,6 +4,7 @@ public enum Armor_Type
 {
 	[Description ("Empty")]	[InspectorName ("Helmet/Empty")]	Helmet_Empty,
 	[Description ("Basic")]	[InspectorName ("Helmet/Basic")]	Helmet_Basic,
+	[Description ("Conscript")]	[InspectorName ("Helmet/Conscript")]	Helmet_Conscript,
 	[Description ("DayDreamer")]	[InspectorName ("Helmet/DayDreamer")]	Helmet_DayDreamer,
 	[Description ("ion")]	[InspectorName ("Helmet/ion")]	Helmet_ion,
 	[Description ("RangeFinder")]	[InspectorName ("Helmet/RangeFinder")]	Helmet_RangeFinder,

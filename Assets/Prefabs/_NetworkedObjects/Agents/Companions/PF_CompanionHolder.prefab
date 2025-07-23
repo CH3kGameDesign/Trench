@@ -103,7 +103,7 @@ MonoBehaviour:
     _value: 0
     _ownerAuth: 1
     _sendIntervalInSeconds: 0
-  equippedArmor: 01000000080000000c0000000c0000000f00000012000000
+  equippedArmor: 03000000090000000d0000000d0000001000000013000000
 --- !u!114 &943015360836498631
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -150,7 +150,10 @@ MonoBehaviour:
   followers: []
   A_model: {fileID: 3727426164504592449}
   v2_animMove: {x: 0, y: 0}
-  NT_agent: {fileID: 0}
+  V3ID:
+    _value: {x: -1, y: 0, z: 0}
+    _ownerAuth: 1
+    _sendIntervalInSeconds: 0
   state: 3
   gunManager: {fileID: 11400000, guid: 1e3b59fdefa93a743beff3357901afa0, type: 2}
   fieldOfView: {fileID: 8741451782662131216}
@@ -1380,7 +1383,7 @@ PrefabInstance:
     - target: {fileID: 1033819419569506346, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 39ac215caf749a244b46aba77888db3b, type: 2}
+      objectReference: {fileID: 2100000, guid: ed43aef2373e27547901642020d7155f, type: 2}
     - target: {fileID: 4762503887113182293, guid: 5bfabb9f2edc3b54f87c398abb78cd5e, type: 3}
       propertyPath: m_Name
       value: PF_Mannequin

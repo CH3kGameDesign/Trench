@@ -18,6 +18,7 @@ public class Camera_MainMenu : MonoBehaviour
     public pointClass Main;
     public pointClass Lobby;
     public pointClass Search;
+    public pointClass Settings;
     [Space(10)]
     public Playlist P_playlist;
     public AgentAudioHolder AudioHolder;
@@ -55,7 +56,7 @@ public class Camera_MainMenu : MonoBehaviour
         }
     }
     private pointClass activePoint = null;
-    public enum points {main, lobby, search};
+    public enum points {main, lobby, search, settings};
 
     private Coroutine C_move = null;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -89,6 +90,7 @@ public class Camera_MainMenu : MonoBehaviour
             case points.main: MoveTo(Main); break;
             case points.lobby: MoveTo(Lobby); break;
             case points.search: MoveTo(Search); break;
+            case points.settings: MoveTo(Settings); break;
             default: break;
         }
     }

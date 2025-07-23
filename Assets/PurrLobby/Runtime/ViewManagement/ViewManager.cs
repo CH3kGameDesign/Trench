@@ -102,6 +102,10 @@ namespace PurrLobby
         {
             ShowView<MainMenuView>();
         }
+        public void OnSettingsClicked()
+        {
+            ShowView<SettingsView>();
+        }
 
         #endregion
     }

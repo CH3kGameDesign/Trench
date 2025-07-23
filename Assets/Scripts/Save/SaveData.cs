@@ -16,7 +16,7 @@ public static class SaveData
 
     public static Armor_Type[] equippedArmor = new Armor_Type[]
     {
-        Armor_Type.Helmet_Basic,
+        Armor_Type.Helmet_Conscript,
         Armor_Type.Chest_Basic,
         Armor_Type.Arm_Basic,
         Armor_Type.Arm_Basic,
@@ -32,6 +32,19 @@ public static class SaveData
         Gun_Type.gun_Rod,
         Gun_Type.gun_Rocket
     };
+
+    public static settingsClass settings = new settingsClass();
+    [System.Serializable]
+    public class settingsClass
+    {
+        public int windowType = 0;
+
+        public int sensitivityMouse = 50;
+        public int sensitivityController = 50;
+
+        public int audioMusic = 80;
+        public int audioSFX = 80;
+    }
 
     public static ArmorManager.SetClass equippedArmorSet = new ArmorManager.SetClass();
 

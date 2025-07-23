@@ -79,7 +79,16 @@ public class LobbyStartHandler : MonoBehaviour
         Camera_MainMenu.Instance.MoveTo(Camera_MainMenu.points.main);
         HidePlayers();
     }
-
+    public void Settings()
+    {
+        VW.OnSettingsClicked();
+        Camera_MainMenu.Instance.MoveTo(Camera_MainMenu.points.settings);
+    }
+    public void Back()
+    {
+        VW.OnRoomLeft();
+        Camera_MainMenu.Instance.MoveTo(Camera_MainMenu.points.main);
+    }
     public void LobbyUpdate(Lobby _lobby)
     {
         UpdatePlayers(_lobby.Members);

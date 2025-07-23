@@ -22,6 +22,7 @@ public class MainMenu : MonoBehaviour
     public mainRefClass main;
     public customizeRefClass customize;
     public panelRefClass load;
+    public panelRefClass settings;
     public storeRefClass store;
     [Space(10)]
     public inputRefClass input;
@@ -38,7 +39,7 @@ public class MainMenu : MonoBehaviour
     public GameObject PF_equipParticle;
 
     private panelEnum openedPanel = panelEnum.main;
-    public enum panelEnum { main, customize, store, load}
+    public enum panelEnum { main, customize, store, load, settings}
 
     [System.Serializable]
     public class panelRefClass
@@ -318,6 +319,7 @@ public class MainMenu : MonoBehaviour
         customize._anim.SetBool("Open", customize == GO);
         load._anim.SetBool("Open", load == GO);
         store._anim.SetBool("Open", store == GO);
+        settings._anim.SetBool("Open", settings == GO);
 
         if (GO._anim.GetCurrentAnimatorClipInfo(0)[0].clip.name == "Close")
             GO._anim.PlayClip("Open");
@@ -446,7 +448,12 @@ public class MainMenu : MonoBehaviour
         SwitchTo(load);
     }
     #endregion
-
+    #region Settings
+    public void SettingsButton()
+    {
+        SwitchTo(settings);
+    }
+    #endregion
     #region General
     public void Menu_Tapped()
     {
@@ -464,6 +471,7 @@ public class MainMenu : MonoBehaviour
             case panelEnum.customize: Open(customize, 1f); break;
             case panelEnum.store: Open(store, 1f); break;
             case panelEnum.load: Open(load); break;
+            case panelEnum.settings: Open(settings); break;
             default: Open(main); break;
         }
     }

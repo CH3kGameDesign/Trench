@@ -49,6 +49,8 @@ public class PlayerController : BaseController
     public float F_camAimRotSpeed = 80f;
     public float F_camSprintRotSpeed = 80f;
 
+    float f_camSensitivity = 1f;
+
     private float f_camDistance = 5;
     public Camera C_camera;
     public Transform T_camHolder;
@@ -1018,7 +1020,7 @@ public class PlayerController : BaseController
             else if (b_isSprinting) _mult *= F_camSprintRotSpeed;
             else _mult *= F_camRotSpeed;
             if (AutoAim()) _mult *= autoAim.slowMultiplier;
-            v3_camDir += new Vector3(-Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0) * _mult;
+            v3_camDir += new Vector3(-Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0) * _mult * f_camSensitivity;
 
             v3_camDir.x = Mathf.Clamp(v3_camDir.x, -80, 80);
 
@@ -1685,7 +1687,17 @@ public class PlayerController : BaseController
             MainMenu.Instance.GamepadSwitch();
             Ref.R_recall.TextUpdate();
             Ref.GUI_gun.UpdateControl();
+
+            UpdateSensitivity();
         }
+    }
+
+    public void UpdateSensitivity()
+    {
+        float _temp;
+        if (Inputs.b_isGamepad) _temp = SaveData.settings.sensitivityController;
+        else _temp = SaveData.settings.sensitivityMouse;
+        f_camSensitivity = _temp / 50;
     }
 
     bool Input_GetPressed(InputAction.CallbackContext cxt)
