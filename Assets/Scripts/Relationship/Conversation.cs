@@ -462,7 +462,7 @@ public class Conversation : MonoBehaviour
     {
         Transform _target = _message.T_Hook;
         SS_MessageObject _holder = GameObject.Instantiate(PF_messagePrefab, RT_messageHolder);
-        _holder.Setup(S_messageSprite, _target, C_canvas, false);
+        _holder.Setup(S_messageSprite, _target, C_canvas, "", false);
         float _lifetime = _message.F_lifetime;
         float _timer = 0;
         float _delay = _message.S_Message.speed;

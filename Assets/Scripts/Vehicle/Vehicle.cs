@@ -187,4 +187,14 @@ using UnityEngine;
         }
         return false;
     }
+
+    public virtual void YRotLoop(float _adjust)
+    {
+
+    }
+
+    public virtual Vector3 GetLocalVelocity()
+    {
+        return Vector3.zero;
+    }
 }

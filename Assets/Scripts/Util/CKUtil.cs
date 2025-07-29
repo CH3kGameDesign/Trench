@@ -3,13 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.ProBuilder.Shapes;
 using UnityEngine.Rendering;
-using UnityEngine.UI;
-using UnityEngine.Windows;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -415,7 +411,7 @@ public static class CKUtil
         _anim.Play(_name);
     }
 
-    public static void FollowObject(this RectTransform _holder, Canvas C_canvas, Transform _target)
+    public static bool FollowObject(this RectTransform _holder, Canvas C_canvas, Transform _target)
     {
         Vector3 _tarPos = Camera.main.WorldToScreenPoint(_target.position);
 
@@ -424,6 +420,12 @@ public static class CKUtil
         Vector2 _size = _holder.sizeDelta / 2;
         Vector2 _xBounds = new Vector2(_size.x, (Screen.width / C_canvas.scaleFactor) - _size.x);
         Vector2 _yBounds = new Vector2(_size.y, (Screen.height / C_canvas.scaleFactor) - _size.y);
+
+        bool _offscreen =
+            _tarPos.x < _xBounds.x ||
+            _tarPos.x > _xBounds.y ||
+            _tarPos.y < _yBounds.x ||
+            _tarPos.y > _yBounds.y;
 
         _tarPos.x = Mathf.Clamp(_tarPos.x, _xBounds.x, _xBounds.y);
         _tarPos.y = Mathf.Clamp(_tarPos.y, _yBounds.x, _yBounds.y);
@@ -444,9 +446,11 @@ public static class CKUtil
                 if (_tarPos.y > Screen.height / 2) _tarPos.y = _yBounds.y;
                 else _tarPos.y = _yBounds.x;
             }
+            _offscreen = true;
         }
 
         _holder.anchoredPosition = _tarPos;
+        return _offscreen;
     }
     public static void DeleteChildren (this Transform _transform, bool _immediate = false)
     {

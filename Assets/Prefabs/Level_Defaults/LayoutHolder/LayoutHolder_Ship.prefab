@@ -97,6 +97,7 @@ MonoBehaviour:
   decelerationMultiplier: 4
   handbrakeDriftMultiplier: 5
   bodyMassCenter: {x: 0, y: 0, z: 0}
+  F_turnDeadzone: {x: 15, y: 360}
   useEffects: 1
   RLWParticleSystem: {fileID: 4214053375551267795}
   RRWParticleSystem: {fileID: 3883409929786433902}
@@ -104,6 +105,7 @@ MonoBehaviour:
   RRWTireSkid: {fileID: 8712030164424514335}
   useUI: 0
   carSpeedText: {fileID: 0}
+  maxThrottleBarSpeed: 180
   useSounds: 1
   carEngineSound: {fileID: 2815340743902057407}
   tireScreechSound: {fileID: 4985660864726977084}

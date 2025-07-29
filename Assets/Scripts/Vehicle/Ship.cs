@@ -44,7 +44,8 @@ public class Ship : Vehicle
                                    // in the points x = 0 and z = 0 of your car. You can select the value that you want in the y axis,
                                    // however, you must notice that the higher this value is, the more unstable the car becomes.
                                    // Usually the y value goes from 0 to 1.5.
-
+    [Space(10)]
+    public Vector2 F_turnDeadzone = new Vector2(20,40);
 
 
     //PARTICLE SYSTEMS
@@ -72,6 +73,7 @@ public class Ship : Vehicle
     //The following variable lets you to set up a UI text to display the speed of your car.
     public bool useUI = false;
     public Text carSpeedText; // Used to store the UI object that is going to show the speed of the car.
+    public int maxThrottleBarSpeed = 180; //The maximum speed that the car can reach in km/h.
 
     //SOUNDS
 
@@ -107,7 +109,10 @@ public class Ship : Vehicle
     float throttleAxis; // Used to know whether the throttle has reached the maximum value. It goes from -1 to 1.
     float driftingAxis;
     float localVelocityZ;
+    float localVelocityY;
     float localVelocityX;
+    Quaternion tarRotation;
+    float rotAngle = 0;
     bool deceleratingCar;
     bool touchControlsSetup = false;
     /*
@@ -134,7 +139,7 @@ public class Ship : Vehicle
         //in the inspector.
         carRigidbody = gameObject.GetComponent<Rigidbody>();
         carRigidbody.centerOfMass = bodyMassCenter;
-
+        tarRotation = transform.rotation;
 
         // We save the initial pitch of the car engine sound.
         if (carEngineSound != null)
@@ -261,7 +266,8 @@ public class Ship : Vehicle
         if (_player is PlayerController)
         {
             PlayerController _temp = _player as PlayerController;
-            Update_Rotation(_temp);
+            _temp.F_vehicleCamMult = Update_Rotation(_temp);
+            _temp.UpdateVehicleUI(localVelocityZ, maxThrottleBarSpeed);
         }
     }
 
@@ -277,6 +283,10 @@ public class Ship : Vehicle
             carEngineSound.Stop();
         base.OnExit(_num);
     }
+    public override Vector3 GetLocalVelocity()
+    {
+        return new Vector3(localVelocityX, localVelocityY, localVelocityZ);
+    }
 
     // Update is called once per frame
     public override void Update()
@@ -291,6 +301,7 @@ public class Ship : Vehicle
         localVelocityX = T_pilotSeat.InverseTransformDirection(carRigidbody.linearVelocity).x;
         // Save the local velocity of the car in the z axis. Used to know if the car is going forward or backwards.
         localVelocityZ = T_pilotSeat.InverseTransformDirection(carRigidbody.linearVelocity).z;
+        localVelocityY = T_pilotSeat.InverseTransformDirection(carRigidbody.linearVelocity).y;
 
         bool _driver = false;
         for (int i = 0; i < SeatInUse.Count; i++)
@@ -307,15 +318,34 @@ public class Ship : Vehicle
         base.Update();
     }
 
-    void Update_Rotation(PlayerController _player)
+    Vector3 _curRot = Vector3.zero;
+    float Update_Rotation(PlayerController _player)
     {
         Vector3 _tarRot = _player.v3_camDir;
         _tarRot.x = Mathf.Clamp(_tarRot.x, downXLimit, upXLimit);
         Quaternion _target = Quaternion.Euler(_tarRot) * Quaternion.Euler(_rotate);
         _target *= Quaternion.Inverse(T_pilotSeat.rotation);
         _target =  _target * transform.rotation;
-        Quaternion _angle = Quaternion.Slerp(transform.rotation, _target, Time.fixedDeltaTime * steeringSpeed);
-        transform.rotation = _angle;
+        float _angle = Vector3.Distance(_tarRot, _curRot);
+        float f_turnAmount = 0;
+        if (_angle > F_turnDeadzone.x)
+        {
+            f_turnAmount = _angle - F_turnDeadzone.x;
+            f_turnAmount /= F_turnDeadzone.y - F_turnDeadzone.x;
+            tarRotation = Quaternion.RotateTowards(tarRotation, _target, _angle * f_turnAmount);
+            _curRot = Vector3.MoveTowards(_curRot, _tarRot, _angle * f_turnAmount);
+        }
+
+        Quaternion _rotation = Quaternion.Slerp(transform.rotation, tarRotation, Time.fixedDeltaTime * steeringSpeed);
+        _player.UpdateVehicleReticle(_player.v3_camDir - _curRot);
+        transform.rotation = _rotation;
+        return f_turnAmount;
+    }
+
+    public override void YRotLoop(float _adjust)
+    {
+        if (DriverIsMain())
+            _curRot.y += _adjust;
     }
 
     // This method converts the car speed data from float to string, and then set the text of the UI carSpeedText with this value.
@@ -437,7 +467,7 @@ public class Ship : Vehicle
     {
         //If the forces aplied to the rigidbody in the 'x' asis are greater than
         //3f, it means that the car is losing traction, then the car will start emitting particle systems.
-        if (Mathf.Abs(localVelocityX) > 2.5f)
+        if (Mathf.Abs(localVelocityX) > 50f)
         {
             isDrifting = true;
             DriftCarPS();
@@ -497,7 +527,7 @@ public class Ship : Vehicle
     // usually every 0.1f when the user is not pressing W (throttle), S (reverse) or Space bar (handbrake).
     public void DecelerateCar()
     {
-        if (Mathf.Abs(localVelocityX) > 2.5f)
+        if (Mathf.Abs(localVelocityX) > 50f)
         {
             isDrifting = true;
             DriftCarPS();
@@ -563,7 +593,7 @@ public class Ship : Vehicle
         }
         //If the forces aplied to the rigidbody in the 'x' asis are greater than
         //3f, it means that the car lost its traction, then the car will start emitting particle systems.
-        if (Mathf.Abs(localVelocityX) > 2.5f)
+        if (Mathf.Abs(localVelocityX) > 50f)
         {
             isDrifting = true;
         }

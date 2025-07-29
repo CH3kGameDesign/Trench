@@ -53,7 +53,7 @@ public class Space_LandingSpot : MonoBehaviour
         Canvas _canvas = PlayerManager.conversation.C_canvas;
         RectTransform _holder = PlayerManager.conversation.RT_messageHolder;
         _activeMessage = Instantiate(PF_message, _holder);
-        _activeMessage.Setup(S_sprite, transform, _canvas, true);
+        _activeMessage.Setup(S_sprite, transform, _canvas, landingName, true);
     }
     protected void OnDisable()
     {

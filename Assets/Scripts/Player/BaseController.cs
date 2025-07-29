@@ -3,10 +3,8 @@ using PurrNet.Packing;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.InputSystem.XR;
 
 [RequireComponent(typeof(BaseInfo))]
 public class BaseController : NetworkBehaviour
@@ -62,15 +60,15 @@ public class BaseController : NetworkBehaviour
         ChangeState(_state);
     }
 
-    public virtual void ChangeState(stateEnum _state, bool _force = false)
+    public virtual bool ChangeState(stateEnum _state, bool _force = false)
     {
         if (_state == stateEnum.unchanged ||
-            _state == state) return;
+            _state == state) return false;
 
         if (info.F_curHealth <= 0 &&
             _state != stateEnum.ragdoll &&
             !_force)
-            return;
+            return false;
 
         ExitState(state);
         switch (_state)
@@ -88,8 +86,9 @@ public class BaseController : NetworkBehaviour
                 break;
         }
         state = _state;
+        return true;
     }
-    void ExitState(stateEnum _state)
+    protected virtual void ExitState(stateEnum _state)
     {
         switch (_state)
         {

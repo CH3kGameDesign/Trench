@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
+using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
@@ -38,16 +38,29 @@ public class PlayerController : BaseController
 
         public SpeedLines speedLines;
         public SpeedLines hurtFace;
+
+        public CanvasGroup CG_onFoot;
+        public CanvasGroup CG_spaceFlight;
+
+        public Image[] I_throttleBars;
+        public TextMeshProUGUI TM_throttle;
+        public RectTransform RT_shipReticle;
+        public LineRendererUI LR_shipReticleLine;
     }
     [Header("UI")]
     public HealthUI PF_followerHealth;
     public RectTransform RT_followerHealthHolder;
     private List<HealthUI> FollowerHealthList = new List<HealthUI>();
+    public float F_aimReticleMult = 4f;
+    public float F_aimReticleSpeed = 5f;
+
     [Header ("Camera Values")]
     public float F_camLatSpeed = 1;
     public float F_camRotSpeed = 240f;
     public float F_camAimRotSpeed = 80f;
     public float F_camSprintRotSpeed = 80f;
+
+    [HideInInspector] public float F_vehicleCamMult = 1f;
 
     float f_camSensitivity = 1f;
 
@@ -245,7 +258,12 @@ public class PlayerController : BaseController
     {
         base.Start();
         SetNetworkOwner();
+
         Ref.R_recall.Setup(this);
+
+        Ref.CG_onFoot.alpha = 1f;
+        Ref.CG_spaceFlight.alpha = 0f;
+
         StartCoroutine(StartLate());
     }
     IEnumerator StartLate()
@@ -534,7 +552,7 @@ public class PlayerController : BaseController
     void FixedUpdate_Vehicle()
     {
         V_curVehicle.OnFixedUpdate(this);
-        CamMovement(true);
+        CamMovement(true, F_vehicleCamMult);
     }
 
     void FixedUpdate_Active()
@@ -547,6 +565,32 @@ public class PlayerController : BaseController
     {
         CamMovement(true);
         CamCollision(true);
+    }
+
+    public void UpdateVehicleUI(float _speed, float _maxSpeed)
+    {
+        Ref.TM_throttle.text = Mathf.Max(_speed,0).ToString_Distance();
+        float _fill = _speed / _maxSpeed;
+        foreach (var item in Ref.I_throttleBars)
+            item.fillAmount = _fill;
+    }
+
+    public void UpdateVehicleReticle(Vector3 _rotation)
+    {
+        Vector2 _pos = new Vector2(_rotation.y, _rotation.x);
+        _pos.y = -_pos.y;
+        _pos *= F_aimReticleMult;
+        Vector2 _tar = Vector2.Lerp(Ref.RT_shipReticle.anchoredPosition, _pos, Time.deltaTime * F_aimReticleSpeed);
+        Ref.RT_shipReticle.anchoredPosition = _tar;
+        if (_tar.magnitude > 125)
+        {
+            Ref.LR_shipReticleLine.gameObject.SetActive(true);
+            Ref.LR_shipReticleLine.CreateLine(_tar.normalized * 100, Vector2.MoveTowards(_tar, Vector2.zero, 25));
+        }
+        else
+        {
+            Ref.LR_shipReticleLine.gameObject.SetActive(false);
+        }
     }
 
     void AnimationUpdate()
@@ -1011,7 +1055,7 @@ public class PlayerController : BaseController
     }
 
     Quaternion _lastOffset = Quaternion.identity;
-    void CamMovement(bool _fixedDelta = false)
+    void CamMovement(bool _fixedDelta = false, float _mult2 = 1)
     {
         if (!b_radialOpen)
         {
@@ -1021,7 +1065,6 @@ public class PlayerController : BaseController
             else _mult *= F_camRotSpeed;
             if (AutoAim()) _mult *= autoAim.slowMultiplier;
             v3_camDir += new Vector3(-Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0) * _mult * f_camSensitivity;
-
             v3_camDir.x = Mathf.Clamp(v3_camDir.x, -80, 80);
 
             //Canvas Pivot
@@ -1035,11 +1078,15 @@ public class PlayerController : BaseController
         {
             v3_camDir.y -= 360;
             T_camHolder.transform.localEulerAngles += new Vector3(0, -360, 0);
+            if (V_curVehicle != null)
+                V_curVehicle.YRotLoop(-360);
         }
         if (v3_camDir.y < -180)
         {
             v3_camDir.y += 360;
             T_camHolder.transform.localEulerAngles += new Vector3(0, 360, 0);
+            if (V_curVehicle != null)
+                V_curVehicle.YRotLoop(360);
         }
 
         float _delta = _fixedDelta ?
@@ -1600,6 +1647,40 @@ public class PlayerController : BaseController
         RB.transform.parent = T;
         T_camHolder.parent = transform;
         _lastOffset = T_camHolder.parent.rotation;
+    }
+
+    public override bool ChangeState(stateEnum _state, bool _force = false)
+    {
+        if (!base.ChangeState(_state, _force))
+            return false;
+        switch (_state)
+        {
+            case stateEnum.idle:
+                StartCoroutine(Ref.CG_onFoot.Fade(true));
+                break;
+            case stateEnum.vehicle:
+                StartCoroutine(Ref.CG_spaceFlight.Fade(true));
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
+    protected override void ExitState(stateEnum _state)
+    {
+        base.ExitState(_state);
+        switch (_state)
+        {
+            case stateEnum.idle:
+                StartCoroutine(Ref.CG_onFoot.Fade(false));
+                break;
+            case stateEnum.vehicle:
+                StartCoroutine(Ref.CG_spaceFlight.Fade(false));
+                F_vehicleCamMult = 1f;
+                break;
+            default:
+                break;
+        }
     }
 
     #region Input Actions

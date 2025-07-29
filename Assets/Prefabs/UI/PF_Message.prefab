@@ -90,10 +90,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b322ef075c0cca4390fddf1bdda75a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  I_image:
-  - {fileID: 2796895533456375059}
-  - {fileID: 8751533395667994003}
-  TM_distanceText: {fileID: 2952598994446107832}
+  mainObject:
+    G_holder: {fileID: 3385742326603105503}
+    I_image:
+    - {fileID: 2796895533456375059}
+    - {fileID: 8751533395667994003}
+    TM_distanceText: {fileID: 2952598994446107832}
+    TM_name: {fileID: 0}
+  offscreenObject:
+    G_holder: {fileID: 0}
+    I_image: []
+    TM_distanceText: {fileID: 0}
+    TM_name: {fileID: 0}
 --- !u!1 &7312339457183393572
 GameObject:
   m_ObjectHideFlags: 0
