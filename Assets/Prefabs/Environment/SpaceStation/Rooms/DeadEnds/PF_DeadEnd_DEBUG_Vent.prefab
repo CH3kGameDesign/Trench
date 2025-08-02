@@ -1121,6 +1121,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   B_Bounds: {fileID: 7035473819254921520}
   I_roomNum: -1
+  V3ID: {x: -1, y: 0, z: 0}
 --- !u!1 &3528451803321723554
 GameObject:
   m_ObjectHideFlags: 0
@@ -1623,6 +1624,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BlockType: 3
+  _name: Vent
+  icon: {fileID: 21300000, guid: 5402faabfb448e6499190375ba423b7f, type: 3}
+  size: {x: 1, y: 1}
+  weight: 5
+  cost:
+    unlockAtStart: 0
+    coinCost: 30
+    list: []
   T_architecture:
   - {fileID: 7523567375638721648}
   B_bounds:

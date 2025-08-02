@@ -177,18 +177,27 @@ using UnityEngine;
     }
     public bool DriverIsMain()
     {
+        PlayerController _PC;
+        return DriverIsMain(out _PC);
+    }
+    public bool DriverIsMain(out PlayerController _PC)
+    {
+        _PC = null;
         if (PlayerManager.main == null)
             return false;
         foreach (var seat in SeatInUse)
         {
             if (Seats[seat].seatType == seatTypeEnum.driver)
                 if (Seats[seat].BC_agent == PlayerManager.main)
+                {
+                    _PC = PlayerManager.main;
                     return true;
+                }
         }
         return false;
     }
 
-    public virtual void YRotLoop(float _adjust)
+    public virtual void RotLoop(bool yLoop, float _adjust)
     {
 
     }

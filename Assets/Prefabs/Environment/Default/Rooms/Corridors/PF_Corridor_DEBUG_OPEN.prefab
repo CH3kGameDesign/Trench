@@ -182,6 +182,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   B_Bounds: {fileID: 6245346200834774164}
   I_roomNum: -1
+  V3ID: {x: -1, y: 0, z: 0}
 --- !u!1 &4435839201424382286
 GameObject:
   m_ObjectHideFlags: 0
@@ -284,6 +285,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   B_Bounds: {fileID: 5086887810481119092}
   I_roomNum: -1
+  V3ID: {x: -1, y: 0, z: 0}
 --- !u!1 &6616200998604309506
 GameObject:
   m_ObjectHideFlags: 0
@@ -431,6 +433,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BlockType: 0
+  _name: Open
+  icon: {fileID: 21300000, guid: 5054fdc732809dd4c8b00aab68335fa7, type: 3}
+  size: {x: 2, y: 2}
+  weight: 20
+  cost:
+    unlockAtStart: 0
+    coinCost: 0
+    list: []
   T_architecture:
   - {fileID: 7212348513087163645}
   - {fileID: 7775180416969877914}

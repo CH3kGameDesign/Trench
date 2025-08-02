@@ -210,6 +210,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   B_Bounds: {fileID: 7988002900879937411}
   I_roomNum: -1
+  V3ID: {x: -1, y: 0, z: 0}
 --- !u!1 &6933445532842193800
 GameObject:
   m_ObjectHideFlags: 0
@@ -259,6 +260,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BlockType: 0
+  _name: Road
+  icon: {fileID: 21300000, guid: 9851bc0ec4b164842a3fcf321bcf62db, type: 3}
+  size: {x: 2, y: 3}
+  weight: 20
+  cost:
+    unlockAtStart: 0
+    coinCost: 0
+    list: []
   T_architecture:
   - {fileID: 4482742374688062591}
   B_bounds:

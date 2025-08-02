@@ -1567,7 +1567,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 946ba4435746ea44793f8ab6e1adc18a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BlockType: 0
+  BlockType: 5
+  _name: Tavern
+  icon: {fileID: 21300000, guid: a437e72b1645fb24cb870209a16a73e1, type: 3}
+  size: {x: 3, y: 2}
+  weight: 25
+  cost:
+    unlockAtStart: 0
+    coinCost: 500
+    list:
+    - _type: 0
+      amt: 10
   T_architecture:
   - {fileID: 3406299234016641083}
   B_bounds:

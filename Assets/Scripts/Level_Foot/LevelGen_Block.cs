@@ -1,12 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static ItemClass;
 
 public class LevelGen_Block : MonoBehaviour
 {
+    [Header("Info")]
     public blockTypeEnum BlockType = blockTypeEnum.corridor;
     public enum blockTypeEnum { corridor, bridge, hangar, deadend, engine, foodhall, crewQuarters, captain, vault, ship }
-
+    public string _name;
+    public Sprite icon;
+    public Vector2Int size;
+    public int weight;
+    public costClass cost;
+    [Space(10)]
+    [Header("References")]
     public List<Transform> T_architecture = new List<Transform>();
     public List<LevelGen_Bounds> B_bounds = new List<LevelGen_Bounds>();
     public LevelGen_Door[] LGD_Entries = new LevelGen_Door[0];

@@ -47,8 +47,8 @@ public class GunClass_Shotgun : GunClass
         if (f_fireTimer <= 0)
         {
             f_fireTimer = fireVariablesOnSprint.fireRate;
-            PM_player.reticle.UpdateRoundCount(this);
-            PM_player.reticle.RotateReticle(f_fireTimer);
+            PM_player.reticle().UpdateRoundCount(this);
+            PM_player.reticle().RotateReticle(f_fireTimer);
             A_charModel.Play("Melee_Swing", 1);
             baseController.RM_ragdoll.DisableRig(2.1f);
             baseController.AH_agentAudioHolder.Play(AgentAudioHolder.type.melee);
@@ -56,13 +56,13 @@ public class GunClass_Shotgun : GunClass
             Transform _barrel;
             _barrel = baseController.T_barrelHook;
             Bullet GO = Instantiate(sprintMelee, _barrel.position, _barrel.rotation);
-            if (b_playerGun)
+            if (isPlayer)
                 GO.OnCreate(fireVariablesOnSprint.damage, PM_player, this);
             else
                 GO.OnCreate(fireVariablesOnSprint.damage, AC_agent, this);
 
 
-            if (b_playerGun)
+            if (isPlayer)
                 MusicHandler.AdjustVolume(MusicHandler.typeEnum.guitar, fireVariablesOnSprint.fireRate / 4);
             else
                 MusicHandler.AdjustVolume(MusicHandler.typeEnum.bass, fireVariablesOnSprint.fireRate / 8);

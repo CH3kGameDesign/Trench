@@ -239,6 +239,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   B_Bounds: {fileID: 4581688186006233067}
   I_roomNum: -1
+  V3ID: {x: -1, y: 0, z: 0}
 --- !u!1 &6933445532842193800
 GameObject:
   m_ObjectHideFlags: 0
@@ -287,7 +288,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 946ba4435746ea44793f8ab6e1adc18a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BlockType: 0
+  BlockType: 5
+  _name: Rows
+  icon: {fileID: 21300000, guid: 6671513537e579947aea3bef53b4e58e, type: 3}
+  size: {x: 2, y: 3}
+  weight: 30
+  cost:
+    unlockAtStart: 0
+    coinCost: 0
+    list: []
   T_architecture:
   - {fileID: 3406299234016641083}
   B_bounds:

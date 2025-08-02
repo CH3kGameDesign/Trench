@@ -104,7 +104,16 @@ public class PlayerController : BaseController
 
 
     [Header("Combat Refs")]
-    public Reticle reticle;
+    public Reticle reticle_OnFoot;
+    public Reticle reticle_SpaceFlight;
+    public Reticle reticle()
+    {
+        switch (state)
+        {
+            case stateEnum.vehicle: return reticle_SpaceFlight;
+            default: return reticle_OnFoot;
+        }
+    }
     public RectTransform RT_hitPoint;
     public RectTransform RT_lockOnPoint;
 
@@ -148,6 +157,9 @@ public class PlayerController : BaseController
         public bool b_radial = false;
         public bool b_melee = false;
         public bool b_purchase = false;
+        public bool b_back = false;
+        public bool b_leftTab = false;
+        public bool b_rightTab = false;
         public bool b_recall = false;
 
         public PlayerInput playerInput;
@@ -282,7 +294,7 @@ public class PlayerController : BaseController
             DebugGunList();
             gun_secondaryEquipped = gun_EquippedList[SaveData.i_equippedGunNum.y];
             Gun_Equip(SaveData.i_equippedGunNum.x, true);
-            reticle.UpdateRoundCount(gun_Equipped);
+            reticle_OnFoot.UpdateRoundCount(gun_Equipped);
 
             NMA.updateRotation = false;
             Setup_Camera();
@@ -470,6 +482,9 @@ public class PlayerController : BaseController
                 Update_DialogueResponse();
                 AnimationEnd();
                 break;
+            case gameStateEnum.menu:
+                MainMenu.Instance.current.OnUpdate(this);
+                break;
             default:
                 break;
         }
@@ -552,7 +567,7 @@ public class PlayerController : BaseController
     void FixedUpdate_Vehicle()
     {
         V_curVehicle.OnFixedUpdate(this);
-        CamMovement(true, F_vehicleCamMult);
+        CamMovement(true, F_vehicleCamMult, false);
     }
 
     void FixedUpdate_Active()
@@ -1055,7 +1070,7 @@ public class PlayerController : BaseController
     }
 
     Quaternion _lastOffset = Quaternion.identity;
-    void CamMovement(bool _fixedDelta = false, float _mult2 = 1)
+    void CamMovement(bool _fixedDelta = false, float _mult2 = 1, bool _clampXDir = true)
     {
         if (!b_radialOpen)
         {
@@ -1065,10 +1080,28 @@ public class PlayerController : BaseController
             else _mult *= F_camRotSpeed;
             if (AutoAim()) _mult *= autoAim.slowMultiplier;
             v3_camDir += new Vector3(-Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0) * _mult * f_camSensitivity;
-            v3_camDir.x = Mathf.Clamp(v3_camDir.x, -80, 80);
+            if (_clampXDir)
+                v3_camDir.x = Mathf.Clamp(v3_camDir.x, -80, 80);
+            else
+            {
+                if (v3_camDir.x > 180)
+                {
+                    v3_camDir.x -= 360;
+                    T_camHolder.transform.localEulerAngles += new Vector3(-360, 0, 0);
+                    if (V_curVehicle != null)
+                        V_curVehicle.RotLoop(false, -360);
+                }
+                if (v3_camDir.x < -180)
+                {
+                    v3_camDir.x += 360;
+                    T_camHolder.transform.localEulerAngles += new Vector3(360, 0, 0);
+                    if (V_curVehicle != null)
+                        V_curVehicle.RotLoop(false, 360);
+                }
+            }
 
-            //Canvas Pivot
-            Ref.V3_canvasRot += new Vector3(Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0);
+                //Canvas Pivot
+                Ref.V3_canvasRot += new Vector3(Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0);
         }
         Vector3 _offset = (T_camHolder.parent.rotation * Quaternion.Inverse(_lastOffset)).eulerAngles;
         v3_camDir.y += _offset.y;
@@ -1079,14 +1112,14 @@ public class PlayerController : BaseController
             v3_camDir.y -= 360;
             T_camHolder.transform.localEulerAngles += new Vector3(0, -360, 0);
             if (V_curVehicle != null)
-                V_curVehicle.YRotLoop(-360);
+                V_curVehicle.RotLoop(true, -360);
         }
         if (v3_camDir.y < -180)
         {
             v3_camDir.y += 360;
             T_camHolder.transform.localEulerAngles += new Vector3(0, 360, 0);
             if (V_curVehicle != null)
-                V_curVehicle.YRotLoop(360);
+                V_curVehicle.RotLoop(true, 360);
         }
 
         float _delta = _fixedDelta ?
@@ -1239,6 +1272,7 @@ public class PlayerController : BaseController
 
     void Update_HitPoint()
     {
+        Reticle _reticle = reticle_OnFoot;
         RaycastHit hit;
         if (Physics.SphereCast(Camera.main.transform.position + (Camera.main.transform.forward * (f_camDistance + 0.5f)), 0.2f, Camera.main.transform.forward, out hit, 100, LM_GunRay))
         {
@@ -1254,38 +1288,38 @@ public class PlayerController : BaseController
             {
                 if (!HO.RM_ragdollManager)
                 {
-                    reticle.ColorReticle(Reticle.colorEnum.none);
+                    _reticle.ColorReticle(Reticle.colorEnum.none);
                     return;
                 }
                 if (!HO.RM_ragdollManager.controller)
                 {
-                    reticle.ColorReticle(Reticle.colorEnum.none);
+                    _reticle.ColorReticle(Reticle.colorEnum.none);
                     return;
                 }
                 if (!HO.RM_ragdollManager.controller.info.b_alive)
                 {
                     if (hit.distance <= 5)
-                        reticle.ColorReticle(Reticle.colorEnum.interactable);
+                        _reticle.ColorReticle(Reticle.colorEnum.interactable);
                     else
-                        reticle.ColorReticle(Reticle.colorEnum.none);
+                        _reticle.ColorReticle(Reticle.colorEnum.none);
                 }
                 else if (HO.RM_ragdollManager.controller is PlayerController)
-                    reticle.ColorReticle(Reticle.colorEnum.ally);
+                    _reticle.ColorReticle(Reticle.colorEnum.ally);
                 else if (((AgentController)HO.RM_ragdollManager.controller).b_friendly)
-                    reticle.ColorReticle(Reticle.colorEnum.ally);
+                    _reticle.ColorReticle(Reticle.colorEnum.ally);
                 else
-                    reticle.ColorReticle(Reticle.colorEnum.enemy);
+                    _reticle.ColorReticle(Reticle.colorEnum.enemy);
             }
             else if (hit.collider.TryGetComponent<Interactable>(out I) && hit.distance <= 5)
             {
-                reticle.ColorReticle(Reticle.colorEnum.interactable);
+                _reticle.ColorReticle(Reticle.colorEnum.interactable);
             }
             else
-                reticle.ColorReticle(Reticle.colorEnum.none);
+                _reticle.ColorReticle(Reticle.colorEnum.none);
         }
         else
         {
-            reticle.ColorReticle(Reticle.colorEnum.none);
+            _reticle.ColorReticle(Reticle.colorEnum.none);
             RT_hitPoint.anchoredPosition = new Vector2(Screen.width / 2, Screen.height / 2) / PlayerManager.conversation.C_canvas.scaleFactor;
             T_aimPoint.position = Camera.main.transform.position + (Camera.main.transform.forward * (f_camDistance + 100.5f));
         }
@@ -1494,6 +1528,9 @@ public class PlayerController : BaseController
 
     public void OnKill(AgentController AC, bool _player = true)
     {
+        Reticle reticle = reticle_OnFoot;
+        if (state == stateEnum.vehicle)
+            reticle = reticle_SpaceFlight;
         Update_Objectives(Objective_Type.Kill_Any, 1);
         if (_player)
             reticle.Kill();
@@ -1733,18 +1770,21 @@ public class PlayerController : BaseController
     }
     public void Input_Back(InputAction.CallbackContext cxt)
     {
+        Inputs.b_back = Input_GetPressed(cxt);
         if (cxt.phase == InputActionPhase.Started)
             if (GameState == gameStateEnum.menu)
                 MainMenu.Instance.BackButton();
     }
     public void Input_LeftTab(InputAction.CallbackContext cxt)
     {
+        Inputs.b_leftTab = Input_GetPressed(cxt);
         if (cxt.phase == InputActionPhase.Started)
             if (GameState == gameStateEnum.menu)
                 MainMenu.Instance.Tab_Switch(true);
     }
     public void Input_RightTab(InputAction.CallbackContext cxt)
     {
+        Inputs.b_rightTab = Input_GetPressed(cxt);
         if (cxt.phase == InputActionPhase.Started)
             if (GameState == gameStateEnum.menu)
                 MainMenu.Instance.Tab_Switch(false);

@@ -33,12 +33,12 @@ public class GunClass_Rifle : GunClass
         if (f_fireTimer <= 0 && clipAmmo < clipVariables.clipSize)
         {
             Transform camHolder = baseController.T_barrelHook;
-            if (b_playerGun)
+            if (isPlayer)
                 camHolder = PM_player.T_camHolder;
             baseController.NMA.transform.eulerAngles = new Vector3(0, camHolder.eulerAngles.y, 0);
             Grenade GO = Instantiate(reloadGrenade, baseController.T_barrelHook.position, camHolder.rotation);
             float _damage = F_grenadeDamagePerBullet * (clipVariables.clipSize - clipAmmo);
-            if (b_playerGun)
+            if (isPlayer)
                 GO.OnCreate(_damage, PM_player, this);
             else
                 GO.OnCreate(_damage, AC_agent, this);

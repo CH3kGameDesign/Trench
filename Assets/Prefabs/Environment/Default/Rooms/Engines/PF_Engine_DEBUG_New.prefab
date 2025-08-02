@@ -257,7 +257,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 946ba4435746ea44793f8ab6e1adc18a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BlockType: 0
+  BlockType: 4
+  _name: New
+  icon: {fileID: 21300000, guid: 01e5895c7333a544c9475e84a981ec48, type: 3}
+  size: {x: 2, y: 3}
+  weight: 30
+  cost:
+    unlockAtStart: 0
+    coinCost: 0
+    list: []
   T_architecture:
   - {fileID: 4482742374688062591}
   B_bounds:
@@ -371,6 +379,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   B_Bounds: {fileID: 854373059869504098}
   I_roomNum: -1
+  V3ID: {x: -1, y: 0, z: 0}
 --- !u!1 &7796345734325835458
 GameObject:
   m_ObjectHideFlags: 0

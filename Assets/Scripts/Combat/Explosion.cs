@@ -95,7 +95,7 @@ public class Explosion : DamageSource
     void HitMarker()
     {
         if (B_info.B_player)
-            B_info.con_Player.reticle.Hit(HitObject.damageTypeEnum.explosive);
+            B_info.con_Player.reticle().Hit(HitObject.damageTypeEnum.explosive);
         _hit = true;
     }
 }

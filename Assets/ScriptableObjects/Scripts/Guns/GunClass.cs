@@ -59,11 +59,17 @@ public class GunClass : ItemClass
     public BaseController baseController;
     [HideInInspector]
     public NetworkAnimator A_charModel;
+    [HideInInspector]
+    public Ship shipController;
+    private int i_hookNum = 0;
 
     private GunPrefab G_gunModel = null;
 
     [HideInInspector]
-    public bool b_playerGun = false;
+    public bool isPlayer = false;
+    [HideInInspector]
+    public gunTypeEnum equippedType = gunTypeEnum.notSetup;
+    public enum gunTypeEnum { notSetup, foot, ship};
 
     private float _damage = 10;
 
@@ -86,6 +92,12 @@ public class GunClass : ItemClass
     {
         GunClass _temp = Clone();
         _temp.Setup(_agent);
+        return _temp;
+    }
+    public GunClass Clone(Ship _ship)
+    {
+        GunClass _temp = Clone();
+        _temp.Setup(_ship);
         return _temp;
     }
     public virtual GunClass Clone()
@@ -154,14 +166,36 @@ public class GunClass : ItemClass
         A_charModel = PM_player.A_model;
         T_camHolder = _player.T_camHolder;
         LM_GunRay = _player.LM_GunRay;
-        b_playerGun = true;
+        equippedType = gunTypeEnum.foot;
+        isPlayer = true;
     }
     public virtual void Setup(AgentController _agent)
     {
         AC_agent = _agent;
         baseController = _agent;
-        b_playerGun = false;
+        equippedType = gunTypeEnum.foot;
         A_charModel = _agent.A_model;
+        isPlayer = false;
+    }
+    public virtual void Setup(Ship _ship)
+    {
+        shipController = _ship;
+        equippedType = gunTypeEnum.ship;
+    }
+
+    public bool IsPlayer(out PlayerController _PC)
+    {
+        switch (equippedType)
+        {
+            case gunTypeEnum.notSetup:
+                _PC = null;
+                return false;
+            case gunTypeEnum.ship:
+                return shipController.DriverIsMain(out _PC);
+            default:
+                _PC = PM_player;
+                return isPlayer;
+        }
     }
 
     public virtual void OnFire()
@@ -186,38 +220,42 @@ public class GunClass : ItemClass
         f_fireTimer = _fireVariables.fireRate;
         f_recoilCam = _fireVariables.recoilCam;
         f_recoilUpwards = _fireVariables.recoilUpwards;
-        if (b_playerGun)
-            PM_player.reticle.RotateReticle(f_fireTimer);
-
-        if (b_playerGun)
+        PlayerController _PC;
+        if (IsPlayer(out _PC))
+        {
+            _PC.reticle().RotateReticle(f_fireTimer);
             MusicHandler.AdjustVolume(MusicHandler.typeEnum.guitar, _fireVariables.fireRate / 4);
+        }
         else
             MusicHandler.AdjustVolume(MusicHandler.typeEnum.bass, _fireVariables.fireRate / 8);
     }
+
     public virtual void OnMelee(bool _isSprinting = false)
     {
         if (f_fireTimer <= 0)
         {
             G_gunModel.FireReady(false);
             f_fireTimer = meleeVariables.fireRate;
-            PM_player.reticle.UpdateRoundCount(this);
-            PM_player.reticle.RotateReticle(f_fireTimer);
             A_charModel.Play("Melee_Rifle", 1);
             baseController.AH_agentAudioHolder.Play(AgentAudioHolder.type.melee);
 
             Transform _barrel;
             _barrel = baseController.T_barrelHook;
             Bullet GO = Instantiate(melee, _barrel.position, baseController.NMA.transform.rotation);
-            if (b_playerGun)
-                GO.OnCreate(meleeVariables.damage, PM_player, this);
-            else
-                GO.OnCreate(meleeVariables.damage, AC_agent, this);
 
-
-            if (b_playerGun)
+            PlayerController _PC;
+            if (IsPlayer(out _PC))
+            {
+                GO.OnCreate(meleeVariables.damage, _PC, this);
                 MusicHandler.AdjustVolume(MusicHandler.typeEnum.guitar, meleeVariables.fireRate / 4);
+                _PC.reticle().UpdateRoundCount(this);
+                _PC.reticle().RotateReticle(f_fireTimer);
+            }
             else
+            {
+                GO.OnCreate(meleeVariables.damage, AC_agent, this);
                 MusicHandler.AdjustVolume(MusicHandler.typeEnum.bass, meleeVariables.fireRate / 8);
+            }
         }
     }
     public virtual void OnReload()
@@ -226,12 +264,22 @@ public class GunClass : ItemClass
         {
             G_gunModel.FireReady(false);
             f_fireTimer = clipVariables.reloadSpeed;
-            if (b_playerGun)
-                PM_player.reticle.ReloadReticle(f_fireTimer, this);
+            PlayerController _PC;
+            if (IsPlayer(out _PC))
+                _PC.reticle().ReloadReticle(f_fireTimer, this);
             clipAmmo = clipVariables.clipSize;
-            baseController.Weapon_Fired();
-            A_charModel.Play("Reload_Rifle", 1);
-            baseController.AH_agentAudioHolder.Play(AgentAudioHolder.type.reload);
+            switch (equippedType)
+            {
+                case gunTypeEnum.foot:
+                    baseController.Weapon_Fired();
+                    A_charModel.Play("Reload_Rifle", 1);
+                    baseController.AH_agentAudioHolder.Play(AgentAudioHolder.type.reload);
+                    break;
+                case gunTypeEnum.ship:
+                    break;
+                default:
+                    break;
+            }
         }
     }
     public virtual void OnAim(bool _aiming)
@@ -244,10 +292,11 @@ public class GunClass : ItemClass
     }
     public virtual void OnEquip(BaseController baseController)
     {
-        if (b_playerGun)
+        PlayerController _PC;
+        if (IsPlayer(out _PC))
         {
-            PM_player.reticle.UpdateRoundCount(this);
-            PM_player.RT_lockOnPoint.gameObject.SetActive(false);
+            _PC.reticle().UpdateRoundCount(this);
+            _PC.RT_lockOnPoint.gameObject.SetActive(false);
         }
         if (prefab != null)
         {
@@ -260,6 +309,22 @@ public class GunClass : ItemClass
         }
         A_charModel.Play("Equip_Rifle", 1);
         baseController.AH_agentAudioHolder.Play(AgentAudioHolder.type.equip);
+    }
+    public virtual void OnEquip(Ship ship, int _gunHook)
+    {
+        i_hookNum = _gunHook;
+        PlayerController _PC;
+        if (IsPlayer(out _PC))
+        {
+            _PC.reticle().UpdateRoundCount(this);
+            _PC.RT_lockOnPoint.gameObject.SetActive(false);
+        }
+        if (prefab != null)
+        {
+            G_gunModel = Instantiate(prefab, ship.T_gunHook[_gunHook]);
+            G_gunModel.transform.localPosition = Vector3.zero;
+            G_gunModel.transform.localEulerAngles = Vector3.zero;
+        }
     }
     public virtual void OnUnEquip()
     {
@@ -279,25 +344,37 @@ public class GunClass : ItemClass
             f_burstTimer = fireVariables.burstRate;
             i_burstRemaining--;
             clipAmmo--;
-            baseController.Weapon_Fired();
+            Vector3 _tarPos;
+            Transform _barrel;
+            switch (equippedType)
+            {
+                case gunTypeEnum.notSetup:
+                    return;
+                case gunTypeEnum.ship:
+                    _barrel = shipController.T_gunHook[i_hookNum];
+                    _tarPos = shipController.transform.position + shipController.T_pilotSeat.forward * 100;
+                    break;
+                default:
+                    baseController.Weapon_Fired();
+                    _barrel = baseController.T_barrelHook;
+                    _tarPos = baseController.T_aimPoint.position;
+                    break;
+            }
 
             if (G_gunModel)
                 G_gunModel.Shoot();
 
-            Vector3 _tarPos;
-            Transform _barrel;
-            _barrel = baseController.T_barrelHook;
-            _tarPos = baseController.T_aimPoint.position;
             Bullet GO = Instantiate(bullet, _barrel.position, _barrel.rotation);
             GO.transform.LookAt(_tarPos);
-            if (b_playerGun)
+            PlayerController _PC;
+            if (IsPlayer(out _PC))
             {
                 BulletSpray(GO, fireVariables.bulletSprayPlayer);
-                GO.OnCreate(_damage, PM_player, this);
-                PM_player.reticle.UpdateRoundCount(this);
+                GO.OnCreate(_damage, _PC, this);
+                _PC.reticle().UpdateRoundCount(this);
 
-                T_camHolder.GetChild(0).position -= T_camHolder.forward * f_recoilCam;
-                PM_player.v3_camDir.x -= f_recoilUpwards;
+                _PC.T_camHolder.GetChild(0).position -= _PC.T_camHolder.forward * f_recoilCam;
+                _PC.v3_camDir.x -= f_recoilUpwards;
             }
             else
             {
@@ -322,8 +399,11 @@ public class GunClass : ItemClass
 
     public virtual void OnBullet(Bullet _bullet)
     {
-        A_charModel.Play("Fire_Rifle", 1);
-        baseController.AH_agentAudioHolder.Play(AgentAudioHolder.type.fire);
+        if (equippedType == gunTypeEnum.foot)
+        {
+            A_charModel.Play("Fire_Rifle", 1);
+            baseController.AH_agentAudioHolder.Play(AgentAudioHolder.type.fire);
+        }
     }
 
     public virtual void OnHit(Bullet _bullet)
@@ -372,14 +452,15 @@ public class GunClass : ItemClass
 
     public void Damage_Objective(int _damage = -1)
     {
-        if (b_playerGun)
+        PlayerController _PC;
+        if (IsPlayer(out _PC))
         {
             if (_damage < 0) _damage = Mathf.FloorToInt(fireVariables.damage);
             switch (_id)
             {
-                case "gun_Rifle": PM_player.Update_Objectives(Objective_Type.Damage_Rifle, _damage); break;
-                case "gun_Rod": PM_player.Update_Objectives(Objective_Type.Damage_Rod, _damage); break;
-                case "gun_Rocket": PM_player.Update_Objectives(Objective_Type.Damage_RPG, _damage); break;
+                case "gun_Rifle": _PC.Update_Objectives(Objective_Type.Damage_Rifle, _damage); break;
+                case "gun_Rod": _PC.Update_Objectives(Objective_Type.Damage_Rod, _damage); break;
+                case "gun_Rocket": _PC.Update_Objectives(Objective_Type.Damage_RPG, _damage); break;
                 default: break;
             }
         }

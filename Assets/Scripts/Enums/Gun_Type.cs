@@ -6,4 +6,5 @@ public enum Gun_Type
 	[Description ("Rocket Gun")]	[InspectorName ("gun/Rocket")]	gun_Rocket,
 	[Description ("Rod Gun")]	[InspectorName ("gun/Rod")]	gun_Rod,
 	[Description ("Shotgun Gun")]	[InspectorName ("gun/Shotgun")]	gun_Shotgun,
+	[Description ("Ship Laser")]	[InspectorName ("gun/Ship/Laser")]	gun_Ship_Laser,
 }

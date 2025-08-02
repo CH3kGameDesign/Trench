@@ -36,6 +36,7 @@ Transform:
   - {fileID: 1327722245234219121}
   - {fileID: 1411039269160407446}
   - {fileID: 1552942681656289315}
+  - {fileID: 7101619544643409240}
   - {fileID: 2448913988293656331}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -86,6 +87,12 @@ MonoBehaviour:
   SeatInUse: 
   T_pilotSeat: {fileID: 0}
   LG: {fileID: 0}
+  DEBUG_gun:
+  - {fileID: 11400000, guid: ea44b6ab2ea130242acdece7301b0c45, type: 2}
+  - {fileID: 11400000, guid: ea44b6ab2ea130242acdece7301b0c45, type: 2}
+  T_gunHook:
+  - {fileID: 7732563233561228072}
+  - {fileID: 3883184863244112375}
   maxSpeed: 250
   maxReverseSpeed: 100
   accelerationMultiplier: 50
@@ -534,6 +541,101 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &3883839117533755777
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3883184863244112375}
+  m_Layer: 16
+  m_Name: gunHook (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3883184863244112375
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3883839117533755777}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.50000674, y: 0.49999344, z: -0.49999577, w: 0.5000041}
+  m_LocalPosition: {x: -12.47784, y: 2.3673568, z: 1.3067374}
+  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7101619544643409240}
+  m_LocalEulerAnglesHint: {x: -0.001, y: 90, z: -90}
+--- !u!1 &5671199022911327058
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7732563233561228072}
+  m_Layer: 16
+  m_Name: gunHook (0)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7732563233561228072
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5671199022911327058}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.50000674, y: 0.49999344, z: -0.49999577, w: 0.5000041}
+  m_LocalPosition: {x: 2.5221596, y: 2.3676813, z: 1.306732}
+  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7101619544643409240}
+  m_LocalEulerAnglesHint: {x: -0.001, y: 90, z: -90}
+--- !u!1 &5703968944137614972
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7101619544643409240}
+  m_Layer: 16
+  m_Name: GunHooks
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7101619544643409240
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5703968944137614972}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7732563233561228072}
+  - {fileID: 3883184863244112375}
+  m_Father: {fileID: 7099241351733515660}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7389604516764734913
 GameObject:
   m_ObjectHideFlags: 0

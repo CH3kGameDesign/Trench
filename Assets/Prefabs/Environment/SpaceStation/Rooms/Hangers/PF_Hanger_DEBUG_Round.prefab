@@ -230,6 +230,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   B_Bounds: {fileID: 8293843634519678352}
   I_roomNum: -1
+  V3ID: {x: -1, y: 0, z: 0}
 --- !u!1 &6933445532842193800
 GameObject:
   m_ObjectHideFlags: 0
@@ -278,7 +279,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 946ba4435746ea44793f8ab6e1adc18a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BlockType: 0
+  BlockType: 2
+  _name: Round
+  icon: {fileID: 21300000, guid: edbdf29c69394334796f7fd1fef82d90, type: 3}
+  size: {x: 4, y: 4}
+  weight: 30
+  cost:
+    unlockAtStart: 0
+    coinCost: 400
+    list: []
   T_architecture:
   - {fileID: 3406299234016641083}
   B_bounds:

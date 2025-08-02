@@ -3,12 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Windows;
 
 public class Ship : Vehicle
 {
     public override string Type() { return "Ship"; }
     [HideInInspector] public Transform T_pilotSeat;
     [HideInInspector] public LevelGen LG = null;
+
+    protected GunClass[] EquippedGuns;
+    public GunClass[] DEBUG_gun;
+    public Transform[] T_gunHook;
 
     //CAR SETUP
 
@@ -197,7 +202,20 @@ public class Ship : Vehicle
                 RRWTireSkid.emitting = false;
             }
         }
+        DEBUG_GunEquip();
     }
+
+    void DEBUG_GunEquip()
+    {
+        int l = Mathf.Min(DEBUG_gun.Length, T_gunHook.Length);
+        EquippedGuns = new GunClass[l];
+        for (int i = 0; i < l; i++)
+        {
+            EquippedGuns[i] = DEBUG_gun[i].Clone(this);
+            EquippedGuns[i].OnEquip(this, i);
+        }
+    }
+
     public override void OnUpdate_Driver(BaseController _player)
     {
         if (_player is PlayerController)
@@ -257,8 +275,20 @@ public class Ship : Vehicle
             {
 
             }
+            FireManager(_temp);
         }
         LevelGen_Holder.Instance.UpdateTransform(LG);
+    }
+    void FireManager(PlayerController _player)
+    {
+        foreach (var item in EquippedGuns)
+        {
+            if (_player.Inputs.b_firing)
+            {
+                item.OnFire();
+            }
+            item.OnUpdate();
+        }
     }
 
     public override void OnFixedUpdate_Driver(BaseController _player)
@@ -322,7 +352,7 @@ public class Ship : Vehicle
     float Update_Rotation(PlayerController _player)
     {
         Vector3 _tarRot = _player.v3_camDir;
-        _tarRot.x = Mathf.Clamp(_tarRot.x, downXLimit, upXLimit);
+        //_tarRot.x = Mathf.Clamp(_tarRot.x, downXLimit, upXLimit);
         Quaternion _target = Quaternion.Euler(_tarRot) * Quaternion.Euler(_rotate);
         _target *= Quaternion.Inverse(T_pilotSeat.rotation);
         _target =  _target * transform.rotation;
@@ -342,10 +372,15 @@ public class Ship : Vehicle
         return f_turnAmount;
     }
 
-    public override void YRotLoop(float _adjust)
+    public override void RotLoop(bool yLoop, float _adjust)
     {
         if (DriverIsMain())
-            _curRot.y += _adjust;
+        {
+            if (yLoop)
+                _curRot.y += _adjust;
+            else
+                _curRot.x += _adjust;
+        }
     }
 
     // This method converts the car speed data from float to string, and then set the text of the UI carSpeedText with this value.

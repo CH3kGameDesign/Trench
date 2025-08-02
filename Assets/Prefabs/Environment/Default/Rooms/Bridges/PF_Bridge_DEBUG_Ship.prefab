@@ -353,6 +353,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   B_Bounds: {fileID: 384988420063255898}
   I_roomNum: -1
+  V3ID: {x: -1, y: 0, z: 0}
 --- !u!1 &6194021126379622447
 GameObject:
   m_ObjectHideFlags: 0
@@ -465,6 +466,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BlockType: 1
+  _name: Ship
+  icon: {fileID: 21300000, guid: 2969d90b86698124696637a6df64a112, type: 3}
+  size: {x: 2, y: 3}
+  weight: 30
+  cost:
+    unlockAtStart: 1
+    coinCost: 0
+    list: []
   T_architecture:
   - {fileID: 8428948708410455898}
   B_bounds:

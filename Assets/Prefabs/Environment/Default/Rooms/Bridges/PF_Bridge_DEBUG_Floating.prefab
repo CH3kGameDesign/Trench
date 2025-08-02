@@ -68,6 +68,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   B_Bounds: {fileID: 9104299981491470337}
   I_roomNum: -1
+  V3ID: {x: -1, y: 0, z: 0}
 --- !u!1 &2460053277829962699
 GameObject:
   m_ObjectHideFlags: 0
@@ -359,6 +360,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BlockType: 1
+  _name: Floating
+  icon: {fileID: 21300000, guid: 6d0cd837c5f14604fa106c40bc1f43a9, type: 3}
+  size: {x: 3, y: 4}
+  weight: 40
+  cost:
+    unlockAtStart: 0
+    coinCost: 500
+    list:
+    - _type: 0
+      amt: 2
   T_architecture:
   - {fileID: 8428948708410455898}
   B_bounds:

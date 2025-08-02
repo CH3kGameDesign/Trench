@@ -115,7 +115,7 @@ public class Bullet : DamageSource
     void HitMarker()
     {
         if (B_info.B_player)
-            B_info.con_Player.reticle.Hit(B_info.D_damageType);
+            B_info.con_Player.reticle().Hit(B_info.D_damageType);
     }
 
     public void HitPoint(RaycastHit hit)

@@ -268,6 +268,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   B_Bounds: {fileID: 8134291000900839816}
   I_roomNum: -1
+  V3ID: {x: -1, y: 0, z: 0}
 --- !u!1 &813363246191905151
 GameObject:
   m_ObjectHideFlags: 0
@@ -7432,6 +7433,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BlockType: 5
+  _name: Foodcourt
+  icon: {fileID: 21300000, guid: 2969d90b86698124696637a6df64a112, type: 3}
+  size: {x: 3, y: 3}
+  weight: 30
+  cost:
+    unlockAtStart: 0
+    coinCost: 300
+    list:
+    - _type: 0
+      amt: 5
+    - _type: 1
+      amt: 10
   T_architecture:
   - {fileID: 3406299234016641083}
   B_bounds:

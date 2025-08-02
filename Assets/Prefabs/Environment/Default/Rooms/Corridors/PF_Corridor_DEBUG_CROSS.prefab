@@ -1549,6 +1549,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   B_Bounds: {fileID: 1586047921817233965}
   I_roomNum: -1
+  V3ID: {x: -1, y: 0, z: 0}
 --- !u!1 &2135007117214461724
 GameObject:
   m_ObjectHideFlags: 0
@@ -3384,6 +3385,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BlockType: 0
+  _name: Cross
+  icon: {fileID: 21300000, guid: 93c8b4ec05da30747b08fbb534f82743, type: 3}
+  size: {x: 1, y: 1}
+  weight: 1
+  cost:
+    unlockAtStart: 0
+    coinCost: 0
+    list: []
   T_architecture:
   - {fileID: 3406299234016641083}
   B_bounds:

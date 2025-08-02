@@ -382,6 +382,10 @@ public class Conversation : MonoBehaviour
                 EndConversation();
                 MainMenu.Instance.Open(MainMenu.panelEnum.customize);
                 break;
+            case "openCustomizeLayout":
+                EndConversation();
+                MainMenu.Instance.Open(MainMenu.panelEnum.customizeLayout);
+                break;
             default:
                 EndConversation();
                 break;

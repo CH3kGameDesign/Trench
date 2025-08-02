@@ -10,6 +10,7 @@ public class Reticle : MonoBehaviour
     public GameObject PF_explosionMarker;
     public GameObject PF_killMarker;
     [Space(10)]
+    public Color32 C_baseColor = new Color32(0x23, 0x23, 0x23, 255);
     public Image I_Reticle;
     public Sprite S_aimReticle;
     public TextMeshProUGUI[] TM_roundCounter;
@@ -83,7 +84,7 @@ public class Reticle : MonoBehaviour
         if (_active == _enum)
             return;
         _active = _enum;
-        Color32 _color = new Color32(0x23, 0x23, 0x23, 255);
+        Color32 _color = C_baseColor;
         switch (_enum)
         {
             case colorEnum.enemy: _color = new Color32(0xE4, 0x4F, 0x4C, 255); break;

@@ -30,7 +30,8 @@ public class GunClass_Rocket : GunClass
             Explosion GO = Instantiate(PF_meleeExplosion, PM_player.T_barrelHook.position, PF_meleeExplosion.transform.rotation);
             GO.OnCreate(null);
             Destroy(GO, 5);
-            if (b_playerGun)
+            
+            if (isPlayer)
             {
                 PM_player.RM_ragdoll.AddSource(GO);
                 PM_player.Jump_Force(2f);
@@ -99,7 +100,7 @@ public class GunClass_Rocket : GunClass
 
     void UpdateLockOnGraphic()
     {
-        if (b_playerGun)
+        if (isPlayer)
         {
             if (t_lockOnTarget != null)
             {
@@ -121,7 +122,7 @@ public class GunClass_Rocket : GunClass
     {
         if (b_lockedOn == false)
         {
-            if (b_playerGun)
+            if (isPlayer)
                 PM_player.RT_lockOnPoint.GetComponent<Image>().color = Color.green;
             b_lockedOn = true;
         }
@@ -130,7 +131,7 @@ public class GunClass_Rocket : GunClass
     {
         if (b_lockedOn == true)
         {
-            if (b_playerGun)
+            if (isPlayer)
                 PM_player.RT_lockOnPoint.GetComponent<Image>().color = Color.grey;
             b_lockedOn = false;
         }
