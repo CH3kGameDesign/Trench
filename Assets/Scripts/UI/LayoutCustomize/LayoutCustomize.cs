@@ -74,6 +74,17 @@ public class LayoutCustomize : MonoBehaviour
     private Vector2 v2_canvasSize;
     private Vector2 v2_canvasHalf;
     private Vector2 v2_areaHalf;
+
+
+    public float F_canvasPosSpeed = 50f;
+    private Vector2 v2_canvasPos;
+    private Vector2 v2_canvasPos_Min;
+    private Vector2 v2_canvasPos_Max;
+
+    public float F_canvasZoomSpeed_Mouse = 3;
+    public float F_canvasZoomSpeed_Gamepad = 1;
+    private float F_canvasZoom = 1;
+    private Vector2 v2_zoomBounds = new Vector2(0.5f, 2f);
     public float f_cursorSpeed = 50f;
 
     private void Awake()
@@ -100,9 +111,11 @@ public class LayoutCustomize : MonoBehaviour
         foreach (var item in save._objects)
         {
             LayoutModuleObject MO = Instantiate(PF_moduleObject, RT_holder);
-            MO.Setup(item._block);
+            MO.Setup(item._block, item._rot);
             MoveLMO(item._pos, MO, true);
-            if (!SetDownModule(MO, item._pos))
+
+            LayoutModuleObject _objOverlap;
+            if (!SetDownModule(MO, item._pos, out _objOverlap))
             {
                 Destroy(MO.gameObject);
                 continue;
@@ -112,15 +125,21 @@ public class LayoutCustomize : MonoBehaviour
     public void OnUpdate(PlayerController _PC)
     {
         if (!b_active) return;
-        MoveCursor(_PC);
-        ClickManager(_PC);
+        if (!G_buildMenu.activeSelf)
+        {
+            MoveCursor(_PC);
+            ClickManager(_PC);
+        }
     }
     void MoveCursor(PlayerController _PC)
     {
         if (_PC.Inputs.b_isGamepad)
-            MoveCursor_Gamepad(_PC.Inputs.v2_inputDir);
+            MoveCursor_Gamepad(_PC.Inputs.v2_inputDir, f_cursorSpeed);
         else
             MoveCursor_Mouse();
+
+        MoveCanvas(_PC);
+        ZoomCanvas(_PC);
         UpdateSelected();
     }
     void ClickManager(PlayerController _PC)
@@ -135,11 +154,19 @@ public class LayoutCustomize : MonoBehaviour
     {
         if (LMO_active == null)
             return false;
-        if (!SetDownModule(LMO_active, v2_selSquare))
-            return false;
-        LMO_list.Add(LMO_active);
-        LMO_active = null;
 
+        LayoutModuleObject _objOverlap;
+        if (!SetDownModule(LMO_active, v2_selSquare, out _objOverlap))
+        {
+            if (_objOverlap == null)
+                return false;
+            PickUpModule(_objOverlap);
+            LMO_list.Remove(_objOverlap);
+            LayoutModuleObject _temp;
+            SetDownModule(LMO_active, v2_selSquare, out _temp, true);
+        }
+        LMO_list.Add(LMO_active);
+        LMO_active = _objOverlap;
         return true;
     }
     bool LMO_InactiveClick(PlayerController _PC)
@@ -159,15 +186,18 @@ public class LayoutCustomize : MonoBehaviour
         if (!CheckPos(pos)) return null;
         return i_grid[pos.x][pos.y]._moduleObject;
     }
-    public void LeftTab()
+    public void Rotate(int _dir)
+    {
+        if (LMO_active == null) return;
+        LMO_active.Rotate(_dir);
+        MoveActiveLMO(v2_selSquare);
+    }
+    public void BuildMenu()
     {
         if (!G_buildMenu.activeSelf) ShowBuild(PlayerManager.main);
         else HideBuild(PlayerManager.main);
     }
-    public void RightTab()
-    {
 
-    }
     void BuildMenu_Update(LevelGen_Theme theme)
     {
         RT_buildGrid.DeleteChildren();
@@ -204,7 +234,7 @@ public class LayoutCustomize : MonoBehaviour
     void ShowBuild(PlayerController _PC)
     {
         DestroyActiveLMO();
-        StartCoroutine(RT_holder.Move(new Vector2(v2_canvasHalf.x + i_buildMenuSlide, 0), Quaternion.identity, true, 0.1f));
+        StartCoroutine(RT_holder.Move(new Vector2(v2_canvasPos.x + i_buildMenuSlide, v2_canvasPos.y), Quaternion.identity, true, 0.1f));
         G_leftColumn.SetActive(false);
         G_buildMenu.SetActive(true);
         if (_PC.Inputs.b_isGamepad)
@@ -212,7 +242,7 @@ public class LayoutCustomize : MonoBehaviour
     }
     void HideBuild(PlayerController _PC)
     {
-        StartCoroutine(RT_holder.Move(new Vector2(v2_canvasHalf.x, 0), Quaternion.identity, true, 0.1f));
+        StartCoroutine(RT_holder.Move(v2_canvasPos, Quaternion.identity, true, 0.1f));
         G_leftColumn.SetActive(true);
         G_buildMenu.SetActive(false);
         if (_PC.Inputs.b_isGamepad)
@@ -238,7 +268,7 @@ public class LayoutCustomize : MonoBehaviour
         Vector2 v2 = sel;
         v2.x = Mathf.Clamp(v2.x, 0, i_grid.Count);
         v2.y = Mathf.Clamp(v2.y, 0, i_grid[0].Count);
-        Vector2 size = LMO.Block.size;
+        Vector2 size = LMO.GetSize();
         v2.x -= ((size.y - 1) % 2) / 2f;
         v2.y -= ((size.x - 1) % 2) / 2f;
 
@@ -249,7 +279,7 @@ public class LayoutCustomize : MonoBehaviour
         if (_instant)
             LMO.RT.localPosition = v2;
         else
-            StartCoroutine(LMO.RT.Move(v2, Quaternion.identity, true, 0.1f));
+            StartCoroutine(LMO.RT.Move(v2, true, 0.1f));
     }
     bool CheckPos(Vector2Int v2)
     {
@@ -264,10 +294,13 @@ public class LayoutCustomize : MonoBehaviour
     {
         Vector2Int _min = _obj.GetMinPos(_center);
         Vector2Int _max = _obj.GetMaxPos(_center);
-        return CheckPos(_min, _max);
+
+        LayoutModuleObject _objOverlap;
+        return CheckPos(_min, _max, out _objOverlap);
     }
-    bool CheckPos(Vector2Int _min, Vector2Int _max)
+    bool CheckPos(Vector2Int _min, Vector2Int _max, out LayoutModuleObject _objOverlap)
     {
+        _objOverlap = null;
         if (_min.x < 0 || _min.y < 0)
             return false;
         if (_max.x >= i_grid.Count || _max.y >= i_grid[0].Count)
@@ -280,37 +313,77 @@ public class LayoutCustomize : MonoBehaviour
                 if (i_grid[x][y]._rt == null)
                     return false;
                 if (i_grid[x][y]._moduleObject != null)
-                    return false;
+                {
+                    if (_objOverlap != null)
+                    {
+                        if (_objOverlap != i_grid[x][y]._moduleObject)
+                        {
+                            _objOverlap = null;
+                            return false;
+                        }
+                    }
+                    else
+                        _objOverlap = i_grid[x][y]._moduleObject;
+                }
             }
         }
-        return true;
+        return _objOverlap == null;
     }
-    bool SetDownModule(LayoutModuleObject _obj, Vector2Int _center)
+    bool SetDownModule(LayoutModuleObject _obj, Vector2Int _center, out LayoutModuleObject _objOverlap, bool _force = false)
     {
+        _objOverlap = null;
         Vector2Int _min = _obj.GetMinPos(_center);
         Vector2Int _max = _obj.GetMaxPos(_center);
-        if (!CheckPos(_min, _max)) return false;
+        if (!_force)
+            if (!CheckPos(_min, _max, out _objOverlap))
+                return false;
         for (int x = _min.x; x <= _max.x; x++)
-        {
             for (int y = _min.y; y <= _max.y; y++)
-            {
                 i_grid[x][y]._moduleObject = _obj;
-            }
-        }
+
         _obj.I_BG.color = Color.white;
         _obj.SetBounds(_min, _max);
+        CheckDoors(_obj);
         return true;
     }
     void PickUpModule(LayoutModuleObject _obj)
     {
         for (int x = _obj.minPos.x; x <= _obj.maxPos.x; x++)
-        {
             for (int y = _obj.minPos.y; y <= _obj.maxPos.y; y++)
-            {
                 i_grid[x][y]._moduleObject = null;
+
+        _obj.PickedUp();
+    }
+
+    void CheckDoors(LayoutModuleObject _obj)
+    {
+        Vector2Int _pos;
+        int _rot;
+        LayoutModuleDoor _door;
+        LayoutModuleObject _other;
+        foreach (var item in _obj.LMO_doorList)
+        {
+            item.GetWorldPos(out _pos, out _rot);
+            switch (_rot)
+            {
+                case 0: _pos += Vector2Int.left; break;
+                case 1: _pos += Vector2Int.down; break;
+                case 2: _pos += Vector2Int.right; break;
+                case 3: _pos += Vector2Int.up; break;
+                default: Debug.LogError("Out Of Range!"); continue;
             }
+            CheckPos(_pos, _pos, out _other);
+
+            _rot = (_rot + 2) % 4;
+
+            if (!_other)
+                continue;
+            if (!_other.GetDoorFromWorldPos(_pos, _rot, out _door))
+                continue;
+
+            item.SetConnected(_door);
+            _door.SetConnected(item);
         }
-        _obj.SetBounds(-Vector2Int.one, -Vector2Int.one);
     }
 
     void MoveCursor_Mouse ()
@@ -326,9 +399,9 @@ public class LayoutCustomize : MonoBehaviour
 
         RT_cursor.anchoredPosition = v2_cursorPosition;
     }
-    void MoveCursor_Gamepad(Vector2 dir)
+    void MoveCursor_Gamepad(Vector2 dir, float _speed)
     {
-        v2_cursorPosition += dir * f_cursorSpeed;
+        v2_cursorPosition += dir * _speed;
 
         v2_cursorPosition.x = Mathf.Clamp(v2_cursorPosition.x, -v2_canvasHalf.x, v2_canvasHalf.x);
         v2_cursorPosition.y = Mathf.Clamp(v2_cursorPosition.y, -v2_canvasHalf.y, v2_canvasHalf.y);
@@ -336,12 +409,48 @@ public class LayoutCustomize : MonoBehaviour
         RT_cursor.anchoredPosition = v2_cursorPosition;
     }
 
+    void MoveCanvas(PlayerController _PC)
+    {
+        Vector2 _temp = v2_canvasPos;
+        if (v2_cursorPosition.x < -v2_canvasHalf.x / 2)
+            _temp.x += F_canvasPosSpeed * Time.unscaledDeltaTime;
+        if (v2_cursorPosition.x > v2_canvasHalf.x / 2)
+            _temp.x -= F_canvasPosSpeed * Time.unscaledDeltaTime;
+        _temp.x = Mathf.Clamp(_temp.x, (v2_canvasPos_Min.x * F_canvasZoom) - v2_canvasHalf.x, (v2_canvasPos_Max.x * F_canvasZoom) + v2_canvasHalf.x);
+
+        if (v2_cursorPosition.y < -v2_canvasHalf.y / 2)
+            _temp.y += F_canvasPosSpeed * Time.unscaledDeltaTime;
+        if (v2_cursorPosition.y > v2_canvasHalf.y / 2)
+            _temp.y -= F_canvasPosSpeed * Time.unscaledDeltaTime;
+        _temp.y = Mathf.Clamp(_temp.y, v2_canvasPos_Min.y * F_canvasZoom, v2_canvasPos_Max.y * F_canvasZoom);
+
+        if (_PC.Inputs.b_isGamepad)
+            MoveCursor_Gamepad(_temp - v2_canvasPos, 1);
+
+        v2_canvasPos = _temp;
+        RT_holder.localPosition = v2_canvasPos;
+    }
+
+    public void ZoomCanvas(PlayerController _PC)
+    {
+        float _dir = _PC.Inputs.f_zoom;
+        if (_PC.Inputs.b_isGamepad)
+            F_canvasZoom += _dir * Time.unscaledDeltaTime * F_canvasZoomSpeed_Gamepad;
+        else
+            F_canvasZoom += _dir * Time.unscaledDeltaTime * F_canvasZoomSpeed_Mouse;
+        F_canvasZoom = Mathf.Clamp(F_canvasZoom, v2_zoomBounds.x, v2_zoomBounds.y);
+
+        RT_holder.localScale = Vector3.one * F_canvasZoom;
+    }
+
     void UpdateSelected()
     {
         Vector2 _v = new Vector2(-v2_cursorPosition.y, v2_cursorPosition.x);
         
         _v.y -= RT_holder.anchoredPosition.x;
-        _v.x -= RT_holder.anchoredPosition.y;
+        _v.x += RT_holder.anchoredPosition.y;
+
+        _v /= F_canvasZoom;
 
         _v += v2_areaHalf;
         _v /= I_spacing;
@@ -381,6 +490,7 @@ public class LayoutCustomize : MonoBehaviour
         _h *= Screen.height;
         v2_canvasSize = new Vector2(_w, _h);
         v2_canvasHalf = v2_canvasSize / 2;
+        v2_canvasPos = new Vector2(v2_canvasHalf.x, 0);
     }
 
     public void Hide()
@@ -419,6 +529,8 @@ public class LayoutCustomize : MonoBehaviour
             }
         }
         v2_areaHalf = new Vector2(_bounds.data[0].d.Count, _bounds.data.Count) * I_spacing / 2;
+        v2_canvasPos_Min = -v2_areaHalf;
+        v2_canvasPos_Max = v2_areaHalf;
     }
 
     // Update is called once per frame

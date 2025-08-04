@@ -584,10 +584,16 @@ public class MainMenu : MonoBehaviour
             }
             if (current == customizeLayout)
             {
-                if (_left) LayoutCustomize.Instance.LeftTab();
-                else LayoutCustomize.Instance.RightTab();
+                if (_left) LayoutCustomize.Instance.Rotate(-1);
+                else LayoutCustomize.Instance.Rotate(1);
             }
         }
+    }
+    public void BuildMenu()
+    {
+        if (menuOpen)
+            if (current == customizeLayout)
+                LayoutCustomize.Instance.BuildMenu();
     }
     public void CheckSelectedButton()
     {

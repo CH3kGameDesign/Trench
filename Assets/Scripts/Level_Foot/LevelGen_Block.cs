@@ -23,6 +23,14 @@ public class LevelGen_Block : MonoBehaviour
 
     [HideInInspector] public int I_roomNum = -1;
 
+    public List<doorClass> doors = new List<doorClass>();
+    [System.Serializable]
+    public class doorClass
+    {
+        public Vector2Int _pos;
+        public int _rot;
+    }
+
     public enum entryTypeEnum { singleDoor, wideDoor, vent, shipDoor, shipPark, any}
     // Start is called before the first frame update
     void Start()

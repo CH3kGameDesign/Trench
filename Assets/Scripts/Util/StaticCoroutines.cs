@@ -99,4 +99,60 @@ public static class StaticCoroutines
         }
         if (_action != null) _action.Invoke();
     }
+    public static IEnumerator Move(this Transform _target, Vector3 _tarPos, bool _local, float _speed = 0.4f, AnimCurve _anim = null, UnityAction _action = null)
+    {
+        float _timer = 0f;
+        Vector3 startPos;
+        float _progress = 0;
+        if (_local)
+            startPos = _target.localPosition;
+        else
+            startPos = _target.position;
+
+        while (_timer < 1)
+        {
+            if (_anim != null) _progress = _anim.Evaluate(_timer);
+            else _progress = _timer;
+
+            if (_local)
+                _target.localPosition = Vector3.Lerp(startPos, _tarPos, _progress);
+            else
+                _target.position = Vector3.Lerp(startPos, _tarPos, _progress);
+            yield return new WaitForEndOfFrame();
+            _timer += Time.unscaledDeltaTime / _speed;
+        }
+        if (_local)
+            _target.localPosition = _tarPos;
+        else
+            _target.position = _tarPos;
+        if (_action != null) _action.Invoke();
+    }
+    public static IEnumerator Move(this Transform _target, Quaternion _tarRot, bool _local, float _speed = 0.4f, AnimCurve _anim = null, UnityAction _action = null)
+    {
+        float _timer = 0f;
+        Quaternion startRot;
+        float _progress = 0;
+        if (_local)
+            startRot = _target.localRotation;
+        else
+            startRot = _target.rotation;
+
+        while (_timer < 1)
+        {
+            if (_anim != null) _progress = _anim.Evaluate(_timer);
+            else _progress = _timer;
+
+            if (_local)
+                _target.localRotation = Quaternion.Lerp(startRot, _tarRot, _progress);
+            else
+                _target.rotation = Quaternion.Lerp(startRot, _tarRot, _progress);
+            yield return new WaitForEndOfFrame();
+            _timer += Time.unscaledDeltaTime / _speed;
+        }
+        if (_local)
+            _target.localRotation = _tarRot;
+        else
+            _target.rotation = _tarRot;
+        if (_action != null) _action.Invoke();
+    }
 }

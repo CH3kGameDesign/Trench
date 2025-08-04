@@ -144,8 +144,12 @@ public class PlayerController : BaseController
     {
         public string s_inputType = "";
         public bool b_isGamepad = false;
+
         public Vector2 v2_inputDir;
         public Vector2 v2_camInputDir;
+
+        public float f_zoom;
+
         public bool b_sprinting = false;
         public bool b_jumping = false;
         public bool b_firing = false;
@@ -1760,6 +1764,7 @@ public class PlayerController : BaseController
     public void Input_Melee(InputAction.CallbackContext cxt) { Inputs.b_melee = Input_GetPressed(cxt); }
     public void Input_Recall(InputAction.CallbackContext cxt) { Inputs.b_recall = Input_GetPressed(cxt); }
     public void Input_Menu(InputAction.CallbackContext cxt) { if (cxt.phase == InputActionPhase.Started) MainMenu.Instance.Menu_Tapped(); }
+    public void Input_Zoom(InputAction.CallbackContext cxt) { Inputs.f_zoom = Input_GetFloat(cxt); }
 
     public void Input_Purchase(InputAction.CallbackContext cxt)
     {
@@ -1789,7 +1794,12 @@ public class PlayerController : BaseController
             if (GameState == gameStateEnum.menu)
                 MainMenu.Instance.Tab_Switch(false);
     }
-
+    public void Input_BuildMenu(InputAction.CallbackContext cxt)
+    {
+        if (cxt.phase == InputActionPhase.Started)
+            if (GameState == gameStateEnum.menu)
+                MainMenu.Instance.BuildMenu();
+    }
     public void Input_ChangedInput(PlayerInput input)
     {
         SetNetworkOwner();
@@ -1840,6 +1850,16 @@ public class PlayerController : BaseController
                 return cxt.action.ReadValue<Vector2>();
             default:
                 return Vector2.zero;
+        }
+    }
+    float Input_GetFloat(InputAction.CallbackContext cxt)
+    {
+        switch (cxt.phase)
+        {
+            case InputActionPhase.Performed:
+                return cxt.action.ReadValue<float>();
+            default:
+                return 0;
         }
     }
 
