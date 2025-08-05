@@ -584,8 +584,8 @@ public class MainMenu : MonoBehaviour
             }
             if (current == customizeLayout)
             {
-                if (_left) LayoutCustomize.Instance.Rotate(-1);
-                else LayoutCustomize.Instance.Rotate(1);
+                if (_left) LayoutCustomize.Instance.Rotate(1);
+                else LayoutCustomize.Instance.Rotate(-1);
             }
         }
     }

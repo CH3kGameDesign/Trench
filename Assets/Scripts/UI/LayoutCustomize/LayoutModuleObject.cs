@@ -118,7 +118,7 @@ public class LayoutModuleObject : MonoBehaviour
         if (_instant)
             RT.localEulerAngles = new Vector3(0, 0, 90 * I_rot);
         else
-            StartCoroutine(RT.Move(Quaternion.Euler(new Vector3(0, 0, 90 * I_rot)), true, 0.1f));
+            StartCoroutine(RT.Move(Quaternion.Euler(new Vector3(0, 0, 90 * I_rot)), true, 0.2f));
         RT_nameBG.localEulerAngles = new Vector3(0, 0, -90 * I_rot);
         Vector2 _anchor = new Vector2(0.5f, 1f);
         switch (I_rot)

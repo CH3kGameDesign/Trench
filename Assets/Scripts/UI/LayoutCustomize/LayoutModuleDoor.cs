@@ -48,10 +48,21 @@ public class LayoutModuleDoor : MonoBehaviour
 
     public void GetWorldPos(out Vector2Int _pos, out int  _rot)
     {
-        _pos = LMO_Holder.minPos + new Vector2Int(V2_localPos.y, V2_localPos.x);
-        //WORLD POS with Rotated object greater than 1x1
+        int _parentRot = LMO_Holder.I_rot;
+        switch (_parentRot)
+        {
+            case 0: _pos = new Vector2Int(LMO_Holder.maxPos.x - V2_localPos.y, LMO_Holder.minPos.y + V2_localPos.x); break;
+            case 1: _pos = new Vector2Int(LMO_Holder.maxPos.x - V2_localPos.x, LMO_Holder.maxPos.y - V2_localPos.y); break;
+            case 2: _pos = new Vector2Int(LMO_Holder.minPos.x + V2_localPos.y, LMO_Holder.maxPos.y - V2_localPos.x); break;
+            case 3: _pos = new Vector2Int(LMO_Holder.minPos.x + V2_localPos.x, LMO_Holder.minPos.y + V2_localPos.y); break;
 
-        _rot = (LMO_Holder.I_rot - I_localRot) % 4;
+            default:
+                Debug.LogError("Rotation Out Of Range: " + _parentRot);
+                _pos = LMO_Holder.minPos;
+                break;
+        }
+        _rot = (_parentRot - I_localRot) % 4;
         if (_rot < 0) _rot += 4;
+        Debug.Log(_pos + ":" + _rot);
     }
 }
