@@ -55,9 +55,11 @@ public class LevelGen_Block : MonoBehaviour
 
         Vector3 _min;
         Vector3 _max;
-        UpdateSize_Layout(out _min, out _max);
-        UpdateDoors_Layout(_min);
-        UpdateTexture_Layout(_min, _max);
+        Vector3 _worldMin;
+        Vector3 _worldMax;
+        UpdateSize_Layout(out _min, out _max, out _worldMin, out _worldMax);
+        UpdateDoors_Layout(_min, _max);
+        UpdateTexture_Layout(_worldMin, _worldMax);
     }
     void UpdateEntryList()
     {
@@ -67,6 +69,7 @@ public class LevelGen_Block : MonoBehaviour
     {
         LGS_Spawns = GetComponentsInChildren<LevelGen_Spawn>();
     }
+    float _boxShrink = 0.5f;
     void UpdateBoundingBox()
     {
         //transform.position = Vector3.zero;
@@ -86,7 +89,7 @@ public class LevelGen_Block : MonoBehaviour
             _temp = _collider[0].bounds;
             foreach (var item in _collider)
                 _temp.Encapsulate(item.bounds);
-            _temp.Expand(-0.5f);
+            _temp.Expand(-_boxShrink);
 
             GameObject GO = new GameObject();
             GO.transform.parent = transform.GetChild(3);
@@ -111,69 +114,103 @@ public class LevelGen_Block : MonoBehaviour
     }
 
     int _gridSize = 5;
-    void UpdateSize_Layout(out Vector3 _min, out Vector3 _max)
+    void UpdateSize_Layout(out Vector3 _min, out Vector3 _max, out Vector3 _worldMin, out Vector3 _worldMax)
     {
-        _min = Vector3.one * 10000;
-        _max = Vector3.one * -10000;
+        _worldMin = Vector3.one * 10000;
+        _worldMax = Vector3.one * -10000;
         Vector3 _temp;
 
         foreach (var item in B_bounds)
         {
             _temp = item.B_Bounds.bounds.min;
-            _min.x = Mathf.Min(_min.x, _temp.x);
-            _min.y = Mathf.Min(_min.y, _temp.y);
-            _min.z = Mathf.Min(_min.z, _temp.z);
+            _worldMin.x = Mathf.Min(_worldMin.x, _temp.x);
+            _worldMin.y = Mathf.Min(_worldMin.y, _temp.y);
+            _worldMin.z = Mathf.Min(_worldMin.z, _temp.z);
             _temp = item.B_Bounds.bounds.max;
-            _min.x = Mathf.Min(_min.x, _temp.x);
-            _min.y = Mathf.Min(_min.y, _temp.y);
-            _min.z = Mathf.Min(_min.z, _temp.z);
+            _worldMax.x = Mathf.Max(_worldMax.x, _temp.x);
+            _worldMax.y = Mathf.Max(_worldMax.y, _temp.y);
+            _worldMax.z = Mathf.Max(_worldMax.z, _temp.z);
         }
-        size.x = Mathf.RoundToInt((_max.x - _min.x)/ _gridSize);
+        _min = Vector3Int.FloorToInt(_worldMin / _gridSize) * _gridSize;
+        _max = Vector3Int.CeilToInt(_worldMax / _gridSize) * _gridSize;
+        size.x = Mathf.RoundToInt((_max.x - _min.x) / _gridSize);
         size.y = Mathf.RoundToInt((_max.z - _min.z) / _gridSize);
     }
-    void UpdateDoors_Layout(Vector3 _min)
+    void UpdateDoors_Layout(Vector3 _min, Vector3 _max)
     {
         doors.Clear();
         foreach (var item in LGD_Entries)
         {
             doorClass DC = new doorClass();
 
-            int _rot = Mathf.RoundToInt((item.transform.localEulerAngles.y / 90) % 4);
+            int _rot = (Mathf.RoundToInt(item.transform.localEulerAngles.y / 90) + 2) % 4;
             if (_rot < 0) _rot += 4;
+
             DC._rot = _rot;
 
             Vector3 _pos = (item.transform.localPosition - _min) / _gridSize;
-            DC._pos = Vector2Int.RoundToInt(new Vector2(_pos.x, _pos.z));
+
+            switch (_rot)
+            {
+                case 0: _pos.x += 0.5f; _pos.z += 1f; break;
+                case 1: _pos.x += 1f; _pos.z += 0.5f; break;
+                case 2: _pos.x += 0.5f; break;
+                case 3: _pos.z += 0.5f; break;
+                default:
+                    break;
+            }
+
+            _pos.x = size.x - _pos.x;
+
+            DC._pos = Vector2Int.RoundToInt(new Vector2(_pos.x, size.y - _pos.z));
+            doors.Add( DC);
         }
     }
     void UpdateTexture_Layout(Vector3 _min, Vector3 _max)
     {
-        Camera _camera = Instantiate(PF_Camera);
+        Camera _camera = Instantiate(PF_Camera, transform);
         Vector3 _pos = new Vector3(_min.x + _max.x, 0, _min.z + _max.z) / 2;
-        _pos.y = _max.y + (Mathf.Max(size.x, size.y) * 5);
+        _pos.y = _max.y + (Mathf.Max(size.x, size.y) * 2.5f);
         _camera.transform.position = _pos;
-        _camera.activeTexture.width = size.x * 64;
-        _camera.activeTexture.height = size.y * 64;
         _camera.transform.localEulerAngles = new Vector3(90, 180, 0);
+
+        List<GameObject> ceilings = GetCeilings();
+        foreach (GameObject g in ceilings)
+            g.SetActive(false);
+
+        GenerateTexture(_camera);
+
+        foreach (GameObject g in ceilings)
+            g.SetActive(true);
+
+        DestroyImmediate(_camera.gameObject);
     }
-    public virtual void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null,
+    //FIX AFTER ROOM BUILDER IS USABLE
+    List<GameObject> GetCeilings()
+    {
+        List<GameObject> list = new List<GameObject>();
+
+        foreach (Transform t in T_architecture)
+        {
+            Transform[] GO = t.GetComponentsInChildren<Transform>();
+            foreach(Transform go in GO)
+            {
+                if (go.name.Contains("Ceiling"))
+                    list.Add(go.gameObject);
+            }
+        }
+
+        return list;
+    }
+
+    public virtual void GenerateTexture(Camera _camera,
         string filePath = "Assets/Art/Sprites/Layout/")
     {
-        if (_model != null)
-        {
-            GameObject GO;
-            string targetPath = filePath + name.Replace("/", "_") + ".png";
-            GO = Instantiate(_model);
-            GO.transform.position = pos;
-            GO.transform.eulerAngles = rot;
+            string targetPath = filePath + _name.Replace("/", "_") + ".png";
             _camera.Render();
 #if UNITY_EDITOR
             _camera.activeTexture.SaveToFile(targetPath, SetImage);
 #endif
-            DestroyImmediate(GO);
-        }
-        else
-            layoutTexture = onEmpty;
     }
     public void SetImage(bool set, Texture2D _texture)
     {

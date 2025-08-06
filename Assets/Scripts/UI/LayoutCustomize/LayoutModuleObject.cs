@@ -11,7 +11,7 @@ public class LayoutModuleObject : MonoBehaviour
     public TextMeshProUGUI TM_name;
     public RectTransform RT;
     public RectTransform RT_nameBG;
-    public Image I_BG;
+    public RawImage I_BG;
 
     public LayoutModuleDoor PF_door;
     public List<LayoutModuleDoor> LMO_doorList = new List<LayoutModuleDoor>();
@@ -34,6 +34,15 @@ public class LayoutModuleObject : MonoBehaviour
         Block = _block;
         TM_name.text = _block._name;
         RT.sizeDelta = _block.size * 100;
+
+        if (_block.layoutTexture)
+        {
+            I_BG.texture = _block.layoutTexture;
+            I_BG.rectTransform.sizeDelta = Vector3.one * Mathf.Max(_block.size.x, _block.size.y) * 100;
+        }
+        else
+            I_BG.rectTransform.sizeDelta = (_block.size * 100) - (Vector2.one * 10);
+
         SetupDoors();
         Rotate(_rot);
     }

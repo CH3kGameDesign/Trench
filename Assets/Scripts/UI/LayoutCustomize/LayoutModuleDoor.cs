@@ -63,6 +63,5 @@ public class LayoutModuleDoor : MonoBehaviour
         }
         _rot = (_parentRot - I_localRot) % 4;
         if (_rot < 0) _rot += 4;
-        Debug.Log(_pos + ":" + _rot);
     }
 }
