@@ -406,6 +406,18 @@ public static class CKUtil
         return _temp;
     }
 
+    public static bool IsValid(this Bounds _bounds, int _dimReq = 2)
+    {
+        int _dim = 0;
+        if (_bounds.extents.x > 0.01f)
+            _dim++;
+        if (_bounds.extents.y > 0.01f)
+            _dim++;
+        if (_bounds.extents.z > 0.01f)
+            _dim++;
+        return _dim >= _dimReq;
+    }
+
     public static void PlayClip(this Animator _anim, string _name)
     {
         _anim.Play(_name);

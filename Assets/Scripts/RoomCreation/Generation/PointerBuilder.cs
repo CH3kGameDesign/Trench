@@ -406,7 +406,8 @@ public class PointerBuilder : MonoBehaviour
         }
         if (Input.GetMouseButtonUp(0) && activeSquare != null)
         {
-            if (firstClickPos == GetPos())
+            Vector3 _compare = GetPos();
+            if (firstClickPos.x == _compare.x || firstClickPos.z == _compare.z)
                 GameObject.Destroy(activeSquare.gameObject);
             activeSquare = null;
         }
@@ -669,6 +670,13 @@ public class PointerBuilder : MonoBehaviour
                 activeArrow.localScale = Vector3.one;
                 switch (drawMode)
                 {
+                    case drawModes.stretch:
+                        if (activeWall != null)
+                        {
+                            if (!activeWall.RU.SU_Floor.mr.bounds.IsValid())
+                                DeleteSquare();
+                        }
+                        break;
                     case drawModes.extend:
                         if (activeSquare != null)
                         {
@@ -817,9 +825,10 @@ public class PointerBuilder : MonoBehaviour
     void DeleteSquare()
     {
         if (activeSquare != null)
-        {
             GameObject.Destroy(activeSquare.gameObject);
-        }
+        else if (activeWall != null)
+            Destroy(activeWall.RU.gameObject);
+
         activeSquare = null;
         activeWall = null;
     }

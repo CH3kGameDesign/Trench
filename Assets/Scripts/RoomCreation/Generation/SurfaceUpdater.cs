@@ -87,7 +87,8 @@ public class SurfaceUpdater : MonoBehaviour
         };
         mf.mesh.RecalculateNormals();
         mf.mesh.RecalculateBounds();
-        mc.sharedMesh = wallActive.SU.mf.mesh;
+        if (wallActive.SU.mf.mesh.bounds.IsValid())
+            mc.sharedMesh = wallActive.SU.mf.mesh;
         bc.size = new Vector3(Mathf.Abs(vertPos[wallActive.verts.x].x - vertPos[wallActive.verts.y].x), wallActive.height, Mathf.Abs(vertPos[wallActive.verts.x].z - vertPos[wallActive.verts.y].z));
     }
 }

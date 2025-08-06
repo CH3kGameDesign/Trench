@@ -71,7 +71,8 @@ public class RoomUpdater : MonoBehaviour
             temp[i] = new Vector2(vertPos[i].x, vertPos[i].z);
         SU_Floor.mf.mesh.uv = temp;
         SU_Floor.mf.mesh.RecalculateBounds();
-        SU_Floor.mc.sharedMesh = SU_Floor.mf.mesh;
+        if (SU_Floor.mf.mesh.bounds.IsValid())
+            SU_Floor.mc.sharedMesh = SU_Floor.mf.mesh;
         //boxCollider.size = new Vector3(Mathf.Abs(vertPos[0].x - vertPos[3].x), 0.01f, Mathf.Abs(vertPos[0].z - vertPos[3].z));
     }
 
@@ -86,7 +87,8 @@ public class RoomUpdater : MonoBehaviour
         SU_Ceiling.mf.mesh.uv = temp;
         SU_Ceiling.mf.mesh.RecalculateNormals();
         SU_Ceiling.mf.mesh.RecalculateBounds();
-        SU_Ceiling.mc.sharedMesh = SU_Ceiling.mf.mesh;
+        if (SU_Ceiling.mf.mesh.bounds.IsValid())
+            SU_Ceiling.mc.sharedMesh = SU_Ceiling.mf.mesh;
         //boxCollider.size = new Vector3(Mathf.Abs(vertPos[0].x - vertPos[3].x), 0.01f, Mathf.Abs(vertPos[0].z - vertPos[3].z));
     }
 
