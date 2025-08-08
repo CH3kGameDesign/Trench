@@ -1,14 +1,22 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
+using System.IO;
+
+using Unity.VisualScripting;
+
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 [CreateAssetMenu(menuName = "Trench/AssetLists/LevelGen/Placeables", fileName = "New Placeables Manager")]
 public class LevelGen_Placeables : ScriptableObject
 {
     public static LevelGen_Placeables Instance;
     public List<SpawnPoint> spawnPoints = new List<SpawnPoint>();
+
+    public string prefabFilePath = "/Prefabs/Environment/Default";
     public List<Structure> structures = new List<Structure>();
     public List<Wall> walls = new List<Wall>();
     public List<Floor> floors = new List<Floor>();
@@ -19,7 +27,7 @@ public class LevelGen_Placeables : ScriptableObject
     {
         public string name;
         public Texture2D image;
-        public GameObject prefab;
+        public Prefab_Environment prefab;
         public virtual void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/LevelGen/")
         {
             if (_model != null)
@@ -50,7 +58,7 @@ public class LevelGen_Placeables : ScriptableObject
         public override void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/LevelGen/")
         {
             filePath += "Spawns/";
-            base.GenerateTexture(_camera, pos, rot, onEmpty, prefab, filePath);
+            base.GenerateTexture(_camera, pos, rot, onEmpty, prefab.gameObject, filePath);
         }
     }
     [System.Serializable]
@@ -59,7 +67,7 @@ public class LevelGen_Placeables : ScriptableObject
         public override void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/LevelGen/")
         {
             filePath += "Structures/";
-            base.GenerateTexture(_camera, pos, rot, onEmpty, prefab, filePath);
+            base.GenerateTexture(_camera, pos, rot, onEmpty, prefab.gameObject, filePath);
         }
     }
     [System.Serializable]
@@ -68,7 +76,7 @@ public class LevelGen_Placeables : ScriptableObject
         public override void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/LevelGen/")
         {
             filePath += "Structures/";
-            base.GenerateTexture(_camera, pos, rot, onEmpty, prefab, filePath);
+            base.GenerateTexture(_camera, pos, rot, onEmpty, prefab.gameObject, filePath);
         }
     }
     [System.Serializable]
@@ -77,7 +85,7 @@ public class LevelGen_Placeables : ScriptableObject
         public override void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/LevelGen/")
         {
             filePath += "Structures/";
-            base.GenerateTexture(_camera, pos, rot, onEmpty, prefab, filePath);
+            base.GenerateTexture(_camera, pos, rot, onEmpty, prefab.gameObject, filePath);
         }
     }
     [System.Serializable]
@@ -86,7 +94,7 @@ public class LevelGen_Placeables : ScriptableObject
         public override void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/LevelGen/")
         {
             filePath += "Structures/";
-            base.GenerateTexture(_camera, pos, rot, onEmpty, prefab, filePath);
+            base.GenerateTexture(_camera, pos, rot, onEmpty, prefab.gameObject, filePath);
         }
     }
 
@@ -129,6 +137,66 @@ public class LevelGen_Placeables : ScriptableObject
         return _temp;
     }
 #if UNITY_EDITOR
+    [ContextMenu("Tools/GatherPrefabs")]
+    public void GatherPrefabs()
+    {
+        string mainPath = Application.dataPath + prefabFilePath;
+        string[] filePaths = Directory.GetFiles(mainPath, "*.prefab",
+                                         SearchOption.AllDirectories);
+        structures.Clear();
+        floors.Clear();
+        walls.Clear();
+        ceilings.Clear();
+        foreach (var path in filePaths)
+        {
+            string _path = "Assets" + path.Substring(Application.dataPath.Length);
+            Prefab_Environment _temp = (Prefab_Environment)AssetDatabase.LoadAssetAtPath(_path, typeof(Prefab_Environment));
+            if (_temp != null)
+            {
+                switch (_temp._type)
+                {
+                    case Prefab_Environment.TypeEnum.floor:
+                        Floor _floor = new Floor();
+                        _floor.name = _temp.GetName();
+                        _floor.prefab = _temp;
+                        floors.Add(_floor);
+                        break;
+                    case Prefab_Environment.TypeEnum.wall:
+                        Wall _wall = new Wall();
+                        _wall.name = _temp.GetName();
+                        _wall.prefab = _temp;
+                        walls.Add(_wall);
+                        break;
+                    case Prefab_Environment.TypeEnum.ceiling:
+                        Ceiling ceiling = new Ceiling();
+                        ceiling.name = _temp.GetName();
+                        ceiling.prefab = _temp;
+                        ceilings.Add(ceiling);
+                        break;
+                    case Prefab_Environment.TypeEnum.door:
+                        Structure _structure = new Structure();
+                        _structure.name = _temp.GetName();
+                        _structure.prefab = _temp;
+                        structures.Add(_structure);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        EditorUtility.SetDirty(this);
+    }
+    public void GenerateList(string _filePath, Type _type)
+    {
+        if (!AssetDatabase.IsValidFolder(_filePath))
+            return;
+        UnityEngine.Object[] _list = AssetDatabase.LoadAllAssetsAtPath(_filePath);
+        if (_type == typeof(Structure))
+        {
+
+        }
+    }
+
     [ContextMenu("Tools/GenerateSprites")]
     public void GenerateSprites()
     {

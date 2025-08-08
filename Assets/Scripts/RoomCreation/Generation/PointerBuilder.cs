@@ -50,6 +50,9 @@ public class PointerBuilder : MonoBehaviour
     {
         public LayerMask gridMask;
         public LayerMask interactableMask;
+        public LayerMask floorMask;
+        public LayerMask wallMask;
+        public LayerMask ceilingMask;
         public LayerMask arrowMask;
     }
 
@@ -164,7 +167,9 @@ public class PointerBuilder : MonoBehaviour
     public class PlaceClass : BeltClass
     {
         public List<PlaceSubClass> list;
-        public GameObject activePrefab;
+        public Prefab_Environment activePrefab;
+        public Prefab_Environment activeTransform;
+        public LayerMask activeLM;
         public override void GenerateBelt(PointerBuilder PB, RectTransform _hook)
         {
             PB.beltMode = beltModes.place;
@@ -227,7 +232,7 @@ public class PointerBuilder : MonoBehaviour
         }
         public virtual void OnSelect(PointerBuilder PB)
         {
-
+            PB.Update_ArrowTypes();
         }
     }
     [System.Serializable]
@@ -244,7 +249,7 @@ public class PointerBuilder : MonoBehaviour
         public override void OnSelect(PointerBuilder PB)
         {
             PB.drawMode = _mode;
-            PB.Update_ArrowTypes();
+            base.OnSelect(PB);
         }
     }
     [System.Serializable]
@@ -259,7 +264,7 @@ public class PointerBuilder : MonoBehaviour
         }
         public override void OnSelect(PointerBuilder PB)
         {
-
+            base.OnSelect(PB);
         }
     }
     [System.Serializable]
@@ -274,7 +279,7 @@ public class PointerBuilder : MonoBehaviour
         }
         public override void OnSelect(PointerBuilder PB)
         {
-
+            base.OnSelect(PB);
         }
     }
     [System.Serializable]
@@ -306,10 +311,18 @@ public class PointerBuilder : MonoBehaviour
     }
     public class PlaceItem : SubItem
     {
-        public GameObject _prefab;
+        public Prefab_Environment _prefab;
         public override void OnSelect(PointerBuilder PB)
         {
             PB._Place.activePrefab = _prefab;
+            switch (_prefab._type)
+            {
+                case Prefab_Environment.TypeEnum.floor: PB._Place.activeLM = PB._layer.floorMask; break;
+                case Prefab_Environment.TypeEnum.wall: PB._Place.activeLM = PB._layer.wallMask; break;
+                case Prefab_Environment.TypeEnum.ceiling: PB._Place.activeLM = PB._layer.ceilingMask; break;
+                case Prefab_Environment.TypeEnum.door: PB._Place.activeLM = PB._layer.wallMask; break;
+                default: PB._Place.activeLM = PB._layer.interactableMask; break;
+            }
             base.OnSelect(PB);
         }
     }
@@ -413,7 +426,7 @@ public class PointerBuilder : MonoBehaviour
         }
     }
 
-    void CreateNewSquare(float _height = 3f)
+    void CreateNewSquare(float _height = 4f)
     {
         GameObject GO;
         RoomUpdater RU;
@@ -728,7 +741,86 @@ public class PointerBuilder : MonoBehaviour
     }
     void Update_Place()
     {
+        if (Input.GetMouseButtonDown(0)) Place_CreateObject();
+        if (Input.GetMouseButton(0)) Place_MoveObject();
+        if (Input.GetMouseButtonUp(0)) Place_PlaceObject();
+    }
+    void Place_CreateObject()
+    {
+        if (!_Place.activePrefab)
+            return;
+        if (EventSystem.current.IsPointerOverGameObject())
+            return;
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out hit, 1000, _layer.interactableMask))
+        {
+            int l = hit.transform.gameObject.layer;
+            if (_Place.activeLM.Check(l))
+            {
+                _Place.activeTransform = Instantiate(_Place.activePrefab, hit.transform);
+                Vector3 _pos = hit.point;
+                if (!Input.GetKey(KeyCode.LeftControl))
+                    _pos = ClampToGrid(_pos);
+                _Place.activeTransform.transform.position = _pos;
 
+                switch (_Place.activeTransform._type)
+                {
+                    case Prefab_Environment.TypeEnum.wall:
+                        _Place.activeTransform.transform.forward = -hit.normal;
+                        break;
+                    case Prefab_Environment.TypeEnum.door:
+                        _Place.activeTransform.transform.forward = -hit.normal;
+                        //DEBUG SHIT
+                        //////////////////////////////////////
+                        SurfaceUpdater _SU;
+                        if (hit.transform.TryGetComponent<SurfaceUpdater>(out _SU))
+                        {
+                            LevelGen_Door LGD;
+                            if (_Place.activeTransform.transform.TryGetComponent<LevelGen_Door>(out LGD))
+                            {
+                                _SU.doors.Add(LGD);
+                            }
+                        }
+                        ///////////////////////////////////////////
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+    void Place_MoveObject()
+    {
+        if (!_Place.activeTransform)
+            return;
+        if (EventSystem.current.IsPointerOverGameObject())
+            return;
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out hit, 1000, _layer.interactableMask))
+        {
+            int l = hit.transform.gameObject.layer;
+            if (_Place.activeLM.Check(l))
+            {
+                Vector3 _pos = hit.point;
+                if (!Input.GetKey(KeyCode.LeftControl))
+                    _pos = ClampToGrid(_pos);
+
+                _Place.activeTransform.transform.parent = hit.transform;
+                _Place.activeTransform.transform.position = _pos;
+
+                if (_Place.activeTransform._type == Prefab_Environment.TypeEnum.wall ||
+                    _Place.activeTransform._type == Prefab_Environment.TypeEnum.door)
+                    _Place.activeTransform.transform.forward = -hit.normal;
+            }
+        }
+    }
+    void Place_PlaceObject()
+    {
+        if (!_Place.activeTransform)
+            return;
+        _Place.activeTransform = null;
     }
     #region Player Interactions
     void Arrow_Move(RoomUpdater RM, Vector3 changeFinal)
@@ -844,7 +936,10 @@ public class PointerBuilder : MonoBehaviour
     void DeselectWall()
     {
         if (activeWall != null)
+        {
             activeWall.OffHover();
+            activeWall.RU.HideArrows();
+        }
         activeWall = null;
     }
     void SelectSquare(Transform _newSquare)
@@ -1030,6 +1125,7 @@ public class PointerBuilder : MonoBehaviour
     public void GenerateBelt_Sub(int _belt)
     {
         ClearBelt();
+        
         DeselectSquare();
         switch (_belt)
         {
@@ -1133,6 +1229,13 @@ public class PointerBuilder : MonoBehaviour
             return tempVec;
         }
         return new Vector3(0, 40400, 0);
+    }
+
+    Vector3 ClampToGrid(Vector3 _pos)
+    {
+        _pos = Vector3Int.RoundToInt(_pos /  gridSize);
+        _pos *= gridSize;
+        return _pos;
     }
 
     private Vector3 GetRoomPos()

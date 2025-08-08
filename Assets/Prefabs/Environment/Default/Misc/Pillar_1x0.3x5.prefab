@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1889332036630435745}
   - component: {fileID: 1030647752993904745}
   - component: {fileID: 7866148329952435297}
-  m_Layer: 14
+  m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -720,7 +720,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1079685546699635095}
-  m_Layer: 14
+  - component: {fileID: 2850689771372979989}
+  m_Layer: 0
   m_Name: Pillar_1x0.3x5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -743,3 +744,17 @@ Transform:
   - {fileID: 659173206656758075}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2850689771372979989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6076102488941337844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 977c7cb71a7493c41963fcff8b181f6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _name: 
+  _type: 1

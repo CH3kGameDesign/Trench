@@ -8,6 +8,10 @@ public class LevelGen_Placeables_Editor : Editor
     {
         LevelGen_Placeables myTarget = (LevelGen_Placeables)target;
         DrawDefaultInspector();
+        if (GUILayout.Button("Gather Structures"))
+        {
+            myTarget.GatherPrefabs();
+        }
         if (GUILayout.Button("Generate Sprites"))
         {
             myTarget.GenerateSprites();

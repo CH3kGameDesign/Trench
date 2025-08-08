@@ -643,7 +643,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 466548980}
   m_HandleRect: {fileID: 466548979}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1776,7 +1776,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 393826599}
   m_HandleRect: {fileID: 393826598}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2557,8 +2557,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 557535416}
   m_HandleRect: {fileID: 557535415}
   m_Direction: 2
-  m_Value: 0.99999976
-  m_Size: 0.61
+  m_Value: 1
+  m_Size: 0.60999995
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2862,7 +2862,16 @@ MonoBehaviour:
       m_Bits: 64
     interactableMask:
       serializedVersion: 2
+      m_Bits: 1589248
+    floorMask:
+      serializedVersion: 2
       m_Bits: 16384
+    wallMask:
+      serializedVersion: 2
+      m_Bits: 524288
+    ceilingMask:
+      serializedVersion: 2
+      m_Bits: 1048576
     arrowMask:
       serializedVersion: 2
       m_Bits: 1024
@@ -2969,6 +2978,10 @@ MonoBehaviour:
       i_lastSel: 0
       _id: ceiling
     activePrefab: {fileID: 0}
+    activeTransform: {fileID: 0}
+    activeLM:
+      serializedVersion: 2
+      m_Bits: 0
 --- !u!4 &1066341703
 Transform:
   m_ObjectHideFlags: 0
