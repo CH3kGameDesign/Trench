@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using System.Linq;
 
 public class SurfaceUpdater : MonoBehaviour
 {
@@ -16,6 +17,8 @@ public class SurfaceUpdater : MonoBehaviour
     [HideInInspector] public List<MeshRenderer> architraves = new List<MeshRenderer>();
 
     public List<LevelGen_Door> doors = new List<LevelGen_Door>();
+
+    public List<Prefab_Environment> PE_furniture = new List<Prefab_Environment>();
 
     private Material mat;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -86,12 +89,18 @@ public class SurfaceUpdater : MonoBehaviour
             _mr.material = _material;
     }
 
+    public void UpdateSurface()
+    {
+        RU.UpdateSurface(this);
+    }
+
     public void UpdateWall(Vector3[] vertPos, RoomUpdater.wall wallActive)
     {
         Vector3 low = vertPos[wallActive.verts.x];
         Vector3 high = vertPos[wallActive.verts.y];
 
         wallActive.transform.localPosition = ((low + high) / 2) + (new Vector3(0, wallActive.height / 2, 0));
+
         List<Vector3> _vert = new List<Vector3>()
         {
             low - wallActive.transform.localPosition,
@@ -123,6 +132,9 @@ public class SurfaceUpdater : MonoBehaviour
                 _start.x, 3, 1,
                 _start.x, 1, _start.y,
         });
+
+
+
         mf.mesh.vertices = _vert.ToArray();
         mf.mesh.uv = _uv.ToArray();
 
@@ -135,6 +147,93 @@ public class SurfaceUpdater : MonoBehaviour
         if (wallActive.SU.mf.mesh.bounds.IsValid())
             mc.sharedMesh = wallActive.SU.mf.mesh;
         bc.size = new Vector3(Mathf.Abs(vertPos[wallActive.verts.x].x - vertPos[wallActive.verts.y].x), wallActive.height, Mathf.Abs(vertPos[wallActive.verts.x].z - vertPos[wallActive.verts.y].z));
+    }
+
+    public void MoveFurniture(Vector3 _dif)
+    {
+        if (PE_furniture.Count == 0)
+            return;
+        switch (_enum)
+        {
+            case enumType.wall:
+                _dif = PE_furniture[0].transform.rotation * _dif;
+                _dif.z = 0;
+                _dif = Quaternion.Inverse(PE_furniture[0].transform.rotation) * _dif / 2;
+                break;
+            default:
+                _dif /= 2;
+                _dif.y = 0;
+                break;
+        }
+        foreach (var p in PE_furniture)
+        {
+            p.transform.localPosition -= _dif;
+            switch (p._type)
+            {
+                case Prefab_Environment.TypeEnum.door:
+                    Vector3 _h = p.transform.localPosition;
+                    _h.y = mf.mesh.vertices[0].y;
+                    p.transform.localPosition = _h;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    public void AddFurniture(Prefab_Environment _prefab)
+    {
+        if (PE_furniture.Contains(_prefab))
+            return;
+        _prefab.SU_surface = this;
+        PE_furniture.Add(_prefab);
+        if (_prefab._type == Prefab_Environment.TypeEnum.door)
+        {
+            LevelGen_Door _door;
+            if (_prefab.TryGetComponent<LevelGen_Door>(out _door))
+            {
+                _door.openDoor(true);
+                AddHole(_door);
+            }
+        }
+    }
+    public void RemoveFurniture(Prefab_Environment _prefab)
+    {
+        if (!PE_furniture.Contains(_prefab))
+            return;
+        PE_furniture.Remove(_prefab);
+        if (_prefab._type == Prefab_Environment.TypeEnum.door)
+        {
+            LevelGen_Door _door;
+            if (_prefab.TryGetComponent<LevelGen_Door>(out _door))
+            {
+                RemoveHole(_door);
+            }
+        }
+    }
+
+    public void AddHole(LevelGen_Door _door)
+    {
+        if (!doors.Contains(_door))
+        {
+            doors.Add(_door);
+            SortHoles();
+        }
+    }
+    public void SortHoles()
+    {
+        if (doors.Count <= 1)
+            return;
+        doors = doors.OrderBy(_d =>
+        Vector3.Distance(_d.transform.position, mf.mesh.vertices[0] + transform.position)).ToList();
+    }
+    public void RemoveHole(LevelGen_Door _door)
+    {
+        if (doors.Contains(_door))
+        {
+            doors.Remove(_door);
+            UpdateSurface();
+        }
     }
 
     public class holeClass
@@ -165,7 +264,7 @@ public class SurfaceUpdater : MonoBehaviour
                     _size = new Vector2(8f, 3f);
                     break;
                 case LevelGen_Block.entryTypeEnum.vent:
-                    _size = new Vector2(1.5f, 2f);
+                    _size = new Vector2(2f, 2f);
                     break;
                 default:
                     return false;

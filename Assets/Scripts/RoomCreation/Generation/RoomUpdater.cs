@@ -50,7 +50,14 @@ public class RoomUpdater : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
+    }
+    public void MoveFurniture(Vector3 _dif)
+    {
+        SU_Floor.MoveFurniture(_dif);
+        SU_Ceiling.MoveFurniture(_dif);
+        for (int i = 0; i < walls.Count; i++)
+            walls[i].SU.MoveFurniture(_dif);
     }
 
     public void UpdateMeshes()
@@ -335,5 +342,27 @@ public class RoomUpdater : MonoBehaviour
     public void UpdateWall(wall wallActive)
     {
         wallActive.SU.UpdateWall(vertPos, wallActive);
+    }
+
+    public void UpdateSurface(SurfaceUpdater SU)
+    {
+        foreach (var item in walls)
+        {
+            if (SU == item.SU)
+            {
+                UpdateWall(item);
+                return;
+            }
+        }
+        if (SU_Floor == SU)
+        {
+            UpdateFloor();
+            return;
+        }
+        if (SU_Ceiling == SU)
+        {
+            UpdateCeiling();
+            return;
+        }
     }
 }

@@ -762,29 +762,29 @@ public class PointerBuilder : MonoBehaviour
                 Vector3 _pos = hit.point;
                 if (!Input.GetKey(KeyCode.LeftControl))
                     _pos = ClampToGrid(_pos);
-                _Place.activeTransform.transform.position = _pos;
+
+                SurfaceUpdater _SU;
+                if (hit.transform.TryGetComponent<SurfaceUpdater>(out _SU))
+                {
+                    _SU.AddFurniture(_Place.activeTransform);
+                }
 
                 switch (_Place.activeTransform._type)
                 {
                     case Prefab_Environment.TypeEnum.wall:
+                        _Place.activeTransform.transform.position = _pos;
                         _Place.activeTransform.transform.forward = -hit.normal;
                         break;
                     case Prefab_Environment.TypeEnum.door:
+                        if (_SU)
+                            _pos.y = _SU.RU.floor.transform.position.y;
+                        _Place.activeTransform.transform.position = _pos;
                         _Place.activeTransform.transform.forward = -hit.normal;
-                        //DEBUG SHIT
-                        //////////////////////////////////////
-                        SurfaceUpdater _SU;
-                        if (hit.transform.TryGetComponent<SurfaceUpdater>(out _SU))
-                        {
-                            LevelGen_Door LGD;
-                            if (_Place.activeTransform.transform.TryGetComponent<LevelGen_Door>(out LGD))
-                            {
-                                _SU.doors.Add(LGD);
-                            }
-                        }
-                        ///////////////////////////////////////////
+                        if (_SU)
+                            _SU.UpdateSurface();
                         break;
                     default:
+                        _Place.activeTransform.transform.position = _pos;
                         break;
                 }
             }
@@ -803,16 +803,42 @@ public class PointerBuilder : MonoBehaviour
             int l = hit.transform.gameObject.layer;
             if (_Place.activeLM.Check(l))
             {
+                _Place.activeTransform.transform.parent = hit.transform;
                 Vector3 _pos = hit.point;
                 if (!Input.GetKey(KeyCode.LeftControl))
                     _pos = ClampToGrid(_pos);
 
-                _Place.activeTransform.transform.parent = hit.transform;
-                _Place.activeTransform.transform.position = _pos;
+                SurfaceUpdater _SU;
+                if (hit.transform.TryGetComponent<SurfaceUpdater>(out _SU))
+                {
+                    if (_Place.activeTransform.SU_surface != _SU)
+                    {
+                        _Place.activeTransform.SU_surface.RemoveFurniture(_Place.activeTransform);
+                        _SU.AddFurniture(_Place.activeTransform);
+                    }
+                }
 
-                if (_Place.activeTransform._type == Prefab_Environment.TypeEnum.wall ||
-                    _Place.activeTransform._type == Prefab_Environment.TypeEnum.door)
-                    _Place.activeTransform.transform.forward = -hit.normal;
+                switch (_Place.activeTransform._type)
+                {
+                    case Prefab_Environment.TypeEnum.wall:
+                        _Place.activeTransform.transform.position = _pos;
+                        _Place.activeTransform.transform.forward = -hit.normal;
+                        break;
+                    case Prefab_Environment.TypeEnum.door:
+                        if (_SU)
+                            _pos.y = _SU.RU.floor.transform.position.y;
+                        _Place.activeTransform.transform.position = _pos;
+                        _Place.activeTransform.transform.forward = -hit.normal;
+                        if (_SU)
+                        {
+                            _SU.SortHoles();
+                            _SU.UpdateSurface();
+                        }
+                        break;
+                    default:
+                        _Place.activeTransform.transform.position = _pos;
+                        break;
+                }
             }
         }
     }
@@ -836,6 +862,7 @@ public class PointerBuilder : MonoBehaviour
     }
     void Arrow_Stretch(RoomUpdater RM, Vector3 changeFinal)
     {
+        RM.MoveFurniture(changeFinal);
         if (RM.upArrow == activeArrow.parent.gameObject)
         {
             float change = changeFinal.y;
@@ -1233,8 +1260,12 @@ public class PointerBuilder : MonoBehaviour
 
     Vector3 ClampToGrid(Vector3 _pos)
     {
-        _pos = Vector3Int.RoundToInt(_pos /  gridSize);
-        _pos *= gridSize;
+        return ClampToGrid(_pos, gridSize);
+    }
+    Vector3 ClampToGrid(Vector3 _pos, float _size)
+    {
+        _pos = Vector3Int.RoundToInt(_pos / _size);
+        _pos *= _size;
         return _pos;
     }
 
