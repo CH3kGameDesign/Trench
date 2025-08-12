@@ -46,14 +46,15 @@ public class ToolBeltButton : MonoBehaviour
         {
             case enumType.belt:
                 PB.BeltButtonTap_Sub(beltClass, subClass);
+                Selected(true);
                 break;
             case enumType.sub:
                 PB.BeltButtonTap_Full(subClass, item);
                 break;
             default:
+                Selected(true);
                 break;
         }
-        Selected(true);
     }
 
     public void Selected(bool _sel)

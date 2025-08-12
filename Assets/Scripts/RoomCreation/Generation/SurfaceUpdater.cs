@@ -1,7 +1,8 @@
-using UnityEngine;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using System.Linq;
+using Unity.VisualScripting;
+using UnityEngine;
+using static SurfaceUpdater;
 
 public class SurfaceUpdater : MonoBehaviour
 {
@@ -14,7 +15,23 @@ public class SurfaceUpdater : MonoBehaviour
     public BoxCollider bc;
 
     public RoomUpdater RU;
-    [HideInInspector] public List<MeshRenderer> architraves = new List<MeshRenderer>();
+    [HideInInspector] public architrave skirting = null;
+    [HideInInspector] public architrave cornice = null;
+
+    [System.Serializable]
+    public class architrave
+    {
+        public Transform T;
+        public MeshRenderer MR;
+        public MeshFilter MF;
+
+        public architrave(Transform transform, MeshRenderer mr, MeshFilter mf)
+        {
+            this.T = transform;
+            this.MR = mr;
+            this.MF = mf;
+        }
+    }
 
     public List<LevelGen_Door> doors = new List<LevelGen_Door>();
 
@@ -85,8 +102,24 @@ public class SurfaceUpdater : MonoBehaviour
     void UpdateMaterial(Material _material)
     {
         mr.material = _material;
-        foreach (MeshRenderer _mr in architraves)
-            _mr.material = _material;
+        switch (_enum)
+        {
+            case enumType.wall:
+                if (skirting != null)
+                    skirting.MR.material = _material;
+                break;
+            case enumType.ceiling:
+                foreach (RoomUpdater.wall w in RU.walls)
+                    w.SU.UpdateMaterial_Cornice(_material);
+                break;
+            default:
+                break;
+        }
+    }
+    public void UpdateMaterial_Cornice(Material _material)
+    {
+        if (cornice != null)
+            cornice.MR.material = _material;
     }
 
     public void UpdateSurface()
@@ -134,7 +167,7 @@ public class SurfaceUpdater : MonoBehaviour
         });
 
 
-
+        mf.mesh.triangles = new int[0];
         mf.mesh.vertices = _vert.ToArray();
         mf.mesh.uv = _uv.ToArray();
 
@@ -147,6 +180,147 @@ public class SurfaceUpdater : MonoBehaviour
         if (wallActive.SU.mf.mesh.bounds.IsValid())
             mc.sharedMesh = wallActive.SU.mf.mesh;
         bc.size = new Vector3(Mathf.Abs(vertPos[wallActive.verts.x].x - vertPos[wallActive.verts.y].x), wallActive.height, Mathf.Abs(vertPos[wallActive.verts.x].z - vertPos[wallActive.verts.y].z));
+        UpdateSkirting();
+        UpdateCornice();
+    }
+
+    void UpdateSkirting()
+    {
+        if (skirting == null)
+        {
+            GameObject GO = new GameObject("Skirting: " + name);
+            GO.transform.parent = transform.parent;
+            MeshFilter _MF = GO.AddComponent<MeshFilter>();
+            MeshRenderer _MR = GO.AddComponent<MeshRenderer>();
+            skirting = new architrave(GO.transform, _MR, _MF);
+        }
+        skirting.T.position = mf.mesh.vertices[0] + transform.position;
+        skirting.T.LookAt(mf.mesh.vertices[1] + transform.position);
+        skirting.T.localEulerAngles -= new Vector3(0, 90, 0);
+
+        LineRenderer LR = RU.architraves.skirting[0];
+        int pCount = LR.positionCount;
+        Vector3[] tempVerts = new Vector3[pCount * 2 * (1 + doors.Count)];
+        int ii = 0;
+        for (int i = 0; i < pCount; i++)
+        {
+            tempVerts[ii] = LR.GetPosition(i);
+            ii++;
+        }
+        float _dist;
+        for (int d = 0; d < doors.Count; d++)
+        {
+            _dist = Vector3.Distance(doors[d].transform.position, mf.mesh.vertices[0] + transform.position) - (doors[d].GetSize().x / 2);
+
+            for (int i = 0; i < pCount; i++)
+            {
+                tempVerts[ii] = LR.GetPosition(i) + Vector3.right * _dist;
+                ii++;
+            }
+            _dist += doors[d].GetSize().x;
+            for (int i = 0; i < pCount; i++)
+            {
+                tempVerts[ii] = LR.GetPosition(i) + Vector3.right * _dist;
+                ii++;
+            }
+        }
+        _dist = Vector3.Distance(mf.mesh.vertices[0], mf.mesh.vertices[1]);
+        for (int i = 0; i < pCount; i++)
+        {
+            tempVerts[ii] = LR.GetPosition(i) + Vector3.right * _dist;
+            ii++;
+        }
+        Vector2[] tempUV = new Vector2[tempVerts.Length];
+        for (int i = 0; i < tempUV.Length; i++)
+        {
+            Vector3 temp = tempVerts[i];
+            tempUV[i] = new Vector2(temp.x + temp.z, temp.y);
+        }
+
+        int[] tempTris = new int[tempVerts.Length * 6];
+
+        for (int j = 0; j <= doors.Count; j++)
+        {
+            for (int i = 0; i < pCount - 1; i++)
+            {
+                int k = i + (j * 2 * pCount);
+                tempTris[k * 6] = k;
+                tempTris[(k * 6) + 1] = k + 1;
+                tempTris[(k * 6) + 2] = pCount + k;
+
+                tempTris[(k * 6) + 3] = k + 1;
+                tempTris[(k * 6) + 4] = pCount + k + 1;
+                tempTris[(k * 6) + 5] = pCount + k;
+            }
+        }
+
+        skirting.MF.mesh.triangles = new int[0];
+        skirting.MF.mesh.vertices = tempVerts;
+        skirting.MF.mesh.uv = tempUV;
+        skirting.MF.mesh.triangles = tempTris;
+
+        skirting.MR.material = mr.material;
+        skirting.MF.mesh.RecalculateNormals();
+        skirting.MF.mesh.RecalculateBounds();
+    }
+    void UpdateCornice()
+    {
+        if (cornice == null)
+        {
+            GameObject GO = new GameObject("Cornice: " + name);
+            GO.transform.parent = transform.parent;
+            MeshFilter _MF = GO.AddComponent<MeshFilter>();
+            MeshRenderer _MR = GO.AddComponent<MeshRenderer>();
+            cornice = new architrave(GO.transform, _MR, _MF);
+        }
+        cornice.T.position = mf.mesh.vertices[2] + transform.position;
+        cornice.T.LookAt(mf.mesh.vertices[3] + transform.position);
+        cornice.T.localEulerAngles -= new Vector3(0, 90, 0);
+
+        LineRenderer LR = RU.architraves.cornices[0];
+        int pCount = LR.positionCount;
+
+        Vector3[] tempVerts = new Vector3[pCount * 2 * (1 + doors.Count)];
+        int ii = 0;
+        for (int i = 0; i < pCount; i++)
+        {
+            tempVerts[ii] = LR.GetPosition(i);
+            ii++;
+        }
+        float _dist = Vector3.Distance(mf.mesh.vertices[0], mf.mesh.vertices[1]);
+        for (int i = 0; i < pCount; i++)
+        {
+            tempVerts[ii] = LR.GetPosition(i) + Vector3.right * _dist;
+            ii++;
+        }
+        Vector2[] tempUV = new Vector2[tempVerts.Length];
+        for (int i = 0; i < tempUV.Length; i++)
+        {
+            Vector3 temp = tempVerts[i];
+            tempUV[i] = new Vector2(temp.x + temp.z, temp.y);
+        }
+
+        int[] tempTris = new int[tempVerts.Length * 6];
+
+        for (int i = 0; i < pCount - 1; i++)
+        {
+            tempTris[i * 6] = i;
+            tempTris[(i * 6) + 1] = i + 1;
+            tempTris[(i * 6) + 2] = pCount + i;
+
+            tempTris[(i * 6) + 3] = i + 1;
+            tempTris[(i * 6) + 4] = pCount + i + 1;
+            tempTris[(i * 6) + 5] = pCount + i;
+        }
+
+        cornice.MF.mesh.triangles = new int[0];
+        cornice.MF.mesh.vertices = tempVerts;
+        cornice.MF.mesh.uv = tempUV;
+        cornice.MF.mesh.triangles = tempTris;
+
+        cornice.MR.material = RU.SU_Ceiling.mr.material;
+        cornice.MF.mesh.RecalculateNormals();
+        cornice.MF.mesh.RecalculateBounds();
     }
 
     public void MoveFurniture(Vector3 _dif)
@@ -254,21 +428,9 @@ public class SurfaceUpdater : MonoBehaviour
         bool GeneratePoints(LevelGen_Door _door, Vector3 _wallMin, float _wallHeight)
         {
             Vector3 _point = _door.transform.position;
-            Vector2 _size;
-            switch (_door.entryType)
-            {
-                case LevelGen_Block.entryTypeEnum.singleDoor:
-                    _size = new Vector2(3f, 3f);
-                    break;
-                case LevelGen_Block.entryTypeEnum.wideDoor:
-                    _size = new Vector2(8f, 3f);
-                    break;
-                case LevelGen_Block.entryTypeEnum.vent:
-                    _size = new Vector2(2f, 2f);
-                    break;
-                default:
-                    return false;
-            }
+            Vector2 _size = _door.GetSize();
+            if (_size == Vector2.zero)
+                return false;
             Vector3 _0 = Vector3.MoveTowards(_door.transform.localPosition, _wallMin, _size.x/2);
             Vector3 _1 = Vector3.MoveTowards(_door.transform.localPosition, _wallMin, -_size.x/2);
             _points = new Vector3[]

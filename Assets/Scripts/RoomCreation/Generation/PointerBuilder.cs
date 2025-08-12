@@ -3,9 +3,12 @@ using NUnit.Framework.Internal;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
+using static UnityEngine.GraphicsBuffer;
 
 public class PointerBuilder : MonoBehaviour
 {
@@ -60,6 +63,7 @@ public class PointerBuilder : MonoBehaviour
     [System.Serializable]
     public class CanvasClass
     {
+        public Canvas mainCanvas;
         public RectTransform RT_canvas;
         public Button[] toolBelt_Buttons;
         [HideInInspector] public ToolBeltButton[] toolBeltSub_Buttons;
@@ -167,9 +171,11 @@ public class PointerBuilder : MonoBehaviour
     public class PlaceClass : BeltClass
     {
         public List<PlaceSubClass> list;
-        public Prefab_Environment activePrefab;
-        public Prefab_Environment activeTransform;
-        public LayerMask activeLM;
+        [HideInInspector] public Prefab_Environment activePrefab;
+        [HideInInspector] public Prefab_Environment activeTransform;
+        [HideInInspector] public Prefab_Environment lastTransform;
+        [HideInInspector] public LayerMask activeLM;
+        public RoomCreation_ItemInfo RC_itemInfo;
         public override void GenerateBelt(PointerBuilder PB, RectTransform _hook)
         {
             PB.beltMode = beltModes.place;
@@ -186,7 +192,20 @@ public class PointerBuilder : MonoBehaviour
         {
             base.Setup(PB);
             SubClass SC = list[i_lastSel];
-            SC.items[SC.i_lastSel].OnSelect(PB);
+            if (SC.items.Count > 0)
+                SC.items[SC.i_lastSel].OnSelect(PB);
+        }
+
+        public void UpdateLayerMask(PointerBuilder PB, Prefab_Environment.TypeEnum prefabType)
+        {
+            switch (prefabType)
+            {
+                case Prefab_Environment.TypeEnum.floor: activeLM = PB._layer.floorMask; break;
+                case Prefab_Environment.TypeEnum.wall: activeLM = PB._layer.wallMask; break;
+                case Prefab_Environment.TypeEnum.ceiling: activeLM = PB._layer.ceilingMask; break;
+                case Prefab_Environment.TypeEnum.door: activeLM = PB._layer.wallMask; break;
+                default: activeLM = PB._layer.interactableMask; break;
+            }
         }
     }
     #endregion
@@ -280,6 +299,15 @@ public class PointerBuilder : MonoBehaviour
         public override void OnSelect(PointerBuilder PB)
         {
             base.OnSelect(PB);
+            PB._canvas.toolBeltFull_Buttons[i_lastSel].Selected(false);
+        }
+        public override void GenerateBelt_Full(PointerBuilder PB, RectTransform _hook)
+        {
+            base.GenerateBelt_Full(PB, _hook);
+            if (i_lastSel < PB._canvas.toolBeltFull_Buttons.Length)
+                PB._canvas.toolBeltFull_Buttons[i_lastSel].Selected(false);
+            PB.UpdateCursor_Image(null);
+            PB._Place.activePrefab = null;
         }
     }
     [System.Serializable]
@@ -290,6 +318,8 @@ public class PointerBuilder : MonoBehaviour
         [HideInInspector] public int index;
         public virtual void OnSelect(PointerBuilder PB)
         {
+            if (index < PB._canvas.toolBeltFull_Buttons.Length)
+                PB._canvas.toolBeltFull_Buttons[index].Selected(true);
             PB.UpdateCursor_Image(image);
         }
     }
@@ -314,16 +344,18 @@ public class PointerBuilder : MonoBehaviour
         public Prefab_Environment _prefab;
         public override void OnSelect(PointerBuilder PB)
         {
-            PB._Place.activePrefab = _prefab;
-            switch (_prefab._type)
+            if (PB._Place.activePrefab == _prefab)
             {
-                case Prefab_Environment.TypeEnum.floor: PB._Place.activeLM = PB._layer.floorMask; break;
-                case Prefab_Environment.TypeEnum.wall: PB._Place.activeLM = PB._layer.wallMask; break;
-                case Prefab_Environment.TypeEnum.ceiling: PB._Place.activeLM = PB._layer.ceilingMask; break;
-                case Prefab_Environment.TypeEnum.door: PB._Place.activeLM = PB._layer.wallMask; break;
-                default: PB._Place.activeLM = PB._layer.interactableMask; break;
+                PB._canvas.toolBeltFull_Buttons[index].Selected(false);
+                PB._Place.activePrefab = null;
+                PB.UpdateCursor_Image(null);
             }
-            base.OnSelect(PB);
+            else
+            {
+                PB._Place.activePrefab = _prefab;
+                PB._Place.UpdateLayerMask(PB, _prefab._type);
+                base.OnSelect(PB);
+            }
         }
     }
     #endregion
@@ -741,9 +773,57 @@ public class PointerBuilder : MonoBehaviour
     }
     void Update_Place()
     {
-        if (Input.GetMouseButtonDown(0)) Place_CreateObject();
-        if (Input.GetMouseButton(0)) Place_MoveObject();
-        if (Input.GetMouseButtonUp(0)) Place_PlaceObject();
+        if (_Place.activePrefab)
+        {
+            if (Input.GetMouseButtonDown(0)) Place_CreateObject();
+            if (Input.GetMouseButton(0)) Place_MoveObject();
+            if (Input.GetMouseButtonUp(0)) Place_PlaceObject();
+        }
+        else
+        {
+            if (Input.GetMouseButtonDown(0)) Place_GetObject();
+            if (Input.GetMouseButton(0)) Place_MoveObject();
+            if (Input.GetMouseButtonUp(0)) Place_PlaceObject();
+        }
+
+        Place_ActiveInfo();
+    }
+
+    void Place_ActiveInfo()
+    {
+        if (_Place.lastTransform == null)
+        { 
+            _Place.RC_itemInfo.gameObject.SetActive(false);
+            return;
+        }
+        _Place.RC_itemInfo.gameObject.SetActive(true);
+        _Place.RC_itemInfo.RT.FollowObject(_canvas.mainCanvas, _Place.lastTransform.transform);
+        switch (_Place.lastTransform._type)
+        {
+            case Prefab_Environment.TypeEnum.floor:
+                _Place.RC_itemInfo.G_rotateButtons.SetActive(true);
+                break;
+            case Prefab_Environment.TypeEnum.ceiling:
+                _Place.RC_itemInfo.G_rotateButtons.SetActive(true);
+                break;
+            default:
+                _Place.RC_itemInfo.G_rotateButtons.SetActive(false);
+                break;
+        }
+    }
+    public void Place_ActiveInfo_Rotate(bool _left)
+    {
+        if (_Place.lastTransform == null)
+            return;
+        _Place.lastTransform.transform.localEulerAngles += new Vector3(0, _left ? -90f : 90f, 0);
+    }
+    public void Place_ActiveInfo_Delete()
+    {
+        if (_Place.lastTransform == null)
+            return;
+        _Place.lastTransform.SU_surface.RemoveFurniture(_Place.lastTransform);
+        Destroy(_Place.lastTransform.gameObject);
+        _Place.lastTransform = null;
     }
     void Place_CreateObject()
     {
@@ -758,7 +838,9 @@ public class PointerBuilder : MonoBehaviour
             int l = hit.transform.gameObject.layer;
             if (_Place.activeLM.Check(l))
             {
+                _Place.lastTransform = null;
                 _Place.activeTransform = Instantiate(_Place.activePrefab, hit.transform);
+
                 Vector3 _pos = hit.point;
                 if (!Input.GetKey(KeyCode.LeftControl))
                     _pos = ClampToGrid(_pos);
@@ -846,8 +928,36 @@ public class PointerBuilder : MonoBehaviour
     {
         if (!_Place.activeTransform)
             return;
+
+        if (!Input.GetKey(KeyCode.LeftShift) || _Place.activePrefab == null)
+        {
+            UpdateCursor_Image(null);
+            _Place.activePrefab = null;
+            _canvas.toolBeltFull_Buttons[_Place.list[_Place.i_lastSel].i_lastSel].Selected(false);
+
+            _Place.lastTransform = _Place.activeTransform;
+        }
         _Place.activeTransform = null;
     }
+
+    void Place_GetObject()
+    {
+        if (EventSystem.current.IsPointerOverGameObject())
+            return;
+        _Place.lastTransform = null;
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out hit, 1000))
+        {
+            Prefab_Environment _PE = hit.transform.GetComponentInParent<Prefab_Environment>();
+            if (_PE)
+            {
+                _Place.activeTransform = _PE;
+                _Place.UpdateLayerMask(this, _PE._type);
+            }
+        }
+    }
+
     #region Player Interactions
     void Arrow_Move(RoomUpdater RM, Vector3 changeFinal)
     {
@@ -979,69 +1089,6 @@ public class PointerBuilder : MonoBehaviour
     #endregion
 
     #region Edit Mesh
-    private void DoorPlaceWallFix(Vector3[] points, MeshFilter mf, float heightFix)
-    {
-        Vector3 min = points[0];
-        Vector3 max = points[0];
-
-        Vector2 height = new Vector2(min.y, min.y);
-
-        for (int i = 0; i < points.Length; i++)
-        {
-            if (points[i].x != min.x || points[i].z != min.z)
-            {
-                max = points[i];
-            }
-            if (points[i].y > height.y)
-                height.y = points[i].y;
-        }
-
-        min = new Vector3(min.x, height.x, min.z);
-        max = new Vector3(max.x, height.y, max.z);
-
-        Vector3[] tempVerts = new Vector3[]
-        {
-            min,
-            new Vector3(min.x, min.y + heightFix, min.z),
-            new Vector3(max.x, min.y + heightFix, max.z),
-            new Vector3(max.x, min.y, max.z)
-
-        };
-
-
-        Vector2[] temp2D = new Vector2[4];
-
-        for (int i = 0; i < 4; i++)
-        {
-            temp2D[i] = new Vector2(tempVerts[i].x + tempVerts[i].z, tempVerts[i].y);
-        }
-
-
-
-        Triangulator tr = new Triangulator(temp2D);
-        int[] indices = tr.Triangulate();
-
-
-        int[] finalIndices = new int[indices.Length];
-
-        for (int i = 0; i < finalIndices.Length; i++)
-        {
-            finalIndices[i] = indices[indices.Length - 1 - i];
-        }
-
-        mf.mesh.vertices = tempVerts;
-        mf.mesh.triangles = indices;
-        mf.mesh.uv = temp2D;
-
-        mf.mesh.RecalculateNormals();
-        mf.mesh.RecalculateBounds();
-
-        if (tempVerts[0].x + tempVerts[0].z > tempVerts[2].x + tempVerts[2].z)
-            mf.mesh.triangles = finalIndices;
-
-        mf.GetComponent<MeshCollider>().sharedMesh = mf.mesh;
-
-    }
     private void SetPosScale(Vector3 start, Vector3 end)
     {
         activeSquare.position = (start + end) / 2 + new Vector3(0, 0.01f, 0);
@@ -1142,12 +1189,8 @@ public class PointerBuilder : MonoBehaviour
         _Build.Setup(this);
         _Paint.Setup(this);
         _Place.Setup(this);
-    }
-    void UpdateItemsList()
-    {
-        _Build.UpdateItemsList();
-        _Paint.UpdateItemsList();
-        _Place.UpdateItemsList();
+
+        UpdateCursor_Image(null);
     }
     public void GenerateBelt_Sub(int _belt)
     {
@@ -1186,7 +1229,6 @@ public class PointerBuilder : MonoBehaviour
     {
         _canvas.toolBeltFull_Buttons[_sub.i_lastSel].Selected(false);
         _sub.i_lastSel = _item.index;
-
         _item.OnSelect(this);
     }
     void GenerateBelt_Full(BeltClass _belt, SubClass _sub)
@@ -1201,6 +1243,9 @@ public class PointerBuilder : MonoBehaviour
         foreach (var item in _canvas.toolBeltSub_Buttons)
             Destroy(item.gameObject);
         _canvas.toolBeltSub_Buttons = new ToolBeltButton[0];
+
+        _Place.lastTransform = null;
+        Place_ActiveInfo();
         ClearBeltFull();
     }
     public void ClearBeltFull()

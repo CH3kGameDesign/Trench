@@ -57,4 +57,18 @@ public class LevelGen_Door : LevelGen_Object
         if (G_frame != null)
             G_frame.SetActive(B_showFrame);
     }
+    public Vector2 GetSize()
+    {
+        switch (entryType)
+        {
+            case LevelGen_Block.entryTypeEnum.singleDoor:
+                return new Vector2(3f, 3f);
+            case LevelGen_Block.entryTypeEnum.wideDoor:
+                return new Vector2(8f, 3f);
+            case LevelGen_Block.entryTypeEnum.vent:
+                return new Vector2(2f, 2f);
+            default:
+                return Vector2.zero;
+        }
+    }
 }
