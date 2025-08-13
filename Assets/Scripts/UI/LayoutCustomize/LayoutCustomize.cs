@@ -416,7 +416,7 @@ public class LayoutCustomize : MonoBehaviour
             _temp.x += F_canvasPosSpeed * Time.unscaledDeltaTime;
         if (v2_cursorPosition.x > v2_canvasHalf.x / 2)
             _temp.x -= F_canvasPosSpeed * Time.unscaledDeltaTime;
-        _temp.x = Mathf.Clamp(_temp.x, (v2_canvasPos_Min.x * F_canvasZoom) - v2_canvasHalf.x, (v2_canvasPos_Max.x * F_canvasZoom) + v2_canvasHalf.x);
+        _temp.x = Mathf.Clamp(_temp.x, (v2_canvasPos_Min.x * F_canvasZoom) + v2_canvasHalf.x, (v2_canvasPos_Max.x * F_canvasZoom) + v2_canvasHalf.x);
 
         if (v2_cursorPosition.y < -v2_canvasHalf.y / 2)
             _temp.y += F_canvasPosSpeed * Time.unscaledDeltaTime;
