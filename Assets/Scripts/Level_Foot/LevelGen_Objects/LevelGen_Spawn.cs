@@ -12,12 +12,17 @@ public class LevelGen_Spawn : LevelGen_Object
 
     public Color C_Color = new Color (1,0,0,0.4f);
 
+    public GameObject G_sceneViewObject;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        ShowInGameView(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex == 2);
     }
-
+    void ShowInGameView(bool _show)
+    {
+        G_sceneViewObject.SetActive(_show);
+    }
     // Update is called once per frame
     void Update()
     {

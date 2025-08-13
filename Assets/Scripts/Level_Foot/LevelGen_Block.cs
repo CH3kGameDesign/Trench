@@ -16,7 +16,9 @@ public class LevelGen_Block : MonoBehaviour
     public costClass cost;
     [Space(10)]
     [Header("References")]
+    public Transform T_blockHolder;
     public List<Transform> T_architecture = new List<Transform>();
+    public Transform T_triggerHolder;
     public List<LevelGen_Bounds> B_bounds = new List<LevelGen_Bounds>();
     public LevelGen_Door[] LGD_Entries = new LevelGen_Door[0];
     public LevelGen_Spawn[] LGS_Spawns = new LevelGen_Spawn[0];
@@ -80,8 +82,8 @@ public class LevelGen_Block : MonoBehaviour
         }
         B_bounds.Clear();
         T_architecture.Clear();
-        for (int i = 0; i < transform.GetChild(2).childCount; i++)
-            T_architecture.Add(transform.GetChild(2).GetChild(i));
+        for (int i = 0; i < T_blockHolder.childCount; i++)
+            T_architecture.Add(T_blockHolder.GetChild(i));
         for (int i = 0; i < T_architecture.Count; i++)
         {
             Bounds _temp;
@@ -92,7 +94,7 @@ public class LevelGen_Block : MonoBehaviour
             _temp.Expand(-_boxShrink);
 
             GameObject GO = new GameObject();
-            GO.transform.parent = transform.GetChild(3);
+            GO.transform.parent = T_triggerHolder;
             GO.transform.position = _temp.center;
             BoxCollider BC = GO.AddComponent<BoxCollider>();
             BC.size = _temp.size;
@@ -143,12 +145,12 @@ public class LevelGen_Block : MonoBehaviour
         {
             doorClass DC = new doorClass();
 
-            int _rot = (Mathf.RoundToInt(item.transform.localEulerAngles.y / 90) + 2) % 4;
+            int _rot = (Mathf.RoundToInt(item.transform.eulerAngles.y / 90) + 2) % 4;
             if (_rot < 0) _rot += 4;
 
             DC._rot = _rot;
 
-            Vector3 _pos = (item.transform.localPosition - _min) / _gridSize;
+            Vector3 _pos = (item.transform.position - _min) / _gridSize;
 
             switch (_rot)
             {

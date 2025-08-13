@@ -341,10 +341,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4863570327249708196}
-  - {fileID: 6672019474232599854}
   - {fileID: 6109420536075723794}
   - {fileID: 7093058337952388715}
+  - {fileID: 4863570327249708196}
+  - {fileID: 6672019474232599854}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1022270576080287826
@@ -371,8 +371,10 @@ MonoBehaviour:
     list:
     - _type: 0
       amt: 2
+  T_blockHolder: {fileID: 6109420536075723794}
   T_architecture:
   - {fileID: 8428948708410455898}
+  T_triggerHolder: {fileID: 7093058337952388715}
   B_bounds:
   - {fileID: 1608536634999417141}
   LGD_Entries:

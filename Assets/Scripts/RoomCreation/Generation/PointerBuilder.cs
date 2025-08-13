@@ -1,17 +1,21 @@
-﻿using NUnit.Framework;
-using NUnit.Framework.Internal;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
-using static UnityEngine.GraphicsBuffer;
+using System.IO;
+using Unity.VisualScripting;
+
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class PointerBuilder : MonoBehaviour
 {
+    private string S_root = "Assets/Prefabs/Environment";
+    public string S_themeName = "RoomBuilder";
+    [Space(10)]
     public LevelGen_Materials _Materials;
     public LevelGen_Placeables _Placeables;
     public enum drawModes { square, point, stretch, move, extend }
@@ -19,6 +23,7 @@ public class PointerBuilder : MonoBehaviour
     [HideInInspector] public drawModes drawMode;
     [HideInInspector] public beltModes beltMode;
 
+    public GameObject planeVisual;
 
     [HideInInspector]
     public Transform activeSquare;
@@ -28,7 +33,8 @@ public class PointerBuilder : MonoBehaviour
     public Transform activeArrow;
     public GameObject squarePrefab;
 
-    public Transform floorHolder;
+    public LevelGen_Block PF_blockTemplate;
+    private LevelGen_Block lg_block;
 
     [HideInInspector]
     public float gridSize = 1;
@@ -77,6 +83,8 @@ public class PointerBuilder : MonoBehaviour
 
         public RectTransform RT_cursorImage;
         public RawImage RI_cursorImage;
+
+        public TMP_InputField TM_inputField;
     }
     public BuildClass _Build;
     public PaintClass _Paint;
@@ -465,7 +473,7 @@ public class PointerBuilder : MonoBehaviour
         SurfaceUpdater SU;
 
 
-        GO = Instantiate(squarePrefab, floorHolder);
+        GO = Instantiate(squarePrefab, lg_block.T_blockHolder);
 
         Mesh tempMesh = new Mesh();
         tempMesh.vertices = new Vector3[]
@@ -542,7 +550,7 @@ public class PointerBuilder : MonoBehaviour
                             activeWall.GetComponentInParent<RoomUpdater>().HideArrows();
                         if (activeSquare == null)
                         {
-                            GO = Instantiate(squarePrefab, floorHolder);
+                            GO = Instantiate(squarePrefab, lg_block.T_blockHolder);
                             GO.name = Time.time.ToString();
                             Mesh meshTempPoint = new Mesh();
                             //Mesh meshTempPoint2 = GO1.GetComponent<MeshFilter>().mesh;
@@ -1186,6 +1194,9 @@ public class PointerBuilder : MonoBehaviour
     #region Tool Belt
     void Setup()
     {
+        if (lg_block == null)
+            lg_block = Instantiate(PF_blockTemplate, transform);
+
         _Build.Setup(this);
         _Paint.Setup(this);
         _Place.Setup(this);
@@ -1349,4 +1360,111 @@ public class PointerBuilder : MonoBehaviour
         return point;
     }
     #endregion
+
+    public void Save()
+    {
+        if (lg_block == null)
+            return;
+        planeVisual.SetActive(false);
+        string fileName = _canvas.TM_inputField.text;
+        if (fileName == "")
+            fileName = "New";
+#if UNITY_EDITOR
+        lg_block._name = fileName;
+        lg_block.name = fileName;
+        lg_block.UpdateLists_Editor();
+        SavePrefab();
+#endif
+        planeVisual.SetActive(true);
+    }
+#if UNITY_EDITOR
+    public void SavePrefab()
+    {
+        string root;
+        string fileName = _canvas.TM_inputField.text;
+        if (fileName == "")
+            fileName = "New";
+        string filePath;
+
+        string[] initialPath = S_root.Split('/');
+        root = initialPath[0];
+        for (int i = 1; i < initialPath.Length; i++)
+        {
+            if (!Directory.Exists(root + "/" + initialPath[i]))
+            {
+                AssetDatabase.CreateFolder(root, initialPath[i]);
+                Debug.Log(initialPath[i]);
+            }
+            root += "/" + initialPath[i];
+        }
+        if (!Directory.Exists(S_root + "/" + S_themeName))
+        {
+            AssetDatabase.CreateFolder(S_root, S_themeName);
+            Debug.Log(S_root + "/" + S_themeName);
+        }
+
+        root = S_root + "/" + S_themeName;
+
+        GameObject _object = lg_block.gameObject;
+        filePath = root + "/" + fileName + ".prefab";
+        bool prefabSuccess;
+        GameObject GO = PrefabUtility.SaveAsPrefabAsset(_object, filePath, out prefabSuccess);
+        if (prefabSuccess == true)
+            Debug.Log("Prefab was saved successfully");
+        else
+        {
+            Debug.Log("Prefab failed to save" + prefabSuccess);
+            return;
+        }
+        GO.transform.localPosition = Vector3.zero;
+        GO.transform.localEulerAngles = Vector3.zero;
+        /*
+        foreach (Transform t in lg_block.T_architecture)
+        {
+            SurfaceUpdater[] SU = t.GetComponentsInChildren<SurfaceUpdater>();
+            foreach (SurfaceUpdater su in SU)
+            {
+                AssetDatabase.AddObjectToAsset(su.mf.sharedMesh, GO);
+                switch (su._enum)
+                {
+                    case SurfaceUpdater.enumType.wall:
+                        AssetDatabase.AddObjectToAsset(su.skirting.MF.sharedMesh, GO);
+                        AssetDatabase.AddObjectToAsset(su.cornice.MF.sharedMesh, GO);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        */
+
+        Mesh m;
+        for (int t = 0; t < lg_block.T_architecture.Count; t++)
+        {
+            SurfaceUpdater[] SU = lg_block.T_architecture[t].GetComponentsInChildren<SurfaceUpdater>();
+            SurfaceUpdater[] SU2 = GO.GetComponent<LevelGen_Block>().T_architecture[t].GetComponentsInChildren<SurfaceUpdater>();
+            for (int s = 0; s < SU.Length; s++)
+            {
+                m = SU[s].mf.sharedMesh;
+                AssetDatabase.AddObjectToAsset(m, GO);
+                SU2[s].mf.sharedMesh = m;
+                SU2[s].mc.sharedMesh = m;
+                switch (SU[s]._enum)
+                {
+                    case SurfaceUpdater.enumType.wall:
+                        m = SU[s].skirting.MF.sharedMesh;
+                        AssetDatabase.AddObjectToAsset(m, GO);
+                        SU2[s].skirting.MF.sharedMesh = m;
+                        m = SU[s].cornice.MF.sharedMesh;
+                        AssetDatabase.AddObjectToAsset(m, GO);
+                        SU2[s].cornice.MF.sharedMesh = m;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        PrefabUtility.SavePrefabAsset(GO);
+    }
+#endif
 }

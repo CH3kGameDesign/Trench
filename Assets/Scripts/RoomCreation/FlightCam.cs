@@ -23,6 +23,7 @@ public class FlightCam : MonoBehaviour
         }
         else
             Cursor.lockState = CursorLockMode.None;
+        transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(v3_camDir), Time.deltaTime * 10);
     }
 
     void CamMove()
@@ -55,7 +56,5 @@ public class FlightCam : MonoBehaviour
             transform.eulerAngles += new Vector3(0, 360, 0);
         }
         v3_camDir.x = Mathf.Clamp(v3_camDir.x, -80, 80);
-
-        transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(v3_camDir), Time.deltaTime * 10);
     }
 }

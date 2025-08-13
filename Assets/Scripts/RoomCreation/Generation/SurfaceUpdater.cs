@@ -55,7 +55,7 @@ public class SurfaceUpdater : MonoBehaviour
         mc = GetComponent<MeshCollider>();
         bc = GetComponent<BoxCollider>();
 
-        mat = mr.material;
+        mat = mr.sharedMaterial;
     }
 
     void SetLayer(enumType _type)
@@ -101,12 +101,12 @@ public class SurfaceUpdater : MonoBehaviour
 
     void UpdateMaterial(Material _material)
     {
-        mr.material = _material;
+        mr.sharedMaterial = _material;
         switch (_enum)
         {
             case enumType.wall:
                 if (skirting != null)
-                    skirting.MR.material = _material;
+                    skirting.MR.sharedMaterial = _material;
                 break;
             case enumType.ceiling:
                 foreach (RoomUpdater.wall w in RU.walls)
@@ -119,7 +119,7 @@ public class SurfaceUpdater : MonoBehaviour
     public void UpdateMaterial_Cornice(Material _material)
     {
         if (cornice != null)
-            cornice.MR.material = _material;
+            cornice.MR.sharedMaterial = _material;
     }
 
     public void UpdateSurface()
@@ -259,7 +259,7 @@ public class SurfaceUpdater : MonoBehaviour
         skirting.MF.mesh.uv = tempUV;
         skirting.MF.mesh.triangles = tempTris;
 
-        skirting.MR.material = mr.material;
+        skirting.MR.sharedMaterial = mr.sharedMaterial;
         skirting.MF.mesh.RecalculateNormals();
         skirting.MF.mesh.RecalculateBounds();
     }
@@ -318,7 +318,7 @@ public class SurfaceUpdater : MonoBehaviour
         cornice.MF.mesh.uv = tempUV;
         cornice.MF.mesh.triangles = tempTris;
 
-        cornice.MR.material = RU.SU_Ceiling.mr.material;
+        cornice.MR.sharedMaterial = RU.SU_Ceiling.mr.sharedMaterial;
         cornice.MF.mesh.RecalculateNormals();
         cornice.MF.mesh.RecalculateBounds();
     }
