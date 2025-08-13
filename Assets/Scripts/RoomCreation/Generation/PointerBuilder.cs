@@ -18,10 +18,12 @@ public class PointerBuilder : MonoBehaviour
     [Space(10)]
     public LevelGen_Materials _Materials;
     public LevelGen_Placeables _Placeables;
+    public LevelGen_Theme _Theme;
     public enum drawModes { square, point, stretch, move, extend }
     public enum beltModes { build, paint, place}
     [HideInInspector] public drawModes drawMode;
     [HideInInspector] public beltModes beltMode;
+    [Space(10)]
 
     public GameObject planeVisual;
 
@@ -57,6 +59,7 @@ public class PointerBuilder : MonoBehaviour
     [System.Serializable]
     public class layerClass
     {
+        public LayerMask allMask;
         public LayerMask gridMask;
         public LayerMask interactableMask;
         public LayerMask floorMask;
@@ -435,7 +438,7 @@ public class PointerBuilder : MonoBehaviour
             {
                 RaycastHit hit;
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out hit, 1000))
+                if (Physics.Raycast(ray, out hit, 1000, _layer.allMask))
                 {
                     int l = hit.transform.gameObject.layer;
                     if (_layer.gridMask.Check(l))
@@ -537,7 +540,7 @@ public class PointerBuilder : MonoBehaviour
             {
                 RaycastHit hit;
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out hit, 1000))
+                if (Physics.Raycast(ray, out hit, 1000, _layer.allMask))
                 {
                     int l = hit.transform.gameObject.layer;
                     if (_layer.gridMask.Check(l))
@@ -676,7 +679,7 @@ public class PointerBuilder : MonoBehaviour
                     }
                     return;
                 }
-                if (Physics.Raycast(ray, out hit, 1000))
+                if (Physics.Raycast(ray, out hit, 1000, _layer.allMask))
                 {
                     int l = hit.transform.gameObject.layer;
                     if (_layer.interactableMask.Check(l))
@@ -753,7 +756,7 @@ public class PointerBuilder : MonoBehaviour
         {
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit, 1000))
+            if (Physics.Raycast(ray, out hit, 1000, _layer.allMask))
             {
                 int l = hit.transform.gameObject.layer;
                 if (_layer.interactableMask.Check(l))
@@ -955,7 +958,7 @@ public class PointerBuilder : MonoBehaviour
         _Place.lastTransform = null;
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out hit, 1000))
+        if (Physics.Raycast(ray, out hit, 1000, _layer.allMask))
         {
             Prefab_Environment _PE = hit.transform.GetComponentInParent<Prefab_Environment>();
             if (_PE)
@@ -1329,7 +1332,7 @@ public class PointerBuilder : MonoBehaviour
     {
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out hit, 1000))
+        if (Physics.Raycast(ray, out hit, 1000, _layer.allMask))
         {
             Vector3Int vecInt = new Vector3Int(Mathf.RoundToInt(hit.point.x / gridSize), 0, Mathf.RoundToInt(hit.point.z / gridSize));
             Vector3 tempVec = vecInt;
@@ -1407,6 +1410,7 @@ public class PointerBuilder : MonoBehaviour
 
         GameObject _object = lg_block.gameObject;
         filePath = root + "/" + fileName + ".prefab";
+        RemoveOldSubAssets(filePath);
         bool prefabSuccess;
         GameObject GO = PrefabUtility.SaveAsPrefabAsset(_object, filePath, out prefabSuccess);
         if (prefabSuccess == true)
@@ -1418,43 +1422,27 @@ public class PointerBuilder : MonoBehaviour
         }
         GO.transform.localPosition = Vector3.zero;
         GO.transform.localEulerAngles = Vector3.zero;
-        /*
-        foreach (Transform t in lg_block.T_architecture)
-        {
-            SurfaceUpdater[] SU = t.GetComponentsInChildren<SurfaceUpdater>();
-            foreach (SurfaceUpdater su in SU)
-            {
-                AssetDatabase.AddObjectToAsset(su.mf.sharedMesh, GO);
-                switch (su._enum)
-                {
-                    case SurfaceUpdater.enumType.wall:
-                        AssetDatabase.AddObjectToAsset(su.skirting.MF.sharedMesh, GO);
-                        AssetDatabase.AddObjectToAsset(su.cornice.MF.sharedMesh, GO);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-        */
 
+        LevelGen_Block LGB = GO.GetComponent<LevelGen_Block>();
         Mesh m;
         for (int t = 0; t < lg_block.T_architecture.Count; t++)
         {
             SurfaceUpdater[] SU = lg_block.T_architecture[t].GetComponentsInChildren<SurfaceUpdater>();
-            SurfaceUpdater[] SU2 = GO.GetComponent<LevelGen_Block>().T_architecture[t].GetComponentsInChildren<SurfaceUpdater>();
+            SurfaceUpdater[] SU2 = LGB.T_architecture[t].GetComponentsInChildren<SurfaceUpdater>();
             for (int s = 0; s < SU.Length; s++)
             {
                 m = SU[s].mf.sharedMesh;
                 AssetDatabase.AddObjectToAsset(m, GO);
                 SU2[s].mf.sharedMesh = m;
                 SU2[s].mc.sharedMesh = m;
+
                 switch (SU[s]._enum)
                 {
                     case SurfaceUpdater.enumType.wall:
                         m = SU[s].skirting.MF.sharedMesh;
                         AssetDatabase.AddObjectToAsset(m, GO);
                         SU2[s].skirting.MF.sharedMesh = m;
+
                         m = SU[s].cornice.MF.sharedMesh;
                         AssetDatabase.AddObjectToAsset(m, GO);
                         SU2[s].cornice.MF.sharedMesh = m;
@@ -1465,6 +1453,18 @@ public class PointerBuilder : MonoBehaviour
             }
         }
         PrefabUtility.SavePrefabAsset(GO);
+        _Theme.AddBlock(LGB);
     }
+
+    void RemoveOldSubAssets(string filePath)
+    {
+        Object[] LGB = AssetDatabase.LoadAllAssetsAtPath(filePath);
+        foreach (Object obj in LGB)
+        {
+            if (obj is Mesh)
+                DestroyImmediate(obj, true);
+        }
+    }
+
 #endif
 }

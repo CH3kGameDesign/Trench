@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditorInternal.Profiling.Memory.Experimental.FileFormat;
 using UnityEngine;
 
 [CreateAssetMenu(fileName ="New LevelGen Theme", menuName = "Trench/LevelGen/Theme")]
@@ -59,6 +60,31 @@ public class LevelGen_Theme : ScriptableObject
                 break;
         }
         return null;
+    }
+    public void AddBlock(LevelGen_Block LGB)
+    {
+        switch (LGB.BlockType)
+        {
+            case LevelGen_Block.blockTypeEnum.corridor: AddBlock(LGB, Corridors); break;
+            case LevelGen_Block.blockTypeEnum.bridge: AddBlock(LGB, Bridges); break;
+            case LevelGen_Block.blockTypeEnum.hangar: AddBlock(LGB, Hangars); break;
+            case LevelGen_Block.blockTypeEnum.deadend: AddBlock(LGB, DeadEnds); break;
+            case LevelGen_Block.blockTypeEnum.engine: AddBlock(LGB, Engines); break;
+            case LevelGen_Block.blockTypeEnum.foodhall: AddBlock(LGB, FoodHalls); break;
+            case LevelGen_Block.blockTypeEnum.crewQuarters: AddBlock(LGB, CrewQuarters); break;
+            case LevelGen_Block.blockTypeEnum.captain: AddBlock(LGB, CaptainQuaters); break;
+            case LevelGen_Block.blockTypeEnum.vault: AddBlock(LGB, Vaults); break;
+            case LevelGen_Block.blockTypeEnum.ship: AddBlock(LGB, Ships); break;
+            default:
+                break;
+        }
+    }
+
+    void AddBlock(LevelGen_Block LGB, List<LevelGen_Block> LGBs)
+    {
+        if (LGBs.Contains(LGB))
+            return;
+        LGBs.Add(LGB);
     }
     private LevelGen_Block GetBlockFromList(List<LevelGen_Block> _list, LevelGen_Block.entryTypeEnum _entryType, Unity.Mathematics.Random _random)
     {
