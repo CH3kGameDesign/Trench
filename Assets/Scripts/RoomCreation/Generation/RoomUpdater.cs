@@ -25,6 +25,7 @@ public class RoomUpdater : MonoBehaviour
             new Vector3(1,0,1)
         };
     public List<wall> walls = new List<wall>();
+    [System.Serializable]
     public class wall
     {
         public Transform transform;
@@ -39,8 +40,6 @@ public class RoomUpdater : MonoBehaviour
     public GameObject[] moveArrows = new GameObject[0];
 
     public float height = 1;
-
-    public List<GameObject> cornices = new List<GameObject>();
     // Start is called before the first frame update
     void Start()
     {
@@ -58,6 +57,19 @@ public class RoomUpdater : MonoBehaviour
         SU_Ceiling.MoveFurniture(_dif);
         for (int i = 0; i < walls.Count; i++)
             walls[i].SU.MoveFurniture(_dif);
+    }
+
+    public void LoadMeshes()
+    {
+        SU_Floor.mf.mesh = SU_Floor.mf.mesh.Clone();
+        SU_Ceiling.mf.mesh = SU_Ceiling.mf.mesh.Clone();
+        for (int i = 0; i < walls.Count; i++)
+        {
+            walls[i].SU.mf.mesh = walls[i].SU.mf.mesh.Clone();
+            walls[i].SU.skirting.MF.mesh = walls[i].SU.skirting.MF.mesh.Clone();
+            walls[i].SU.cornice.MF.mesh = walls[i].SU.cornice.MF.mesh.Clone();
+        }
+        UpdateMeshes();
     }
 
     public void UpdateMeshes()
@@ -158,157 +170,6 @@ public class RoomUpdater : MonoBehaviour
             GO.transform.GetChild(0).GetComponent<MeshRenderer>().material.SetColor("_LitColor", color[i]);
 
             moveArrows[i] = GO;
-        }
-    }
-
-    public void UpdateArchitraves()
-    {
-        foreach (var item in cornices)
-            GameObject.Destroy(item);
-        cornices = new List<GameObject>();
-
-
-        UpdateSkirting();
-        UpdateCornices();
-    }
-
-    
-
-    public void UpdateSkirting()
-    {
-        List<MeshFilter> walls = new List<MeshFilter>();
-        foreach (var item in GetComponentsInChildren<MeshFilter>())
-        {
-            if (item.gameObject.name[item.gameObject.name.Length - 1] == 'a')
-                walls.Add(item);
-        }
-        for (int j = 0; j < walls.Count; j++)
-        {
-            SurfaceUpdater SU = walls[j].GetComponent<SurfaceUpdater>();
-            SU.skirting = null;
-            int k = j + 1;
-            if (k >= GetComponent<MeshFilter>().mesh.vertices.Length)
-                k = 0;
-
-            GameObject wallActive = new GameObject("Skirting:" + j.ToString());
-            wallActive.transform.position = walls[j].mesh.vertices[0] + walls[j].transform.position;
-            wallActive.transform.parent = transform;
-            wallActive.transform.LookAt(walls[j].mesh.vertices[1] + walls[j].transform.position);
-            wallActive.transform.localEulerAngles -= new Vector3(0, 90, 0);
-            MeshFilter MF = wallActive.AddComponent<MeshFilter>();
-            MeshRenderer MR = wallActive.AddComponent<MeshRenderer>();
-            cornices.Add(wallActive);
-
-            Vector3[] tempVerts = new Vector3[architraves.skirting[0].positionCount * 2];
-            for (int i = 0; i < architraves.skirting[0].positionCount; i++)
-            {
-                tempVerts[i] = architraves.skirting[0].GetPosition(i);
-            }
-
-            float dist = Vector2.Distance(new Vector2(walls[j].mesh.vertices[0].x, walls[j].mesh.vertices[0].z), new Vector2(walls[j].mesh.vertices[3].x, walls[j].mesh.vertices[3].z));
-            for (int i = 0; i < architraves.skirting[0].positionCount; i++)
-            {
-                tempVerts[i + architraves.skirting[0].positionCount] = architraves.skirting[0].GetPosition(i) + (Vector3.right * dist);
-            }
-            Vector2[] tempUV = new Vector2[architraves.skirting[0].positionCount * 2];
-            for (int i = 0; i < tempUV.Length; i++)
-            {
-                Vector3 temp = tempVerts[i];
-                tempUV[i] = new Vector2(temp.x + temp.z, temp.y);
-            }
-
-            int[] tempTris = new int[(architraves.skirting[0].positionCount - 1) * 6];
-
-            for (int i = 0; i < architraves.skirting[0].positionCount - 1; i++)
-            {
-                tempTris[i * 6] = i;
-                tempTris[(i * 6) + 1] = i + 1;
-                tempTris[(i * 6) + 2] = architraves.skirting[0].positionCount + i;
-
-                //Debug.Log(i + "," + (i + 1) + "," + (cornice.GetComponent<LineRenderer>().positionCount + i));
-
-                tempTris[(i * 6) + 3] = i + 1;
-                tempTris[(i * 6) + 4] = architraves.skirting[0].positionCount + i + 1;
-                tempTris[(i * 6) + 5] = architraves.skirting[0].positionCount + i;
-                //Debug.Log((i + 1) + "," + (cornice.GetComponent<LineRenderer>().positionCount + i + 1) + "," + (cornice.GetComponent<LineRenderer>().positionCount + i));
-            }
-            MF.mesh.vertices = tempVerts;
-            MF.mesh.uv = tempUV;
-            MF.mesh.triangles = tempTris;
-
-            MR.material = walls[j].GetComponent<MeshRenderer>().material;
-            //SU.skirting = MR;
-            MF.mesh.RecalculateNormals();
-            MF.mesh.RecalculateBounds();
-
-            //wallActive.meshCollider.sharedMesh = wallActive.mf.mesh;
-            //wallActive.boxCollider.size = new Vector3(Mathf.Abs(vertPos[wallActive.verts.x].x - vertPos[wallActive.verts.y].x), wallActive.height, Mathf.Abs(vertPos[wallActive.verts.x].z - vertPos[wallActive.verts.y].z));
-        }
-    }
-
-    public void UpdateCornices()
-    {
-        //SU_Ceiling.architraves = new List<MeshRenderer>();
-        for (int j = 0; j < GetComponent<MeshFilter>().mesh.vertices.Length; j++)
-        {
-            int k = j + 1;
-            if (k >= GetComponent<MeshFilter>().mesh.vertices.Length)
-                k = 0;
-
-            GameObject wallActive = new GameObject("Cornice:" + j.ToString());
-            wallActive.transform.position = GetComponent<MeshFilter>().mesh.vertices[j] + transform.position;
-            wallActive.transform.parent = transform;
-            wallActive.transform.LookAt(GetComponent<MeshFilter>().mesh.vertices[k] + transform.position);
-            wallActive.transform.localEulerAngles -= new Vector3(0, 90, 0);
-            MeshFilter MF = wallActive.AddComponent<MeshFilter>();
-            MeshRenderer MR = wallActive.AddComponent<MeshRenderer>();
-
-            cornices.Add(wallActive);
-            //SU_Ceiling.architraves.Add(MR);
-            Vector3[] tempVerts = new Vector3[architraves.cornices[0].positionCount * 2];
-            for (int i = 0; i < architraves.cornices[0].positionCount; i++)
-            {
-                tempVerts[i] = architraves.cornices[0].GetPosition(i) + new Vector3(0, walls[j].height,0);
-            }
-
-            float dist = Vector2.Distance(new Vector2(GetComponent<MeshFilter>().mesh.vertices[j].x, GetComponent<MeshFilter>().mesh.vertices[j].z), new Vector2(GetComponent<MeshFilter>().mesh.vertices[k].x, GetComponent<MeshFilter>().mesh.vertices[k].z));
-            for (int i = 0; i < architraves.cornices[0].positionCount; i++)
-            {
-                tempVerts[i + architraves.cornices[0].positionCount] = architraves.cornices[0].GetPosition(i) + (Vector3.right * dist) + new Vector3(0, walls[j].height, 0);
-            }
-            Vector2[] tempUV = new Vector2[architraves.cornices[0].positionCount * 2];
-            for (int i = 0; i < tempUV.Length; i++)
-            {
-                Vector3 temp = tempVerts[i];
-                tempUV[i] = new Vector2(temp.x + temp.z, temp.y);
-            }
-
-            int[] tempTris = new int[(architraves.cornices[0].positionCount - 1) * 6];
-
-            for (int i = 0; i < architraves.cornices[0].positionCount - 1; i++)
-            {
-                tempTris[i * 6] = i;
-                tempTris[(i * 6) + 1] = i + 1;
-                tempTris[(i * 6) + 2] = architraves.cornices[0].positionCount + i;
-
-                //Debug.Log(i + "," + (i + 1) + "," + (cornice.GetComponent<LineRenderer>().positionCount + i));
-
-                tempTris[(i * 6) + 3] = i + 1;
-                tempTris[(i * 6) + 4] = architraves.cornices[0].positionCount + i + 1;
-                tempTris[(i * 6) + 5] = architraves.cornices[0].positionCount + i;
-                //Debug.Log((i + 1) + "," + (cornice.GetComponent<LineRenderer>().positionCount + i + 1) + "," + (cornice.GetComponent<LineRenderer>().positionCount + i));
-            }
-            MF.mesh.vertices = tempVerts;
-            MF.mesh.uv = tempUV;
-            MF.mesh.triangles = tempTris;
-
-            MR.material = SU_Ceiling.mr.material;
-
-            MF.mesh.RecalculateNormals();
-            MF.mesh.RecalculateBounds();
-
-            //wallActive.meshCollider.sharedMesh = wallActive.mf.mesh;
-            //wallActive.boxCollider.size = new Vector3(Mathf.Abs(vertPos[wallActive.verts.x].x - vertPos[wallActive.verts.y].x), wallActive.height, Mathf.Abs(vertPos[wallActive.verts.x].z - vertPos[wallActive.verts.y].z));
         }
     }
 

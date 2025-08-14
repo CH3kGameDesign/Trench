@@ -405,7 +405,19 @@ public static class CKUtil
         }
         return _temp;
     }
-
+    public static Mesh Clone(this Mesh m)
+    {
+        Mesh _m = new Mesh()
+        {
+            vertices = m.vertices,
+            triangles = m.triangles,
+            normals = m.normals,
+            tangents = m.tangents,
+            bounds = m.bounds,
+            uv = m.uv,
+        };
+        return _m;
+    }
     public static bool IsValid(this Bounds _bounds, int _dimReq = 2)
     {
         int _dim = 0;

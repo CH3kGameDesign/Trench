@@ -47,7 +47,18 @@ public class LevelGen_Block : MonoBehaviour
     {
         
     }
-
+    public void RoomEditor_Setup()
+    {
+        RoomUpdater[] RUs = T_blockHolder.GetComponentsInChildren<RoomUpdater>();
+        foreach (RoomUpdater RU in RUs)
+        {
+            RU.SU_Floor.Setup(RU, SurfaceUpdater.enumType.floor);
+            RU.SU_Ceiling.Setup(RU, SurfaceUpdater.enumType.ceiling);
+            foreach (var item in RU.walls)
+                item.SU.Setup(RU, SurfaceUpdater.enumType.wall);
+            RU.LoadMeshes();
+        }
+    }
     public void UpdateLists_Editor()
     {
         UpdateEntryList();

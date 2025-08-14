@@ -61,6 +61,25 @@ public class LevelGen_Theme : ScriptableObject
         }
         return null;
     }
+    public List<LevelGen_Block> GetBlocks(LevelGen_Block.blockTypeEnum _type)
+    {
+        switch (_type)
+        {
+            case LevelGen_Block.blockTypeEnum.corridor: return Corridors;
+            case LevelGen_Block.blockTypeEnum.bridge: return Bridges;
+            case LevelGen_Block.blockTypeEnum.hangar: return Hangars;
+            case LevelGen_Block.blockTypeEnum.deadend: return DeadEnds;
+            case LevelGen_Block.blockTypeEnum.engine: return Engines;
+            case LevelGen_Block.blockTypeEnum.foodhall: return FoodHalls;
+            case LevelGen_Block.blockTypeEnum.crewQuarters: return CrewQuarters;
+            case LevelGen_Block.blockTypeEnum.captain: return CaptainQuaters;
+            case LevelGen_Block.blockTypeEnum.vault: return Vaults;
+            case LevelGen_Block.blockTypeEnum.ship: return Ships;
+            default:
+                break;
+        }
+        return null;
+    }
     public void AddBlock(LevelGen_Block LGB)
     {
         switch (LGB.BlockType)

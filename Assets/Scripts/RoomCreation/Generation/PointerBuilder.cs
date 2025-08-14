@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.IO;
-using Unity.VisualScripting;
+using System;
 
 
 #if UNITY_EDITOR
@@ -37,6 +37,8 @@ public class PointerBuilder : MonoBehaviour
 
     public LevelGen_Block PF_blockTemplate;
     private LevelGen_Block lg_block;
+
+    public Button PF_layoutButton;
 
     [HideInInspector]
     public float gridSize = 1;
@@ -88,6 +90,13 @@ public class PointerBuilder : MonoBehaviour
         public RawImage RI_cursorImage;
 
         public TMP_InputField TM_inputField;
+        public TMP_Dropdown TM_saveDropdown;
+        public TMP_Dropdown TM_loadDropdown;
+        public GameObject G_saveWindow;
+        public GameObject G_loadWindow;
+
+        public RectTransform RT_saveList;
+        public RectTransform RT_loadList;
     }
     public BuildClass _Build;
     public PaintClass _Paint;
@@ -1198,13 +1207,26 @@ public class PointerBuilder : MonoBehaviour
     void Setup()
     {
         if (lg_block == null)
+        {
             lg_block = Instantiate(PF_blockTemplate, transform);
+            lg_block.RoomEditor_Setup();
+        }
 
         _Build.Setup(this);
         _Paint.Setup(this);
         _Place.Setup(this);
 
         UpdateCursor_Image(null);
+        SetupSaveWindow();
+    }
+    void SetupSaveWindow()
+    {
+        string[] s = Enum.GetNames(typeof(LevelGen_Block.blockTypeEnum));
+        List<TMP_Dropdown.OptionData> GUILayoutOptions = new List<TMP_Dropdown.OptionData>();
+        foreach (var _s in s)
+            GUILayoutOptions.Add(new TMP_Dropdown.OptionData(_s));
+        _canvas.TM_saveDropdown.options = GUILayoutOptions;
+        _canvas.TM_loadDropdown.options = GUILayoutOptions;
     }
     public void GenerateBelt_Sub(int _belt)
     {
@@ -1364,6 +1386,86 @@ public class PointerBuilder : MonoBehaviour
     }
     #endregion
 
+    public void OpenSaveWindow(bool _open)
+    {
+        _canvas.G_saveWindow.SetActive(_open);
+        if (!_open)
+            return;
+        _canvas.TM_saveDropdown.value = (int)lg_block.BlockType;
+        UpdateSaveList(lg_block.BlockType);
+        OpenLoadWindow(false);
+    }
+    public void SetSaveType(Int32 _change)
+    {
+        if (lg_block == null)
+            return;
+        lg_block.BlockType = (LevelGen_Block.blockTypeEnum)_change;
+        UpdateSaveList(lg_block.BlockType);
+    }
+    public void SetLoadType(Int32 _change)
+    {
+        UpdateLoadList((LevelGen_Block.blockTypeEnum)_change);
+    }
+
+    public void UpdateSaveList(LevelGen_Block.blockTypeEnum _type)
+    {
+        _canvas.RT_saveList.DeleteChildren();
+        List<LevelGen_Block> LGBs = _Theme.GetBlocks(_type);
+        for (int i = 0; i < LGBs.Count; i++)
+        {
+            Button b = Instantiate(PF_layoutButton, _canvas.RT_saveList);
+            b.GetComponentInChildren<TextMeshProUGUI>().text = LGBs[i]._name;
+            b.GetComponentInChildren<RawImage>().texture = LGBs[i].layoutTexture;
+            int _i = i;
+            b.onClick.AddListener(delegate { ClickSaveList(_type, _i); });
+        }
+    }
+    public void ClickSaveList(LevelGen_Block.blockTypeEnum _type, int _i)
+    {
+        List<LevelGen_Block> LGBs = _Theme.GetBlocks(_type);
+        ClickSaveList(LGBs[_i]);
+    }
+    public void ClickSaveList(LevelGen_Block LGB)
+    {
+        _canvas.TM_inputField.text = LGB._name;
+    }
+    public void UpdateLoadList(LevelGen_Block.blockTypeEnum _type)
+    {
+        _canvas.RT_loadList.DeleteChildren();
+        List<LevelGen_Block> LGBs = _Theme.GetBlocks(_type);
+        for (int i = 0; i < LGBs.Count; i++)
+        {
+            Button b = Instantiate(PF_layoutButton, _canvas.RT_loadList);
+            b.GetComponentInChildren<TextMeshProUGUI>().text = LGBs[i]._name;
+            b.GetComponentInChildren<RawImage>().texture = LGBs[i].layoutTexture;
+            int _i = i;
+            b.onClick.AddListener(delegate { LoadLayout(_type, _i); });
+        }
+    }
+    public void LoadLayout(LevelGen_Block.blockTypeEnum _type, int _i)
+    {
+        List<LevelGen_Block> LGBs = _Theme.GetBlocks(_type);
+        LoadLayout(LGBs[_i]);
+    }
+    public void LoadLayout(LevelGen_Block LGB)
+    {
+        if (lg_block != null)
+            Destroy(lg_block.gameObject);
+        lg_block = Instantiate(LGB, transform);
+        _canvas.TM_inputField.text = lg_block._name;
+        lg_block.RoomEditor_Setup();
+        OpenLoadWindow(false);
+    }
+
+    public void OpenLoadWindow(bool _open)
+    {
+        _canvas.G_loadWindow.SetActive(_open);
+        if (!_open)
+            return;
+        UpdateLoadList((LevelGen_Block.blockTypeEnum)_canvas.TM_loadDropdown.value);
+        OpenSaveWindow(false);
+    }
+
     public void Save()
     {
         if (lg_block == null)
@@ -1454,12 +1556,13 @@ public class PointerBuilder : MonoBehaviour
         }
         PrefabUtility.SavePrefabAsset(GO);
         _Theme.AddBlock(LGB);
-    }
 
+        LoadLayout(LGB);
+    }
     void RemoveOldSubAssets(string filePath)
     {
-        Object[] LGB = AssetDatabase.LoadAllAssetsAtPath(filePath);
-        foreach (Object obj in LGB)
+        UnityEngine.Object[] LGB = AssetDatabase.LoadAllAssetsAtPath(filePath);
+        foreach (UnityEngine.Object obj in LGB)
         {
             if (obj is Mesh)
                 DestroyImmediate(obj, true);
