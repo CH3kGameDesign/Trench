@@ -21,6 +21,7 @@ public class LevelGen_Placeables : ScriptableObject
     public List<Wall> walls = new List<Wall>();
     public List<Floor> floors = new List<Floor>();
     public List<Ceiling> ceilings = new List<Ceiling>();
+    public List<Fence> fences = new List<Fence>();
     public Camera PF_Camera;
     [System.Serializable]
     public class PlaceableClass
@@ -75,7 +76,7 @@ public class LevelGen_Placeables : ScriptableObject
     {
         public override void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/LevelGen/")
         {
-            filePath += "Structures/";
+            filePath += "Walls/";
             base.GenerateTexture(_camera, pos, rot, onEmpty, prefab.gameObject, filePath);
         }
     }
@@ -84,7 +85,7 @@ public class LevelGen_Placeables : ScriptableObject
     {
         public override void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/LevelGen/")
         {
-            filePath += "Structures/";
+            filePath += "Floors/";
             base.GenerateTexture(_camera, pos, rot, onEmpty, prefab.gameObject, filePath);
         }
     }
@@ -93,7 +94,16 @@ public class LevelGen_Placeables : ScriptableObject
     {
         public override void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/LevelGen/")
         {
-            filePath += "Structures/";
+            filePath += "Ceilings/";
+            base.GenerateTexture(_camera, pos, rot, onEmpty, prefab.gameObject, filePath);
+        }
+    }
+    [System.Serializable]
+    public class Fence : PlaceableClass
+    {
+        public override void GenerateTexture(Camera _camera, Vector3 pos, Vector3 rot, Texture2D onEmpty = null, GameObject _model = null, string filePath = "Assets/Art/Sprites/LevelGen/")
+        {
+            filePath += "Fences/";
             base.GenerateTexture(_camera, pos, rot, onEmpty, prefab.gameObject, filePath);
         }
     }
@@ -117,6 +127,9 @@ public class LevelGen_Placeables : ScriptableObject
                 break;
             case "ceiling":
                 _temp.AddRange(ceilings);
+                break;
+            case "fence":
+                _temp.AddRange(fences);
                 break;
             default:
                 break;
@@ -147,6 +160,7 @@ public class LevelGen_Placeables : ScriptableObject
         floors.Clear();
         walls.Clear();
         ceilings.Clear();
+        fences.Clear();
         foreach (var path in filePaths)
         {
             string _path = "Assets" + path.Substring(Application.dataPath.Length);
@@ -178,6 +192,12 @@ public class LevelGen_Placeables : ScriptableObject
                         _structure.name = _temp.GetName();
                         _structure.prefab = _temp;
                         structures.Add(_structure);
+                        break;
+                    case Prefab_Environment.TypeEnum.fence:
+                        Fence _fence = new Fence();
+                        _fence.name = _temp.GetName();
+                        _fence.prefab = _temp;
+                        fences.Add(_fence);
                         break;
                     default:
                         break;
@@ -214,6 +234,8 @@ public class LevelGen_Placeables : ScriptableObject
         foreach (var item in floors)
             item.GenerateTexture(_camera, pos, rot);
         foreach (var item in ceilings)
+            item.GenerateTexture(_camera, pos, rot);
+        foreach (var item in fences)
             item.GenerateTexture(_camera, pos, rot);
         DestroyImmediate(_camera.gameObject);
         AssetDatabase.Refresh();

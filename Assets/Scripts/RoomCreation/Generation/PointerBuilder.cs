@@ -6,7 +6,6 @@ using UnityEngine.UI;
 using System.IO;
 using System;
 
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -26,6 +25,85 @@ public class PointerBuilder : MonoBehaviour
     [Space(10)]
 
     public GameObject planeVisual;
+    public Transform PF_planeOccupied;
+    public List<planeOccupiedClass> occupiedPlanes = new List<planeOccupiedClass>();
+    [System.Serializable]
+    public class planeOccupiedClass
+    {
+        public Transform t;
+        public Vector2Int pos;
+
+        public List<RoomUpdater> rooms = new List<RoomUpdater>();
+
+        public planeOccupiedClass(Transform PF,Vector2Int _pos, RoomUpdater _room)
+        {
+            t = Instantiate(PF);
+            pos = _pos;
+            t.position = GetPos(_pos);
+            AddRoom(_room);
+        }
+
+        Vector3 GetPos(Vector2Int _pos)
+        {
+            return new Vector3((_pos.x * 5) + 2.5f, 0.0001f, (_pos.y * 5) + 2.5f);
+        }
+        void AddRoom(RoomUpdater _room)
+        {
+            if (!rooms.Contains(_room))
+                rooms.Add(_room);
+        }
+        public void RemoveRoom(RoomUpdater _room, PointerBuilder PB)
+        {
+            if (!rooms.Contains(_room))
+                return;
+            rooms.Remove(_room);
+            if (rooms.Count == 0)
+            {
+                PB.occupiedPlanes.Remove(this);
+                Destroy(t.gameObject);
+            }
+        }
+        public bool AddRoom(RoomUpdater _room, Vector2Int _pos)
+        {
+            if (pos != _pos)
+                return false;
+            AddRoom(_room);
+            return true;
+        }
+        public bool CheckRoom(PointerBuilder PB, RoomUpdater _room, Vector2Int _min, Vector2Int _max)
+        {
+            for (int i = rooms.Count - 1; i >= 0; i--)
+                if (rooms[i] == null)
+                    rooms.RemoveAt(i);
+            if (rooms.Count == 0)
+            {
+                PB.occupiedPlanes.Remove(this);
+                Destroy(t.gameObject);
+            }
+            if (!rooms.Contains(_room))
+                return false;
+
+            if (pos.x >= _min.x && pos.x <= _max.x &&
+                pos.y >= _min.y && pos.y <= _max.y)
+            {
+                AddRoom(_room);
+                return true;
+            }
+            RemoveRoom(_room, PB);
+            return false;
+        }
+        public static void ConvertToBounds(RoomUpdater _room, out Vector2Int _min, out Vector2Int _max)
+        {
+            Vector3 _min3 = (_room.transform.position - _room.vertPos[0] + (Vector3.one * 0.1f)) / 5;
+            Vector3 _max3 = (_room.transform.position + _room.vertPos[0] - (Vector3.one * 0.1f)) / 5;
+            _min = new Vector2Int(
+                Mathf.FloorToInt(Mathf.Min(_min3.x, _max3.x)),
+                Mathf.FloorToInt(Mathf.Min(_min3.z, _max3.z)));
+            _max = new Vector2Int(
+                Mathf.FloorToInt(Mathf.Max(_min3.x, _max3.x)),
+                Mathf.FloorToInt(Mathf.Max(_min3.z, _max3.z)));
+        }
+    }
 
     [HideInInspector]
     public Transform activeSquare;
@@ -437,6 +515,9 @@ public class PointerBuilder : MonoBehaviour
                 Update_BuildEdit();
                 break;
         }
+
+        if (Input.GetMouseButtonUp(0))
+            UpdateOccupiedPlanes();
     }
 
     void Update_BuildDraw_Square()
@@ -758,6 +839,43 @@ public class PointerBuilder : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Delete))
             DeleteSquare();
     }
+    void UpdateOccupiedPlanes()
+    {
+        if (lg_block == null)
+            return;
+        for (int i = 0; i < lg_block.T_blockHolder.childCount; i++)
+        {
+            UpdateOccupiedPlanes(lg_block.T_blockHolder.GetChild(i).GetComponent<RoomUpdater>());
+        }
+    }
+    void UpdateOccupiedPlanes(RoomUpdater RU)
+    {
+        Vector2Int _min;
+        Vector2Int _max;
+        planeOccupiedClass.ConvertToBounds(RU, out _min, out _max);
+        List<Vector2Int> _checked = new List<Vector2Int>();
+        for (int i = occupiedPlanes.Count - 1; i >= 0; i--)
+            occupiedPlanes[i].CheckRoom(this, RU, _min, _max);
+
+        for (int x = _min.x; x <= _max.x; x++)
+        {
+            for (int y = _min.y; y <= _max.y; y++)
+            {
+                Vector2Int _pos = new Vector2Int(x, y);
+                bool _cont = false;
+                foreach (var item in occupiedPlanes)
+                {
+                    if (item.AddRoom(RU, _pos))
+                    {
+                        _cont = true;
+                        break;
+                    }
+                }
+                if (_cont) continue;
+                occupiedPlanes.Add(new planeOccupiedClass(PF_planeOccupied, _pos, RU));
+            }
+        }
+    }
     void Update_Paint()
     {
         bool _deselect = true;
@@ -863,7 +981,7 @@ public class PointerBuilder : MonoBehaviour
 
                 Vector3 _pos = hit.point;
                 if (!Input.GetKey(KeyCode.LeftControl))
-                    _pos = ClampToGrid(_pos);
+                    _pos = ClampToGrid(_pos, 0.5f);
 
                 SurfaceUpdater _SU;
                 if (hit.transform.TryGetComponent<SurfaceUpdater>(out _SU))
@@ -908,7 +1026,7 @@ public class PointerBuilder : MonoBehaviour
                 _Place.activeTransform.transform.parent = hit.transform;
                 Vector3 _pos = hit.point;
                 if (!Input.GetKey(KeyCode.LeftControl))
-                    _pos = ClampToGrid(_pos);
+                    _pos = ClampToGrid(_pos, 0.5f);
 
                 SurfaceUpdater _SU;
                 if (hit.transform.TryGetComponent<SurfaceUpdater>(out _SU))
@@ -1076,7 +1194,11 @@ public class PointerBuilder : MonoBehaviour
         if (activeSquare != null)
             GameObject.Destroy(activeSquare.gameObject);
         else if (activeWall != null)
+        {
+            for (int i = occupiedPlanes.Count - 1; i >= 0; i--)
+                occupiedPlanes[i].RemoveRoom(activeWall.RU, this);
             Destroy(activeWall.RU.gameObject);
+        }
 
         activeSquare = null;
         activeWall = null;

@@ -352,7 +352,7 @@ public class Ship : Vehicle
     float Update_Rotation(PlayerController _player)
     {
         Vector3 _tarRot = _player.v3_camDir;
-        //_tarRot.x = Mathf.Clamp(_tarRot.x, downXLimit, upXLimit);
+        _tarRot.x = Mathf.Clamp(_tarRot.x, downXLimit, upXLimit);
         Quaternion _target = Quaternion.Euler(_tarRot) * Quaternion.Euler(_rotate);
         _target *= Quaternion.Inverse(T_pilotSeat.rotation);
         _target =  _target * transform.rotation;

@@ -1170,7 +1170,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 466548979}
   m_Direction: 2
   m_Value: 1
-  m_Size: 1
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2758,7 +2758,7 @@ GameObject:
   - component: {fileID: 531595205}
   - component: {fileID: 531595204}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: RendererUpdate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4997,8 +4997,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 557535416}
   m_HandleRect: {fileID: 557535415}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.60999995
+  m_Value: 1.0000002
+  m_Size: 0.61
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -6136,6 +6136,7 @@ MonoBehaviour:
   drawMode: 0
   beltMode: 0
   planeVisual: {fileID: 714629209}
+  PF_planeOccupied: {fileID: 4684632101287263461, guid: 7f689144ee51627449fa5abfe99b7e57, type: 3}
   activeSquare: {fileID: 0}
   activeWall: {fileID: 0}
   activeArrow: {fileID: 0}
@@ -6222,30 +6223,12 @@ MonoBehaviour:
   _Paint:
     i_lastSel: 0
     list:
-    - name: Rooms
+    - name: Debug
       image: {fileID: 0}
       items: []
       index: 0
       i_lastSel: 0
       _id: room
-    - name: Walls
-      image: {fileID: 0}
-      items: []
-      index: 0
-      i_lastSel: 0
-      _id: wall
-    - name: Floors
-      image: {fileID: 0}
-      items: []
-      index: 0
-      i_lastSel: 0
-      _id: floor
-    - name: Ceilings
-      image: {fileID: 0}
-      items: []
-      index: 0
-      i_lastSel: 0
-      _id: ceiling
     activeMat: {fileID: 0}
   _Place:
     i_lastSel: 0
@@ -6280,6 +6263,12 @@ MonoBehaviour:
       index: 0
       i_lastSel: 0
       _id: ceiling
+    - name: Fences
+      image: {fileID: 0}
+      items: []
+      index: 0
+      i_lastSel: 0
+      _id: fence
     activePrefab: {fileID: 0}
     activeTransform: {fileID: 0}
     lastTransform: {fileID: 0}

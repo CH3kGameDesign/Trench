@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
+
 public class RendererUpdate : MonoBehaviour
 {
     public UniversalRendererData URD;

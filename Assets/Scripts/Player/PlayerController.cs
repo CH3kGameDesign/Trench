@@ -232,7 +232,8 @@ public class PlayerController : BaseController
         Back,
         LeftTab,
         RightTab,
-        Purchase
+        Purchase,
+        BuildMenu,
     }
 
     [HideInInspector] public Interactable I_curInteractable = null;

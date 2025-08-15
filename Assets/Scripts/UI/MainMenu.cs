@@ -337,6 +337,9 @@ public class MainMenu : MonoBehaviour
     {
         public LayoutCustomize layoutCustomize;
 
+        public TextMeshProUGUI TM_buildButton;
+        public TextMeshProUGUI TM_backButton;
+
         public override void Open(AnimCurve _curve, Vector3 v3_camMenuLocalPos, Quaternion q_camLastLocalRot, bool _move = true)
         {
             layoutCustomize.Display();
@@ -642,6 +645,9 @@ public class MainMenu : MonoBehaviour
         store.TM_rightTab.text = "".ToString_Input(PlayerController.inputActions.RightTab, store.TM_rightTab, Interactable.enumType.input);
 
         store.TM_purchase.text = "Get".ToString_Input(PlayerController.inputActions.Purchase, store.TM_purchase, Interactable.enumType.combine);
+        
+        customizeLayout.TM_buildButton.text = "Build".ToString_Input(PlayerController.inputActions.BuildMenu, customizeLayout.TM_buildButton, Interactable.enumType.combine);
+        customizeLayout.TM_backButton.text = "Back".ToString_Input(PlayerController.inputActions.Back, customizeLayout.TM_backButton, Interactable.enumType.combine);
     }
 
     
