@@ -23,6 +23,11 @@ using UnityEngine;
         [HideInInspector] public BaseController.stateEnum prevState;
     }
 
+    public virtual void Awake()
+    {
+
+    }
+
     public override void OnInteract(BaseController _player)
     {
         for (int i = 0; i < Seats.Count; i++)

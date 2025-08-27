@@ -66,6 +66,8 @@ public class LevelGen_Block : MonoBehaviour
         UpdateBoundingBox();
         UpdateTreasurePoints();
 
+        CenterBlock();
+
         Vector3 _min;
         Vector3 _max;
         Vector3 _worldMin;
@@ -73,6 +75,34 @@ public class LevelGen_Block : MonoBehaviour
         UpdateSize_Layout(out _min, out _max, out _worldMin, out _worldMax);
         UpdateDoors_Layout(_min, _max);
         UpdateTexture_Layout(_worldMin, _worldMax);
+    }
+    void CenterBlock()
+    {
+        //Get New Pivot
+        if (B_bounds.Count == 0) return;
+        Vector3 _min = B_bounds[0].B_Bounds.bounds.min;
+        for (int i = 1; i < B_bounds.Count; i++)
+            _min = Vector3.Min(_min, B_bounds[i].B_Bounds.bounds.min);
+        _min -= Vector3.one * (_boxShrink / 2f);
+        _min = Vector3Int.RoundToInt(_min / _gridSize);
+        _min *= _gridSize;
+
+        //Get Architecure Pos
+        List<Vector3> _posA = new List<Vector3>();
+        foreach (var item in T_architecture)
+            _posA.Add(item.position);
+        //Get Trigger Pos
+        List<Vector3> _posB = new List<Vector3>();
+        foreach (var item in B_bounds)
+            _posB.Add(item.transform.position);
+        //Set Pivot
+        transform.position = _min;
+        //Set Architecture Pos
+        for (int i = 0; i < T_architecture.Count; i++)
+            T_architecture[i].position = _posA[i];
+        //Set Trigger Pos
+        for (int i = 0; i < B_bounds.Count; i++)
+            B_bounds[i].transform.position = _posB[i];
     }
     void UpdateEntryList()
     {

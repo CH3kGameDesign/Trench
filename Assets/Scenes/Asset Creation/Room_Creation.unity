@@ -1169,8 +1169,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 466548980}
   m_HandleRect: {fileID: 466548979}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.99999994
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3111,7 +3111,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 393826599}
   m_HandleRect: {fileID: 393826598}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -4997,8 +4997,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 557535416}
   m_HandleRect: {fileID: 557535415}
   m_Direction: 2
-  m_Value: 1.0000002
-  m_Size: 0.61
+  m_Value: 1
+  m_Size: 0.6100001
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -6137,6 +6137,7 @@ MonoBehaviour:
   beltMode: 0
   planeVisual: {fileID: 714629209}
   PF_planeOccupied: {fileID: 4684632101287263461, guid: 7f689144ee51627449fa5abfe99b7e57, type: 3}
+  occupiedPlanes: []
   activeSquare: {fileID: 0}
   activeWall: {fileID: 0}
   activeArrow: {fileID: 0}
@@ -6152,13 +6153,13 @@ MonoBehaviour:
   _layer:
     allMask:
       serializedVersion: 2
-      m_Bits: 3687489
+      m_Bits: 3687617
     gridMask:
       serializedVersion: 2
       m_Bits: 64
     interactableMask:
       serializedVersion: 2
-      m_Bits: 1589248
+      m_Bits: 1589376
     floorMask:
       serializedVersion: 2
       m_Bits: 16384
@@ -7592,7 +7593,7 @@ Transform:
   m_GameObject: {fileID: 1513138509}
   serializedVersion: 2
   m_LocalRotation: {x: 0.60876125, y: -0, z: -0, w: 0.7933535}
-  m_LocalPosition: {x: 0, y: 20, z: -20}
+  m_LocalPosition: {x: 0, y: 20, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

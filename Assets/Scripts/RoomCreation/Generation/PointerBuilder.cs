@@ -944,6 +944,9 @@ public class PointerBuilder : MonoBehaviour
             case Prefab_Environment.TypeEnum.ceiling:
                 _Place.RC_itemInfo.G_rotateButtons.SetActive(true);
                 break;
+            case Prefab_Environment.TypeEnum.fence:
+                _Place.RC_itemInfo.G_rotateButtons.SetActive(true);
+                break;
             default:
                 _Place.RC_itemInfo.G_rotateButtons.SetActive(false);
                 break;
@@ -1632,6 +1635,7 @@ public class PointerBuilder : MonoBehaviour
 
         root = S_root + "/" + S_themeName;
 
+        FixColliders();
         GameObject _object = lg_block.gameObject;
         filePath = root + "/" + fileName + ".prefab";
         RemoveOldSubAssets(filePath);
@@ -1692,4 +1696,19 @@ public class PointerBuilder : MonoBehaviour
     }
 
 #endif
+    void FixColliders()
+    {
+        for (int t = 0; t < lg_block.T_architecture.Count; t++)
+        {
+            SurfaceUpdater[] SU = lg_block.T_architecture[t].GetComponentsInChildren<SurfaceUpdater>();
+            for (int s = 0; s < SU.Length; s++)
+            {
+                SU[s].mc.enabled = false;
+                foreach (var item in SU[s].bc)
+                {
+                    item.enabled = true;
+                }
+            }
+        }
+    }
 }

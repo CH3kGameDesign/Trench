@@ -44,7 +44,7 @@ public class LayoutModuleObject : MonoBehaviour
             I_BG.rectTransform.sizeDelta = (_block.size * 100) - (Vector2.one * 10);
 
         SetupDoors();
-        Rotate(_rot);
+        Rotate(_rot, true);
     }
 
     void SetupDoors()
@@ -77,6 +77,21 @@ public class LayoutModuleObject : MonoBehaviour
         foreach (var item in LMO_doorList)
             item.SetConnected(null);
         SetBounds(-Vector2Int.one, -Vector2Int.one);
+    }
+    public Vector2Int GetCenter()
+    {
+        Vector2Int _center = minPos;
+        if (I_rot % 2 == 0)
+        {
+            _center.x += Mathf.FloorToInt((float)Block.size.y / 2);
+            _center.y += Mathf.FloorToInt((float)Block.size.x / 2);
+        }
+        else
+        {
+            _center.x += Mathf.FloorToInt((float)Block.size.x / 2);
+            _center.y += Mathf.FloorToInt((float)Block.size.y / 2);
+        }
+        return _center;
     }
     public Vector2Int GetMinPos(Vector2Int _center)
     {

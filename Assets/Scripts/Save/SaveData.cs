@@ -11,6 +11,8 @@ public static class SaveData
     public static List<Resource.resourceClass> resources = new List<Resource.resourceClass>();
     public static List<Consumable.save> consumables = new List<Consumable.save>();
 
+    public static LayoutCustomize.saveClass shipLayout = new LayoutCustomize.saveClass();
+
     public static List<Gun_Type> ownedGun = new List<Gun_Type>();
     public static List<Armor_Type> ownedArmor = new List<Armor_Type>();
 

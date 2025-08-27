@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
+using UnityEditor.SceneManagement;
 using UnityEngine;
-using static SurfaceUpdater;
 
 public class SurfaceUpdater : MonoBehaviour
 {
@@ -12,7 +12,7 @@ public class SurfaceUpdater : MonoBehaviour
     public MeshFilter mf;
     public MeshRenderer mr;
     public MeshCollider mc;
-    public BoxCollider bc;
+    public List<BoxCollider> bc = new List<BoxCollider>();
 
     public RoomUpdater RU;
     [HideInInspector] public architrave skirting = null;
@@ -53,7 +53,7 @@ public class SurfaceUpdater : MonoBehaviour
         mf = GetComponent<MeshFilter>();
         mr = GetComponent<MeshRenderer>();
         mc = GetComponent<MeshCollider>();
-        bc = GetComponent<BoxCollider>();
+        bc = GetComponents<BoxCollider>().ToList();
 
         mat = mr.sharedMaterial;
     }
@@ -153,18 +153,24 @@ public class SurfaceUpdater : MonoBehaviour
         List<int> _tri = new List<int>();
         int _i = 4;
         Vector2Int _start = new Vector2Int(2, 0);
+        List<Vector3> BC_points = new List<Vector3>() { _vert[0] };
         foreach (var item in doors)
         {
             holeClass _hole = holeClass.CreateNew(item, low - wallActive.transform.localPosition, wallActive.height);
             _vert.AddRange(_hole._points);
             _uv.AddRange(_hole._uv);
             _tri.AddRange(_hole.GetTriangles(_i, _start, out _i, out _start));
+            BC_points.Add(_hole._points[4]);
+            BC_points.Add(_hole._points[2]);
+            BC_points.Add(_hole._points[5]);
+            BC_points.Add(_hole._points[1]);
         }
         _tri.AddRange(new int[]
         {
                 _start.x, 3, 1,
                 _start.x, 1, _start.y,
         });
+        BC_points.Add(_vert[3]);
 
 
         mf.mesh.triangles = new int[0];
@@ -179,9 +185,36 @@ public class SurfaceUpdater : MonoBehaviour
         mf.mesh.RecalculateBounds();
         if (wallActive.SU.mf.mesh.bounds.IsValid())
             mc.sharedMesh = wallActive.SU.mf.mesh;
-        bc.size = new Vector3(Mathf.Abs(vertPos[wallActive.verts.x].x - vertPos[wallActive.verts.y].x), wallActive.height, Mathf.Abs(vertPos[wallActive.verts.x].z - vertPos[wallActive.verts.y].z));
+        UpdateBoxColliders(BC_points);
+
         UpdateSkirting();
         UpdateCornice();
+    }
+
+    void UpdateBoxColliders(List<Vector3> BC_points)
+    {
+        int tarAmt = BC_points.Count / 2;
+        for (int i = bc.Count - 1; i >= tarAmt; i--)
+        {
+            Destroy(bc[i]);
+            bc.RemoveAt(i);
+        }
+
+        for (int i = 0; i < tarAmt; i ++)
+        {
+            int j = i * 2;
+            BoxCollider _bc;
+            if (i >= bc.Count)
+            {
+                _bc = this.AddComponent<BoxCollider>();
+                bc.Add(_bc);
+            }
+            else
+                _bc = bc[i];
+            Vector3 _dif = BC_points[j + 1] - BC_points[j];
+            _bc.size = new Vector3(Mathf.Abs(_dif.x), Mathf.Abs(_dif.y), Mathf.Abs(_dif.z));
+            _bc.center = BC_points[j] + (_dif / 2);
+        }
     }
 
     void UpdateSkirting()
@@ -341,6 +374,7 @@ public class SurfaceUpdater : MonoBehaviour
         }
         foreach (var p in PE_furniture)
         {
+            if (p == null) continue;
             p.transform.localPosition -= _dif;
             switch (p._type)
             {

@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 [CreateAssetMenu(fileName ="New LevelGen Theme", menuName = "Trench/LevelGen/Theme")]
 public class LevelGen_Theme : ScriptableObject
 {
@@ -96,6 +100,9 @@ public class LevelGen_Theme : ScriptableObject
             default:
                 break;
         }
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(this);
+#endif
     }
 
     void AddBlock(LevelGen_Block LGB, List<LevelGen_Block> LGBs)

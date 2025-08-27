@@ -352,7 +352,7 @@ public class GunClass : ItemClass
                     return;
                 case gunTypeEnum.ship:
                     _barrel = shipController.T_gunHook[i_hookNum];
-                    _tarPos = shipController.transform.position + shipController.T_pilotSeat.forward * 100;
+                    _tarPos = shipController.GetTargetPosition();
                     break;
                 default:
                     baseController.Weapon_Fired();

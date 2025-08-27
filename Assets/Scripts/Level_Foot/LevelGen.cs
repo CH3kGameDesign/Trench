@@ -1,14 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Unity.AI.Navigation;
-using Unity.Mathematics;
-using static Layout_Basic;
-using static UnityEngine.EventSystems.EventTrigger;
-using static Themes;
 using PurrNet;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Unity.AI.Navigation;
+using Unity.Mathematics;
+using UnityEngine;
+using UnityEngine.WSA;
+using static Layout_Basic;
+using static Themes;
+using static UnityEngine.EventSystems.EventTrigger;
 
 
 public class LevelGen : MonoBehaviour
@@ -57,11 +58,15 @@ public class LevelGen : MonoBehaviour
         Random_Seeded = new Unity.Mathematics.Random(_seed);
 
         LG_Theme = themeHolder.GetTheme(SaveData.themeCurrent);
-        if (LG_Theme.Layouts.Count > 0)
+        MusicHandler.Instance.SetupPlaylist(LG_Theme.playlist);
+        if (SaveData.shipLayout._objects.Count > 0 && SaveData.themeCurrent == themeEnum.ship)
+        {
+            GenerateLayout_Specific(SaveData.shipLayout);
+        }
+        else if (LG_Theme.Layouts.Count > 0)
         {
             Layout_Basic _layout = LG_Theme.GetLayout_Basic(Random_Seeded);
             StartCoroutine(GenerateLayout_Smart(LG_Theme, _layout));
-            MusicHandler.Instance.SetupPlaylist(LG_Theme.playlist);
         }
         else
             GenerateLayout_Series(LG_Theme);
@@ -78,6 +83,90 @@ public class LevelGen : MonoBehaviour
         if (_block < 0)
             _block = UnityEngine.Random.Range(0, LG_Blocks.Count);
         return LG_Blocks[_block].GetRandomPoint(_3D);
+    }
+
+    int _gridSize = 5;
+    public void GenerateLayout_Specific(LayoutCustomize.saveClass _save)
+    {
+        LG_Blocks = new List<LevelGen_Block>();
+        T_Holder = Instantiate(GetHolderTypePrefab(SaveData.themeCurrent)).transform;
+
+        T_Holder.parent = transform;
+        UpdatePosition(T_Holder);
+        Physics.SyncTransforms();
+
+        nm_Surfaces = T_Holder.GetComponents<NavMeshSurface>();
+
+        foreach (var item in _save._objects)
+        {
+            Transform _holder = new GameObject().transform;
+            _holder.gameObject.name = "Room: " + item._block._name;
+            _holder.parent = T_Holder;
+
+            LevelGen_Block _prefab =  item._block;
+            LevelGen_Block _temp = Instantiate(_prefab, _holder);
+
+            _temp.transform.localEulerAngles = new Vector3(0, -item._rot * 90, 0);
+            switch (item._rot)
+            {
+                case 1:
+                    _temp.transform.localPosition = Vector3.zero;
+                    break;
+                case 2:
+                    _temp.transform.localPosition = new Vector3(0, 0, _temp.size.y) * _gridSize;
+                    break;
+                case 3:
+                    _temp.transform.localPosition = new Vector3(-_temp.size.y, 0, _temp.size.x) * _gridSize;
+                    break;
+                default:
+                    _temp.transform.localPosition = new Vector3(-_temp.size.x, 0, 0) * _gridSize;
+                    break;
+            }
+
+            _temp.Setup(id, LG_Blocks.Count);
+            LG_Blocks.Add(_temp);
+            foreach (var bound in _temp.B_bounds)
+                bound.B_Bounds.enabled = true;
+
+            _holder.localPosition = new Vector3(
+                -item._pos.y + 1 + ((float)_save._bounds.data[0].d.Count / 2f), 
+                0, 
+                item._pos.x - 1 - ((float)_save._bounds.data.Count / 2f)) 
+                * _gridSize;
+            _holder.localRotation = Quaternion.identity;
+        }
+
+        SetDoors_Auto();
+        UpdateNavMeshes();
+        SetupVehicle(T_Holder, _save);
+        SpawnObjects();
+        LevelGen_Holder.Instance.IsReady();
+    }
+    void SetDoors_Auto()
+    {
+        List<LevelGen_Door> _doors = new List<LevelGen_Door>();
+        foreach (var item in LG_Blocks)
+        {
+            foreach(var door in item.LGD_Entries)
+            {
+                bool _continue = false;
+                for (int i = _doors.Count - 1; i >= 0; i--)
+                {
+                    if (_doors[i].entryType != door.entryType) continue;
+                    if (Vector3.Distance(_doors[i].transform.position, door.transform.position) > 0.2f) continue;
+
+                    door.B_connected = true;
+                    _doors[i].B_connected = true;
+
+                    _doors.RemoveAt(i);
+                    _continue = true;
+                    break;
+                }
+                if (_continue) continue;
+                _doors.Add(door);
+            }
+        }
+        SetDoors();
     }
 
     public void GenerateLayout_Series(LevelGen_Theme _theme)
@@ -123,7 +212,7 @@ public class LevelGen : MonoBehaviour
             yield return new WaitForEndOfFrame();
             UpdateNavMeshes();
             yield return new WaitForEndOfFrame();
-            SetupVehicle(_theme, _layout, T_Holder);
+            SetupVehicle(T_Holder);
             yield return new WaitForEndOfFrame();
             SpawnObjects();
             yield return new WaitForEndOfFrame();
@@ -147,8 +236,25 @@ public class LevelGen : MonoBehaviour
             lHolder.localPosition = Vector3.zero;
         LevelGen_Holder.Instance.UpdateTransform(this);
     }
-
-    void SetupVehicle(LevelGen_Theme _theme, Layout_Basic _layout, Transform lHolder)
+    void SetupVehicle(Transform lHolder, LayoutCustomize.saveClass _save)
+    {
+        if (_save == null) SetupVehicle(T_Holder);
+        if (SaveData.themeCurrent == themeEnum.ship)
+        {
+            ship = lHolder.GetComponent<Ship>();
+            ship.LG = this;
+            Vector3 offset = Vector3.zero;
+            ship.T_camHook.localPosition = new Vector3(
+                0,
+                2.5f,
+                0);
+            ship.V3_camOffset = new Vector3(
+                0, 
+                6, 
+                -_save._bounds.data.Count * 5);
+        }
+    }
+    void SetupVehicle(Transform lHolder)
     {
         if (SaveData.themeCurrent == themeEnum.ship)
         {

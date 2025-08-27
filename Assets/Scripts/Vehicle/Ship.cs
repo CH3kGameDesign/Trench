@@ -29,7 +29,7 @@ public class Ship : Vehicle
     [Space(10)]
     [Range(10, 45)]
     public int maxSteeringAngle = 27; // The maximum angle that the tires can reach while rotating the steering wheel.
-    [Range(0.1f, 5f)]
+    [Range(0.1f, 10f)]
     public float steeringSpeed = 0.5f; // How fast the steering wheel turns.
     [Space(10)]
     [Range(-90f, 0f)]
@@ -62,13 +62,13 @@ public class Ship : Vehicle
     public bool useEffects = false;
 
     // The following particle systems are used as tire smoke when the car drifts.
-    public ParticleSystem RLWParticleSystem;
-    public ParticleSystem RRWParticleSystem;
+    public ParticleSystem[] RLWParticleSystem;
+    public ParticleSystem[] RRWParticleSystem;
 
     [Space(10)]
     // The following trail renderers are used as tire skids when the car loses traction.
-    public TrailRenderer RLWTireSkid;
-    public TrailRenderer RRWTireSkid;
+    public TrailRenderer[] RLWTireSkid;
+    public TrailRenderer[] RRWTireSkid;
 
     //SPEED TEXT (UI)
 
@@ -125,14 +125,8 @@ public class Ship : Vehicle
     extremumSlip,extremumValue, asymptoteSlip, asymptoteValue and stiffness). We change this values to
     make the car to start drifting.
     */
-    WheelFrictionCurve FLwheelFriction;
-    float FLWextremumSlip;
-    WheelFrictionCurve FRwheelFriction;
-    float FRWextremumSlip;
-    WheelFrictionCurve RLwheelFriction;
-    float RLWextremumSlip;
-    WheelFrictionCurve RRwheelFriction;
-    float RRWextremumSlip;
+    WheelFrictionCurve wheelFriction;
+    float WextremumSlip;
 
     [HideInInspector] public List<Space_LandingSpot> landingSpots = new List<Space_LandingSpot>();
 
@@ -185,22 +179,10 @@ public class Ship : Vehicle
 
         if (!useEffects)
         {
-            if (RLWParticleSystem != null)
-            {
-                RLWParticleSystem.Stop();
-            }
-            if (RRWParticleSystem != null)
-            {
-                RRWParticleSystem.Stop();
-            }
-            if (RLWTireSkid != null)
-            {
-                RLWTireSkid.emitting = false;
-            }
-            if (RRWTireSkid != null)
-            {
-                RRWTireSkid.emitting = false;
-            }
+            foreach (var item in RLWParticleSystem) { item.Stop(); }
+            foreach (var item in RRWParticleSystem) { item.Stop(); }
+            foreach (var item in RLWTireSkid) { item.emitting = false; }
+            foreach (var item in RRWTireSkid) { item.emitting = false; }
         }
         DEBUG_GunEquip();
     }
@@ -246,11 +228,13 @@ public class Ship : Vehicle
 
             if (_temp.Inputs.v2_inputDir.x < 0)
             {
-                Rotate(_temp.Inputs.v2_inputDir.x);
+                GoSideways(_temp.Inputs.v2_inputDir.x);
+                //Rotate(_temp.Inputs.v2_inputDir.x);
             }
             if (_temp.Inputs.v2_inputDir.x > 0)
             {
-                Rotate(_temp.Inputs.v2_inputDir.x);
+                GoSideways(_temp.Inputs.v2_inputDir.x);
+                //Rotate(_temp.Inputs.v2_inputDir.x);
             }
             if (_temp.Inputs.b_jumping)
             {
@@ -297,7 +281,7 @@ public class Ship : Vehicle
         {
             PlayerController _temp = _player as PlayerController;
             _temp.F_vehicleCamMult = Update_Rotation(_temp);
-            _temp.UpdateVehicleUI(localVelocityZ, maxThrottleBarSpeed);
+            _temp.UpdateVehicleUI(Vector3.Magnitude(GetLocalVelocity()), maxThrottleBarSpeed);
         }
     }
 
@@ -352,7 +336,7 @@ public class Ship : Vehicle
     float Update_Rotation(PlayerController _player)
     {
         Vector3 _tarRot = _player.v3_camDir;
-        _tarRot.x = Mathf.Clamp(_tarRot.x, downXLimit, upXLimit);
+        //_tarRot.x = Mathf.Clamp(_tarRot.x, downXLimit, upXLimit);
         Quaternion _target = Quaternion.Euler(_tarRot) * Quaternion.Euler(_rotate);
         _target *= Quaternion.Inverse(T_pilotSeat.rotation);
         _target =  _target * transform.rotation;
@@ -367,7 +351,7 @@ public class Ship : Vehicle
         }
 
         Quaternion _rotation = Quaternion.Slerp(transform.rotation, tarRotation, Time.fixedDeltaTime * steeringSpeed);
-        _player.UpdateVehicleReticle(_player.v3_camDir - _curRot);
+        _player.UpdateVehicleReticle(_curRot);
         transform.rotation = _rotation;
         return f_turnAmount;
     }
@@ -381,6 +365,17 @@ public class Ship : Vehicle
             else
                 _curRot.x += _adjust;
         }
+    }
+
+    public Vector3 GetTargetPosition()
+    {
+        PlayerController PC;
+        if (!DriverIsMain(out PC))
+            return transform.position + T_pilotSeat.forward * 100;
+
+        Ray _ray = PC.C_camera.ScreenPointToRay(PC.Ref.RT_shipReticle.position);
+        Vector3 _temp = _ray.GetPoint(100);
+        return _temp;
     }
 
     // This method converts the car speed data from float to string, and then set the text of the UI carSpeedText with this value.
@@ -496,7 +491,49 @@ public class Ship : Vehicle
             }
         //}
     }
+    public void GoSideways(float _input)
+    {
+        //If the forces aplied to the rigidbody in the 'x' asis are greater than
+        //3f, it means that the car is losing traction, then the car will start emitting particle systems.
+        if (Mathf.Abs(localVelocityX) > 50f)
+        {
+            isDrifting = true;
+            DriftCarPS();
+        }
+        else
+        {
+            isDrifting = false;
+            DriftCarPS();
+        }
+        // The following part sets the throttle power to 1 smoothly.
+        //throttleAxis = throttleAxis + (Time.deltaTime * 3f);
+        //if (throttleAxis > 1f)
+        //{
+        //    throttleAxis = 1f;
+        //}
+        //If the car is going backwards, then apply brakes in order to avoid strange
+        //behaviours. If the local velocity in the 'z' axis is less than -1f, then it
+        //is safe to apply positive torque to go forward.
+        //if (localVelocityZ < -1f)
+        //{
+        //    Brakes();
+        //}
+        //else
+        //{
+        if (Mathf.RoundToInt(carSpeed) < maxSpeed)
+        {
+            //Apply positive torque in all wheels to go forward if maxSpeed has not been reached.
+            carRigidbody.AddForce(T_pilotSeat.right * _input * accelerationMultiplier * Time.deltaTime, ForceMode.Impulse);
+        }
+        else
+        {
+            // If the maxSpeed has been reached, then stop applying torque to the wheels.
+            // IMPORTANT: The maxSpeed variable should be considered as an approximation; the speed of the car
+            // could be a bit higher than expected.
 
+        }
+        //}
+    }
     // This method apply negative torque to the wheels in order to go backwards.
     public void GoReverse(float _input)
     {
@@ -616,11 +653,11 @@ public class Ship : Vehicle
         // place. This variable will start from 0 and will reach a top value of 1, which means that the maximum
         // drifting value has been reached. It will increase smoothly by using the variable Time.deltaTime.
         driftingAxis = driftingAxis + (Time.deltaTime);
-        float secureStartingPoint = driftingAxis * FLWextremumSlip * handbrakeDriftMultiplier;
+        float secureStartingPoint = driftingAxis * WextremumSlip * handbrakeDriftMultiplier;
 
-        if (secureStartingPoint < FLWextremumSlip)
+        if (secureStartingPoint < WextremumSlip)
         {
-            driftingAxis = FLWextremumSlip / (FLWextremumSlip * handbrakeDriftMultiplier);
+            driftingAxis = WextremumSlip / (WextremumSlip * handbrakeDriftMultiplier);
         }
         if (driftingAxis > 1f)
         {
@@ -662,13 +699,13 @@ public class Ship : Vehicle
             {
                 if (isDrifting)
                 {
-                    RLWParticleSystem.Play();
-                    RRWParticleSystem.Play();
+                    foreach (var item in RLWParticleSystem) { item.Play(); }
+                    foreach (var item in RRWParticleSystem) { item.Play(); }
                 }
                 else if (!isDrifting)
                 {
-                    RLWParticleSystem.Stop();
-                    RRWParticleSystem.Stop();
+                    foreach (var item in RLWParticleSystem) { item.Stop(); }
+                    foreach (var item in RRWParticleSystem) { item.Stop(); }
                 }
             }
             catch (Exception ex)
@@ -680,13 +717,13 @@ public class Ship : Vehicle
             {
                 if ((isTractionLocked || Mathf.Abs(localVelocityX) > 5f) && Mathf.Abs(carSpeed) > 12f)
                 {
-                    RLWTireSkid.emitting = true;
-                    RRWTireSkid.emitting = true;
+                    foreach (var item in RLWTireSkid) { item.emitting = true; }
+                    foreach (var item in RRWTireSkid) { item.emitting = true; }
                 }
                 else
                 {
-                    RLWTireSkid.emitting = false;
-                    RRWTireSkid.emitting = false;
+                    foreach (var item in RLWTireSkid) { item.emitting = false; }
+                    foreach (var item in RRWTireSkid) { item.emitting = false; }
                 }
             }
             catch (Exception ex)
@@ -696,22 +733,10 @@ public class Ship : Vehicle
         }
         else if (!useEffects)
         {
-            if (RLWParticleSystem != null)
-            {
-                RLWParticleSystem.Stop();
-            }
-            if (RRWParticleSystem != null)
-            {
-                RRWParticleSystem.Stop();
-            }
-            if (RLWTireSkid != null)
-            {
-                RLWTireSkid.emitting = false;
-            }
-            if (RRWTireSkid != null)
-            {
-                RRWTireSkid.emitting = false;
-            }
+            foreach (var item in RLWParticleSystem) { item.Stop(); }
+            foreach (var item in RRWParticleSystem) { item.Stop(); }
+            foreach (var item in RLWTireSkid) { item.emitting = false; }
+            foreach (var item in RRWTireSkid) { item.emitting = false; }
         }
 
     }
@@ -729,12 +754,12 @@ public class Ship : Vehicle
         //If the 'driftingAxis' value is not 0f, it means that the wheels have not recovered their traction.
         //We are going to continue decreasing the sideways friction of the wheels until we reach the initial
         // car's grip.
-        if (FLwheelFriction.extremumSlip > FLWextremumSlip)
+        if (wheelFriction.extremumSlip > WextremumSlip)
         {
             Invoke("RecoverTraction", Time.deltaTime);
 
         }
-        else if (FLwheelFriction.extremumSlip < FLWextremumSlip)
+        else if (wheelFriction.extremumSlip < WextremumSlip)
         {
 
 

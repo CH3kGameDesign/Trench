@@ -3,10 +3,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class PlayerController : BaseController
 {
@@ -46,6 +47,8 @@ public class PlayerController : BaseController
         public TextMeshProUGUI TM_throttle;
         public RectTransform RT_shipReticle;
         public LineRendererUI LR_shipReticleLine;
+        public RectTransform RT_shipAltitudeLine;
+        public Image I_shipAltitidueLine;
     }
     [Header("UI")]
     public HealthUI PF_followerHealth;
@@ -595,22 +598,66 @@ public class PlayerController : BaseController
             item.fillAmount = _fill;
     }
 
-    public void UpdateVehicleReticle(Vector3 _rotation)
+    public void UpdateVehicleReticle(Vector3 _rotation) 
     {
+        UpdateVehicleReticlePosition(v3_camDir - _rotation);
+        UpdateVehicleAltitudeLine(_rotation);
+    }
+    void UpdateVehicleReticlePosition(Vector3 _rotation)
+    {
+        //Reticle Position
+        bool _flipped = v3_camDir.x > 90 || v3_camDir.x < -90;
         Vector2 _pos = new Vector2(_rotation.y, _rotation.x);
         _pos.y = -_pos.y;
+        if (_flipped)
+            _pos.x = -_pos.x;
         _pos *= F_aimReticleMult;
         Vector2 _tar = Vector2.Lerp(Ref.RT_shipReticle.anchoredPosition, _pos, Time.deltaTime * F_aimReticleSpeed);
         Ref.RT_shipReticle.anchoredPosition = _tar;
+
+        //Reticle Line
         if (_tar.magnitude > 125)
         {
             Ref.LR_shipReticleLine.gameObject.SetActive(true);
             Ref.LR_shipReticleLine.CreateLine(_tar.normalized * 100, Vector2.MoveTowards(_tar, Vector2.zero, 25));
         }
         else
-        {
             Ref.LR_shipReticleLine.gameObject.SetActive(false);
+    }
+
+    void UpdateVehicleAltitudeLine(Vector3 _rotation)
+    {
+        //Altitude Line
+        float _pos = _rotation.x;
+        bool _flipped = false;
+        if (_pos > 90)
+        {
+            _pos = 90 - (_pos - 90);
+            _flipped = true;
         }
+        if (_pos < -90)
+        {
+            _pos = -90 - (_pos + 90);
+            _flipped = true;
+        }
+
+        //Color
+        Color _color = _flipped ? Color.red : Color.white;
+        _color.a = 1 - Mathf.Pow(Mathf.Abs(_pos) / 90,3);
+        Ref.I_shipAltitidueLine.color = _color;
+
+        //Position
+        _pos *= 110 / 90;
+        Ref.RT_shipAltitudeLine.anchoredPosition = new Vector2(0, _pos);
+
+        //Rotation
+        float _rot = 0;
+        if (Ref.RT_shipReticle.anchoredPosition.x > 100)
+            _rot = (Ref.RT_shipReticle.anchoredPosition.x - 100) * -0.2f;
+        if (Ref.RT_shipReticle.anchoredPosition.x < -100)
+            _rot = (Ref.RT_shipReticle.anchoredPosition.x + 100) * -0.2f;
+
+        Ref.RT_shipAltitudeLine.parent.localEulerAngles = new Vector3(0, 0, _rot);
     }
 
     void AnimationUpdate()
@@ -1077,37 +1124,48 @@ public class PlayerController : BaseController
     Quaternion _lastOffset = Quaternion.identity;
     void CamMovement(bool _fixedDelta = false, float _mult2 = 1, bool _clampXDir = true)
     {
-        if (!b_radialOpen)
+        float _delta = _fixedDelta ?
+            Time.fixedDeltaTime : Time.deltaTime;
+        if (b_radialOpen)
         {
-            float _mult = Time.deltaTime;
-            if (Inputs.b_aiming) _mult *= F_camAimRotSpeed;
-            else if (b_isSprinting) _mult *= F_camSprintRotSpeed;
-            else _mult *= F_camRotSpeed;
-            if (AutoAim()) _mult *= autoAim.slowMultiplier;
-            v3_camDir += new Vector3(-Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0) * _mult * f_camSensitivity;
-            if (_clampXDir)
-                v3_camDir.x = Mathf.Clamp(v3_camDir.x, -80, 80);
-            else
-            {
-                if (v3_camDir.x > 180)
-                {
-                    v3_camDir.x -= 360;
-                    T_camHolder.transform.localEulerAngles += new Vector3(-360, 0, 0);
-                    if (V_curVehicle != null)
-                        V_curVehicle.RotLoop(false, -360);
-                }
-                if (v3_camDir.x < -180)
-                {
-                    v3_camDir.x += 360;
-                    T_camHolder.transform.localEulerAngles += new Vector3(360, 0, 0);
-                    if (V_curVehicle != null)
-                        V_curVehicle.RotLoop(false, 360);
-                }
-            }
-
-                //Canvas Pivot
-                Ref.V3_canvasRot += new Vector3(Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0);
+            T_camHolder.transform.rotation = Quaternion.Lerp(T_camHolder.transform.rotation, Quaternion.Euler(v3_camDir), _delta * 10);
+            return;
         }
+        float _mult = Time.deltaTime;
+        if (Inputs.b_aiming) _mult *= F_camAimRotSpeed;
+        else if (b_isSprinting) _mult *= F_camSprintRotSpeed;
+        else _mult *= F_camRotSpeed;
+        if (AutoAim()) _mult *= autoAim.slowMultiplier;
+        v3_camDir += new Vector3(-Inputs.v2_camInputDir.y, 0, 0) * _mult * f_camSensitivity;
+        if (_clampXDir)
+            v3_camDir.x = Mathf.Clamp(v3_camDir.x, -80, 80);
+        else
+        {
+            if (v3_camDir.x > 180)
+            {
+                v3_camDir.x -= 360;
+                T_camHolder.transform.localEulerAngles += new Vector3(-360, 0, 0);
+                if (V_curVehicle != null)
+                    V_curVehicle.RotLoop(false, -360);
+            }
+            if (v3_camDir.x < -180)
+            {
+                v3_camDir.x += 360;
+                T_camHolder.transform.localEulerAngles += new Vector3(360, 0, 0);
+                if (V_curVehicle != null)
+                    V_curVehicle.RotLoop(false, 360);
+            }
+        }
+
+        //Canvas Pivot
+        Ref.V3_canvasRot += new Vector3(Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0);
+
+        //Correct For When Upside Down
+        float yCamDir = Inputs.v2_camInputDir.x;
+        if (v3_camDir.x > 90 || v3_camDir.x < -90)
+            yCamDir = -yCamDir;
+        v3_camDir += new Vector3(0, yCamDir, 0) * _mult * f_camSensitivity;
+
         Vector3 _offset = (T_camHolder.parent.rotation * Quaternion.Inverse(_lastOffset)).eulerAngles;
         v3_camDir.y += _offset.y;
         _lastOffset = T_camHolder.parent.rotation;
@@ -1126,9 +1184,6 @@ public class PlayerController : BaseController
             if (V_curVehicle != null)
                 V_curVehicle.RotLoop(true, 360);
         }
-
-        float _delta = _fixedDelta ?
-            Time.fixedDeltaTime : Time.deltaTime;
 
         T_camHolder.transform.rotation = Quaternion.Lerp(T_camHolder.transform.rotation, Quaternion.Euler(v3_camDir), _delta * 10);
     }

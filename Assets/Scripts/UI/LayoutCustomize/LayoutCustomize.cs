@@ -3,12 +3,14 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static UnityEditor.Progress;
 
 public class LayoutCustomize : MonoBehaviour
 {
     public static LayoutCustomize Instance;
     protected bool b_active;
 
+    public saveClass DEBUG_save;
     public saveClass save;
     public RectTransform RT_holder;
     public RectTransform PF_square;
@@ -52,6 +54,29 @@ public class LayoutCustomize : MonoBehaviour
         public LevelGen_Theme _theme;
         public Layout_Bounds _bounds;
         public List<saveClass_Object> _objects = new List<saveClass_Object>();
+
+        public saveClass()
+        {
+            _theme = null;
+            _bounds = null;
+            _objects = new List<saveClass_Object>();
+        }
+        public saveClass(saveClass _temp)
+        {
+            _theme = _temp._theme;
+            _bounds = _temp._bounds;
+            _objects = new List<saveClass_Object>();
+            foreach (var item in _temp._objects)
+                _objects.Add(new saveClass_Object(item));
+        }
+        public saveClass(LevelGen_Theme theme, Layout_Bounds bounds, List<saveClass_Object> objects)
+        {
+            _theme = theme;
+            _bounds = bounds;
+            _objects = new List<saveClass_Object>();
+            foreach (var item in objects)
+                _objects.Add(new saveClass_Object(item));
+        }
     }
     [System.Serializable]
     public class saveClass_Object
@@ -59,6 +84,24 @@ public class LayoutCustomize : MonoBehaviour
         public LevelGen_Block _block;
         public Vector2Int _pos;
         public int _rot = 0;
+        public saveClass_Object()
+        {
+            _block = null;
+            _pos = Vector2Int.zero;
+            _rot = 0;
+        }
+        public saveClass_Object(saveClass_Object _temp)
+        {
+            _block = _temp._block;
+            _pos = _temp._pos;
+            _rot = _temp._rot;
+        }
+        public saveClass_Object(LevelGen_Block block, Vector2Int pos, int rot)
+        {
+            _block = block;
+            _pos = pos;
+            _rot = rot;
+        }
     }
     [Header("Menus")]
     public GameObject G_leftColumn;
@@ -101,10 +144,29 @@ public class LayoutCustomize : MonoBehaviour
 
     void LoadSave()
     {
+        if (SaveData.shipLayout._theme == null)
+            SaveData.shipLayout = new saveClass(DEBUG_save);
+        save = new saveClass(SaveData.shipLayout);
+
         CanvasSize_Update();
         BuildMenu_Update(save._theme);
         GenerateSquares(save._bounds);
         LoadObjects();
+    }
+
+    void Save()
+    {
+        save._objects.Clear();
+        foreach (var item in LMO_list)
+        {
+            saveClass_Object _obj = new saveClass_Object(
+                item.Block, 
+                item.GetCenter(), 
+                item.I_rot
+                );
+            save._objects.Add(_obj);
+        }
+        SaveData.shipLayout = new saveClass(save);
     }
 
     void LoadObjects()
@@ -121,6 +183,7 @@ public class LayoutCustomize : MonoBehaviour
                 Destroy(MO.gameObject);
                 continue;
             }
+            LMO_list.Add(MO);
         }
     }
     public void OnUpdate(PlayerController _PC)
@@ -496,6 +559,7 @@ public class LayoutCustomize : MonoBehaviour
 
     public void Hide()
     {
+        Save();
         b_active = false;
         HideBuild(PlayerManager.main);
     }
