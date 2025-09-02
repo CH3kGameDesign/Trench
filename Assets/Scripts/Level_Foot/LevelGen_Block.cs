@@ -33,6 +33,7 @@ public class LevelGen_Block : MonoBehaviour
     {
         public Vector2Int _pos;
         public int _rot;
+        public entryTypeEnum _entryType;
     }
 
     public enum entryTypeEnum { singleDoor, wideDoor, vent, shipDoor, shipPark, any}
@@ -186,6 +187,8 @@ public class LevelGen_Block : MonoBehaviour
         {
             doorClass DC = new doorClass();
 
+            DC._entryType = item.entryType;
+
             int _rot = (Mathf.RoundToInt(item.transform.eulerAngles.y / 90) + 2) % 4;
             if (_rot < 0) _rot += 4;
 
@@ -193,12 +196,21 @@ public class LevelGen_Block : MonoBehaviour
 
             Vector3 _pos = (item.transform.position - _min) / _gridSize;
 
+            //XOffset is intended to account for Doorsize
+            //(Wide Doors being 2 cells wide in comparison to the default of 1 cell)
+            float xOffset;
+            switch (item.entryType)
+            {
+                case entryTypeEnum.wideDoor: xOffset = 0f; break;
+                default: xOffset = 0.5f; break;
+            }
+            
             switch (_rot)
             {
-                case 0: _pos.x += 0.5f; _pos.z += 1f; break;
-                case 1: _pos.x += 1f; _pos.z += 0.5f; break;
-                case 2: _pos.x += 0.5f; break;
-                case 3: _pos.z += 0.5f; break;
+                case 0: _pos.x += 1f - xOffset; _pos.z += 1f; break;
+                case 1: _pos.x += 1f - xOffset; _pos.z += xOffset; break;
+                case 2: _pos.x += xOffset; break;
+                case 3: _pos.z += 1f - xOffset; break;
                 default:
                     break;
             }

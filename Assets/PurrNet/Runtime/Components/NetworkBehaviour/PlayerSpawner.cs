@@ -134,7 +134,7 @@ namespace PurrNet
         }
         public void SetSpawns(List<Transform> _spawns)
         {
-            spawnPoints = _spawns;
+            spawnPoints.AddRange(_spawns);
         }
         public Transform GetSpawn()
         {

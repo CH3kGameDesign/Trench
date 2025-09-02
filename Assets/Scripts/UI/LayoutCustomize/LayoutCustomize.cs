@@ -3,15 +3,14 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using static UnityEditor.Progress;
 
 public class LayoutCustomize : MonoBehaviour
 {
     public static LayoutCustomize Instance;
     protected bool b_active;
 
-    public saveClass DEBUG_save;
-    public saveClass save;
+    public Layout_Defined DEBUG_save;
+    private Layout_Defined save;
     public RectTransform RT_holder;
     public RectTransform PF_square;
     public int I_spacing = 50;
@@ -46,61 +45,6 @@ public class LayoutCustomize : MonoBehaviour
             if (!_moduleObject) return;
 
             _moduleObject.I_BG.color = _color;
-        }
-    }
-    [System.Serializable]
-    public class saveClass
-    {
-        public LevelGen_Theme _theme;
-        public Layout_Bounds _bounds;
-        public List<saveClass_Object> _objects = new List<saveClass_Object>();
-
-        public saveClass()
-        {
-            _theme = null;
-            _bounds = null;
-            _objects = new List<saveClass_Object>();
-        }
-        public saveClass(saveClass _temp)
-        {
-            _theme = _temp._theme;
-            _bounds = _temp._bounds;
-            _objects = new List<saveClass_Object>();
-            foreach (var item in _temp._objects)
-                _objects.Add(new saveClass_Object(item));
-        }
-        public saveClass(LevelGen_Theme theme, Layout_Bounds bounds, List<saveClass_Object> objects)
-        {
-            _theme = theme;
-            _bounds = bounds;
-            _objects = new List<saveClass_Object>();
-            foreach (var item in objects)
-                _objects.Add(new saveClass_Object(item));
-        }
-    }
-    [System.Serializable]
-    public class saveClass_Object
-    {
-        public LevelGen_Block _block;
-        public Vector2Int _pos;
-        public int _rot = 0;
-        public saveClass_Object()
-        {
-            _block = null;
-            _pos = Vector2Int.zero;
-            _rot = 0;
-        }
-        public saveClass_Object(saveClass_Object _temp)
-        {
-            _block = _temp._block;
-            _pos = _temp._pos;
-            _rot = _temp._rot;
-        }
-        public saveClass_Object(LevelGen_Block block, Vector2Int pos, int rot)
-        {
-            _block = block;
-            _pos = pos;
-            _rot = rot;
         }
     }
     [Header("Menus")]
@@ -145,8 +89,8 @@ public class LayoutCustomize : MonoBehaviour
     void LoadSave()
     {
         if (SaveData.shipLayout._theme == null)
-            SaveData.shipLayout = new saveClass(DEBUG_save);
-        save = new saveClass(SaveData.shipLayout);
+            SaveData.shipLayout = new Layout_Defined(DEBUG_save);
+        save = new Layout_Defined(SaveData.shipLayout);
 
         CanvasSize_Update();
         BuildMenu_Update(save._theme);
@@ -159,14 +103,15 @@ public class LayoutCustomize : MonoBehaviour
         save._objects.Clear();
         foreach (var item in LMO_list)
         {
-            saveClass_Object _obj = new saveClass_Object(
+            Layout_Defined.objectClass _obj = new Layout_Defined.objectClass(
                 item.Block, 
                 item.GetCenter(), 
-                item.I_rot
+                item.I_rot,
+                item.B_locked
                 );
             save._objects.Add(_obj);
         }
-        SaveData.shipLayout = new saveClass(save);
+        SaveData.shipLayout = new Layout_Defined(save);
     }
 
     void LoadObjects()
@@ -174,7 +119,7 @@ public class LayoutCustomize : MonoBehaviour
         foreach (var item in save._objects)
         {
             LayoutModuleObject MO = Instantiate(PF_moduleObject, RT_holder);
-            MO.Setup(item._block, item._rot);
+            MO.Setup(item._block, item._rot, item._locked);
             MoveLMO(item._pos, MO, true);
 
             LayoutModuleObject _objOverlap;
@@ -224,6 +169,8 @@ public class LayoutCustomize : MonoBehaviour
         {
             if (_objOverlap == null)
                 return false;
+            if (_objOverlap.B_locked)
+                return false;
             PickUpModule(_objOverlap);
             LMO_list.Remove(_objOverlap);
             LayoutModuleObject _temp;
@@ -240,6 +187,11 @@ public class LayoutCustomize : MonoBehaviour
         LMO_active = GetModuleObject(v2_selSquare);
         if (LMO_active == null)
             return false;
+        if (LMO_active.B_locked)
+        {
+            LMO_active = null;
+            return false;
+        }
         PickUpModule(LMO_active);
         LMO_list.Remove(LMO_active);
 
@@ -430,10 +382,26 @@ public class LayoutCustomize : MonoBehaviour
             item.GetWorldPos(out _pos, out _rot);
             switch (_rot)
             {
-                case 0: _pos += Vector2Int.left; break;
-                case 1: _pos += Vector2Int.down; break;
-                case 2: _pos += Vector2Int.right; break;
-                case 3: _pos += Vector2Int.up; break;
+                case 0:
+                    _pos += Vector2Int.left;
+                    if (item.entryType == LevelGen_Block.entryTypeEnum.wideDoor)
+                        _pos += Vector2Int.up;
+                    break;
+                case 1: 
+                    _pos += Vector2Int.down;
+                    if (item.entryType == LevelGen_Block.entryTypeEnum.wideDoor)
+                        _pos += Vector2Int.left;
+                    break;
+                case 2: 
+                    _pos += Vector2Int.right;
+                    if (item.entryType == LevelGen_Block.entryTypeEnum.wideDoor)
+                        _pos += Vector2Int.down;
+                    break;
+                case 3: 
+                    _pos += Vector2Int.up;
+                    if (item.entryType == LevelGen_Block.entryTypeEnum.wideDoor)
+                        _pos += Vector2Int.right;
+                    break;
                 default: Debug.LogError("Out Of Range!"); continue;
             }
             CheckPos(_pos, _pos, out _other);

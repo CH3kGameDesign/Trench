@@ -6,6 +6,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
+using static Themes;
 
 public class LevelGen_Holder : NetworkBehaviour
 {
@@ -153,11 +154,30 @@ public class LevelGen_Holder : NetworkBehaviour
     public void CreateNew(_networkTransform _transform)
     {
         LevelGen LG = Instantiate(PF_levelGen, transform);
-        LG.Setup(_transform.seed, List.Count);
+
+        Vector3 _pos = Vector3.zero;
+        if (_transform.position.Count > 0)
+            _pos = _transform.position[0];
+
+        LG.Setup(_transform.seed, List.Count, _pos);
         List.Add(LG);
         RequestTransform(List.Count - 1, NetworkManager.main.localPlayer);
     }
-    public void CreateNew()
+    public void CreateNew(bool _player = true)
+    {
+        Vector3 _pos = Vector3.zero;
+        if (_player)
+        {
+            if (SaveData.themeCurrent == themeEnum.ship)
+            {
+                Vector3 pos;
+                if (spaceGen.GetExitPos(out pos, SaveData.lastLandingSpot))
+                    _pos = pos;
+            }
+        }
+        CreateNew(_pos, null, _player);
+    }
+    public void CreateNew(Vector3 _pos, Layout_Defined _layout = null, bool _player = true)
     {
         _networkTransform _transform = new _networkTransform();
         _transform.lgID = Transforms.value.Count;
@@ -167,10 +187,12 @@ public class LevelGen_Holder : NetworkBehaviour
 
         LevelGen LG = Instantiate(PF_levelGen, transform);
         LG.isHost = true;
-        LG.Setup(_transform.seed, List.Count);
+        if (_layout == null)
+            LG.Setup(_transform.seed, List.Count, _pos, _player);
+        else
+            LG.Setup(_transform.seed, List.Count, _pos, _layout, _player);
         List.Add(LG);
     }
-
 
     [ObserversRpc]
     public void UpdateTransform(int _lgID, Vector3 pos, Quaternion rot)

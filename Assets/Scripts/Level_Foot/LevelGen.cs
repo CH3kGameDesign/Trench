@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.WSA;
 using static Layout_Basic;
 using static Themes;
+using static UnityEditor.Experimental.GraphView.GraphView;
 using static UnityEngine.EventSystems.EventTrigger;
 
 
@@ -51,7 +52,8 @@ public class LevelGen : MonoBehaviour
 
     }
 
-    public void Setup(uint _seed, int _id)
+    public enum spawnType { _default, friendlyOnly, enemyOnly};
+    public void Setup(uint _seed, int _id, Vector3 _pos, bool _player = true)
     {
         id = _id;
 
@@ -61,15 +63,37 @@ public class LevelGen : MonoBehaviour
         MusicHandler.Instance.SetupPlaylist(LG_Theme.playlist);
         if (SaveData.shipLayout._objects.Count > 0 && SaveData.themeCurrent == themeEnum.ship)
         {
-            GenerateLayout_Specific(SaveData.shipLayout);
+            GenerateLayout_Specific(SaveData.shipLayout, _pos,
+                _player ? spawnType.friendlyOnly : spawnType.enemyOnly);
         }
         else if (LG_Theme.Layouts.Count > 0)
         {
             Layout_Basic _layout = LG_Theme.GetLayout_Basic(Random_Seeded);
-            StartCoroutine(GenerateLayout_Smart(LG_Theme, _layout));
+            StartCoroutine(GenerateLayout_Smart(LG_Theme, _layout, _pos));
         }
         else
-            GenerateLayout_Series(LG_Theme);
+            GenerateLayout_Series(LG_Theme, _pos);
+    }
+    public void Setup(uint _seed, int _id, Vector3 _pos, Layout_Defined _layoutDefined, bool _player = true)
+    {
+        id = _id;
+
+        Random_Seeded = new Unity.Mathematics.Random(_seed);
+
+        LG_Theme = themeHolder.GetTheme(SaveData.themeCurrent);
+        MusicHandler.Instance.SetupPlaylist(LG_Theme.playlist);
+        if (_layoutDefined._objects.Count > 0 && SaveData.themeCurrent == themeEnum.ship)
+        {
+            GenerateLayout_Specific(_layoutDefined, _pos,
+                _player ? spawnType.friendlyOnly : spawnType.enemyOnly);
+        }
+        else if (LG_Theme.Layouts.Count > 0)
+        {
+            Layout_Basic _layout = LG_Theme.GetLayout_Basic(Random_Seeded);
+            StartCoroutine(GenerateLayout_Smart(LG_Theme, _layout, _pos));
+        }
+        else
+            GenerateLayout_Series(LG_Theme, _pos);
     }
 
     // Update is called once per frame
@@ -86,13 +110,13 @@ public class LevelGen : MonoBehaviour
     }
 
     int _gridSize = 5;
-    public void GenerateLayout_Specific(LayoutCustomize.saveClass _save)
+    public void GenerateLayout_Specific(Layout_Defined _save, Vector3 _pos, spawnType _type = spawnType._default)
     {
         LG_Blocks = new List<LevelGen_Block>();
         T_Holder = Instantiate(GetHolderTypePrefab(SaveData.themeCurrent)).transform;
 
         T_Holder.parent = transform;
-        UpdatePosition(T_Holder);
+        UpdatePosition(T_Holder, _pos);
         Physics.SyncTransforms();
 
         nm_Surfaces = T_Holder.GetComponents<NavMeshSurface>();
@@ -139,7 +163,7 @@ public class LevelGen : MonoBehaviour
         SetDoors_Auto();
         UpdateNavMeshes();
         SetupVehicle(T_Holder, _save);
-        SpawnObjects();
+        SpawnObjects(_type);
         LevelGen_Holder.Instance.IsReady();
     }
     void SetDoors_Auto()
@@ -169,13 +193,13 @@ public class LevelGen : MonoBehaviour
         SetDoors();
     }
 
-    public void GenerateLayout_Series(LevelGen_Theme _theme)
+    public void GenerateLayout_Series(LevelGen_Theme _theme, Vector3 _pos)
     {
         LG_Blocks = new List<LevelGen_Block>();
         T_Holder = Instantiate(GetHolderTypePrefab(SaveData.themeCurrent)).transform;
 
         T_Holder.parent = transform;
-        T_Holder.localPosition = Vector3.zero;
+        UpdatePosition(T_Holder, _pos);
         nm_Surfaces = T_Holder.GetComponents<NavMeshSurface>();
 
         LevelGen_Block _bridge = Instantiate(_theme.GetBlock(LevelGen_Block.blockTypeEnum.bridge, LevelGen_Block.entryTypeEnum.any, Random_Seeded), T_Holder);
@@ -188,13 +212,13 @@ public class LevelGen : MonoBehaviour
         SpawnObjects();
     }
 
-    public IEnumerator GenerateLayout_Smart(LevelGen_Theme _theme, Layout_Basic _layout)
+    public IEnumerator GenerateLayout_Smart(LevelGen_Theme _theme, Layout_Basic _layout, Vector3 _pos)
     {
         LG_Blocks = new List<LevelGen_Block>();
         T_Holder = Instantiate(GetHolderTypePrefab(SaveData.themeCurrent)).transform;
 
         T_Holder.parent = transform;
-        UpdatePosition(T_Holder);
+        UpdatePosition(T_Holder, _pos);
 
         nm_Surfaces = T_Holder.GetComponents<NavMeshSurface>();
 
@@ -203,7 +227,7 @@ public class LevelGen : MonoBehaviour
         {
             Debug.Log("Retry Generation");
             GameObject.Destroy(T_Holder.gameObject);
-            StartCoroutine(GenerateLayout_Smart(_theme, _layout));
+            StartCoroutine(GenerateLayout_Smart(_theme, _layout, _pos));
         }
         else
         {
@@ -219,24 +243,15 @@ public class LevelGen : MonoBehaviour
             LevelGen_Holder.Instance.IsReady();
         }
     }
-
-    void UpdatePosition(Transform lHolder)
+    void UpdatePosition(Transform lHolder, Vector3 _pos)
     {
         if (!NetworkManager.isServerStatic)
             return;
-        if (SaveData.themeCurrent == themeEnum.ship)
-        {
-            Vector3 pos;
-            if (LevelGen_Holder.Instance.spaceGen.GetExitPos(out pos, SaveData.lastLandingSpot))
-                lHolder.position = pos;
-            else
-                lHolder.localPosition = Vector3.zero;
-        }
-        else
-            lHolder.localPosition = Vector3.zero;
+        lHolder.position = _pos;
         LevelGen_Holder.Instance.UpdateTransform(this);
     }
-    void SetupVehicle(Transform lHolder, LayoutCustomize.saveClass _save)
+
+    void SetupVehicle(Transform lHolder, Layout_Defined _save)
     {
         if (_save == null) SetupVehicle(T_Holder);
         if (SaveData.themeCurrent == themeEnum.ship)
@@ -293,7 +308,7 @@ public class LevelGen : MonoBehaviour
         }
     }
 
-    private void SpawnObjects()
+    private void SpawnObjects(spawnType _type = spawnType._default)
     {
         GameObject prefab;
         GameObject GO;
@@ -305,21 +320,14 @@ public class LevelGen : MonoBehaviour
                 switch (spawn.spawnType)
                 {
                     case LevelGen_Spawn.spawnTypeEnum.player:
+                        if (_type == spawnType.enemyOnly)
+                            break;
                         spawnPoints.Add(spawn.transform);
-                        /*
-                        prefab = LG_Theme.PF_Player;
-                        if (prefab != null && playerSpawned == false)
-                        {
-                            GO = Instantiate(prefab, spawn.transform.position, Quaternion.Euler(Vector3.zero), transform);
-                            PlayerController PC = GO.GetComponent<PlayerController>();
-                            PC.NMA.transform.rotation = spawn.transform.rotation;
-                            PC.Ref.R_recall.SetRecallPos(spawn.transform);
-                            playerSpawned = true;
-                        }
-                        */
                         break;
                     case LevelGen_Spawn.spawnTypeEnum.companion:
                         if (!isHost)
+                            break;
+                        if (_type == spawnType.enemyOnly)
                             break;
                         if (spawn.PF_override != null) prefab = spawn.PF_override;
                         else prefab = LG_Theme.GetCompanion(Random_Seeded);
@@ -338,6 +346,8 @@ public class LevelGen : MonoBehaviour
                     case LevelGen_Spawn.spawnTypeEnum.enemy:
                         if (!isHost)
                             break;
+                        if (_type == spawnType.friendlyOnly)
+                            break;
                         if (spawn.PF_override != null) prefab = spawn.PF_override;
                         else prefab = LG_Theme.GetEnemy(Random_Seeded); 
 
@@ -355,6 +365,8 @@ public class LevelGen : MonoBehaviour
                     case LevelGen_Spawn.spawnTypeEnum.treasure:
                         if (!isHost)
                             break;
+                        if (_type == spawnType.friendlyOnly)
+                            break;
                         if (spawn.PF_override != null) prefab = spawn.PF_override;
                         else prefab = LG_Theme.GetTreasure(Random_Seeded);
 
@@ -363,6 +375,8 @@ public class LevelGen : MonoBehaviour
                             GO = Instantiate(prefab, spawn.transform.position, spawn.transform.rotation, transform);
                         break;
                     case LevelGen_Spawn.spawnTypeEnum.boss:
+                        if (_type == spawnType.friendlyOnly)
+                            break;
                         EnemyTimer.Instance.Setup(spawn.transform);
                         break;
                     default:

@@ -116,7 +116,9 @@ public class Conversation : MonoBehaviour
     public CanvasGroup CG_banterHolder;
     public TextMeshProUGUI TM_messages;
 
-    public RectTransform RT_messageHolder;
+    public RectTransform RT_messageHolder_All;
+    public RectTransform RT_messageHolder_Foot;
+    public RectTransform RT_messageHolder_Ship;
     public SS_MessageObject PF_messagePrefab;
     public Sprite S_messageSprite;
     public List<MessageClass> M_activeMessages = new List<MessageClass>();
@@ -465,7 +467,7 @@ public class Conversation : MonoBehaviour
     IEnumerator TypeMessage_Coroutine(MessageClass _message)
     {
         Transform _target = _message.T_Hook;
-        SS_MessageObject _holder = GameObject.Instantiate(PF_messagePrefab, RT_messageHolder);
+        SS_MessageObject _holder = GameObject.Instantiate(PF_messagePrefab, RT_messageHolder_All);
         _holder.Setup(S_messageSprite, _target, C_canvas, "", false);
         float _lifetime = _message.F_lifetime;
         float _timer = 0;

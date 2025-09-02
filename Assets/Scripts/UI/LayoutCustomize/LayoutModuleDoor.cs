@@ -5,6 +5,7 @@ public class LayoutModuleDoor : MonoBehaviour
 {
     [HideInInspector] public Vector2Int V2_localPos;
     [HideInInspector] public int I_localRot;
+    [HideInInspector] public LevelGen_Block.entryTypeEnum entryType;
     [HideInInspector] public LayoutModuleObject LMO_Holder;
     [HideInInspector] public LayoutModuleDoor LMD_Connection;
     public Image I_BG;
@@ -17,8 +18,27 @@ public class LayoutModuleDoor : MonoBehaviour
         V2_localPos = _door._pos;
         I_localRot = _door._rot;
         LMO_Holder = _LMO;
+        SetType(_door._entryType);
         SetLocalTransform();
         SetConnected(null);
+    }
+
+    void SetType(LevelGen_Block.entryTypeEnum _type)
+    {
+        entryType = _type;
+        switch (_type)
+        {
+            case LevelGen_Block.entryTypeEnum.singleDoor:
+                break;
+            case LevelGen_Block.entryTypeEnum.wideDoor:
+                RT.sizeDelta = new Vector2(200, 100);
+                RT.pivot = new Vector2(0.25f, 0.5f);
+                break;
+            case LevelGen_Block.entryTypeEnum.vent:
+                break;
+            default:
+                break;
+        }
     }
 
     void SetLocalTransform()
@@ -29,6 +49,9 @@ public class LayoutModuleDoor : MonoBehaviour
 
     public void SetConnected(LayoutModuleDoor _LMD)
     {
+        if (_LMD != null)
+            if (_LMD.entryType != entryType)
+                return;
         LayoutModuleDoor _old = LMD_Connection;
         LMD_Connection = _LMD;
 

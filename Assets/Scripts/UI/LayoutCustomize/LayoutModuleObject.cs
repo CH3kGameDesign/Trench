@@ -11,6 +11,7 @@ public class LayoutModuleObject : MonoBehaviour
     public TextMeshProUGUI TM_name;
     public RectTransform RT;
     public RectTransform RT_nameBG;
+    public RectTransform RT_lockBG;
     public RawImage I_BG;
 
     public LayoutModuleDoor PF_door;
@@ -18,6 +19,7 @@ public class LayoutModuleObject : MonoBehaviour
     [HideInInspector] public Vector2Int minPos;
     [HideInInspector] public Vector2Int maxPos;
     [HideInInspector] public int I_rot = 0;
+    [HideInInspector] public bool B_locked = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -29,11 +31,14 @@ public class LayoutModuleObject : MonoBehaviour
     {
         
     }
-    public void Setup(LevelGen_Block _block, int _rot = 0)
+    public void Setup(LevelGen_Block _block, int _rot = 0, bool _locked = false)
     {
         Block = _block;
         TM_name.text = _block._name;
         RT.sizeDelta = _block.size * 100;
+
+        B_locked = _locked;
+        RT_lockBG.gameObject.SetActive(_locked);
 
         if (_block.layoutTexture)
         {
@@ -144,23 +149,29 @@ public class LayoutModuleObject : MonoBehaviour
         else
             StartCoroutine(RT.Move(Quaternion.Euler(new Vector3(0, 0, 90 * I_rot)), true, 0.2f));
         RT_nameBG.localEulerAngles = new Vector3(0, 0, -90 * I_rot);
+        RT_lockBG.localEulerAngles = new Vector3(0, 0, -90 * I_rot);
         Vector2 _anchor = new Vector2(0.5f, 1f);
+        Vector2 _anchorLock = new Vector2(1f, 0f);
         switch (I_rot)
         {
             case 0:
                 _anchor = new Vector2(0.5f, 1f);
+                _anchorLock = new Vector2(1f, 0f);
                 RT_nameBG.sizeDelta = new Vector2(RT.sizeDelta.x - 20, 30);
                 break;
             case 1:
                 _anchor = new Vector2(1f, 0.5f);
+                _anchorLock = new Vector2(0f, 0f);
                 RT_nameBG.sizeDelta = new Vector2(RT.sizeDelta.y - 20, 30);
                 break;
             case 2:
                 _anchor = new Vector2(0.5f, 0f);
+                _anchorLock = new Vector2(0f, 1f);
                 RT_nameBG.sizeDelta = new Vector2(RT.sizeDelta.x - 20, 30);
                 break;
             case 3:
                 _anchor = new Vector2(0f, 0.5f);
+                _anchorLock = new Vector2(1f, 1f);
                 RT_nameBG.sizeDelta = new Vector2(RT.sizeDelta.y - 20, 30);
                 break;
             default:
@@ -169,5 +180,9 @@ public class LayoutModuleObject : MonoBehaviour
         RT_nameBG.anchorMin = _anchor;
         RT_nameBG.anchorMax = _anchor;
         RT_nameBG.anchoredPosition = Vector2.zero;
+
+        RT_lockBG.anchorMin = _anchorLock;
+        RT_lockBG.anchorMax = _anchorLock;
+        RT_lockBG.anchoredPosition = Vector2.zero;
     }
 }

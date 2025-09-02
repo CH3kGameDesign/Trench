@@ -51,7 +51,7 @@ public class Space_LandingSpot : MonoBehaviour
     void SetupMessage()
     {
         Canvas _canvas = PlayerManager.conversation.C_canvas;
-        RectTransform _holder = PlayerManager.conversation.RT_messageHolder;
+        RectTransform _holder = PlayerManager.conversation.RT_messageHolder_Ship;
         _activeMessage = Instantiate(PF_message, _holder);
         _activeMessage.Setup(S_sprite, transform, _canvas, landingName, true);
     }
