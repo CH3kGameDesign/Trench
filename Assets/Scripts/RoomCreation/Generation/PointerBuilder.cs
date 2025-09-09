@@ -18,7 +18,7 @@ public class PointerBuilder : MonoBehaviour
     public LevelGen_Materials _Materials;
     public LevelGen_Placeables _Placeables;
     public LevelGen_Theme _Theme;
-    public enum drawModes { square, point, stretch, move, extend }
+    public enum drawModes { square, point, stretch, move, extend, deleteSurface, reinstateSurface }
     public enum beltModes { build, paint, place}
     [HideInInspector] public drawModes drawMode;
     [HideInInspector] public beltModes beltMode;
@@ -511,6 +511,12 @@ public class PointerBuilder : MonoBehaviour
             case drawModes.point:
                 Update_BuildDraw_Point();
                 break;
+            case drawModes.deleteSurface:
+                Update_DeleteSurface();
+                break;
+            case drawModes.reinstateSurface:
+                Update_ReinstateSurface();
+                break;
             default:
                 Update_BuildEdit();
                 break;
@@ -739,6 +745,51 @@ public class PointerBuilder : MonoBehaviour
         }
     }
     
+    void Update_DeleteSurface()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (!EventSystem.current.IsPointerOverGameObject())
+            {
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out hit, 1000, _layer.interactableMask))
+                {
+                    int l = hit.transform.gameObject.layer;
+                    SurfaceUpdater SU;
+                    if (hit.collider.TryGetComponent<SurfaceUpdater>(out SU))
+                    {
+                        SU.ShowHide(false);
+                    }
+                }
+            }
+        }
+    }
+    void Update_ReinstateSurface()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (!EventSystem.current.IsPointerOverGameObject())
+            {
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out hit, 1000, _layer.interactableMask))
+                {
+                    int l = hit.transform.gameObject.layer;
+                    SurfaceUpdater SU;
+                    if (hit.collider.TryGetComponent<SurfaceUpdater>(out SU))
+                    {
+                        RoomUpdater RU = SU.RU;
+                        RU.SU_Floor.ShowHide(true, false);
+                        RU.SU_Ceiling.ShowHide(true, false);
+                        foreach (var item in RU.walls)
+                            item.SU.ShowHide(true);
+                    }
+                }
+            }
+        }
+    }
+
     void Update_BuildEdit()
     {
         if (Input.GetMouseButtonDown(0))
@@ -1766,11 +1817,12 @@ public class PointerBuilder : MonoBehaviour
             SurfaceUpdater[] SU = lg_block.T_architecture[t].GetComponentsInChildren<SurfaceUpdater>();
             for (int s = 0; s < SU.Length; s++)
             {
-                SU[s].mc.enabled = _active;
+                bool mr = SU[s].mr.enabled;
+                SU[s].mc.enabled = _active && mr;
                 SU[s].mc.convex = !_active;
                 foreach (var item in SU[s].bc)
                 {
-                    item.enabled = !_active;
+                    item.enabled = (!_active) && mr;
                 }
             }
         }

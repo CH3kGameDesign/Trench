@@ -444,6 +444,37 @@ public class SurfaceUpdater : MonoBehaviour
         }
     }
 
+    public void ShowHide(bool _show, bool _includeArchitrave = true)
+    {
+        mr.enabled = _show;
+        mc.enabled = _show;
+        foreach (var item in bc)
+            item.enabled = _show;
+
+        if (_includeArchitrave)
+        {
+            switch (_enum)
+            {
+                case enumType.wall:
+                    if (cornice != null)
+                        cornice.MR.enabled = _show;
+                    if (skirting != null)
+                        skirting.MR.enabled = _show;
+                    break;
+                case enumType.floor:
+                    foreach (RoomUpdater.wall w in RU.walls)
+                        if (w.SU.skirting != null) w.SU.skirting.MR.enabled = _show;
+                    break;
+                case enumType.ceiling:
+                    foreach (RoomUpdater.wall w in RU.walls)
+                        if (w.SU.cornice != null) w.SU.cornice.MR.enabled = _show;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
     public class holeClass
     {
         public enum typeEnum { door}
