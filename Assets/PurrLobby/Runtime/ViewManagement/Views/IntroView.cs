@@ -26,7 +26,11 @@ namespace PurrLobby
             {
                 RT_BG.localScale = Vector3.one * Mathf.Lerp(1f, 0.95f, _timer);
                 yield return new WaitForEndOfFrame();
+
                 _timer += Time.deltaTime / _dur;
+                if (_timer > 0.1f)
+                    if (Input.anyKey)
+                        _timer = 1f;
             }
             viewManager.HideView<IntroView>(1f);
             viewManager.ShowView<MainMenuView>(false, 1f);

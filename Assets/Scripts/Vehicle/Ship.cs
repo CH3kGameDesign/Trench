@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Windows;
 
 public class Ship : Vehicle
 {
@@ -14,6 +13,49 @@ public class Ship : Vehicle
     protected GunClass[] EquippedGuns;
     public GunClass[] DEBUG_gun;
     public Transform[] T_gunHook;
+
+    public SS_MessageObject PF_message;
+    public Sprite S_sprite;
+    private SS_MessageObject _activeMessage;
+
+    public AIVarClass AIVar;
+
+    public enum agentBehaviourEnum { idle, wander, travel, attack }
+    [System.Serializable]
+    public class AIVarClass
+    {
+        public agentBehaviourEnum behaviourState { get; private set; } = agentBehaviourEnum.idle;
+
+        [HideInInspector] public bool b_hasTarPosition = false;
+        [HideInInspector] public BoxCollider wanderBounds = null;
+        public float tarWanderDistance = 20f;
+        [HideInInspector] public float wanderTimer = 0f;
+        public float tarWanderTimer_Override = 15f;
+
+        [HideInInspector] public Vector3 tarPosition;
+
+        public void ChangeState(Ship _ship, agentBehaviourEnum _state)
+        {
+            LeaveState(_ship, behaviourState);
+            EnterState(_ship, _state);
+        }
+        void EnterState(Ship _ship, agentBehaviourEnum _state)
+        {
+            behaviourState = _state;
+            switch (_state)
+            {
+                case agentBehaviourEnum.wander:
+                    _ship.Wander_FindNewPosition();
+                    break;
+                default:
+                    break;
+            }
+        }
+        void LeaveState(Ship _ship, agentBehaviourEnum _state)
+        {
+            b_hasTarPosition = false;
+        }
+    }
 
     //CAR SETUP
 
@@ -185,6 +227,14 @@ public class Ship : Vehicle
             foreach (var item in RRWTireSkid) { item.emitting = false; }
         }
         DEBUG_GunEquip();
+        PlayerManager.Instance.CheckMain(SetupMessage);
+    }
+    void SetupMessage()
+    {
+        Canvas _canvas = PlayerManager.conversation.C_canvas;
+        RectTransform _holder = PlayerManager.conversation.RT_messageHolder_Ship;
+        _activeMessage = Instantiate(PF_message, _holder);
+        _activeMessage.Setup(S_sprite, transform, _canvas, S_interactName, true, this);
     }
 
     void DEBUG_GunEquip()
@@ -201,67 +251,162 @@ public class Ship : Vehicle
     public override void OnUpdate_Driver(BaseController _player)
     {
         if (_player is PlayerController)
+            UpdateDriver_Player(_player as PlayerController);
+        else if (_player is AgentController)
+            UpdateDriver_Agent(_player as AgentController);
+
+        LevelGen_Holder.Instance.UpdateTransform(LG);
+    }
+    void UpdateDriver_Player(PlayerController _player)
+    {
+        if (_player.Inputs.v2_inputDir.y > 0)
         {
-            PlayerController _temp = _player as PlayerController;
-            if (_temp.Inputs.v2_inputDir.y > 0)
+            CancelInvoke("DecelerateCar");
+            deceleratingCar = false;
+            float _mult = 1;
+            if (_player.Inputs.b_sprinting)
             {
-                CancelInvoke("DecelerateCar");
-                deceleratingCar = false;
-                float _mult = 1;
-                if (_temp.Inputs.b_sprinting)
-                {
-                    _mult = 2;
-                    _temp.Ref.speedLines.SetMaskActive(true);
-                }
-                else
-                    _temp.Ref.speedLines.SetMaskActive(false);
-                GoForward(_temp.Inputs.v2_inputDir.y * _mult);
+                _mult = 2;
+                _player.Ref.speedLines.SetMaskActive(true);
             }
             else
-                _temp.Ref.speedLines.SetMaskActive(false);
-            if (_temp.Inputs.v2_inputDir.y < 0)
-            {
-                CancelInvoke("DecelerateCar");
-                deceleratingCar = false;
-                GoReverse(_temp.Inputs.v2_inputDir.y);
-            }
-
-            if (_temp.Inputs.v2_inputDir.x < 0)
-            {
-                GoSideways(_temp.Inputs.v2_inputDir.x);
-                //Rotate(_temp.Inputs.v2_inputDir.x);
-            }
-            if (_temp.Inputs.v2_inputDir.x > 0)
-            {
-                GoSideways(_temp.Inputs.v2_inputDir.x);
-                //Rotate(_temp.Inputs.v2_inputDir.x);
-            }
-            if (_temp.Inputs.b_jumping)
-            {
-                CancelInvoke("DecelerateCar");
-                deceleratingCar = false;
-                Handbrake();
-            }
-            if (!_temp.Inputs.b_jumping)
-            {
-                RecoverTraction();
-            }
-            if (_temp.Inputs.v2_inputDir.y == 0)
-            {
-                ThrottleOff();
-            }
-            if (_temp.Inputs.v2_inputDir.y == 0 && !_temp.Inputs.b_jumping && !deceleratingCar)
-            {
-                InvokeRepeating("DecelerateCar", 0f, 0.1f);
-                deceleratingCar = true;
-            }
-            if (_temp.Inputs.v2_inputDir.x == 0 && steeringAxis != 0f)
-            {
-
-            }
-            FireManager(_temp);
+                _player.Ref.speedLines.SetMaskActive(false);
+            GoForward(_player.Inputs.v2_inputDir.y * _mult);
         }
-        LevelGen_Holder.Instance.UpdateTransform(LG);
+        else
+            _player.Ref.speedLines.SetMaskActive(false);
+        if (_player.Inputs.v2_inputDir.y < 0)
+        {
+            CancelInvoke("DecelerateCar");
+            deceleratingCar = false;
+            GoReverse(_player.Inputs.v2_inputDir.y);
+        }
+
+        if (_player.Inputs.v2_inputDir.x < 0)
+        {
+            GoSideways(_player.Inputs.v2_inputDir.x);
+            //Rotate(_temp.Inputs.v2_inputDir.x);
+        }
+        if (_player.Inputs.v2_inputDir.x > 0)
+        {
+            GoSideways(_player.Inputs.v2_inputDir.x);
+            //Rotate(_temp.Inputs.v2_inputDir.x);
+        }
+        if (_player.Inputs.b_jumping)
+        {
+            CancelInvoke("DecelerateCar");
+            deceleratingCar = false;
+            Handbrake();
+        }
+        if (!_player.Inputs.b_jumping)
+        {
+            RecoverTraction();
+        }
+        if (_player.Inputs.v2_inputDir.y == 0)
+        {
+            ThrottleOff();
+        }
+        if (_player.Inputs.v2_inputDir.y == 0 && !_player.Inputs.b_jumping && !deceleratingCar)
+        {
+            InvokeRepeating("DecelerateCar", 0f, 0.1f);
+            deceleratingCar = true;
+        }
+        if (_player.Inputs.v2_inputDir.x == 0 && steeringAxis != 0f)
+        {
+
+        }
+        FireManager(_player);
+    }
+
+    void UpdateDriver_Agent(AgentController _agent)
+    {
+        switch (AIVar.behaviourState)
+        {
+            case agentBehaviourEnum.idle:
+                break;
+            case agentBehaviourEnum.wander:
+                //Find Destination
+                UpdateWander_Agent();
+                //Rotate To Target
+                Rotation_Agent(_agent);
+                //Move Forward
+                Movement_Agent(_agent);
+                break;
+            case agentBehaviourEnum.travel:
+                break;
+            case agentBehaviourEnum.attack:
+                //Find Target
+                UpdateTarget_Agent(_agent);
+                //Rotate To Target
+                Rotation_Agent(_agent);
+                //Move Forward
+                Movement_Agent(_agent);
+                //Fire
+                FireManager(_agent);
+                break;
+            default:
+                break;
+        }
+    }
+
+    void UpdateWander_Agent()
+    {
+        if (!AIVar.b_hasTarPosition)
+            Wander_FindNewPosition();
+        if (Vector3.Distance(transform.position, AIVar.tarPosition) <= AIVar.tarWanderDistance ||
+            AIVar.wanderTimer > AIVar.tarWanderTimer_Override)
+            Wander_FindNewPosition();
+
+        AIVar.wanderTimer += Time.deltaTime;
+
+        AIVar.b_hasTarPosition = true;
+    }
+    void Wander_FindNewPosition()
+    {
+        if (AIVar.wanderBounds != null)
+            AIVar.tarPosition = AIVar.wanderBounds.bounds.GetRandomPoint();
+        else
+            AIVar.tarPosition = transform.position + (UnityEngine.Random.insideUnitSphere * 200);
+        AIVar.wanderTimer = 0;
+    }
+
+    void UpdateTarget_Agent(AgentController _agent)
+    {
+        if (PlayerManager.main != null)
+        {
+            AIVar.tarPosition = PlayerManager.main.RB.transform.position;
+            AIVar.b_hasTarPosition = true;
+        }
+    }
+    void Movement_Agent(AgentController _agent)
+    {
+        if (!AIVar.b_hasTarPosition)
+            return;
+        //Go Forward
+        CancelInvoke("DecelerateCar");
+        deceleratingCar = false;
+        float _mult = 1;
+        GoForward(_mult);
+        RecoverTraction();
+
+    }
+    void Rotation_Agent(AgentController _agent)
+    {
+        if (!AIVar.b_hasTarPosition)
+            return;
+        Vector3 _tarRot = transform.eulerAngles;
+        _tarRot = Quaternion.LookRotation(AIVar.tarPosition - transform.position).eulerAngles;
+        //_tarRot.x = Mathf.Clamp(_tarRot.x, downXLimit, upXLimit);
+        Quaternion _target = Quaternion.Euler(_tarRot) * Quaternion.Euler(_rotate);
+        _target *= Quaternion.Inverse(T_pilotSeat.rotation);
+        _target = _target * transform.rotation;
+        float _angle = Vector3.Distance(_tarRot, _curRot);
+
+        tarRotation = _target;
+        _curRot = _tarRot;
+
+        Quaternion _rotation = Quaternion.Slerp(transform.rotation, tarRotation, Time.deltaTime * steeringSpeed);
+        transform.rotation = _rotation;
     }
     void FireManager(PlayerController _player)
     {
@@ -274,14 +419,45 @@ public class Ship : Vehicle
             item.OnUpdate();
         }
     }
+    void FireManager(AgentController _agent)
+    {
+        //Add Fire Logic
+        bool _fire = true;
+
+        foreach (var item in EquippedGuns)
+        {
+            if (_fire)
+                item.OnFire();
+            item.OnUpdate();
+        }
+    }
 
     public override void OnFixedUpdate_Driver(BaseController _player)
     {
         if (_player is PlayerController)
+            FixedUpdateDriver_Player(_player as PlayerController);
+        else if (_player is AgentController)
+            FixedUpdateDriver_Agent(_player as AgentController);
+    }
+    void FixedUpdateDriver_Player(PlayerController _player)
+    {
+        _player.F_vehicleCamMult = Update_Rotation(_player);
+        _player.UpdateVehicleUI(Vector3.Magnitude(GetLocalVelocity()), maxThrottleBarSpeed);
+    }
+    void FixedUpdateDriver_Agent(AgentController _agent)
+    {
+        switch (AIVar.behaviourState)
         {
-            PlayerController _temp = _player as PlayerController;
-            _temp.F_vehicleCamMult = Update_Rotation(_temp);
-            _temp.UpdateVehicleUI(Vector3.Magnitude(GetLocalVelocity()), maxThrottleBarSpeed);
+            case agentBehaviourEnum.idle:
+                break;
+            case agentBehaviourEnum.wander:
+                break;
+            case agentBehaviourEnum.travel:
+                break;
+            case agentBehaviourEnum.attack:
+                break;
+            default:
+                break;
         }
     }
 
@@ -290,16 +466,33 @@ public class Ship : Vehicle
         if (useSounds && hasDriver())
             carEngineSound.Play();
         base.OnEnter(_player);
+
+        BaseController _base;
+        if (GetDriver(out _base))
+        {
+            if (_base == _player && _player is AgentController)
+                AIVar.ChangeState(this, agentBehaviourEnum.wander);
+        }
+
+        if (_player == PlayerManager.main)
+            _activeMessage.gameObject.SetActive(false);
     }
     public override void OnExit(int _num)
     {
+        if (Seats[_num].BC_agent == PlayerManager.main)
+            _activeMessage.gameObject.SetActive(true);
+
+        base.OnExit(_num);
         if (useSounds && !hasDriver())
             carEngineSound.Stop();
-        base.OnExit(_num);
     }
     public override Vector3 GetLocalVelocity()
     {
         return new Vector3(localVelocityX, localVelocityY, localVelocityZ);
+    }
+    public override Vector3 GetVelocity()
+    {
+        return carRigidbody.linearVelocity;
     }
 
     // Update is called once per frame
@@ -371,10 +564,10 @@ public class Ship : Vehicle
     {
         PlayerController PC;
         if (!DriverIsMain(out PC))
-            return transform.position + T_pilotSeat.forward * 100;
+            return transform.position + T_pilotSeat.forward * 1000;
 
         Ray _ray = PC.C_camera.ScreenPointToRay(PC.Ref.RT_shipReticle.position);
-        Vector3 _temp = _ray.GetPoint(100);
+        Vector3 _temp = _ray.GetPoint(1000);
         return _temp;
     }
 
@@ -770,5 +963,41 @@ public class Ship : Vehicle
     public void UpdateInteractText()
     {
 
+    }
+
+    public void OnHit(GunManager.bulletClass _bullet, DamageSource _source = null)
+    {
+        if (_bullet.B_player)
+            AIVar.ChangeState(this, agentBehaviourEnum.attack);
+
+        f_curHealth -= _bullet.F_damage;
+
+        _activeMessage.UpdateHealth();
+
+        BaseController BC;
+        if (GetDriver(out BC))
+            BC.UpdateVehicleHealth(this);
+        if (f_curHealth < 0f)
+            OnKilled();
+    }
+    void OnKilled()
+    {
+        for (int i = SeatInUse.Count - 1; i >= 0; i--)
+            OnExit(SeatInUse[i]);
+        _activeMessage.gameObject.SetActive(false);
+        AgentLocation[] AL = GetComponentsInChildren<AgentLocation>();
+        foreach (AgentLocation al in AL)
+        {
+            if (al.RM.isController)
+                al.ClearRooms();
+        }
+        gameObject.SetActive(false);
+    }
+    public override float GetWeaponSpeed()
+    {
+        float _speed = 0;
+        foreach (var item in EquippedGuns)
+            _speed = Mathf.Max(_speed, item.bullet.B_info.F_speed);
+        return _speed;
     }
 }

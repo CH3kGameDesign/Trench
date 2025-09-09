@@ -388,12 +388,31 @@ public class AgentController : BaseController
             case stateEnum.kamikaze:
                 ModelRotate(false);
                 break;
+            case stateEnum.vehicle:
+                if (V_curVehicle)
+                    V_curVehicle.OnUpdate(this);
+                break;
             default:
                 break;
         }
         AnimationUpdate(b_firing);
         NavSurface_Update();
         base.Update();
+    }
+    public override void FixedUpdate()
+    {
+        if (!isController)
+            return;
+        switch (state)
+        {
+            case stateEnum.vehicle:
+                if (V_curVehicle)
+                    V_curVehicle.OnFixedUpdate(this);
+                break;
+            default:
+                break;
+        }
+        base.FixedUpdate();
     }
 
     private IEnumerator UpdateIsFriendly()

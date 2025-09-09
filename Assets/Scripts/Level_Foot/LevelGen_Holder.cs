@@ -177,7 +177,7 @@ public class LevelGen_Holder : NetworkBehaviour
         }
         CreateNew(_pos, null, _player);
     }
-    public void CreateNew(Vector3 _pos, Layout_Defined _layout = null, bool _player = true)
+    public void CreateNew(Vector3 _pos, Layout_Defined _layout = null, bool _player = true, BoxCollider _BC = null)
     {
         _networkTransform _transform = new _networkTransform();
         _transform.lgID = Transforms.value.Count;
@@ -188,9 +188,9 @@ public class LevelGen_Holder : NetworkBehaviour
         LevelGen LG = Instantiate(PF_levelGen, transform);
         LG.isHost = true;
         if (_layout == null)
-            LG.Setup(_transform.seed, List.Count, _pos, _player);
+            LG.Setup(_transform.seed, List.Count, _pos, _player, _BC);
         else
-            LG.Setup(_transform.seed, List.Count, _pos, _layout, _player);
+            LG.Setup(_transform.seed, List.Count, _pos, _layout, _player, _BC);
         List.Add(LG);
     }
 
@@ -212,6 +212,8 @@ public class LevelGen_Holder : NetworkBehaviour
         if (!List[_transform.lgID].ship)
             return;
         if (List[_transform.lgID].ship.DriverIsMain())
+            return;
+        if (List[_transform.lgID].ship.DriverIsAgent() && isHost)
             return;
         if (_transform.position.Count == 0)
         {

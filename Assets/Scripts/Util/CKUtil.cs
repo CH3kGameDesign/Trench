@@ -64,6 +64,13 @@ public static class CKUtil
         }
         return _temp;
     }
+    public static string ToString_Percentage(this float _value)
+    {
+        string _temp;
+        _temp = Mathf.Round(_value * 100).ToString();
+        _temp += "%";
+        return _temp;
+    }
     public static string ToString_InputSetup(this string _interactable, PlayerController.inputActions _input, Interactable.enumType _type = Interactable.enumType.interact)
     {
         PlayerController.inputClass _IC = PlayerManager.main.Inputs;
@@ -437,7 +444,11 @@ public static class CKUtil
 
     public static bool FollowObject(this RectTransform _holder, Canvas C_canvas, Transform _target)
     {
-        Vector3 _tarPos = Camera.main.WorldToScreenPoint(_target.position);
+        return _holder.FollowObject(C_canvas, _target.position);
+    }
+    public static bool FollowObject(this RectTransform _holder, Canvas C_canvas, Vector3 _target)
+    {
+        Vector3 _tarPos = Camera.main.WorldToScreenPoint(_target);
 
         _tarPos /= C_canvas.scaleFactor;
 
@@ -455,7 +466,7 @@ public static class CKUtil
         _tarPos.y = Mathf.Clamp(_tarPos.y, _yBounds.x, _yBounds.y);
 
 
-        if(_tarPos.z < 0)
+        if (_tarPos.z < 0)
         {
             Vector2 _checker = _tarPos;
             _checker.x = 1 - Mathf.Abs(_checker.x / (Screen.width / 2) - 1);

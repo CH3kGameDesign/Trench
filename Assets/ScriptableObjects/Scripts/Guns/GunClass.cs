@@ -364,13 +364,14 @@ public class GunClass : ItemClass
             if (G_gunModel)
                 G_gunModel.Shoot();
 
-            Bullet GO = Instantiate(bullet, _barrel.position, _barrel.rotation);
-            GO.transform.LookAt(_tarPos);
+            Quaternion _tarRot = Quaternion.LookRotation(_tarPos - _barrel.position);
+            Bullet GO;
             PlayerController _PC;
             if (IsPlayer(out _PC))
             {
-                BulletSpray(GO, fireVariables.bulletSprayPlayer);
-                GO.OnCreate(_damage, _PC, this);
+                _tarRot = BulletSpray(_tarRot, fireVariables.bulletSprayPlayer);
+                GO = Instantiate(bullet, _barrel.position, _tarRot);
+                GO.OnCreate(_damage, _PC, this, shipController);
                 _PC.reticle().UpdateRoundCount(this);
 
                 _PC.T_camHolder.GetChild(0).position -= _PC.T_camHolder.forward * f_recoilCam;
@@ -378,8 +379,9 @@ public class GunClass : ItemClass
             }
             else
             {
-                BulletSpray(GO, fireVariables.bulletSprayAI);
-                GO.OnCreate(_damage, AC_agent, this);
+                _tarRot = BulletSpray(_tarRot, fireVariables.bulletSprayAI);
+                GO = Instantiate(bullet, _barrel.position, _tarRot);
+                GO.OnCreate(_damage, AC_agent, this, shipController);
             }
             OnBullet(GO);
         }
@@ -395,6 +397,12 @@ public class GunClass : ItemClass
         Vector2 v2 = Random.insideUnitCircle;
         v2 *= Random.Range(0, _maxSpray);
         GO.transform.rotation *= Quaternion.Euler(v2.x, v2.y, 0);
+    }
+    Quaternion BulletSpray(Quaternion _q, float _maxSpray)
+    {
+        Vector2 v2 = Random.insideUnitCircle;
+        v2 *= Random.Range(0, _maxSpray);
+        return _q * Quaternion.Euler(v2.x, v2.y, 0);
     }
 
     public virtual void OnBullet(Bullet _bullet)

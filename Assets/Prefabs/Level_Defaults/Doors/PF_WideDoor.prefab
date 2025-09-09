@@ -1683,6 +1683,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3309626539305749261}
   - component: {fileID: 149779521501665865}
+  - component: {fileID: 4194118176812392915}
   m_Layer: 0
   m_Name: PF_WideDoor
   m_TagString: Untagged
@@ -1725,6 +1726,23 @@ MonoBehaviour:
   G_frame: {fileID: 5753781183226095358}
   B_showFrame: 0
   B_connected: 0
+  B_validDoor: 1
+  LGD_connectedDoor: {fileID: 0}
+--- !u!114 &4194118176812392915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7993140251783995159}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 977c7cb71a7493c41963fcff8b181f6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _name: 
+  _type: 3
+  SU_surface: {fileID: 0}
 --- !u!1 &9197311763654597645
 GameObject:
   m_ObjectHideFlags: 0

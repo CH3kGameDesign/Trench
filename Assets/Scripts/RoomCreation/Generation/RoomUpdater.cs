@@ -15,7 +15,6 @@ public class RoomUpdater : MonoBehaviour
 
     public Architraves architraves;
 
-    private List<GameObject> measurements = new List<GameObject>();
 
     public Vector3[] vertPos = new Vector3[]
         {

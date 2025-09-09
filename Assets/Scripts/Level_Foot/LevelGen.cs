@@ -53,7 +53,7 @@ public class LevelGen : MonoBehaviour
     }
 
     public enum spawnType { _default, friendlyOnly, enemyOnly};
-    public void Setup(uint _seed, int _id, Vector3 _pos, bool _player = true)
+    public void Setup(uint _seed, int _id, Vector3 _pos, bool _player = true, BoxCollider _BC = null)
     {
         id = _id;
 
@@ -64,7 +64,7 @@ public class LevelGen : MonoBehaviour
         if (SaveData.shipLayout._objects.Count > 0 && SaveData.themeCurrent == themeEnum.ship)
         {
             GenerateLayout_Specific(SaveData.shipLayout, _pos,
-                _player ? spawnType.friendlyOnly : spawnType.enemyOnly);
+                _player ? spawnType.friendlyOnly : spawnType.enemyOnly, _BC);
         }
         else if (LG_Theme.Layouts.Count > 0)
         {
@@ -74,7 +74,7 @@ public class LevelGen : MonoBehaviour
         else
             GenerateLayout_Series(LG_Theme, _pos);
     }
-    public void Setup(uint _seed, int _id, Vector3 _pos, Layout_Defined _layoutDefined, bool _player = true)
+    public void Setup(uint _seed, int _id, Vector3 _pos, Layout_Defined _layoutDefined, bool _player = true, BoxCollider _BC = null)
     {
         id = _id;
 
@@ -85,7 +85,7 @@ public class LevelGen : MonoBehaviour
         if (_layoutDefined._objects.Count > 0 && SaveData.themeCurrent == themeEnum.ship)
         {
             GenerateLayout_Specific(_layoutDefined, _pos,
-                _player ? spawnType.friendlyOnly : spawnType.enemyOnly);
+                _player ? spawnType.friendlyOnly : spawnType.enemyOnly, _BC);
         }
         else if (LG_Theme.Layouts.Count > 0)
         {
@@ -110,7 +110,7 @@ public class LevelGen : MonoBehaviour
     }
 
     int _gridSize = 5;
-    public void GenerateLayout_Specific(Layout_Defined _save, Vector3 _pos, spawnType _type = spawnType._default)
+    public void GenerateLayout_Specific(Layout_Defined _save, Vector3 _pos, spawnType _type = spawnType._default, BoxCollider _BC = null)
     {
         LG_Blocks = new List<LevelGen_Block>();
         T_Holder = Instantiate(GetHolderTypePrefab(SaveData.themeCurrent)).transform;
@@ -162,7 +162,7 @@ public class LevelGen : MonoBehaviour
 
         SetDoors_Auto();
         UpdateNavMeshes();
-        SetupVehicle(T_Holder, _save);
+        SetupVehicle(T_Holder, _save, _type, _BC);
         SpawnObjects(_type);
         LevelGen_Holder.Instance.IsReady();
     }
@@ -251,13 +251,14 @@ public class LevelGen : MonoBehaviour
         LevelGen_Holder.Instance.UpdateTransform(this);
     }
 
-    void SetupVehicle(Transform lHolder, Layout_Defined _save)
+    void SetupVehicle(Transform lHolder, Layout_Defined _save, spawnType _type, BoxCollider _BC = null)
     {
-        if (_save == null) SetupVehicle(T_Holder);
+        if (_save == null) SetupVehicle(T_Holder, _type);
         if (SaveData.themeCurrent == themeEnum.ship)
         {
             ship = lHolder.GetComponent<Ship>();
             ship.LG = this;
+            ship.AIVar.wanderBounds = _BC;
             Vector3 offset = Vector3.zero;
             ship.T_camHook.localPosition = new Vector3(
                 0,
@@ -265,16 +266,23 @@ public class LevelGen : MonoBehaviour
                 0);
             ship.V3_camOffset = new Vector3(
                 0, 
-                6, 
+                10, 
                 -_save._bounds.data.Count * 5);
+
+            if (_type == spawnType.enemyOnly)
+            {
+                AgentController AC = SpawnDriver(ship.T_pilotSeat);
+                ship.OnEnter(AC);
+            }
         }
     }
-    void SetupVehicle(Transform lHolder)
+    void SetupVehicle(Transform lHolder, spawnType _type = spawnType._default, BoxCollider _BC = null)
     {
         if (SaveData.themeCurrent == themeEnum.ship)
         {
             ship = lHolder.GetComponent<Ship>();
             ship.LG = this;
+            ship.AIVar.wanderBounds = _BC;
             Vector3 offset = Vector3.zero;
             foreach (var item in LG_Blocks)
             {
@@ -286,7 +294,37 @@ public class LevelGen : MonoBehaviour
             }
             offset /= LG_Blocks.Count;
             ship.T_camHook.position = offset;
+
+            if (_type == spawnType.enemyOnly)
+            {
+                AgentController AC = SpawnDriver(ship.T_pilotSeat);
+                ship.OnEnter(AC);
+            }
         }
+    }
+
+    AgentController SpawnDriver (Transform _spawn)
+    {
+        if (!isHost)
+            return null;
+
+        GameObject prefab;
+        GameObject GO;
+        
+        prefab = LG_Theme.GetEnemy(Random_Seeded);
+
+        Random_Seeded.NextInt();
+        if (prefab != null)
+        {
+            GO = Instantiate(prefab);
+            AgentController AC = GO.GetComponent<AgentController>();
+            AC.NMA.transform.position = _spawn.position;
+            AC.NMA.transform.rotation = _spawn.rotation;
+            AC.ChangeState(BaseController.stateEnum.vehicle);
+            AC_agents.Add(AC);
+            return AC;
+        }
+        return null;
     }
 
     void SetDoors()

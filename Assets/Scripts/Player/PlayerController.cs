@@ -49,6 +49,9 @@ public class PlayerController : BaseController
         public LineRendererUI LR_shipReticleLine;
         public RectTransform RT_shipAltitudeLine;
         public Image I_shipAltitidueLine;
+
+        public Image I_shipHealth;
+        public TextMeshProUGUI TM_shipHealth;
     }
     [Header("UI")]
     public HealthUI PF_followerHealth;
@@ -1551,6 +1554,12 @@ public class PlayerController : BaseController
         }
     }
 
+    public override void UpdateVehicleHealth(Vehicle _vehicle)
+    {
+        float _amt = _vehicle.f_curHealth / (float)_vehicle.I_maxHealth;
+        Ref.I_shipHealth.fillAmount = _amt;
+        Ref.TM_shipHealth.text = _amt.ToString_Percentage();
+    }
     public void Gun_Equip(int _invNum, bool _force = false)
     {
         //Check if already equipped

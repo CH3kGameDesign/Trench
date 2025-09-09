@@ -19,6 +19,7 @@ public class HitObject : MonoBehaviour
     public enum damageTypeEnum { all, bullet, fire, explosive};
 
     public RagdollManager RM_ragdollManager;
+    public Vehicle V_vehicle;
 
 
     private void Start()
@@ -45,6 +46,8 @@ public class HitObject : MonoBehaviour
     {
         if (RM_ragdollManager != null)
             return RM_ragdollManager.gameObject;
+        if (V_vehicle != null)
+            return V_vehicle.gameObject;
         return gameObject;
     }
 }

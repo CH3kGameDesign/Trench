@@ -731,6 +731,7 @@ GameObject:
   - component: {fileID: 2968298529435864408}
   - component: {fileID: -6741669464004263501}
   - component: {fileID: 1234859887144673026}
+  - component: {fileID: 722526606326681893}
   m_Layer: 16
   m_Name: LayoutHolder_Ship
   m_TagString: Untagged
@@ -804,6 +805,8 @@ MonoBehaviour:
   T_camHook: {fileID: 1327722245234219121}
   V3_camOffset: {x: 0, y: 6, z: -32}
   SeatInUse: 
+  f_curHealth: 1000
+  I_maxHealth: 1000
   T_pilotSeat: {fileID: 0}
   LG: {fileID: 0}
   DEBUG_gun:
@@ -812,6 +815,15 @@ MonoBehaviour:
   T_gunHook:
   - {fileID: 7732563233561228072}
   - {fileID: 3883184863244112375}
+  PF_message: {fileID: 5514063645717317665, guid: c1f7762309baea74297088dc54e45488, type: 3}
+  S_sprite: {fileID: 21300000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
+  AIVar:
+    b_hasTarPosition: 0
+    wanderBounds: {fileID: 0}
+    tarWanderDistance: 20
+    wanderTimer: 0
+    tarWanderTimer_Override: 15
+    tarPosition: {x: 0, y: 0, z: 0}
   maxSpeed: 250
   maxReverseSpeed: 100
   accelerationMultiplier: 100
@@ -924,6 +936,42 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   layoutBounds: {fileID: 11400000, guid: e141aba4bdea57d44bce6ba22faef27a, type: 2}
+--- !u!114 &722526606326681893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 407907345362264402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d044c5fc33f35a546ace057a5b50c48f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  B_useHealth: 0
+  I_maxHealth: 10
+  PF_hitParticles: {fileID: 0}
+  UE_OnHit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2190990233376713527}
+        m_TargetAssemblyTypeName: Ship, Assembly-CSharp
+        m_MethodName: OnHit
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  UE_OnDestroy:
+    m_PersistentCalls:
+      m_Calls: []
+  ignoreDamageType: 
+  RM_ragdollManager: {fileID: 0}
+  V_vehicle: {fileID: 2190990233376713527}
 --- !u!1 &618349774703882281
 GameObject:
   m_ObjectHideFlags: 0

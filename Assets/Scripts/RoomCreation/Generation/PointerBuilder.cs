@@ -517,7 +517,10 @@ public class PointerBuilder : MonoBehaviour
         }
 
         if (Input.GetMouseButtonUp(0))
+        {
             UpdateOccupiedPlanes();
+            CheckDoors();
+        }
     }
 
     void Update_BuildDraw_Square()
@@ -839,6 +842,40 @@ public class PointerBuilder : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Delete))
             DeleteSquare();
     }
+    void CheckDoors()
+    {
+        RoomUpdater[] RU = GetComponentsInChildren<RoomUpdater>();
+        foreach (var item in GetComponentsInChildren<LevelGen_Door>())
+        {
+            Vector3 checkPos = item.transform.position + item.transform.forward + Vector3.up;
+            RoomUpdater ru;
+            if (CheckPositionWithinBounds(out ru, checkPos, RU))
+                item.MakeFake(ru);
+            else
+                item.MakeValid();
+        }
+    }
+
+    bool CheckPositionWithinBounds(out RoomUpdater ru, Vector3 pos, RoomUpdater[] RU)
+    {
+        ru = null;
+        foreach (var item in RU)
+        {
+            Vector3 _min = Vector3.Min(item.vertPos[0], item.vertPos[2]) + item.transform.position;
+            Vector3 _max = Vector3.Max(item.vertPos[0], item.vertPos[2]) + item.transform.position + (Vector3.up * item.height);
+
+            if (pos.x >= _min.x && pos.y >= _min.y && pos.z >= _min.z)
+            {
+                if (pos.x <= _max.x && pos.y <= _max.y && pos.z <= _max.z)
+                {
+                    ru = item;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     void UpdateOccupiedPlanes()
     {
         if (lg_block == null)
@@ -962,6 +999,13 @@ public class PointerBuilder : MonoBehaviour
     {
         if (_Place.lastTransform == null)
             return;
+        if (_Place.lastTransform._type == Prefab_Environment.TypeEnum.door)
+        {
+            LevelGen_Door _door;
+            if (_Place.lastTransform.TryGetComponent<LevelGen_Door>(out _door))
+                _door.MakeValid();
+        }
+
         _Place.lastTransform.SU_surface.RemoveFurniture(_Place.lastTransform);
         Destroy(_Place.lastTransform.gameObject);
         _Place.lastTransform = null;
@@ -1036,8 +1080,16 @@ public class PointerBuilder : MonoBehaviour
                 {
                     if (_Place.activeTransform.SU_surface != _SU)
                     {
-                        _Place.activeTransform.SU_surface.RemoveFurniture(_Place.activeTransform);
+                        if (_Place.activeTransform.SU_surface)
+                            _Place.activeTransform.SU_surface.RemoveFurniture(_Place.activeTransform);
                         _SU.AddFurniture(_Place.activeTransform);
+
+                        if (_Place.activeTransform._type == Prefab_Environment.TypeEnum.door)
+                        {
+                            LevelGen_Door LGD;
+                            if (_Place.activeTransform.TryGetComponent<LevelGen_Door>(out LGD))
+                                LGD.MakeValid();
+                        }
                     }
                 }
 
@@ -1057,6 +1109,9 @@ public class PointerBuilder : MonoBehaviour
                             _SU.SortHoles();
                             _SU.UpdateSurface();
                         }
+                        LevelGen_Door LGD;
+                        if (_Place.activeTransform.TryGetComponent<LevelGen_Door>(out LGD))
+                            LGD.MoveConnection();
                         break;
                     default:
                         _Place.activeTransform.transform.position = _pos;
@@ -1079,6 +1134,7 @@ public class PointerBuilder : MonoBehaviour
             _Place.lastTransform = _Place.activeTransform;
         }
         _Place.activeTransform = null;
+        CheckDoors();
     }
 
     void Place_GetObject()
@@ -1160,7 +1216,8 @@ public class PointerBuilder : MonoBehaviour
             _totalChange += change;
             Vector3 _start = activeWall.mf.mesh.vertices[0] + activeWall.transform.position;
             Vector3 _end = activeWall.mf.mesh.vertices[2] + activeWall.transform.position;
-
+            _start.y -= 0.01f;
+            _end.y -= 0.01f;
             RoomUpdater ru = activeSquare.GetComponent<RoomUpdater>();
             ru.height = Mathf.Abs(_totalChange);
             if (_totalChange < 0)
@@ -1181,6 +1238,8 @@ public class PointerBuilder : MonoBehaviour
                 _totalChange += change;
                 Vector3 _start = activeWall.mf.mesh.vertices[0] + activeWall.transform.position;
                 Vector3 _end = activeWall.mf.mesh.vertices[3] + activeWall.transform.position;
+                _start.y -= 0.01f;
+                _end.y -= 0.01f;
 
                 Vector3 _dir = new Vector3(
                     Mathf.Abs(activeWall.mf.mesh.normals[3].x),
@@ -1205,6 +1264,7 @@ public class PointerBuilder : MonoBehaviour
 
         activeSquare = null;
         activeWall = null;
+        CheckDoors();
     }
     void DeselectSquare()
     {
@@ -1236,7 +1296,9 @@ public class PointerBuilder : MonoBehaviour
     #region Edit Mesh
     private void SetPosScale(Vector3 start, Vector3 end)
     {
-        activeSquare.position = (start + end) / 2 + new Vector3(0, 0.01f, 0);
+        Vector3 _pos = (start + end) / 2;
+        _pos.y = start.y;
+        activeSquare.position = _pos;
 
         RoomUpdater ru = activeSquare.GetComponent<RoomUpdater>();
 
@@ -1579,6 +1641,7 @@ public class PointerBuilder : MonoBehaviour
         lg_block = Instantiate(LGB, transform);
         _canvas.TM_inputField.text = lg_block._name;
         lg_block.RoomEditor_Setup();
+        ActivateMeshColliders(true);
         OpenLoadWindow(false);
     }
 
@@ -1635,7 +1698,7 @@ public class PointerBuilder : MonoBehaviour
 
         root = S_root + "/" + S_themeName;
 
-        FixColliders();
+        ActivateMeshColliders(false);
         GameObject _object = lg_block.gameObject;
         filePath = root + "/" + fileName + ".prefab";
         RemoveOldSubAssets(filePath);
@@ -1696,17 +1759,18 @@ public class PointerBuilder : MonoBehaviour
     }
 
 #endif
-    void FixColliders()
+    void ActivateMeshColliders(bool _active)
     {
         for (int t = 0; t < lg_block.T_architecture.Count; t++)
         {
             SurfaceUpdater[] SU = lg_block.T_architecture[t].GetComponentsInChildren<SurfaceUpdater>();
             for (int s = 0; s < SU.Length; s++)
             {
-                SU[s].mc.enabled = false;
+                SU[s].mc.enabled = _active;
+                SU[s].mc.convex = !_active;
                 foreach (var item in SU[s].bc)
                 {
-                    item.enabled = true;
+                    item.enabled = !_active;
                 }
             }
         }

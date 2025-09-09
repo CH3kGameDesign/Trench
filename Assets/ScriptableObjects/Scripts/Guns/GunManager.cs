@@ -28,6 +28,7 @@ public class GunManager : ScriptableObject
         public bool B_player = false;
         public PlayerController con_Player;
         public AgentController con_Agent;
+        public Ship con_Ship;
         public GunClass con_Gun;
 
         public float F_speed = 100f;

@@ -1619,6 +1619,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1075961408284651757}
   - component: {fileID: 2383720662967493033}
+  - component: {fileID: 2400212059676844282}
   m_Layer: 0
   m_Name: PF_VentDoor
   m_TagString: Untagged
@@ -1661,6 +1662,23 @@ MonoBehaviour:
   G_frame: {fileID: 7167421286621322913}
   B_showFrame: 0
   B_connected: 0
+  B_validDoor: 1
+  LGD_connectedDoor: {fileID: 0}
+--- !u!114 &2400212059676844282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5615395325354550519}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 977c7cb71a7493c41963fcff8b181f6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _name: 
+  _type: 3
+  SU_surface: {fileID: 0}
 --- !u!1 &6675417321163778029
 GameObject:
   m_ObjectHideFlags: 0

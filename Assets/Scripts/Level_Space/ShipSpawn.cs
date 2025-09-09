@@ -28,7 +28,7 @@ public class ShipSpawn : MonoBehaviour
     {
         Vector3 _spawn = GetSpawnLocation();
 
-        LevelGen_Holder.Instance.CreateNew(_spawn, _GO, false);
+        LevelGen_Holder.Instance.CreateNew(_spawn, _GO, false, BC_bounds);
     }
 
     Vector3 GetSpawnLocation ()

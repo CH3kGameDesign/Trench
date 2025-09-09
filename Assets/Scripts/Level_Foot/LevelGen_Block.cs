@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using static ItemClass;
 
@@ -107,7 +108,13 @@ public class LevelGen_Block : MonoBehaviour
     }
     void UpdateEntryList()
     {
-        LGD_Entries = GetComponentsInChildren<LevelGen_Door>();
+        List<LevelGen_Door> _doors = GetComponentsInChildren<LevelGen_Door>().ToList();
+        for (int i = _doors.Count - 1; i >= 0; i--)
+        {
+            if (!_doors[i].B_validDoor)
+                _doors.RemoveAt(i);
+        }
+        LGD_Entries = _doors.ToArray();
     }
     void UpdateDecorList()
     {

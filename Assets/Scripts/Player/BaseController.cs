@@ -306,6 +306,10 @@ public class BaseController : NetworkBehaviour
     {
 
     }
+    public virtual void UpdateVehicleHealth(Vehicle _vehicle)
+    {
+
+    }
     public virtual string GetName()
     {
         return "Undefined";

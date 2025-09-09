@@ -11,18 +11,20 @@ public class Bullet : DamageSource
     private Transform t_lockOnTarget;
 
     private List<GameObject> hitObjects = new List<GameObject>();
-    public void OnCreate(float _damage, PlayerController _player, GunClass _gun)
+    public void OnCreate(float _damage, PlayerController _player, GunClass _gun, Ship _ship = null)
     {
         B_info.con_Gun = _gun;
         B_info.B_player = true;
         B_info.con_Player = _player;
+        B_info.con_Ship = _ship;
         OnCreate(_damage);
     }
-    public void OnCreate(float _damage, AgentController _agent, GunClass _gun)
+    public void OnCreate(float _damage, AgentController _agent, GunClass _gun, Ship _ship = null)
     {
         B_info.con_Gun = _gun;
         B_info.B_player = false;
         B_info.con_Agent = _agent;
+        B_info.con_Ship = _ship;
         OnCreate(_damage);
     }
     public virtual void OnCreate(float _damage)
@@ -104,6 +106,16 @@ public class Bullet : DamageSource
     public bool DamageObject(HitObject hitObject)
     {
         GameObject _parent = hitObject.GetParent();
+        if (B_info.con_Player != null)
+            if (_parent == B_info.con_Player.gameObject)
+                return false;
+        if (B_info.con_Agent != null)
+            if (_parent == B_info.con_Agent.gameObject)
+                return false;
+        if (B_info.con_Ship != null)
+            if (_parent == B_info.con_Ship.gameObject)
+                return false;
+
         if (hitObjects.Contains(_parent))
             return false;
         hitObjects.Add(_parent);

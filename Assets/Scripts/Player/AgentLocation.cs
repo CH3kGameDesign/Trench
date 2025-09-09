@@ -38,6 +38,12 @@ public class AgentLocation : MonoBehaviour
         }
     }
 
+    public void ClearRooms()
+    {
+        LGBS.Clear();
+        UpdateRoom();
+    }
+
     void UpdateRoom()
     {
         for (int i = LGBS.Count - 1; i >= 0; i--)

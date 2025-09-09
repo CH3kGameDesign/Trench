@@ -12,6 +12,8 @@ using UnityEngine;
     public Vector3 V3_camOffset = new Vector3(0, 0.5f, -6);
     [HideInInspector] public List<int> SeatInUse = new List<int>();
 
+    [HideInInspector] public float f_curHealth = 1000;
+    public int I_maxHealth = 1000;
     public enum seatTypeEnum { driver, passenger, none};
     [System.Serializable]
     public class seatClass
@@ -25,9 +27,13 @@ using UnityEngine;
 
     public virtual void Awake()
     {
-
+        SetHealth();
     }
 
+    void SetHealth()
+    {
+        f_curHealth = I_maxHealth;
+    }
     public override void OnInteract(BaseController _player)
     {
         for (int i = 0; i < Seats.Count; i++)
@@ -180,6 +186,11 @@ using UnityEngine;
         }
         return false;
     }
+    public bool DriverIsAgent()
+    {
+        AgentController _AC;
+        return DriverIsAgent(out _AC);
+    }
     public bool DriverIsMain()
     {
         PlayerController _PC;
@@ -201,6 +212,41 @@ using UnityEngine;
         }
         return false;
     }
+    public bool DriverIsAgent(out AgentController _AC)
+    {
+        _AC = null;
+        foreach (var seat in SeatInUse)
+        {
+            if (Seats[seat].seatType == seatTypeEnum.driver)
+            {
+                if (Seats[seat].BC_agent == null)
+                    return false;
+                if (Seats[seat].BC_agent is AgentController)
+                {
+                    _AC = Seats[seat].BC_agent as AgentController;
+                    return true;
+                }
+                else
+                    return false;
+            }
+        }
+        return false;
+    }
+    public bool GetDriver(out BaseController _BC)
+    {
+        _BC = null;
+        foreach (var seat in SeatInUse)
+        {
+            if (Seats[seat].seatType == seatTypeEnum.driver)
+            {
+                if (Seats[seat].BC_agent == null)
+                    return false;
+                _BC = Seats[seat].BC_agent;
+                return true;
+            }
+        }
+        return false;
+    }
 
     public virtual void RotLoop(bool yLoop, float _adjust)
     {
@@ -210,5 +256,13 @@ using UnityEngine;
     public virtual Vector3 GetLocalVelocity()
     {
         return Vector3.zero;
+    }
+    public virtual Vector3 GetVelocity()
+    {
+        return Vector3.zero;
+    }
+    public virtual float GetWeaponSpeed()
+    {
+        return 0f;
     }
 }
