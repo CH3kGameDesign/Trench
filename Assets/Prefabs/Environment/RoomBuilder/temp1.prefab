@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BlockType: 0
-  _name: temp1
+  _name: Closet
   icon: {fileID: 21300000, guid: 633bee248e40b9e47ba7853cab33c0a4, type: 3}
   layoutTexture: {fileID: 2800000, guid: 47d4f47891739774ea3e02e0463f53de, type: 3}
   size: {x: 2, y: 1}
@@ -71,6 +71,7 @@ MonoBehaviour:
   doors:
   - _pos: {x: 1, y: 0}
     _rot: 2
+    _entryType: 0
 --- !u!1 &225895668377393577
 GameObject:
   m_ObjectHideFlags: 0
@@ -219,7 +220,8 @@ MonoBehaviour:
   mf: {fileID: 6887751078680546582}
   mr: {fileID: 4126497795798805027}
   mc: {fileID: 4311593330423912667}
-  bc: {fileID: 5808589133495676168}
+  bc:
+  - {fileID: 0}
   RU: {fileID: 6453771081124441707}
   skirting:
     T: {fileID: 8450252627939504218}
@@ -1114,7 +1116,8 @@ MonoBehaviour:
   mf: {fileID: 5090786035852790659}
   mr: {fileID: 4660990323294539107}
   mc: {fileID: 9189049459131058668}
-  bc: {fileID: 1929318203380313217}
+  bc:
+  - {fileID: 0}
   RU: {fileID: 6453771081124441707}
   skirting:
     T: {fileID: 7737187902188262852}
@@ -1596,7 +1599,8 @@ MonoBehaviour:
   mf: {fileID: 6601345092458899288}
   mr: {fileID: 6284436418163515219}
   mc: {fileID: 39309002669190458}
-  bc: {fileID: 407848193554292900}
+  bc:
+  - {fileID: 0}
   RU: {fileID: 6453771081124441707}
   skirting:
     T: {fileID: 0}
@@ -1788,7 +1792,8 @@ MonoBehaviour:
   mf: {fileID: 7310125183304203761}
   mr: {fileID: 3265410607579202792}
   mc: {fileID: 9064645536402499883}
-  bc: {fileID: 1864520158025672356}
+  bc:
+  - {fileID: 0}
   RU: {fileID: 6453771081124441707}
   skirting:
     T: {fileID: 8212277027957566513}
@@ -3267,7 +3272,8 @@ MonoBehaviour:
   mf: {fileID: 5525351747911196182}
   mr: {fileID: 5327692243902470871}
   mc: {fileID: 8473147626659200597}
-  bc: {fileID: 554482299116250933}
+  bc:
+  - {fileID: 0}
   RU: {fileID: 6453771081124441707}
   skirting:
     T: {fileID: 0}
@@ -4077,6 +4083,8 @@ MonoBehaviour:
   G_frame: {fileID: 4257888399163779820}
   B_showFrame: 1
   B_connected: 0
+  B_validDoor: 1
+  LGD_connectedDoor: {fileID: 0}
 --- !u!114 &8795141093344115899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4273,7 +4281,8 @@ MonoBehaviour:
   mf: {fileID: 6578843367592713951}
   mr: {fileID: 3751863225661800475}
   mc: {fileID: 389321256034974027}
-  bc: {fileID: 2237130534461244732}
+  bc:
+  - {fileID: 0}
   RU: {fileID: 6453771081124441707}
   skirting:
     T: {fileID: 805632426821820328}

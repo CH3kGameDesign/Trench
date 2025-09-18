@@ -6,11 +6,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.AI.Navigation;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.WSA;
-using static Layout_Basic;
 using static Themes;
-using static UnityEditor.Experimental.GraphView.GraphView;
-using static UnityEngine.EventSystems.EventTrigger;
 
 
 public class LevelGen : MonoBehaviour

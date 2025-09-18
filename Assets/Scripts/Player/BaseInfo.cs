@@ -2,8 +2,6 @@ using PurrNet;
 using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEngine.GraphicsBuffer;
 
 public class BaseInfo : NetworkBehaviour
 {

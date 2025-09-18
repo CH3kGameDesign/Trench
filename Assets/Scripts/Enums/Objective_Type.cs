@@ -10,4 +10,9 @@ public enum Objective_Type
 	[Description ("Damage Enemies with Rod Gun")]	[InspectorName ("Damage/Rod")]	Damage_Rod,
 	[Description ("Damage Enemies with RPG")]	[InspectorName ("Damage/RPG")]	Damage_RPG,
 	[Description ("Damage Enemies with Explosions")]	[InspectorName ("Damage/Explosions")]	Damage_Explosions,
+	[Description ("Times Spotted")]	[InspectorName ("Stealth/Spotted")]	Stealth_Spotted,
+	[Description ("Times Fired")]	[InspectorName ("Shots/Fired")]	Shots_Fired,
+	[Description ("Times Fired")]	[InspectorName ("Damage/Taken")]	Damage_Taken,
+	[Description ("Revive Others")]	[InspectorName ("Revive/Others")]	Revive_Others,
+	[Description ("Times Killed")]	[InspectorName ("Kill/Self")]	Kill_Self,
 }

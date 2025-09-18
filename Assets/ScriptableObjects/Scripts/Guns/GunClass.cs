@@ -224,6 +224,7 @@ public class GunClass : ItemClass
         if (IsPlayer(out _PC))
         {
             _PC.reticle().RotateReticle(f_fireTimer);
+            _PC.Update_Objectives(Objective_Type.Shots_Fired, Mathf.Min(clipAmmo, i_burstRemaining));
             MusicHandler.AdjustVolume(MusicHandler.typeEnum.guitar, _fireVariables.fireRate / 4);
         }
         else

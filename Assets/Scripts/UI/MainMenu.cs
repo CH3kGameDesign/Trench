@@ -25,6 +25,7 @@ public class MainMenu : MonoBehaviour
     public panelRefClass settings;
     public storeRefClass store;
     public customizeLayoutRefClass customizeLayout;
+    public loadingLevelRefClass loadingLevel;
     [Space(10)]
     public inputRefClass input;
     [Space(10)]
@@ -353,6 +354,34 @@ public class MainMenu : MonoBehaviour
         public override void OnUpdate(PlayerController _PC)
         {
             layoutCustomize.OnUpdate(_PC);
+        }
+    }
+    [System.Serializable]
+    public class loadingLevelRefClass : panelRefClass
+    {
+        [Header("Prefabs")]
+        public GameObject PF_loadingEnv;
+        [Header("Text")]
+        public TextMeshProUGUI TM_area;
+        public TextMeshProUGUI TM_missionName;
+        public TextMeshProUGUI TM_missionDescription;
+        public TextMeshProUGUI TM_mainObjective;
+        public TextMeshProUGUI TM_sideObjective;
+        public TextMeshProUGUI TM_loadingText;
+        [Header("NameTags")]
+        public GameObject[] G_nameTags;
+        public TextMeshProUGUI[] TM_nameTags;
+        public override void Open(AnimCurve _curve, Vector3 v3_camMenuLocalPos, Quaternion q_camLastLocalRot, bool _move = true)
+        {
+            base.Open(_curve, v3_camMenuLocalPos, q_camLastLocalRot, _move);
+        }
+        public override void Close()
+        {
+            base.Close();
+        }
+        public override void OnUpdate(PlayerController _PC)
+        {
+            base.OnUpdate(_PC);
         }
     }
     [System.Serializable]

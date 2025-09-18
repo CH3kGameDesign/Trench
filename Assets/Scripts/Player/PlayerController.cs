@@ -7,7 +7,6 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class PlayerController : BaseController
 {
@@ -52,6 +51,90 @@ public class PlayerController : BaseController
 
         public Image I_shipHealth;
         public TextMeshProUGUI TM_shipHealth;
+    }
+
+    public StatClass Stats = new StatClass();
+    [System.Serializable]
+    public class StatClass
+    {
+        //Accuracy
+        public int shotsFired;//
+        public int shotsHit;//
+        public float GetAccuracy() { return (float)shotsHit / (float)shotsFired; }
+
+        //Damage
+        public int damageDealt;//
+        public int damageTaken;//
+        public int enemiesKilled;//
+        public int timesKilled;//
+
+        //Collection
+        public int moneyCollected;//
+        public int resourceCollected;//
+        public int bodiesCollected;//
+
+        //Time
+        public double timeStarted;//
+        public double timeEnded;//
+        public float GetRunTime()
+        {
+            double _timeEnded = Time.timeAsDouble;
+            if (timeEnded > 0)
+                _timeEnded = timeEnded;
+            return (float)(_timeEnded - timeStarted);
+        }
+
+        //Base Values
+        public void Setup()
+        {
+            timeStarted = Time.timeAsDouble;
+        }
+
+        public void UpdateStats(Objective_Type _type, int _amt)
+        {
+            switch (_type)
+            {
+                case Objective_Type.Kill_Any:
+                    enemiesKilled += _amt;
+                    break;
+                case Objective_Type.Kill_Self:
+                    timesKilled += _amt;
+                    break;
+                case Objective_Type.Collect_Value:
+                    moneyCollected += _amt;
+                    break;
+                case Objective_Type.Collect_Resource:
+                    resourceCollected += _amt;
+                    break;
+                case Objective_Type.Collect_Enemy:
+                    bodiesCollected += _amt;
+                    break;
+                case Objective_Type.Damage_Rifle:
+                    damageDealt += _amt;
+                    shotsHit += 1;
+                    break;
+                case Objective_Type.Damage_Rod:
+                    damageDealt += _amt;
+                    shotsHit += 1;
+                    break;
+                case Objective_Type.Damage_RPG:
+                    damageDealt += _amt;
+                    shotsHit += 1;
+                    break;
+                case Objective_Type.Damage_Explosions:
+                    damageDealt += _amt;
+                    break;
+                case Objective_Type.Shots_Fired:
+                    shotsFired += _amt;
+                    break;
+                case Objective_Type.Damage_Taken:
+                    damageTaken += _amt;
+                    break;
+                default:
+                    Debug.LogError("Missing Objective Type: " + _type.ToString());
+                    break;
+            }
+        }
     }
     [Header("UI")]
     public HealthUI PF_followerHealth;
@@ -266,6 +349,8 @@ public class PlayerController : BaseController
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             SetRecallPos();
+
+            Stats.Setup();
         }
     }
 
@@ -418,6 +503,8 @@ public class PlayerController : BaseController
 
     public override void Update_Objectives(Objective_Type _type, int _amt)
     {
+        Stats.UpdateStats(_type, _amt);
+
         bool _affected = false;
         foreach (var item in SaveData.objectives)
         {
@@ -433,6 +520,8 @@ public class PlayerController : BaseController
     }
     public override void Update_Objectives(Objective_Type _type, Resource_Type _resource, int _amt)
     {
+        Stats.UpdateStats(_type, _amt);
+
         bool _affected = false;
         foreach (var item in SaveData.objectives)
         {
@@ -1429,6 +1518,7 @@ public class PlayerController : BaseController
         }
 
         info.Hurt(_bullet.F_damage);
+        Update_Objectives(Objective_Type.Damage_Taken, Mathf.RoundToInt(_bullet.F_damage));
 
         AggroAllies(_bullet);
         AH_agentAudioHolder.Play(AgentAudioHolder.type.hurt);
@@ -1613,6 +1703,9 @@ public class PlayerController : BaseController
 
         if (gun_Equipped != null)
             gun_Equipped.OnUnEquip();
+
+
+        Update_Objectives(Objective_Type.Kill_Self, 1);
 
         Ref.speedLines.SetMaskActive(false);
         AH_agentAudioHolder.Play(AgentAudioHolder.type.death);
