@@ -1,11 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-using DG.Tweening;
-using Unity.VisualScripting;
-
-
-
+using System.Linq;
 
 #if UNITY_EDITOR
 using System.IO;
@@ -17,6 +13,8 @@ public class Objective : ScriptableObject
 {
     public static Objective Instance;
     public List<objectiveClass> list = new List<objectiveClass>();
+
+    public List<Mission> missionList = new List<Mission>();
     [System.Serializable]
     public class objectiveClass
     {
@@ -60,6 +58,10 @@ public class Objective : ScriptableObject
             _temp.total = total;
             _temp.completed = false;
             return _temp;
+        }
+        public objectiveClass Clone()
+        {
+            return Clone(Objective.Instance);
         }
     }
     public List<objectiveType> types = new List<objectiveType>();
@@ -114,7 +116,38 @@ public class Objective : ScriptableObject
         PlayerManager.main.AH_agentAudioHolder.Play(AgentAudioHolder.type.objectiveGain);
     }
 
+    public Mission GetMission(int _id) { return missionList[_id]; }
+
 #if UNITY_EDITOR
+    [ContextMenu("Tools/Update")]
+    public void Update()
+    {
+        CollectMissions();
+        GenerateEnum();
+    }
+
+    public void CollectMissions()
+    {
+        string mainPath = Application.dataPath + "/ScriptableObjects/Missions/";
+        string[] filePaths = Directory.GetFiles(mainPath, "*.asset",
+                                         SearchOption.AllDirectories);
+        missionList.Clear();
+        int i = 0;
+        foreach (var path in filePaths)
+        {
+            string _path = "Assets" + path.Substring(Application.dataPath.Length);
+            Mission _temp = (Mission)AssetDatabase.LoadAssetAtPath(_path, typeof(Mission));
+            if (_temp != null)
+            {
+                missionList.Add(_temp);
+                _temp._id = i;
+                EditorUtility.SetDirty(_temp);
+                i++;
+            }
+        }
+        EditorUtility.SetDirty(this);
+    }
+
     [ContextMenu("Tools/GenerateEnum")]
     public void GenerateEnum()
     {

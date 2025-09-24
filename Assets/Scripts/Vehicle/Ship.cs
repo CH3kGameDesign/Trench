@@ -534,10 +534,10 @@ public class Ship : Vehicle
         _target *= Quaternion.Inverse(T_pilotSeat.rotation);
         _target =  _target * transform.rotation;
         float _angle = Vector3.Distance(_tarRot, _curRot);
-        float f_turnAmount = 0;
+
         if (_angle > F_turnDeadzone.x)
         {
-            f_turnAmount = _angle - F_turnDeadzone.x;
+            float f_turnAmount = _angle - F_turnDeadzone.x;
             f_turnAmount /= F_turnDeadzone.y - F_turnDeadzone.x;
             tarRotation = Quaternion.RotateTowards(tarRotation, _target, _angle * f_turnAmount);
             _curRot = Vector3.MoveTowards(_curRot, _tarRot, _angle * f_turnAmount);
@@ -546,7 +546,8 @@ public class Ship : Vehicle
         Quaternion _rotation = Quaternion.Slerp(transform.rotation, tarRotation, Time.fixedDeltaTime * steeringSpeed);
         _player.UpdateVehicleReticle(_curRot);
         transform.rotation = _rotation;
-        return f_turnAmount;
+
+        return Mathf.Lerp(0.3f, 1f, Mathf.Log10(_angle / F_turnDeadzone.x));
     }
 
     public override void RotLoop(bool yLoop, float _adjust)

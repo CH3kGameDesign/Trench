@@ -181,7 +181,7 @@ public class BaseController : NetworkBehaviour
         base.OnDestroy();
     }
 
-    public virtual void OnHit(GunManager.bulletClass _bullet)
+    public virtual void OnHit(GunManager.bulletClass _bullet, DamageSource _source = null, HitObject _limb = null)
     {
         
     }

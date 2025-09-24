@@ -41,7 +41,7 @@ public class MainMenu : MonoBehaviour
     public GameObject PF_equipParticle;
 
     private panelEnum openedPanel = panelEnum.main;
-    public enum panelEnum { main, customize, store, load, settings, customizeLayout}
+    public enum panelEnum { main, customize, store, load, settings, customizeLayout, loadLevel}
 
     [System.Serializable]
     public class panelRefClass
@@ -361,6 +361,7 @@ public class MainMenu : MonoBehaviour
     {
         [Header("Prefabs")]
         public GameObject PF_loadingEnv;
+        [HideInInspector] public GameObject G_loadedEnv = null;
         [Header("Text")]
         public TextMeshProUGUI TM_area;
         public TextMeshProUGUI TM_missionName;
@@ -373,15 +374,41 @@ public class MainMenu : MonoBehaviour
         public TextMeshProUGUI[] TM_nameTags;
         public override void Open(AnimCurve _curve, Vector3 v3_camMenuLocalPos, Quaternion q_camLastLocalRot, bool _move = true)
         {
+            if (G_loadedEnv != null)
+                Destroy(G_loadedEnv);
+            G_loadedEnv = Instantiate(PF_loadingEnv, Vector3.down * 1000, Quaternion.identity);
+
+
+
             base.Open(_curve, v3_camMenuLocalPos, q_camLastLocalRot, _move);
         }
         public override void Close()
         {
+            if (G_loadedEnv != null)
+                Destroy(G_loadedEnv);
             base.Close();
         }
         public override void OnUpdate(PlayerController _PC)
         {
             base.OnUpdate(_PC);
+        }
+        public void SetNames(string[] _names)
+        {
+            //Reorder to match seating if applicable
+            if (_names.Length >= 3)
+            {
+                string _temp = _names[2];
+                _names[2] = _names[1];
+                _names[1] = _temp;
+            }
+            //Show Names
+            for (int i = 0; i < TM_nameTags.Length; i++)
+            {
+                bool _valid = i < _names.Length;
+                G_nameTags[i].SetActive(_valid);
+                if (!_valid) continue;
+                TM_nameTags[i].text = _names[i];
+            }
         }
     }
     [System.Serializable]
@@ -402,6 +429,7 @@ public class MainMenu : MonoBehaviour
         if (store != GO) store.Close();
         if (settings != GO) settings.Close();
         if (customizeLayout != GO) customizeLayout.Close();
+        if (loadingLevel != GO) loadingLevel.Close();
 
         GO.Open(AC_smooth, v3_camMenuLocalPos, q_camLastLocalRot);
 
@@ -551,6 +579,7 @@ public class MainMenu : MonoBehaviour
             case panelEnum.load: Open(load); break;
             case panelEnum.settings: Open(settings); break;
             case panelEnum.customizeLayout: Open(customizeLayout); break;
+            case panelEnum.loadLevel: LoadLevel(); break;
             default: Open(main); break;
         }
     }
@@ -572,6 +601,12 @@ public class MainMenu : MonoBehaviour
 
         _prevGameState = PlayerManager.main.GameState;
         PlayerManager.main.GameState_Change(PlayerController.gameStateEnum.menu);
+    }
+    public void LoadLevel()
+    {
+        loadingLevel.UpdateCurrency(SaveData.i_currency);
+        loadingLevel._anim.Play("Open");
+        loadingLevel.Open(AC_smooth, v3_camMenuLocalPos, q_camLastLocalRot, false);
     }
     public void Close()
     {

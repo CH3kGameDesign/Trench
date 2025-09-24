@@ -54,10 +54,24 @@ public class LevelGen_Holder : NetworkBehaviour
         theme.onChanged += Setup;
         lastLandingSpot.onChanged += Setup;
         I_value.onChanged += I_valueChanged;
+    }
 
+    private void Start()
+    {
+        ShowLoadingScreen();
+    }
 
-        CG_loadingScreen.gameObject.SetActive(true);
-        CG_loadingScreen.alpha = 1;
+    void ShowLoadingScreen()
+    {
+        if (SaveData.missionCurrent == null)
+        {
+            CG_loadingScreen.gameObject.SetActive(true);
+            CG_loadingScreen.alpha = 1;
+        }
+        else
+        {
+            MainMenu.Instance.Open(MainMenu.panelEnum.loadLevel);
+        }
     }
 
     private void FixedUpdate()
@@ -78,6 +92,7 @@ public class LevelGen_Holder : NetworkBehaviour
         }
         base.OnSpawned();
     }
+
     protected override void OnDestroy()
     {
         Transforms.onChanged -= UpdateNetworkTransforms;
@@ -112,9 +127,13 @@ public class LevelGen_Holder : NetworkBehaviour
     }
 
     [ObserversRpc]
-    public static void LoadTheme(Themes.themeEnum _theme)
+    public static void LoadTheme(Themes.themeEnum _theme, int _mission = -1)
     {
         SaveData.themeCurrent = _theme;
+        if (_mission == -1)
+            SaveData.missionCurrent = null;
+        else
+            SaveData.missionCurrent = Objective.Instance.GetMission(_mission).Clone();
         SaveData.i_currency += Instance.GetCollectedValue();
         SceneManager.LoadScene(1);
     }
@@ -320,6 +339,7 @@ public class LevelGen_Holder : NetworkBehaviour
 
     IEnumerator FadeLoadingScreen(float _dur = 1f)
     {
+        MainMenu.Instance.loadingLevel.Close();
         float _timer = 0f;
         while (_timer < 1f)
         {

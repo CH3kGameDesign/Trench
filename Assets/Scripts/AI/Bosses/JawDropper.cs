@@ -32,9 +32,9 @@ public class JawDropper : AgentController
             AssignSlider(EnemyTimer.Instance.S_healthSlider);
     }
 
-    public override void OnHit(GunManager.bulletClass _bullet)
+    public override void OnHit(GunManager.bulletClass _bullet, DamageSource _source = null, HitObject _limb = null)
     {
-        base.OnHit(_bullet);
+        base.OnHit(_bullet, _source, _limb);
         if (spawnEnemies == null && isController)
             spawnEnemies = StartCoroutine(SpawnEnemies());
     }

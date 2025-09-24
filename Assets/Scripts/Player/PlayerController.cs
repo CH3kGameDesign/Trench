@@ -51,6 +51,10 @@ public class PlayerController : BaseController
 
         public Image I_shipHealth;
         public TextMeshProUGUI TM_shipHealth;
+
+        public Canvas C_canvas;
+        public SS_MessageObject PF_killMarkerWorld;
+        public RectTransform RT_messageHolder_All;
     }
 
     public StatClass Stats = new StatClass();
@@ -818,12 +822,15 @@ public class PlayerController : BaseController
                 StopCoroutine(C_idleAnim);
                 C_idleAnim = null;
             }
+            v3_camDir.z = -Inputs.v2_inputDir.x * 5;
         }
         else
         {
             if (C_idleAnim == null && !Inputs.IsInput())
                 C_idleAnim = StartCoroutine(Idle_Anim());
             b_isMoving = false;
+
+            v3_camDir.z = 0;
             SprintStop();
         }
     }
@@ -1228,6 +1235,8 @@ public class PlayerController : BaseController
         else if (b_isSprinting) _mult *= F_camSprintRotSpeed;
         else _mult *= F_camRotSpeed;
         if (AutoAim()) _mult *= autoAim.slowMultiplier;
+
+        _mult *= _mult2;
         v3_camDir += new Vector3(-Inputs.v2_camInputDir.y, 0, 0) * _mult * f_camSensitivity;
         if (_clampXDir)
             v3_camDir.x = Mathf.Clamp(v3_camDir.x, -80, 80);
@@ -1499,7 +1508,7 @@ public class PlayerController : BaseController
             PlayerManager.conversation.MoveDialogueChoice(1);
     }
 
-    public override void OnHit(GunManager.bulletClass _bullet)
+    public override void OnHit(GunManager.bulletClass _bullet, DamageSource _source = null, HitObject _limb = null)
     {
         if (_bullet.con_Player == this && !_bullet.D_damageType.isSelfHittable())
             return;
@@ -1693,6 +1702,13 @@ public class PlayerController : BaseController
         Update_Objectives(Objective_Type.Kill_Any, 1);
         if (_player)
             reticle.Kill();
+    }
+
+    public void KillMarker_World(Vector3 _pos, Transform _holder)
+    {
+        SS_MessageObject _temp = Instantiate(Ref.PF_killMarkerWorld, Ref.RT_messageHolder_All);
+        _temp.Setup(_holder, Ref.C_canvas, _pos - _holder.transform.position);
+        Destroy(_temp.gameObject, 2f);
     }
 
     public override void OnDeath()
@@ -1904,6 +1920,7 @@ public class PlayerController : BaseController
                 Inputs.playerInput.SwitchCurrentActionMap("Base");
                 break;
         }
+        v3_camDir.z = 0;
         GameState = _state;
         Setup_InteractStrings();
     }

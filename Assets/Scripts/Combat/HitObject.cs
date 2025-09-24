@@ -12,8 +12,8 @@ public class HitObject : MonoBehaviour
 
     public GameObject PF_hitParticles;
 
-    public UnityEvent<GunManager.bulletClass, DamageSource> UE_OnHit;
-    public UnityEvent<GunManager.bulletClass, DamageSource> UE_OnDestroy;
+    public UnityEvent<GunManager.bulletClass, DamageSource, HitObject> UE_OnHit;
+    public UnityEvent<GunManager.bulletClass, DamageSource, HitObject> UE_OnDestroy;
 
     public List<damageTypeEnum> ignoreDamageType = new List<damageTypeEnum>();
     public enum damageTypeEnum { all, bullet, fire, explosive};
@@ -31,7 +31,7 @@ public class HitObject : MonoBehaviour
     {
         if (!ignoreDamageType.Contains(_bullet.D_damageType))
         {
-            UE_OnHit.Invoke(_bullet, _source);
+            UE_OnHit.Invoke(_bullet, _source, this);
             if (B_useHealth)
                 f_health -= _bullet.F_damage;
             if (f_health <= 0)
@@ -40,7 +40,7 @@ public class HitObject : MonoBehaviour
     }
     private void Destroy(GunManager.bulletClass _bullet, DamageSource _source = null)
     {
-        UE_OnDestroy.Invoke(_bullet, _source);
+        UE_OnDestroy.Invoke(_bullet, _source, this);
     }    
     public GameObject GetParent()
     {

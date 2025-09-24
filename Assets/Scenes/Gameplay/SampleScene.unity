@@ -826,6 +826,7 @@ MonoBehaviour:
     _ownerAuth: 0
     _sendIntervalInSeconds: 0
   CG_loadingScreen: {fileID: 276529876}
+  DEBUG_MISSION: {fileID: 11400000, guid: 2a2fbc94a7dcc634c80e58a70e8b4a8f, type: 2}
   I_maxDecals: 100
   isReady: 0
 --- !u!1 &137500816
@@ -6939,6 +6940,7 @@ MonoBehaviour:
     _backButton: {fileID: 0}
     cursorVisible: 1
     PF_loadingEnv: {fileID: 2399033753751973241, guid: 47115274efa8d6440b26402f51aec74e, type: 3}
+    G_loadedEnv: {fileID: 0}
     TM_area: {fileID: 210619533}
     TM_missionName: {fileID: 2122866583}
     TM_missionDescription: {fileID: 647861202}
@@ -18981,7 +18983,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 804884407}
   m_HandleRect: {fileID: 804884406}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

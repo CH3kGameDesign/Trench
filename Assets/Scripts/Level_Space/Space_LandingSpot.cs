@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using PurrNet;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -12,6 +14,9 @@ public class Space_LandingSpot : MonoBehaviour
     public SS_MessageObject PF_message;
     public Sprite S_sprite;
     private SS_MessageObject _activeMessage;
+    [Space(10)]
+    public List<Mission> missionList = new List<Mission>();
+    private Mission selMission;
 
     public void OnTriggerEnter(Collider other)
     {
@@ -41,12 +46,14 @@ public class Space_LandingSpot : MonoBehaviour
                 break;
         }
         _player.info.Land(landingID);
-        LevelGen_Holder.LoadTheme(_theme);
+        LevelGen_Holder.LoadTheme(_theme, selMission._id);
     }
 
     protected void Start()
     {
         PlayerManager.Instance.CheckMain(SetupMessage);
+        if (missionList.Count > 0)
+            selMission = missionList.GetRandom().Clone();
     }
     void SetupMessage()
     {

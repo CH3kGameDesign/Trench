@@ -644,7 +644,7 @@ public class AgentController : BaseController
 
     }
 
-    public override void OnHit(GunManager.bulletClass _bullet)
+    public override void OnHit(GunManager.bulletClass _bullet, DamageSource _source = null, HitObject _limb = null)
     {
         if (!info.b_alive)
             return;
@@ -709,7 +709,7 @@ public class AgentController : BaseController
 
         info.Hurt(_bullet.F_damage);
         if (info.F_curHealth <= 0)
-            OnDeath(_bullet);
+            OnDeath(_bullet, _source, _limb);
         else
             AH_agentAudioHolder.Play(AgentAudioHolder.type.hurt);
         HealthUpdate();
@@ -730,7 +730,7 @@ public class AgentController : BaseController
         }
     }
 
-    public void OnDeath(GunManager.bulletClass _bullet)
+    public void OnDeath(GunManager.bulletClass _bullet, DamageSource _source = null, HitObject _limb = null)
     {
         if (_bullet.B_player)
         {
@@ -743,6 +743,7 @@ public class AgentController : BaseController
                 _group.relationship.chaotic += 10;
             }
             _bullet.con_Player.OnKill(this, true);
+            _bullet.con_Player.KillMarker_World(_source.transform.position, _limb.transform);
         }
         else
         {

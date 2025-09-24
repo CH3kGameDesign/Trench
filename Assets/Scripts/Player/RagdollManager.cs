@@ -133,12 +133,12 @@ public class RagdollManager : NetworkBehaviour
             item.gameObject.layer = _layerNum;
         }
     }
-    public void OnHit(GunManager.bulletClass _bullet, DamageSource _source = null)
+    public void OnHit(GunManager.bulletClass _bullet, DamageSource _source = null, HitObject _limb = null)
     {
         if (!PrevDamageSpurces.Contains(_source) || _source == null)
         {
             if (controller != null)
-                controller.OnHit(_bullet);
+                controller.OnHit(_bullet, _source, _limb);
             AddSource(_source);
         }
     }

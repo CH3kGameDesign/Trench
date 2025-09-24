@@ -8,9 +8,9 @@ public class Objective_Editor : Editor
     {
         Objective myTarget = (Objective)target;
         DrawDefaultInspector();
-        if (GUILayout.Button("Generate Enum"))
+        if (GUILayout.Button("Update"))
         {
-            myTarget.GenerateEnum();
+            myTarget.Update();
         }
     }
 }

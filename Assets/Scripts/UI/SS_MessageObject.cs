@@ -18,6 +18,8 @@ public class SS_MessageObject : MonoBehaviour
 
     private Vehicle v_vehicle;
 
+    private Vector3 v3_offset = Vector3.zero;
+
     [System.Serializable]
     public class messageObjectClass
     {
@@ -80,7 +82,7 @@ public class SS_MessageObject : MonoBehaviour
     {
         if (t_target == null)
             return;
-        if (rect.FollowObject(c_canvas, t_target) && offscreenObject.G_holder != null)
+        if (rect.FollowObject(c_canvas, t_target.position + v3_offset) && offscreenObject.G_holder != null)
         {
             mainObject.Show(false);
             offscreenObject.Show(true);
@@ -133,5 +135,19 @@ public class SS_MessageObject : MonoBehaviour
 
         mainObject.Setup(_sprite, _name, _showDistance, _vehicle);
         offscreenObject.Setup(_sprite, _name, _showDistance, _vehicle);
+    }
+
+    public void Setup(Transform _target, Canvas _canvas, Vector3? _offset = null)
+    {
+        if (_offset != null)
+            v3_offset = _offset.Value;
+
+        showDistance = false;
+
+        rect = GetComponent<RectTransform>();
+        c_canvas = _canvas;
+        t_target = _target;
+        t_player = PlayerManager.main.RB.transform;
+        v_vehicle = null;
     }
 }
