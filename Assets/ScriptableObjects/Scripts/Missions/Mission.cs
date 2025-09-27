@@ -11,6 +11,8 @@ public class Mission : ScriptableObject
     public Sprite _sprite;
     [Space(10)]
     public List<stepClass> _steps = new List<stepClass>();
+    [Space(10)]
+    public objectiveClass _sideObjective = new objectiveClass();
     [System.Serializable]
     public class stepClass
     {
@@ -25,7 +27,7 @@ public class Mission : ScriptableObject
     }
     public Mission Clone()
     {
-        Mission _temp = new Mission();
+        Mission _temp = CreateInstance<Mission>();
         _temp._name = _name;
         _temp._description = _description;
         _temp._sprite = _sprite;
@@ -33,6 +35,7 @@ public class Mission : ScriptableObject
         _temp._steps = new List<stepClass>();
         foreach (var step in _steps)
             _temp._steps.Add(step.Clone());
+        _temp._sideObjective = _sideObjective.Clone();
 
         return _temp;
     }

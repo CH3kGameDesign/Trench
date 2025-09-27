@@ -43,6 +43,10 @@ public static class CKUtil
         _temp += seconds.ToString();
         return _temp;
     }
+    public static string ToString_Duration(this float _value)
+    {
+        return Mathf.FloorToInt(_value).ToString_Duration();
+    }
 
     public static string ToString_Distance(this float _value)
     {

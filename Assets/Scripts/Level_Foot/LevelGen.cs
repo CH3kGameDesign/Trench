@@ -349,8 +349,10 @@ public class LevelGen : MonoBehaviour
         List<Transform> spawnPoints = new List<Transform>();
         foreach (var item in LG_Blocks)
         {
+            if (item == null) continue;
             foreach (var spawn in item.LGS_Spawns)
             {
+                if (spawn == null) continue;
                 switch (spawn.spawnType)
                 {
                     case LevelGen_Spawn.spawnTypeEnum.player:

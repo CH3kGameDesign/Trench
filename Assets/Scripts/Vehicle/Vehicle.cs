@@ -10,6 +10,7 @@ using UnityEngine;
     public List<seatClass> Seats = new List<seatClass>();
     public Transform T_camHook;
     public Vector3 V3_camOffset = new Vector3(0, 0.5f, -6);
+    public float F_camRotSpeed = 120f;
     [HideInInspector] public List<int> SeatInUse = new List<int>();
 
     [HideInInspector] public float f_curHealth = 1000;
@@ -147,6 +148,11 @@ using UnityEngine;
         Seats[_num].BC_agent.ChangeState(Seats[_num].prevState);
         Seats[_num].BC_agent.V_curVehicle = null;
         Seats[_num].BC_agent = null;
+    }
+
+    public virtual Quaternion GetRotation()
+    {
+        return transform.rotation;
     }
 
     int Seat_GetOpen()

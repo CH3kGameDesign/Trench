@@ -441,7 +441,7 @@ public class Ship : Vehicle
     }
     void FixedUpdateDriver_Player(PlayerController _player)
     {
-        _player.F_vehicleCamMult = Update_Rotation(_player);
+        Update_Rotation(_player);
         _player.UpdateVehicleUI(Vector3.Magnitude(GetLocalVelocity()), maxThrottleBarSpeed);
     }
     void FixedUpdateDriver_Agent(AgentController _agent)
@@ -534,10 +534,10 @@ public class Ship : Vehicle
         _target *= Quaternion.Inverse(T_pilotSeat.rotation);
         _target =  _target * transform.rotation;
         float _angle = Vector3.Distance(_tarRot, _curRot);
-
+        float f_turnAmount = 0;
         if (_angle > F_turnDeadzone.x)
         {
-            float f_turnAmount = _angle - F_turnDeadzone.x;
+            f_turnAmount = _angle - F_turnDeadzone.x;
             f_turnAmount /= F_turnDeadzone.y - F_turnDeadzone.x;
             tarRotation = Quaternion.RotateTowards(tarRotation, _target, _angle * f_turnAmount);
             _curRot = Vector3.MoveTowards(_curRot, _tarRot, _angle * f_turnAmount);
@@ -547,7 +547,12 @@ public class Ship : Vehicle
         _player.UpdateVehicleReticle(_curRot);
         transform.rotation = _rotation;
 
-        return Mathf.Lerp(0.3f, 1f, Mathf.Log10(_angle / F_turnDeadzone.x));
+        return f_turnAmount;
+    }
+
+    public override Quaternion GetRotation()
+    {
+        return T_pilotSeat.rotation;
     }
 
     public override void RotLoop(bool yLoop, float _adjust)
@@ -966,7 +971,7 @@ public class Ship : Vehicle
 
     }
 
-    public void OnHit(GunManager.bulletClass _bullet, DamageSource _source = null)
+    public void OnHit(GunManager.bulletClass _bullet, DamageSource _source = null, HitObject _limb = null)
     {
         if (_bullet.B_player)
             AIVar.ChangeState(this, agentBehaviourEnum.attack);

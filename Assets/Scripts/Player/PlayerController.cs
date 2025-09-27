@@ -153,8 +153,6 @@ public class PlayerController : BaseController
     public float F_camAimRotSpeed = 80f;
     public float F_camSprintRotSpeed = 80f;
 
-    [HideInInspector] public float F_vehicleCamMult = 1f;
-
     float f_camSensitivity = 1f;
 
     private float f_camDistance = 5;
@@ -671,7 +669,7 @@ public class PlayerController : BaseController
     void FixedUpdate_Vehicle()
     {
         V_curVehicle.OnFixedUpdate(this);
-        CamMovement(true, F_vehicleCamMult, false);
+        CamMovement(true, true);
     }
 
     void FixedUpdate_Active()
@@ -1221,7 +1219,7 @@ public class PlayerController : BaseController
     }
 
     Quaternion _lastOffset = Quaternion.identity;
-    void CamMovement(bool _fixedDelta = false, float _mult2 = 1, bool _clampXDir = true)
+    void CamMovement(bool _fixedDelta = false, bool _inSpaceVehicle = false)
     {
         float _delta = _fixedDelta ?
             Time.fixedDeltaTime : Time.deltaTime;
@@ -1231,14 +1229,11 @@ public class PlayerController : BaseController
             return;
         }
         float _mult = Time.deltaTime;
-        if (Inputs.b_aiming) _mult *= F_camAimRotSpeed;
-        else if (b_isSprinting) _mult *= F_camSprintRotSpeed;
-        else _mult *= F_camRotSpeed;
+        _mult *= GetCamRotSpeed();
         if (AutoAim()) _mult *= autoAim.slowMultiplier;
 
-        _mult *= _mult2;
         v3_camDir += new Vector3(-Inputs.v2_camInputDir.y, 0, 0) * _mult * f_camSensitivity;
-        if (_clampXDir)
+        if (!_inSpaceVehicle)
             v3_camDir.x = Mathf.Clamp(v3_camDir.x, -80, 80);
         else
         {
@@ -1259,10 +1254,11 @@ public class PlayerController : BaseController
         }
 
         //Canvas Pivot
-        Ref.V3_canvasRot += new Vector3(Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0);
+        if (!_inSpaceVehicle)
+            Ref.V3_canvasRot += new Vector3(Inputs.v2_camInputDir.y, Inputs.v2_camInputDir.x, 0);
 
-        //Correct For When Upside Down
-        float yCamDir = Inputs.v2_camInputDir.x;
+            //Correct For When Upside Down
+            float yCamDir = Inputs.v2_camInputDir.x;
         if (v3_camDir.x > 90 || v3_camDir.x < -90)
             yCamDir = -yCamDir;
         v3_camDir += new Vector3(0, yCamDir, 0) * _mult * f_camSensitivity;
@@ -1285,8 +1281,18 @@ public class PlayerController : BaseController
             if (V_curVehicle != null)
                 V_curVehicle.RotLoop(true, 360);
         }
+        if (!_inSpaceVehicle)
+            T_camHolder.transform.rotation = Quaternion.Lerp(T_camHolder.transform.rotation, Quaternion.Euler(v3_camDir), _delta * 10);
+        else
+            T_camHolder.transform.rotation = V_curVehicle.GetRotation();
+    }
 
-        T_camHolder.transform.rotation = Quaternion.Lerp(T_camHolder.transform.rotation, Quaternion.Euler(v3_camDir), _delta * 10);
+    float GetCamRotSpeed()
+    {
+        if (V_curVehicle != null) return V_curVehicle.F_camRotSpeed;
+        if (Inputs.b_aiming) return F_camAimRotSpeed;
+        if (b_isSprinting) return F_camSprintRotSpeed;
+        return F_camRotSpeed;
     }
 
     bool AutoAim()
@@ -1704,10 +1710,10 @@ public class PlayerController : BaseController
             reticle.Kill();
     }
 
-    public void KillMarker_World(Vector3 _pos, Transform _holder)
+    public void KillMarker_World(Transform _holder)
     {
         SS_MessageObject _temp = Instantiate(Ref.PF_killMarkerWorld, Ref.RT_messageHolder_All);
-        _temp.Setup(_holder, Ref.C_canvas, _pos - _holder.transform.position);
+        _temp.Setup(_holder, Ref.C_canvas);
         Destroy(_temp.gameObject, 2f);
     }
 
@@ -1891,7 +1897,6 @@ public class PlayerController : BaseController
                 break;
             case stateEnum.vehicle:
                 StartCoroutine(Ref.CG_spaceFlight.Fade(false));
-                F_vehicleCamMult = 1f;
                 break;
             default:
                 break;

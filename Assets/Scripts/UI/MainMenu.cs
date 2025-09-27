@@ -26,6 +26,7 @@ public class MainMenu : MonoBehaviour
     public storeRefClass store;
     public customizeLayoutRefClass customizeLayout;
     public loadingLevelRefClass loadingLevel;
+    public endLevelRefClass endLevel;
     [Space(10)]
     public inputRefClass input;
     [Space(10)]
@@ -41,7 +42,7 @@ public class MainMenu : MonoBehaviour
     public GameObject PF_equipParticle;
 
     private panelEnum openedPanel = panelEnum.main;
-    public enum panelEnum { main, customize, store, load, settings, customizeLayout, loadLevel}
+    public enum panelEnum { main, customize, store, load, settings, customizeLayout, loadLevel, endLevel}
 
     [System.Serializable]
     public class panelRefClass
@@ -370,14 +371,13 @@ public class MainMenu : MonoBehaviour
         public TextMeshProUGUI TM_sideObjective;
         public TextMeshProUGUI TM_loadingText;
         [Header("NameTags")]
-        public GameObject[] G_nameTags;
-        public TextMeshProUGUI[] TM_nameTags;
+        public UI_NameTag[] UI_nameTags;
         public override void Open(AnimCurve _curve, Vector3 v3_camMenuLocalPos, Quaternion q_camLastLocalRot, bool _move = true)
         {
             if (G_loadedEnv != null)
                 Destroy(G_loadedEnv);
             G_loadedEnv = Instantiate(PF_loadingEnv, Vector3.down * 1000, Quaternion.identity);
-
+            SetMissionText();
 
 
             base.Open(_curve, v3_camMenuLocalPos, q_camLastLocalRot, _move);
@@ -392,6 +392,16 @@ public class MainMenu : MonoBehaviour
         {
             base.OnUpdate(_PC);
         }
+        void SetMissionText()
+        {
+            Mission _mission = SaveData.missionCurrent;
+            if (_mission == null) return;
+
+            TM_missionName.text = _mission._name;
+            TM_missionDescription.text = _mission._description;
+            TM_mainObjective.text = _mission._steps[0]._objective.GetDescription_Long();
+            TM_sideObjective.text = _mission._sideObjective.GetDescription_Long();
+        }
         public void SetNames(string[] _names)
         {
             //Reorder to match seating if applicable
@@ -402,12 +412,79 @@ public class MainMenu : MonoBehaviour
                 _names[1] = _temp;
             }
             //Show Names
-            for (int i = 0; i < TM_nameTags.Length; i++)
+            for (int i = 0; i < UI_nameTags.Length; i++)
             {
                 bool _valid = i < _names.Length;
-                G_nameTags[i].SetActive(_valid);
+                UI_nameTags[i].gameObject.SetActive(_valid);
                 if (!_valid) continue;
-                TM_nameTags[i].text = _names[i];
+                UI_nameTags[i].Setup(_names[i]);
+            }
+        }
+    }
+    [System.Serializable]
+    public class endLevelRefClass : panelRefClass
+    {
+        [Header("Prefabs")]
+        public GameObject PF_loadingEnv;
+        [HideInInspector] public GameObject G_loadedEnv = null;
+        [Header("Text")]
+        public TextMeshProUGUI TM_area;
+        public TextMeshProUGUI TM_missionName;
+        public TextMeshProUGUI TM_mainObjective;
+        public TextMeshProUGUI TM_sideObjective;
+        public TextMeshProUGUI TM_loadingText;
+        public TextMeshProUGUI TM_timerText;
+        [Header("Images")]
+        public Image I_missionIcon;
+        public GameObject G_missionFailedIcon;
+        [Header("NameTags")]
+        public UI_NameTag[] UI_nameTags;
+        public override void Open(AnimCurve _curve, Vector3 v3_camMenuLocalPos, Quaternion q_camLastLocalRot, bool _move = true)
+        {
+            if (G_loadedEnv != null)
+                Destroy(G_loadedEnv);
+            G_loadedEnv = Instantiate(PF_loadingEnv, Vector3.down * 1000, Quaternion.identity);
+            SetMissionText();
+
+
+            base.Open(_curve, v3_camMenuLocalPos, q_camLastLocalRot, _move);
+        }
+        public override void Close()
+        {
+            if (G_loadedEnv != null)
+                Destroy(G_loadedEnv);
+            base.Close();
+        }
+        public override void OnUpdate(PlayerController _PC)
+        {
+            base.OnUpdate(_PC);
+        }
+        void SetMissionText()
+        {
+            Mission _mission = SaveData.missionCurrent;
+            if (_mission == null) return;
+
+            TM_missionName.text = _mission._name;
+            TM_timerText.text = PlayerManager.main.Stats.GetRunTime().ToString_Duration();
+            TM_mainObjective.text = _mission._steps[0]._objective.GetDescription_Long();
+            TM_sideObjective.text = _mission._sideObjective.GetDescription_Long();
+        }
+        public void SetNames(string[] _names)
+        {
+            //Reorder to match seating if applicable
+            if (_names.Length >= 3)
+            {
+                string _temp = _names[2];
+                _names[2] = _names[1];
+                _names[1] = _temp;
+            }
+            //Show Names
+            for (int i = 0; i < UI_nameTags.Length; i++)
+            {
+                bool _valid = i < _names.Length;
+                UI_nameTags[i].gameObject.SetActive(_valid);
+                if (!_valid) continue;
+                UI_nameTags[i].Setup(_names[i]);
             }
         }
     }
@@ -580,6 +657,7 @@ public class MainMenu : MonoBehaviour
             case panelEnum.settings: Open(settings); break;
             case panelEnum.customizeLayout: Open(customizeLayout); break;
             case panelEnum.loadLevel: LoadLevel(); break;
+            case panelEnum.endLevel: LoadEndLevel(); break;
             default: Open(main); break;
         }
     }
@@ -607,6 +685,12 @@ public class MainMenu : MonoBehaviour
         loadingLevel.UpdateCurrency(SaveData.i_currency);
         loadingLevel._anim.Play("Open");
         loadingLevel.Open(AC_smooth, v3_camMenuLocalPos, q_camLastLocalRot, false);
+    }
+    public void LoadEndLevel()
+    {
+        endLevel.UpdateCurrency(SaveData.i_currency);
+        endLevel._anim.Play("Open");
+        endLevel.Open(AC_smooth, v3_camMenuLocalPos, q_camLastLocalRot, false);
     }
     public void Close()
     {

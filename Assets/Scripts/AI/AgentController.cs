@@ -743,7 +743,7 @@ public class AgentController : BaseController
                 _group.relationship.chaotic += 10;
             }
             _bullet.con_Player.OnKill(this, true);
-            _bullet.con_Player.KillMarker_World(_source.transform.position, _limb.transform);
+            _bullet.con_Player.KillMarker_World(_limb.transform);
         }
         else
         {

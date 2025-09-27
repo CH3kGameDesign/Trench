@@ -24,6 +24,7 @@ public class Objective : ScriptableObject
         [HideInInspector] public Resource.resourceType resource = null;
         [HideInInspector] public int amt = 0;
         public int total = 0;
+        [HideInInspector] public bool mainObjective = true;
         [HideInInspector] public bool completed = false;
         public string GetDescription()
         {
@@ -38,13 +39,32 @@ public class Objective : ScriptableObject
                 _temp = "<s><color=#232323>" + _temp + "</color></s>";
             return _temp;
         }
+        public string GetDescription_Long()
+        {
+            string _temp = type.description;
+            if (_type == Objective_Type.Collect_Resource)
+            {
+                if (resource == null)
+                    resource = Resource.GetResourceType_Static(_resource);
+                _temp += "<b>" + resource._name + "</b> ";
+            }
+            _temp += " [0 / " + total.ToString() + "]";
+            if (completed)
+                _temp = "<s><color=#232323>" + _temp + "</color></s>";
+            return _temp;
+        }
         public string GetAmount()
         {
             string _temp;
             if (completed)
                 _temp = "<color=#232323>" + total.ToString() + "</color>";
             else
-                _temp = "<color=#FF9500>" + amt.ToString() + "</color> " + total.ToString();
+            {
+                if (mainObjective)
+                    _temp = "<color=#FF9500>" + amt.ToString() + "</color> " + total.ToString();
+                else
+                    _temp = "<color=#1D8AD3>" + amt.ToString() + "</color> " + total.ToString();
+            }
             return _temp;
         }
         public objectiveClass Clone(Objective _objective)
@@ -55,6 +75,7 @@ public class Objective : ScriptableObject
             _temp._resource = _resource;
             _temp.resource = Resource.GetResourceType_Static(_resource);
             _temp.amt = 0;
+            _temp.mainObjective = mainObjective;
             _temp.total = total;
             _temp.completed = false;
             return _temp;
@@ -99,6 +120,22 @@ public class Objective : ScriptableObject
     public void Setup()
     {
         Instance = this;
+        SetMission();
+    }
+
+    void SetMission()
+    {
+        SaveData.objectives.Clear();
+        if (SaveData.missionCurrent != null)
+        {
+            //Main Objective
+            SaveData.missionCurrent._steps[0]._objective.mainObjective = true;
+            SaveData.objectives.Add(SaveData.missionCurrent._steps[0]._objective.Clone());
+
+            //Side Objective
+            SaveData.missionCurrent._sideObjective.mainObjective = false;
+            SaveData.objectives.Add(SaveData.missionCurrent._sideObjective.Clone());
+        }
     }
 
     public void NewObjectives()

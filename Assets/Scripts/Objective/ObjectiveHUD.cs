@@ -54,7 +54,10 @@ public class ObjectiveHUD : MonoBehaviour
         else
         {
             _child.I_background.color = new Color32(0x23, 0x23, 0x23, 0xFF);
-            _child.I_spriteBackground.color = new Color32(0xFF, 0x95, 0x00, 0xFF);
+            if (_obj.mainObjective)
+                _child.I_spriteBackground.color = new Color32(0xFF, 0x95, 0x00, 0xFF);
+            else
+                _child.I_spriteBackground.color = new Color32(0x1D, 0x8A, 0xD3, 0xFF);
         }
     }
 

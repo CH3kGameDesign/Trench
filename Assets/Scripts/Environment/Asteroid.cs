@@ -34,7 +34,7 @@ public class Asteroid : MonoBehaviour
         rb.AddTorque(_rotForce, ForceMode.Impulse);
     }
 
-    public void OnHit(GunManager.bulletClass _bullet, DamageSource _source)
+    public void OnHit(GunManager.bulletClass _bullet, DamageSource _source, HitObject _limb = null)
     {
         i_health -= Mathf.RoundToInt(_bullet.F_damage);
         if (i_health <= 0)
