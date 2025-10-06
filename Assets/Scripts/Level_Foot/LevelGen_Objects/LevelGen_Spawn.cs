@@ -5,7 +5,7 @@ using UnityEngine;
 public class LevelGen_Spawn : LevelGen_Object
 {
     public spawnTypeEnum spawnType = spawnTypeEnum.enemy;
-    public enum spawnTypeEnum { player, companion, enemy, treasure, boss};
+    public enum spawnTypeEnum { player, companion, enemy, treasure, boss, shoppingCart};
 
     public GameObject PF_override;
     public AgentController.stateEnum _state = AgentController.stateEnum.unchanged;

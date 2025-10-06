@@ -19,6 +19,8 @@ public class LevelGen_Holder : NetworkBehaviour
     public SyncVar<string> lastLandingSpot = new SyncVar<string>();
     public SyncVar<Themes.themeEnum> theme = new SyncVar<Themes.themeEnum>(Themes.themeEnum.none);
 
+    public List<Treasure_Point> TP_loosePoints = new List<Treasure_Point>();
+
     public SyncVar<int> I_value = new(0);
 
     public CanvasGroup CG_loadingScreen;
@@ -43,7 +45,7 @@ public class LevelGen_Holder : NetworkBehaviour
 
     public int I_maxDecals = 100;
     private List<Decal_Handler> d_Handlers = new List<Decal_Handler>();
-
+    [HideInInspector] public LevelGen_Block shipBlock = null;
 
     [HideInInspector] public bool isReady = false;
 
@@ -108,6 +110,10 @@ public class LevelGen_Holder : NetworkBehaviour
         {
             _value += LG.GetCollectedValue();
         }
+        foreach (var LG in TP_loosePoints)
+        {
+            _value += LG.I_value;
+        }
         return _value;
     }
 
@@ -124,6 +130,10 @@ public class LevelGen_Holder : NetworkBehaviour
                 }
             }
         }
+        foreach (var TP in TP_loosePoints)
+        {
+            TP.DisplayPoints(I_value.value);
+        }
     }
 
     [ObserversRpc]
@@ -138,6 +148,31 @@ public class LevelGen_Holder : NetworkBehaviour
         SceneManager.LoadScene(1);
     }
 
+    [ObserversRpc]
+    public void EndLevel(Themes.themeEnum _tarTheme)
+    {
+        ShowEndScreen(_tarTheme);
+    }
+    void ShowEndScreen(Themes.themeEnum _tarTheme)
+    {
+        if (SaveData.missionCurrent == null)
+        {
+            LoadTheme(_tarTheme);
+        }
+        else
+        {
+            MainMenu.Instance.endLevel.stats = PlayerManager.main.Stats;
+            foreach (var C in PlayerManager.Instance.Controllers)
+                if (C != null)
+                    C.gameObject.SetActive(false);
+            foreach (var LG in List)
+                LG.gameObject.SetActive(false);
+
+            MainMenu.Instance.endLevel.themeEnum = _tarTheme;
+            MainMenu.Instance.Open(MainMenu.panelEnum.endLevel);
+            
+        }
+    }
     void Setup<T>(T _seed)
     {
         if (theme != Themes.themeEnum.none &&

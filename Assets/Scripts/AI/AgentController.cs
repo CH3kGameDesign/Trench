@@ -92,7 +92,7 @@ public class AgentController : BaseController
         {
             if (AC.info.b_alive && (int)AC.state < 10)
             {
-                EnemyTimer.Instance.StartTimer();
+                EnemyTimer.Instance.StartTimer_Boss();
                 onFound.Activate(AC);
             }
         }
@@ -109,7 +109,7 @@ public class AgentController : BaseController
                 //Surprised
                 if ((int)AC.state < 3)
                 {
-                    EnemyTimer.Instance.StartTimer();
+                    EnemyTimer.Instance.StartTimer_Boss();
                     onHit_Surprise.Activate(AC);
                     return;
                 }
@@ -481,6 +481,8 @@ public class AgentController : BaseController
         //PLACEHOLDER
         if (!NMA.hasPath || NMA.velocity.sqrMagnitude == 0f)
         {
+            if (NMA.navMeshOwner == null)
+                return;
             if (_sameRoom)
             {
                 if (I_curRoom >= 0)

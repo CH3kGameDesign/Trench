@@ -64,6 +64,11 @@ public class Resource : ScriptableObject
             string _temp = "<b>" + amt.ToString() + "</b> " + type._name;
             return _temp;
         }
+        public string GetName()
+        {
+            string _temp = type._name;
+            return _temp;
+        }
         public static resourceClass Create(Resource_Type _type, int _amt = 1, Resource _resource = null)
         {
             resourceClass _temp = new resourceClass();

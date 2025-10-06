@@ -971,8 +971,10 @@ public class PlayerController : BaseController
 
     public void Pickup_Resource(Resource.resourceClass _resource)
     {
+        //Update Objectives
         Update_Objectives(Objective_Type.Collect_Resource, _resource._type, _resource.amt);
 
+        //Add To Save Data
         bool _collected = false;
         foreach (var item in SaveData.resources)
         {
@@ -985,8 +987,11 @@ public class PlayerController : BaseController
         }
         if (!_collected)
             SaveData.resources.Add(_resource.Clone());
+        //Play Audio
         AH_agentAudioHolder.Play(AgentAudioHolder.type.pickupSmall);
         MusicHandler.AdjustVolume(MusicHandler.typeEnum.synth, 0.1f);
+        //Add To Run Data
+        PlayerManager.Instance.runData.AddResource(_resource);
     }
 
     public void Pickup_Consumable(Consumable.consumableClass _consumable)
@@ -1766,7 +1771,7 @@ public class PlayerController : BaseController
     
     protected override void OnDisable()
     {
-        PlayerManager.Instance.RemovePlayer(info);
+        //PlayerManager.Instance.RemovePlayer(info);
         base.OnDisable();
     }
 

@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.XR;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -372,6 +373,8 @@ public class MainMenu : MonoBehaviour
         public TextMeshProUGUI TM_loadingText;
         [Header("NameTags")]
         public UI_NameTag[] UI_nameTags;
+
+
         public override void Open(AnimCurve _curve, Vector3 v3_camMenuLocalPos, Quaternion q_camLastLocalRot, bool _move = true)
         {
             if (G_loadedEnv != null)
@@ -425,8 +428,12 @@ public class MainMenu : MonoBehaviour
     public class endLevelRefClass : panelRefClass
     {
         [Header("Prefabs")]
-        public GameObject PF_loadingEnv;
-        [HideInInspector] public GameObject G_loadedEnv = null;
+        public LoadingArea PF_loadingEnv;
+        [HideInInspector] public LoadingArea G_loadedEnv = null;
+        public UI_Resource PF_UIResource;
+        [Header("Object References")]
+        public UI_Resource UI_money;
+        public RectTransform RT_resourceHolder;
         [Header("Text")]
         public TextMeshProUGUI TM_area;
         public TextMeshProUGUI TM_missionName;
@@ -439,18 +446,26 @@ public class MainMenu : MonoBehaviour
         public GameObject G_missionFailedIcon;
         [Header("NameTags")]
         public UI_NameTag[] UI_nameTags;
+        [HideInInspector] public Themes.themeEnum themeEnum;
+        [HideInInspector] public PlayerController.StatClass stats;
+        private Coroutine closeMenu = null;
         public override void Open(AnimCurve _curve, Vector3 v3_camMenuLocalPos, Quaternion q_camLastLocalRot, bool _move = true)
         {
             if (G_loadedEnv != null)
                 Destroy(G_loadedEnv);
             G_loadedEnv = Instantiate(PF_loadingEnv, Vector3.down * 1000, Quaternion.identity);
+            G_loadedEnv.Setup();
             SetMissionText();
 
+            if (closeMenu != null) MainMenu.Instance.StopCoroutine(closeMenu);
+            closeMenu = MainMenu.Instance.StartCoroutine(CloseMenu());
 
             base.Open(_curve, v3_camMenuLocalPos, q_camLastLocalRot, _move);
         }
         public override void Close()
         {
+            if (closeMenu != null) MainMenu.Instance.StopCoroutine(closeMenu);
+
             if (G_loadedEnv != null)
                 Destroy(G_loadedEnv);
             base.Close();
@@ -465,27 +480,50 @@ public class MainMenu : MonoBehaviour
             if (_mission == null) return;
 
             TM_missionName.text = _mission._name;
-            TM_timerText.text = PlayerManager.main.Stats.GetRunTime().ToString_Duration();
-            TM_mainObjective.text = _mission._steps[0]._objective.GetDescription_Long();
-            TM_sideObjective.text = _mission._sideObjective.GetDescription_Long();
+            if (stats != null)
+                TM_timerText.text = stats.GetRunTime().ToString_Duration(true);
+
+            if (SaveData.objectives.Count > 0) TM_mainObjective.text = SaveData.objectives[0].GetDescription_Long();
+            else TM_mainObjective.text = "";
+            if (SaveData.objectives.Count > 1) TM_sideObjective.text = SaveData.objectives[1].GetDescription_Long();
+            else TM_sideObjective.text = "";
+
+            DisplayMoneyResources();
+        }
+
+        void DisplayMoneyResources()
+        {
+            UI_money.SetMoney(LevelGen_Holder.Instance.GetCollectedValue(), SaveData.i_currency);
+            foreach (var item in PlayerManager.Instance.runData.resources)
+            {
+                UI_Resource _temp = Instantiate(PF_UIResource, RT_resourceHolder);
+                _temp.SetResource(item);
+            }
         }
         public void SetNames(string[] _names)
         {
-            //Reorder to match seating if applicable
-            if (_names.Length >= 3)
-            {
-                string _temp = _names[2];
-                _names[2] = _names[1];
-                _names[1] = _temp;
-            }
+            SetNames(_names, PlayerManager.Instance.Players);
+        }
+        public void SetNames(string[] _names, List<BaseInfo> _players)
+        {
             //Show Names
             for (int i = 0; i < UI_nameTags.Length; i++)
             {
-                bool _valid = i < _names.Length;
+                bool _valid = i < _players.Count && i < _names.Length;
                 UI_nameTags[i].gameObject.SetActive(_valid);
                 if (!_valid) continue;
-                UI_nameTags[i].Setup(_names[i]);
+                UI_nameTags[i].Setup(_names[i], "Champion", ArmorManager.Instance.GetArmorType(_players[i].icon).image, _players[i].b_alive);
             }
+        }
+
+        public IEnumerator CloseMenu()
+        {
+            yield return new WaitForSecondsRealtime(1f);
+            while (!UnityEngine.Input.anyKey)
+            {
+                yield return new WaitForEndOfFrame();
+            }
+            LevelGen_Holder.LoadTheme(themeEnum);
         }
     }
     [System.Serializable]

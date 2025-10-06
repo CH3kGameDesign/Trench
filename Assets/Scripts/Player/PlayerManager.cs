@@ -10,6 +10,27 @@ public class PlayerManager : MonoBehaviour
     public static Conversation conversation;
     public static PlayerManager Instance;
     public List<BaseInfo> Players = new List<BaseInfo>();
+    public List<BaseController> Controllers = new List<BaseController>();
+
+    public runDataClass runData = new runDataClass();
+    [System.Serializable]
+    public class runDataClass
+    {
+        public List<Resource.resourceClass> resources = new List<Resource.resourceClass>();
+
+        public void AddResource(Resource.resourceClass _resource)
+        {
+            foreach (var item in resources)
+            {
+                if (item._type == _resource._type)
+                {
+                    item.amt += _resource.amt;
+                    return;
+                }
+            }
+            resources.Add(_resource.Clone());
+        }
+    }
     private void Awake()
     {
         Instance = this;

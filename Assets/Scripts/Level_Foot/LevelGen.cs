@@ -410,6 +410,17 @@ public class LevelGen : MonoBehaviour
                         if (prefab != null)
                             GO = Instantiate(prefab, spawn.transform.position, spawn.transform.rotation, transform);
                         break;
+                    case LevelGen_Spawn.spawnTypeEnum.shoppingCart:
+                        if (!isHost)
+                            break;
+                        if (_type == spawnType.friendlyOnly)
+                            break;
+                        if (spawn.PF_override != null) prefab = spawn.PF_override;
+                        else prefab = null;
+
+                        if (prefab != null)
+                            GO = Instantiate(prefab, spawn.transform.position, spawn.transform.rotation, transform);
+                        break;
                     case LevelGen_Spawn.spawnTypeEnum.boss:
                         if (_type == spawnType.friendlyOnly)
                             break;
@@ -528,7 +539,8 @@ public class LevelGen : MonoBehaviour
                     bound.B_Bounds.enabled = false;
                 Physics.SyncTransforms();
                 int _tarOverlaps = 0;
-                if (entry.entryType == LevelGen_Block.entryTypeEnum.shipPark) _tarOverlaps = 1;
+                if (entry.entryType == LevelGen_Block.entryTypeEnum.shipPark)
+                    _tarOverlaps = 1;
                 if (CheckBounds(_temp, _tarOverlaps))
                 {
                     DestroyImmediate(_temp.gameObject);
@@ -536,7 +548,6 @@ public class LevelGen : MonoBehaviour
                 else
                 {
                     entry.OnConnect();
-
                     _temp.Setup(id, LG_Blocks.Count);
                     LG_Blocks.Add(_temp);
                     foreach (var bound in _temp.B_bounds)
@@ -612,6 +623,8 @@ public class LevelGen : MonoBehaviour
                     LG_Blocks.Add(_temp);
                     foreach (var bound in _temp.B_bounds)
                         bound.B_Bounds.enabled = true;
+                    if (_type == LevelGen_Block.blockTypeEnum.ship)
+                        ShipSpawn(_temp);
                     break;
                 }
             }
@@ -646,7 +659,16 @@ public class LevelGen : MonoBehaviour
 
         entry.OnConnect();
 
+
         return _corridor;
+    }
+
+    void ShipSpawn(LevelGen_Block _block)
+    {
+        LevelGen_Holder.Instance.shipBlock = _block;
+        EnemyTimer.Instance.LG_Ship = _block;
+        if (SaveData.missionCurrent != null)
+            _block.gameObject.SetActive(false);
     }
 
     bool CheckBounds(LevelGen_Block _temp, int _tarAmount = 0)

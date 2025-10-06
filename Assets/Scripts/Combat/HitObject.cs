@@ -16,7 +16,7 @@ public class HitObject : MonoBehaviour
     public UnityEvent<GunManager.bulletClass, DamageSource, HitObject> UE_OnDestroy;
 
     public List<damageTypeEnum> ignoreDamageType = new List<damageTypeEnum>();
-    public enum damageTypeEnum { all, bullet, fire, explosive};
+    public enum damageTypeEnum { all, bullet, fire, explosive, melee};
 
     public RagdollManager RM_ragdollManager;
     public Vehicle V_vehicle;

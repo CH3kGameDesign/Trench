@@ -140,7 +140,7 @@ public class BaseController : NetworkBehaviour
 
     public virtual void Start()
     {
-
+        PlayerManager.Instance.Controllers.Add(this);
     }
 
     public virtual void Update()

@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System;
-using System.Linq;
+
 
 #if UNITY_EDITOR
 using System.IO;
@@ -48,7 +47,7 @@ public class Objective : ScriptableObject
                     resource = Resource.GetResourceType_Static(_resource);
                 _temp += "<b>" + resource._name + "</b> ";
             }
-            _temp += " [0 / " + total.ToString() + "]";
+            _temp += " [" + amt.ToString() + "/ " + total.ToString() + "]";
             if (completed)
                 _temp = "<s><color=#232323>" + _temp + "</color></s>";
             return _temp;
@@ -84,6 +83,17 @@ public class Objective : ScriptableObject
         {
             return Clone(Objective.Instance);
         }
+
+        public void OnComplete()
+        {
+            if (completed) return;
+            completed = true;
+            OnCompleted?.Invoke();
+            PlayerManager.main.AH_agentAudioHolder.Play(AgentAudioHolder.type.objectiveComplete);
+        }
+
+        public delegate void OnCompletedEvent();
+        public event OnCompletedEvent OnCompleted;
     }
     public List<objectiveType> types = new List<objectiveType>();
     [System.Serializable]
@@ -130,12 +140,19 @@ public class Objective : ScriptableObject
         {
             //Main Objective
             SaveData.missionCurrent._steps[0]._objective.mainObjective = true;
-            SaveData.objectives.Add(SaveData.missionCurrent._steps[0]._objective.Clone());
+            objectiveClass _main = SaveData.missionCurrent._steps[0]._objective.Clone();
+            SaveData.objectives.Add(_main);
+            _main.OnCompleted += FinishMainObjective;
 
             //Side Objective
             SaveData.missionCurrent._sideObjective.mainObjective = false;
             SaveData.objectives.Add(SaveData.missionCurrent._sideObjective.Clone());
         }
+    }
+
+    void FinishMainObjective()
+    {
+        EnemyTimer.Instance.StartTimer_Ship();
     }
 
     public void NewObjectives()

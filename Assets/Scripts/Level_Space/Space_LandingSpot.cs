@@ -46,7 +46,10 @@ public class Space_LandingSpot : MonoBehaviour
                 break;
         }
         _player.info.Land(landingID);
-        LevelGen_Holder.LoadTheme(_theme, selMission._id);
+        if (selMission != null)
+            LevelGen_Holder.LoadTheme(_theme, selMission._id);
+        else
+            LevelGen_Holder.LoadTheme(_theme, -1);
     }
 
     protected void Start()

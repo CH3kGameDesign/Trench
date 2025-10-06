@@ -31,7 +31,7 @@ public class UI_NameTag : MonoBehaviour
         }
 
         if (G_deathIcon)
-            G_deathIcon.SetActive(_alive);
+            G_deathIcon.SetActive(!_alive);
         if (I_deathBG)
             I_deathBG.color = _alive ?
             new Color32(0x23, 0x23, 0x23, 0xFF) :

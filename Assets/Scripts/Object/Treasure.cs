@@ -17,6 +17,11 @@ public class Treasure : Interactable
     private int i_droppedLayer = 7;
     private int i_heldLayer = 2;
 
+    public bool B_lockedRotation = false;
+    public bool B_collectable = true;
+
+    private Vector3 v3_spawnPos;
+
     [HideInInspector] public NetworkTreasure networkTreasure;
 
     private Coroutine heldCoroutine;
@@ -31,6 +36,7 @@ public class Treasure : Interactable
     {
         if (TM_valueText != null)
             TM_valueText.text = I_value.ToString_Currency();
+        v3_spawnPos = transform.position;
     }
 
     // Update is called once per frame
@@ -58,6 +64,8 @@ public class Treasure : Interactable
         networkTreasure.OnDrop(_player, _forceDir, _isSprinting);
         if (heldCoroutine != null)
             StopCoroutine(heldCoroutine);
+        if (B_lockedRotation)
+            transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
     }
 
     IEnumerator WhileHeld(PlayerController _player)
@@ -66,6 +74,20 @@ public class Treasure : Interactable
         {
             yield return new WaitForSeconds(0.5f);
             MusicHandler.AdjustVolume(MusicHandler.typeEnum.synth, 0.1f);
+        }
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "DeadSpace")
+            Respawn();
+    }
+    void Respawn()
+    {
+        if (!RB_rigidbody.isKinematic)
+        {
+            RB_rigidbody.angularVelocity = Vector3.zero;
+            RB_rigidbody.linearVelocity = Vector3.zero;
+            transform.position = v3_spawnPos;
         }
     }
 }

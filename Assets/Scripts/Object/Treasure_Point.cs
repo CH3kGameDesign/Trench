@@ -19,6 +19,8 @@ public class Treasure_Point : MonoBehaviour
     private Coroutine _sizeCoroutine;
     public GameObject PF_respawnParticles;
 
+    public bool B_looseTreasurePoint = false;
+
     [HideInInspector] public int I_value = 0;
 
     [System.Serializable]
@@ -35,6 +37,11 @@ public class Treasure_Point : MonoBehaviour
         TM_valueText.text = I_value.ToString_Currency();
         I_displayValue = I_value;
         C_baseColor = TM_valueText.color;
+
+        DisplayPoints(LevelGen_Holder.Instance.I_value.value);
+
+        if (B_looseTreasurePoint)
+            LevelGen_Holder.Instance.TP_loosePoints.Add(this);
     }
 
     public void UpdatePoints(int _value)
@@ -50,9 +57,19 @@ public class Treasure_Point : MonoBehaviour
 
     public void DisplayPoints(int _amt)
     {
-        if (_sizeCoroutine != null)
-            StopCoroutine(_sizeCoroutine);
-        _sizeCoroutine = StartCoroutine(C_ValueChange(_amt));
+        if (gameObject.activeInHierarchy)
+        {
+            if (_sizeCoroutine != null)
+                StopCoroutine(_sizeCoroutine);
+            _sizeCoroutine = StartCoroutine(C_ValueChange(_amt));
+        }
+        else
+        {
+            TM_valueText.text = _amt.ToString_Currency();
+            I_displayValue = _amt;
+            TM_valueText.color = C_baseColor;
+            T_sizeChanger.localScale = Vector3.one;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -61,6 +78,8 @@ public class Treasure_Point : MonoBehaviour
         if (other.TryGetComponent<Treasure>(out _temp))
         {
             if (!_temp.networkTreasure.isController)
+                return;
+            if (!_temp.B_collectable)
                 return;
             if (!t_treasure.Contains(_temp))
             {

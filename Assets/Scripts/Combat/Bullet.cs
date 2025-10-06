@@ -107,10 +107,10 @@ public class Bullet : DamageSource
     {
         GameObject _parent = hitObject.GetParent();
         if (B_info.con_Player != null)
-            if (_parent == B_info.con_Player.gameObject)
+            if (_parent == B_info.con_Player.RM_ragdoll.gameObject)
                 return false;
         if (B_info.con_Agent != null)
-            if (_parent == B_info.con_Agent.gameObject)
+            if (_parent == B_info.con_Agent.RM_ragdoll.gameObject)
                 return false;
         if (B_info.con_Ship != null)
             if (_parent == B_info.con_Ship.gameObject)
