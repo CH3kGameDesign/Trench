@@ -96,7 +96,7 @@ namespace PurrNet
         private void OnValidate()
         {
 #if UNITY_EDITOR
-            if (!Application.isPlaying) 
+            if (!Application.isPlaying)
                 UpdateLabelStyle();
 #endif
         }
@@ -150,7 +150,7 @@ namespace PurrNet
 
             var position = GetPosition();
             float currentY = position.y;
-            float labelWidth = 200;
+            const float labelWidth = 200;
             Rect rect = new(position.x, currentY, labelWidth, LineHeight);
             if (_displayType.HasFlag(StatisticsDisplayType.Ping))
             {
@@ -179,6 +179,12 @@ namespace PurrNet
                 GUI.Label(rect, _cachedServerAvgFpsText, _labelStyle);
                 rect.y += LineHeight;
                 GUI.Label(rect, _cachedServerMinFpsText, _labelStyle);
+            }
+
+            if (_displayType.HasFlag(StatisticsDisplayType.Version))
+            {
+                rect.y += LineHeight;
+                GUI.Label(rect, "Version: " + NetworkManager.version, _labelStyle);
             }
         }
 
@@ -284,7 +290,9 @@ namespace PurrNet
 
         private void OnClientConnectionState(ConnectionState state)
         {
-            _tickManager = _networkManager.GetModule<TickManager>(false);
+            if (!_networkManager.TryGetModule<TickManager>(false, out _tickManager))
+                return;
+
             _playersClientBroadcaster = _networkManager.GetModule<PlayersBroadcaster>(false);
             _pingHistorySize = Mathf.RoundToInt(_networkManager.tickModule.tickRate * PING_HISTORY_TIME);
             _pingStats = new int[_pingHistorySize];
@@ -560,6 +568,7 @@ namespace PurrNet
             Ping = 1 << 0,
             Usage = 1 << 1,
             ServerStats = 1 << 2,
+            Version = 1 << 3,
         }
     }
 }

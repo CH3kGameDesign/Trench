@@ -33,6 +33,7 @@ namespace PurrNet.Codegen
 
             var serializer = packerGenType.GetMethod("Read").Import(module);
             var deltaSerializer = deltaPackerGenType.GetMethod("Read").Import(module);
+            var deltaBypassSerializer = deltaPackerGenType.GetMethod("ReadUnpacked").Import(module);
             var packerTypeBoolean =
                 GenerateSerializersProcessor.CreateGenericMethod(packerGenType, module.TypeSystem.Boolean, serializer,
                     module);
@@ -104,6 +105,36 @@ namespace PurrNet.Codegen
             }
             else
             {
+                if (isClass && type.BaseType != null && type.BaseType.FullName != typeof(object).FullName)
+                {
+                    var baseType = type.BaseType;
+
+                    if (baseType is { IsValueType: false })
+                    {
+                        var genericM =
+                            GenerateSerializersProcessor.CreateGenericMethod(deltaPackerGenType, baseType, deltaSerializer,
+                                module);
+
+                        var variable = new VariableDefinition(baseType);
+                        method.Body.Variables.Add(variable);
+
+                        // variable = this
+                        il.Emit(OpCodes.Ldarg_2);
+                        il.Emit(OpCodes.Ldind_Ref);
+                        il.Emit(OpCodes.Stloc, variable);
+
+                        il.Emit(OpCodes.Ldarg_0);
+                        il.Emit(OpCodes.Ldarg_1);
+                        il.Emit(OpCodes.Ldloca, variable);
+                        il.Emit(OpCodes.Call, genericM);
+
+                        il.Emit(OpCodes.Ldarg_2);
+                        il.Emit(OpCodes.Ldloc, variable);
+                        il.Emit(OpCodes.Castclass, type);
+                        il.Emit(OpCodes.Stind_Ref);
+                    }
+                }
+
                 foreach (var field in type.Fields)
                 {
                     if (field.IsStatic)
@@ -119,15 +150,16 @@ namespace PurrNet.Codegen
                     if (fieldType == null)
                         continue;
 
-                    bool ignore = field.CustomAttributes.Any(a =>
-                        a.AttributeType.FullName == typeof(DontPackAttribute).FullName);
+                    bool ignore = ShouldIgnoreField(field);
 
                     if (ignore)
                         continue;
 
-                    var packer =
-                        GenerateSerializersProcessor.CreateGenericMethod(deltaPackerGenType, fieldType, deltaSerializer,
-                            module);
+                    bool shouldSkipDelta = ShouldNotDeltaPackField(field);
+
+                    var packer = GenerateSerializersProcessor.CreateGenericMethod(deltaPackerGenType, fieldType,
+                        shouldSkipDelta ? deltaBypassSerializer : deltaSerializer,
+                        module);
 
                     if (!field.IsPublic)
                     {
@@ -201,6 +233,7 @@ namespace PurrNet.Codegen
             var deltaPackerGenType = module.GetTypeDefinition(typeof(DeltaPacker<>)).Import(module);
 
             var deltaSerializer = deltaPackerGenType.GetMethod("Write").Import(module);
+            var deltaBypassSerializer = deltaPackerGenType.GetMethod("WriteUnpacked").Import(module);
             var advanceBits = bitPackerType.GetMethod("AdvanceBits", false).Import(module);
             var writeAt = bitPackerType.GetMethod("WriteAt", false).Import(module);
             var setBitPosition = bitPackerType.GetMethod("SetBitPosition", false).Import(module);
@@ -267,6 +300,30 @@ namespace PurrNet.Codegen
             }
             else
             {
+                bool isInheritedClass = isClass && type.BaseType != null &&
+                                    type.BaseType.FullName != typeof(object).FullName;
+
+                if (isInheritedClass)
+                {
+                    var baseType = type.BaseType;
+
+                    if (baseType is { IsValueType: false })
+                    {
+                        var genericM =
+                            GenerateSerializersProcessor.CreateGenericMethod(deltaPackerGenType, baseType, deltaSerializer,
+                                module);
+
+                        il.Emit(OpCodes.Ldarg_0);
+                        il.Emit(OpCodes.Ldarg_1);
+                        il.Emit(OpCodes.Ldarg_2);
+
+                        il.Emit(OpCodes.Call, genericM);
+                        il.Emit(OpCodes.Ldloc_1);
+                        il.Emit(OpCodes.Or);
+
+                        il.Emit(OpCodes.Stloc_1);
+                    }
+                }
 
                 for (var i = 0; i < type.Fields.Count; i++)
                 {
@@ -284,14 +341,16 @@ namespace PurrNet.Codegen
                     if (fieldType == null)
                         continue;
 
-                    bool ignore = field.CustomAttributes.Any(a =>
-                        a.AttributeType.FullName == typeof(DontPackAttribute).FullName);
+                    var ignore = ShouldIgnoreField(field);
 
                     if (ignore)
                         continue;
 
+                    bool shouldSkipDelta = ShouldNotDeltaPackField(field);
+
                     var packer =
-                        GenerateSerializersProcessor.CreateGenericMethod(deltaPackerGenType, fieldType, deltaSerializer,
+                        GenerateSerializersProcessor.CreateGenericMethod(deltaPackerGenType, fieldType,
+                            shouldSkipDelta ? deltaBypassSerializer : deltaSerializer,
                             module);
 
                     if (!field.IsPublic)
@@ -334,7 +393,7 @@ namespace PurrNet.Codegen
 
                     il.Emit(OpCodes.Call, packer);
 
-                    if (i > 0)
+                    if (i > 0 || isInheritedClass)
                     {
                         il.Emit(OpCodes.Ldloc_1);
                         il.Emit(OpCodes.Or);
@@ -372,6 +431,24 @@ namespace PurrNet.Codegen
                 new ScopeDebugInformation(method.Body.Instructions[0], method.Body.Instructions[^1]);
             method.DebugInformation.Scope.Variables.Add(new VariableDebugInformation(flagPos, "flagPos"));
             method.DebugInformation.Scope.Variables.Add(new VariableDebugInformation(isEqualVar, "wasChanged"));
+        }
+
+        private static bool ShouldIgnoreField(FieldDefinition field)
+        {
+            bool ignore = field.CustomAttributes.Any(a =>
+                a.AttributeType.FullName == typeof(DontPackAttribute).FullName) || GenerateSerializersProcessor.DoesTypeHaveDontPackAttribute(field.FieldType.Resolve());
+
+            return ignore;
+        }
+
+        private static bool ShouldNotDeltaPackField(FieldDefinition field)
+        {
+            bool ignore = field.CustomAttributes.Any(a =>
+                a.AttributeType.FullName == typeof(DontDeltaCompressAttribute).FullName);
+
+            if (GenerateSerializersProcessor.DoesTypeHaveAttribute(field.FieldType.Resolve(), typeof(DontDeltaCompressAttribute)))
+                ignore = true;
+            return ignore;
         }
 
         public static void HandleGenericType(AssemblyDefinition assembly, TypeReference type,

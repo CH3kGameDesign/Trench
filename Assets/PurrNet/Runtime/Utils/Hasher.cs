@@ -94,10 +94,18 @@ namespace PurrNet.Utils
         [UsedByIL]
         public static void PrepareType<T>() => PrepareType(typeof(T));
 
+        public static bool IsRegistered(Type type)
+        {
+            return _hashes.ContainsKey(type);
+        }
+
         public static uint GetStableHashU32(Type type)
         {
             if (type == null)
                 return 0;
+
+            if (_hashCounter == 1)
+                throw new InvalidOperationException("Hasher hasn't been initialized yet.");
 
             return _hashes.TryGetValue(type, out var hash)
                 ? hash

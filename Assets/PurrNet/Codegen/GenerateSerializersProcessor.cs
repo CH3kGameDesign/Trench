@@ -112,6 +112,11 @@ namespace PurrNet.Codegen
             if (resolvedType == null)
                 return;
 
+            bool hasDontPack = DoesTypeHaveDontPackAttribute(resolvedType);
+
+            if (hasDontPack)
+                return;
+
             if (resolvedType.IsInterface)
                 return;
 
@@ -179,10 +184,12 @@ namespace PurrNet.Codegen
 
                 var packerType = mainmodule.GetTypeDefinition(typeof(Packer<>)).Import(mainmodule);
                 var readMethodP = packerType.GetMethod("Read").Import(mainmodule);
+                var readDirectP = packerType.GetMethod("ReadAsExactType").Import(mainmodule);
                 var writeMethodP = packerType.GetMethod("Write").Import(mainmodule);
+                var writeDirectP = packerType.GetMethod("WriteAsExactType").Import(mainmodule);
 
                 var write = writeMethod.Body.GetILProcessor();
-                GenerateMethod(true, writeMethod, writeMethodP, type, write, mainmodule, valueArg);
+                GenerateMethod(true, writeMethod, writeMethodP, writeDirectP, type, write, mainmodule, valueArg);
                 serializerClass.Methods.Add(writeMethod);
 
                 // create static read method
@@ -198,7 +205,7 @@ namespace PurrNet.Codegen
                 };
 
                 var read = readMethod.Body.GetILProcessor();
-                GenerateMethod(false, readMethod, readMethodP, type, read, mainmodule, valueArg);
+                GenerateMethod(false, readMethod, readMethodP, readDirectP, type, read, mainmodule, valueArg);
                 serializerClass.Methods.Add(readMethod);
             }
 
@@ -422,9 +429,40 @@ namespace PurrNet.Codegen
             il.Emit(OpCodes.Ret);
         }
 
+        public static bool HasInterfaceRaw(TypeDefinition def, Type interfaceType)
+        {
+            bool selfHas = false;
+            foreach (var i in def.Interfaces)
+            {
+                var resolved = i.InterfaceType.Resolve();
+                if (resolved != null && resolved.FullName == interfaceType.FullName)
+                {
+                    selfHas = true;
+                    break;
+                }
+            }
+
+            if (selfHas)
+                return true;
+
+            if (def.BaseType == null)
+                return false;
+
+            var baseType = def.BaseType.Resolve();
+            return baseType != null && HasInterface(baseType, interfaceType);
+        }
+
         public static bool HasInterface(TypeDefinition def, Type interfaceType)
         {
-            return def.Interfaces.Any(i => i.InterfaceType.FullName == interfaceType.FullName);
+            bool selfHas = def.Interfaces.Any(i => i.InterfaceType.FullName == interfaceType.FullName);
+            if (selfHas)
+                return true;
+
+            if (def.BaseType == null)
+                return false;
+
+            var baseType = def.BaseType.Resolve();
+            return baseType != null && HasInterface(baseType, interfaceType);
         }
 
         private static MethodReference CreateSetterMethod(TypeDefinition parent, FieldDefinition field)
@@ -519,8 +557,35 @@ namespace PurrNet.Codegen
             return method;
         }
 
+        public static bool DoesTypeHaveAttribute(TypeDefinition type, Type attribute)
+        {
+            while (true)
+            {
+                if (type == null)
+                    return false;
+
+                if (type.CustomAttributes.Any(a => a.AttributeType.FullName == attribute.FullName))
+                    return true;
+
+                if (type.BaseType != null)
+                {
+                    type = type.BaseType.Resolve();
+                    continue;
+                }
+
+                break;
+            }
+
+            return false;
+        }
+
+        public static bool DoesTypeHaveDontPackAttribute(TypeDefinition type)
+        {
+            return DoesTypeHaveAttribute(type, typeof(DontPackAttribute));
+        }
+
         private static void GenerateMethod(
-            bool isWriting, MethodDefinition method, MethodReference serialize, TypeReference typeRef, ILProcessor il,
+            bool isWriting, MethodDefinition method, MethodReference serialize, MethodReference serializeDirect, TypeReference typeRef, ILProcessor il,
             ModuleDefinition mainmodule, ParameterDefinition valueArg)
         {
             var bitPackerType = mainmodule.GetTypeDefinition(typeof(BitPacker)).Import(mainmodule);
@@ -580,14 +645,15 @@ namespace PurrNet.Codegen
                 return;
             }
 
-            // if it inherits from a class, write/read the base class
             if (isClass && type.BaseType != null && type.BaseType.FullName != typeof(object).FullName)
             {
                 var baseType = type.BaseType;
 
                 if (baseType is { IsValueType: false })
                 {
-                    var genericM = CreateGenericMethod(packerType, baseType, serialize, mainmodule);
+                    var genericM = CreateGenericMethod(packerType, baseType, serializeDirect, mainmodule);
+
+                    var variable = new VariableDefinition(baseType);
 
                     if (isWriting)
                     {
@@ -596,10 +662,9 @@ namespace PurrNet.Codegen
                     }
                     else
                     {
-                        var variable = new VariableDefinition(baseType);
+                        // variable = this
                         method.Body.Variables.Add(variable);
 
-                        // variable = this
                         il.Emit(OpCodes.Ldarg_1);
                         il.Emit(OpCodes.Ldind_Ref);
                         il.Emit(OpCodes.Stloc, variable);
@@ -609,6 +674,14 @@ namespace PurrNet.Codegen
                     }
 
                     il.Emit(OpCodes.Call, genericM);
+
+                    if (!isWriting)
+                    {
+                        il.Emit(OpCodes.Ldarg_1);
+                        il.Emit(OpCodes.Ldloc, variable);
+                        il.Emit(OpCodes.Castclass, type);
+                        il.Emit(OpCodes.Stind_Ref);
+                    }
                 }
             }
 
@@ -622,8 +695,7 @@ namespace PurrNet.Codegen
                 if (isDelegate)
                     continue;
 
-                bool ignore = field.CustomAttributes.Any(a =>
-                    a.AttributeType.FullName == typeof(DontPackAttribute).FullName);
+                var ignore = ShouldIgnoreField(field);
 
                 if (ignore)
                     continue;
@@ -721,46 +793,58 @@ namespace PurrNet.Codegen
             il.Append(ret);
         }
 
+        private static bool ShouldIgnoreField(FieldDefinition field)
+        {
+            bool ignore = field.CustomAttributes.Any(a =>
+                a.AttributeType.FullName == typeof(DontPackAttribute).FullName);
+
+            if (DoesTypeHaveDontPackAttribute(field.FieldType.Resolve()))
+                ignore = true;
+            return ignore;
+        }
+
         public static TypeReference ResolveGenericFieldType(FieldDefinition field, TypeReference declaringType)
         {
             var fieldType = field.FieldType;
 
-            // If the declaring type is a generic instance
             if (declaringType is GenericInstanceType genericDeclaringType)
             {
-                // If the field type has generic parameters
-                if (fieldType.IsGenericParameter)
-                {
-                    // Map the generic parameter to the actual type argument
-                    var genericParam = (GenericParameter)fieldType;
-                    int position = genericParam.Position;
-                    return genericDeclaringType.GenericArguments[position];
-                }
-
-                // If the field type is itself a generic instance
-                if (fieldType is GenericInstanceType fieldGenericInstance)
-                {
-                    var resolvedInstance = new GenericInstanceType(fieldGenericInstance.ElementType);
-                    foreach (var arg in fieldGenericInstance.GenericArguments)
-                    {
-                        if (arg.IsGenericParameter)
-                        {
-                            var genericParam = (GenericParameter)arg;
-                            int position = genericParam.Position;
-                            resolvedInstance.GenericArguments.Add(genericDeclaringType.GenericArguments[position]);
-                        }
-                        else
-                        {
-                            resolvedInstance.GenericArguments.Add(arg);
-                        }
-                    }
-
-                    return resolvedInstance;
-                }
+                return SubstituteDeclaringTypeGenerics(fieldType, genericDeclaringType);
             }
 
-            // Return the original field type if no generics are involved
             return fieldType;
+        }
+
+        private static TypeReference SubstituteDeclaringTypeGenerics(TypeReference type, GenericInstanceType declaringGeneric)
+        {
+            // Direct mapping for generic parameter T from the declaring type
+            if (type.IsGenericParameter)
+            {
+                var gp = (GenericParameter)type;
+                return declaringGeneric.GenericArguments[gp.Position];
+            }
+
+            // Rebuild nested generic instances recursively: e.g., List<Blah<T>>, Dictionary<K, Blah<T>>
+            if (type is GenericInstanceType gi)
+            {
+                var rebuilt = new GenericInstanceType(gi.ElementType);
+                for (int i = 0; i < gi.GenericArguments.Count; i++)
+                {
+                    var arg = gi.GenericArguments[i];
+                    rebuilt.GenericArguments.Add(SubstituteDeclaringTypeGenerics(arg, declaringGeneric));
+                }
+                return rebuilt;
+            }
+
+            // Support arrays with generic element types: T[] or Blah<T>[]
+            if (type is ArrayType arrayType)
+            {
+                var substitutedElement = SubstituteDeclaringTypeGenerics(arrayType.ElementType, declaringGeneric);
+                return new ArrayType(substitutedElement, arrayType.Rank);
+            }
+
+            // Non-generic type: return as-is
+            return type;
         }
 
         private static void HandleIData(bool isWriting, TypeDefinition type,
