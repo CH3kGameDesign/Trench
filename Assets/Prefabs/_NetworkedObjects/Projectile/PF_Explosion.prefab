@@ -239,7 +239,7 @@ SphereCollider:
   m_ProvidesContacts: 1
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 2
+  m_Radius: 5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &619156510942422913
 MonoBehaviour:
@@ -266,10 +266,11 @@ MonoBehaviour:
     B_player: 0
     con_Player: {fileID: 0}
     con_Agent: {fileID: 0}
+    con_Ship: {fileID: 0}
     con_Gun: {fileID: 0}
     F_speed: 0
-    F_radius: 0.1
-    F_lifeTime: 0.1
+    F_radius: 5
+    F_lifeTime: 0.3
     F_lockOnTurnSpeed: 60
     PF_impactHit: {fileID: 0}
     F_damage: 100

@@ -15,14 +15,6 @@ MonoBehaviour:
   data:
   - d:
     - type: 0
-      roomtype: 3
-      entryType: 0
-  - d:
-    - type: 1
-      roomtype: 0
-      entryType: 6
-  - d:
-    - type: 0
       roomtype: 6
       entryType: 0
   - d:
@@ -34,14 +26,11 @@ MonoBehaviour:
       roomtype: 2
       entryType: 0
   recipe:
-    roomType: 3
+    roomType: 6
     connectedRooms:
-    - roomType: 6
-      connectedRooms:
-      - roomType: 2
-        connectedRooms: []
-        entryTypes: 
-      entryTypes: 02000000
-    entryTypes: 06000000
-  totalRoomAmount: 3
+    - roomType: 2
+      connectedRooms: []
+      entryTypes: 
+    entryTypes: 02000000
+  totalRoomAmount: 2
   extraRoom_Amount: {x: 0, y: 0}
