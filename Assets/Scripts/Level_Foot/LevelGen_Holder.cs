@@ -60,17 +60,20 @@ public class LevelGen_Holder : NetworkBehaviour
 
     private void Start()
     {
-        ShowLoadingScreen();
+        ShowLoadingScreen_MissionLess();
     }
 
-    void ShowLoadingScreen()
+    void ShowLoadingScreen_MissionLess()
     {
         if (SaveData.missionCurrent == null)
         {
             CG_loadingScreen.gameObject.SetActive(true);
             CG_loadingScreen.alpha = 1;
         }
-        else
+    }
+    void ShowLoadingScreen_Mission()
+    {
+        if (SaveData.missionCurrent != null)
         {
             MainMenu.Instance.Open(MainMenu.panelEnum.loadLevel);
         }
@@ -85,14 +88,15 @@ public class LevelGen_Holder : NetworkBehaviour
 
     protected override void OnSpawned()
     {
+        base.OnSpawned();
         if (isController)
         {
+            ShowLoadingScreen_Mission();
             theme.value = SaveData.themeCurrent;
             lastLandingSpot.value = SaveData.lastLandingSpot;
             Setup();
             CreateNew();
         }
-        base.OnSpawned();
     }
 
     protected override void OnDestroy()

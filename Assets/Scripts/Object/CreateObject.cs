@@ -50,6 +50,8 @@ public class CreateObject : MonoBehaviour
                 Destroy(gameObject);
             return;
         }
+        if (transform == null)
+            return;
 
         GameObject PF = PF_prefabs.GetRandom();
         Vector3 pos = CopyPosition ? transform.position : PF.transform.position;

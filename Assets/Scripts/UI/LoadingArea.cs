@@ -68,16 +68,17 @@ public class LoadingArea : NetworkBehaviour
                 _names[i] = "Player";
             MainMenu.Instance.loadingLevel.SetNames(_names);
         }
-        if (isHost || isServer)
+        if (NetworkManager.main.isServer || NetworkManager.main.isHost)
         {
-            if (networkManager.playerCount > 0)
+            if (NetworkManager.main.playerCount > 0)
             {
-                ShowPlayers(networkManager.playerCount);
-                for (int i = 0; i < networkManager.playerCount; i++)
-                    LoadArmor(networkManager.players[i], i);
+                ShowPlayers(NetworkManager.main.playerCount);
+                for (int i = 0; i < NetworkManager.main.playerCount; i++)
+                    LoadArmor(NetworkManager.main.players[i], i);
             }
             else
             {
+                ShowPlayers(1);
                 LoadArmor(0);
             }
         }

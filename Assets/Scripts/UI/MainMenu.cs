@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Android;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -362,8 +363,8 @@ public class MainMenu : MonoBehaviour
     public class loadingLevelRefClass : panelRefClass
     {
         [Header("Prefabs")]
-        public GameObject PF_loadingEnv;
-        [HideInInspector] public GameObject G_loadedEnv = null;
+        public LoadingArea PF_loadingEnv;
+        [HideInInspector] public LoadingArea G_loadedEnv = null;
         [Header("Text")]
         public TextMeshProUGUI TM_area;
         public TextMeshProUGUI TM_missionName;
@@ -380,6 +381,7 @@ public class MainMenu : MonoBehaviour
             if (G_loadedEnv != null)
                 Destroy(G_loadedEnv);
             G_loadedEnv = Instantiate(PF_loadingEnv, Vector3.down * 1000, Quaternion.identity);
+            G_loadedEnv.Setup();
             SetMissionText();
 
 
@@ -667,6 +669,15 @@ public class MainMenu : MonoBehaviour
     public void SettingsButton()
     {
         SwitchTo(settings);
+    }
+    #endregion
+    #region Reload
+    public void ReloadButton()
+    {
+        int _id = -1;
+        if (SaveData.missionCurrent != null)
+            _id = SaveData.missionCurrent._id;
+        LevelGen_Holder.LoadTheme(SaveData.themeCurrent, _id);
     }
     #endregion
     #region CustomizeLayout
