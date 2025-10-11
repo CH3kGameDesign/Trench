@@ -20,7 +20,7 @@ MonoBehaviour:
   ownedAmt: 1
   rarity: 0
   cost:
-    unlockAtStart: 1
+    unlockAtStart: 0
     coinCost: 0
     list: []
   sortOrder: 0
@@ -79,5 +79,7 @@ MonoBehaviour:
   AC_agent: {fileID: 0}
   baseController: {fileID: 0}
   A_charModel: {fileID: 0}
-  b_playerGun: 0
+  shipController: {fileID: 0}
+  isPlayer: 0
+  equippedType: 0
   F_floatDrag: 10

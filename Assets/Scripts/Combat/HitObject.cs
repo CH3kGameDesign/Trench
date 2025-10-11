@@ -9,6 +9,7 @@ public class HitObject : MonoBehaviour
     public bool B_useHealth = true;
     public float I_maxHealth = 10;
     private float f_health = 10;
+    bool b_destroyed = false;
 
     public GameObject PF_hitParticles;
 
@@ -29,6 +30,8 @@ public class HitObject : MonoBehaviour
 
     public void OnDamage(GunManager.bulletClass _bullet, DamageSource _source = null)
     {
+        if (b_destroyed)
+            return;
         if (!ignoreDamageType.Contains(_bullet.D_damageType))
         {
             UE_OnHit.Invoke(_bullet, _source, this);
@@ -40,6 +43,7 @@ public class HitObject : MonoBehaviour
     }
     private void Destroy(GunManager.bulletClass _bullet, DamageSource _source = null)
     {
+        b_destroyed = true;
         UE_OnDestroy.Invoke(_bullet, _source, this);
     }    
     public GameObject GetParent()

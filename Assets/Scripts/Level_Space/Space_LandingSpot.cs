@@ -41,6 +41,9 @@ public class Space_LandingSpot : MonoBehaviour
             case "lidoStation":
                 _theme = Themes.themeEnum._default;
                 break;
+            case "dollyStation":
+                _theme = Themes.themeEnum._default;
+                break;
             default:
                 _theme = Themes.themeEnum.ship;
                 break;

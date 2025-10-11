@@ -63,7 +63,7 @@ public class LoadingArea : NetworkBehaviour
         }
         if (_fakeLobby)
         {
-            string[] _names = new string[Math.Max(networkManager.playerCount, 1)];
+            string[] _names = new string[Math.Max(NetworkManager.main.playerCount, 1)];
             for (int i = 0; i < _names.Length; i++)
                 _names[i] = "Player";
             MainMenu.Instance.loadingLevel.SetNames(_names);

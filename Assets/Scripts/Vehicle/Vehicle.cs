@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
  public class Vehicle : Interactable
 {
@@ -147,6 +148,14 @@ using UnityEngine;
         Seats[_num].BC_agent.EnterExit_Vehicle(false, this);
         Seats[_num].BC_agent.ChangeState(Seats[_num].prevState);
         Seats[_num].BC_agent.V_curVehicle = null;
+        //Set Agent Position
+        Seats[_num].BC_agent.RB.linearVelocity = Vector3.zero;
+        Seats[_num].BC_agent.NMA.transform.rotation = Seats[_num].T_exitPos.rotation;
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(Seats[_num].T_exitPos.position, out hit, 1, -1))
+            Seats[_num].BC_agent.SetPosition(hit.position + Vector3.up);
+
+
         Seats[_num].BC_agent = null;
     }
 

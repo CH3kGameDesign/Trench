@@ -30,9 +30,11 @@ public class GunClass_Rocket : GunClass
             Explosion GO = Instantiate(PF_meleeExplosion, PM_player.T_barrelHook.position, PF_meleeExplosion.transform.rotation);
             GO.OnCreate(null);
             Destroy(GO, 5);
-            
+
+            clipAmmo = 0;
             if (isPlayer)
             {
+                PM_player.Weapon_Fired();
                 PM_player.RM_ragdoll.AddSource(GO);
                 PM_player.Jump_Force(2f);
                 if (_isSprinting) PM_player.Apply_Force(PM_player.RB.transform.forward);
@@ -43,7 +45,6 @@ public class GunClass_Rocket : GunClass
                 //AC_agent.Jump_Force(2f);
                 //if (_isSprinting) PM_player.Apply_Force(PM_player.RB.transform.forward);
             }
-                clipAmmo = 0;
         }
         base.OnMelee();
     }
