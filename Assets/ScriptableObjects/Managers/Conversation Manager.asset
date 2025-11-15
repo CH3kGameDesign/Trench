@@ -25,23 +25,16 @@ MonoBehaviour:
       other: 4
       otherEmotion: 1
     response:
-    - english: More Objectives please mate
-      spanish: More Objectives please mate
-      japanese: More Objectives please mate
+    - english: Grab the spray cans
+      spanish: Grab the spray cans
+      japanese: Grab the spray cans
       followUp:
-        type: 1
+        type: 2
         _convo: 1
-        _event: 
-    - english: Welp See ya then!
-      spanish: Welp See ya then!
-      japanese: Welp See ya then!
-      followUp:
-        type: 0
-        _convo: 0
-        _event: 
-    - english: Byea
-      spanish: Byeb
-      japanese: Byec
+        _event: openCustomizeGraffiti
+    - english: Nevermind
+      spanish: Nevermind
+      japanese: Nevermind
       followUp:
         type: 0
         _convo: 0

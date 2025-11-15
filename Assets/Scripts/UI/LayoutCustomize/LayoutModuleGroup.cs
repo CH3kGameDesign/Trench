@@ -36,4 +36,18 @@ public class LayoutModuleGroup : MonoBehaviour
             LMB.Setup(item);
         }
     }
+    public void Setup(string _name, List<Stamp_Scriptable> _stamps)
+    {
+        TM_name.text = _name;
+        RT_holder.DeleteChildren();
+
+        int _rows = Mathf.CeilToInt((float)_stamps.Count / 3f);
+        RT_holder.sizeDelta = new(RT_holder.sizeDelta.x, _rows * _moduleButtonSize);
+        GetComponent<RectTransform>().sizeDelta = new(GetComponent<RectTransform>().sizeDelta.x, 50 + (_rows * _moduleButtonSize));
+        foreach (var item in _stamps)
+        {
+            LayoutModuleButton LMB = Instantiate(PF_ModuleButton, RT_holder);
+            LMB.Setup(item);
+        }
+    }
 }

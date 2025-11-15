@@ -30,7 +30,7 @@ public class NetworkTreasure : NetworkIdentity
         //gameObject.layer = i_droppedLayer;
         treasure.C_collider.enabled = true;
 
-        StartCoroutine(OnThrown(_player, _dir, _isSprinting ? 2f : 1f));
+        StartCoroutine(OnThrown(_player, _dir, _isSprinting ? 1.3f : 1f));
     }
 
     IEnumerator OnThrown(PlayerController _player, Vector3 _dir, float _mult)

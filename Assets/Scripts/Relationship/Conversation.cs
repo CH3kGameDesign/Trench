@@ -388,6 +388,10 @@ public class Conversation : MonoBehaviour
                 EndConversation();
                 MainMenu.Instance.Open(MainMenu.panelEnum.customizeLayout);
                 break;
+            case "openCustomizeGraffiti":
+                EndConversation();
+                MainMenu.Instance.Open(MainMenu.panelEnum.customizeGraffiti);
+                break;
             default:
                 EndConversation();
                 break;

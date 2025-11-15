@@ -666,7 +666,7 @@ public class AgentController : BaseController
             }
             if (!b_friendly)
             {
-                _bullet.con_Gun.Damage_Objective(Mathf.FloorToInt(_bullet.F_damage));
+                _bullet.con_Gun.Damage_Objective(Mathf.FloorToInt(_bullet.F_damage * _limb.F_damageMult));
                 info.AttackTarget(_bullet.con_Player.info.owner);
                 _bullet.con_Player.AggroAllies(this);
                 OnHit_Behaviour(true);
@@ -709,7 +709,7 @@ public class AgentController : BaseController
                 RM_ragdoll.RB_rigidbodies[0].AddForce(dir, ForceMode.VelocityChange);
         }
 
-        info.Hurt(_bullet.F_damage);
+        info.Hurt(_bullet.F_damage * _limb.F_damageMult);
         if (info.F_curHealth <= 0)
             OnDeath(_bullet, _source, _limb);
         else

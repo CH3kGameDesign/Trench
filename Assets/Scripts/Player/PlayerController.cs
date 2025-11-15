@@ -343,11 +343,10 @@ public class PlayerController : BaseController
 
     IEnumerator AwakeLate()
     {
-        while (!NetworkOwner.isFullySpawned || !LevelGen_Holder.Instance.isReady)
+        while (!NetworkOwner.isFullySpawned)
             yield return new WaitForEndOfFrame();
         if (NetworkOwner.isOwner)
         {
-            PlayerManager.Instance.AddPlayer(info);
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             SetRecallPos();
@@ -794,7 +793,10 @@ public class PlayerController : BaseController
 
             if (b_grounded)
             {
-                if (Inputs.b_sprinting && !Inputs.b_crouch)
+                if (Inputs.b_sprinting && 
+                    !Inputs.b_crouch &&
+                    !Inputs.b_aiming &&
+                    Inputs.v2_inputDir.y > 0)
                 {
                     _tarPos = new Vector3(Inputs.v2_inputDir.x / 2, 0, 1);
                     v3_moveDir = Quaternion.Euler(0, v3_camDir.y, 0) * _tarPos;
@@ -1537,8 +1539,8 @@ public class PlayerController : BaseController
                 Push((PlayerID)owner, dir);
         }
 
-        info.Hurt(_bullet.F_damage);
-        Update_Objectives(Objective_Type.Damage_Taken, Mathf.RoundToInt(_bullet.F_damage));
+        info.Hurt(_bullet.F_damage * _limb.F_damageMult);
+        Update_Objectives(Objective_Type.Damage_Taken, Mathf.RoundToInt(_bullet.F_damage * _limb.F_damageMult));
 
         AggroAllies(_bullet);
         AH_agentAudioHolder.Play(AgentAudioHolder.type.hurt);

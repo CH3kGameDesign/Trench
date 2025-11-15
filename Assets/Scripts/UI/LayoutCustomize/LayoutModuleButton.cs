@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class LayoutModuleButton : MonoBehaviour
 {
     [HideInInspector] public LevelGen_Block Block;
+    [HideInInspector] public Stamp_Scriptable Stamp;
 
     public TextMeshProUGUI TM_name;
     public TextMeshProUGUI TM_size;
@@ -62,6 +63,14 @@ public class LayoutModuleButton : MonoBehaviour
         Block = _block;
     }
 
+    public void Setup(Stamp_Scriptable _stamp)
+    {
+        TM_name.text = _stamp._name;
+        I_icon.sprite = _stamp._sprite;
+
+        Stamp = _stamp;
+    }
+
     void SizeText_Update(Vector2Int _size)
     {
         string _temp = "";
@@ -77,6 +86,7 @@ public class LayoutModuleButton : MonoBehaviour
 
     public void OnClick()
     {
-        LayoutCustomize.Instance.SelectBuild(Block);
+        if (Block != null) LayoutCustomize.Instance.SelectBuild(Block);
+        if (Stamp != null) GraffitiCustomize.Instance.SelectStamp(Stamp);
     }
 }

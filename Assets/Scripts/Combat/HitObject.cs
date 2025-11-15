@@ -7,6 +7,7 @@ using UnityEngine.Events;
 public class HitObject : MonoBehaviour
 {
     public bool B_useHealth = true;
+    [Range(0,5)] public float F_damageMult = 1;
     public float I_maxHealth = 10;
     private float f_health = 10;
     bool b_destroyed = false;

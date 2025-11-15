@@ -69,6 +69,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   RM: {fileID: 492485408440410870}
+  LGBS: []
 --- !u!1 &147381650169076724
 GameObject:
   m_ObjectHideFlags: 0
@@ -2603,10 +2604,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 878547791334733901}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 7.5
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -2682,6 +2683,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   B_useHealth: 0
+  F_damageMult: 1
   I_maxHealth: 10
   PF_hitParticles: {fileID: 2647958522976250888, guid: 94d14072ec6d642479ed4915d9d1bb60, type: 3}
   UE_OnHit:
@@ -2704,6 +2706,7 @@ MonoBehaviour:
       m_Calls: []
   ignoreDamageType: 
   RM_ragdollManager: {fileID: 492485408440410870}
+  V_vehicle: {fileID: 0}
 --- !u!4 &934643288329714868 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4454556173267821136, guid: bf6965db94003934dae88d13247dafe9, type: 3}
@@ -2759,10 +2762,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1122112151473072847}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 7.5
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -2838,6 +2841,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   B_useHealth: 0
+  F_damageMult: 1
   I_maxHealth: 10
   PF_hitParticles: {fileID: 2647958522976250888, guid: 94d14072ec6d642479ed4915d9d1bb60, type: 3}
   UE_OnHit:
@@ -2860,6 +2864,7 @@ MonoBehaviour:
       m_Calls: []
   ignoreDamageType: 
   RM_ragdollManager: {fileID: 492485408440410870}
+  V_vehicle: {fileID: 0}
 --- !u!4 &1311678185765672344 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -2530251679569251172, guid: bf6965db94003934dae88d13247dafe9, type: 3}
@@ -2955,10 +2960,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3096605010985207440}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 5
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -3034,6 +3039,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   B_useHealth: 0
+  F_damageMult: 1
   I_maxHealth: 10
   PF_hitParticles: {fileID: 2647958522976250888, guid: 94d14072ec6d642479ed4915d9d1bb60, type: 3}
   UE_OnHit:
@@ -3056,6 +3062,7 @@ MonoBehaviour:
       m_Calls: []
   ignoreDamageType: 
   RM_ragdollManager: {fileID: 492485408440410870}
+  V_vehicle: {fileID: 0}
 --- !u!4 &3149927406056958481 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -1918406353201951979, guid: bf6965db94003934dae88d13247dafe9, type: 3}
@@ -3413,10 +3420,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5082980473989136266}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 5
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -3492,6 +3499,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   B_useHealth: 0
+  F_damageMult: 1
   I_maxHealth: 10
   PF_hitParticles: {fileID: 2647958522976250888, guid: 94d14072ec6d642479ed4915d9d1bb60, type: 3}
   UE_OnHit:
@@ -3514,6 +3522,7 @@ MonoBehaviour:
       m_Calls: []
   ignoreDamageType: 
   RM_ragdollManager: {fileID: 492485408440410870}
+  V_vehicle: {fileID: 0}
 --- !u!4 &5219173142151150994 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8739090428522079082, guid: bf6965db94003934dae88d13247dafe9, type: 3}
@@ -3599,10 +3608,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5910980588810488935}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 7.5
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -3678,6 +3687,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   B_useHealth: 0
+  F_damageMult: 1
   I_maxHealth: 10
   PF_hitParticles: {fileID: 2647958522976250888, guid: 94d14072ec6d642479ed4915d9d1bb60, type: 3}
   UE_OnHit:
@@ -3700,6 +3710,7 @@ MonoBehaviour:
       m_Calls: []
   ignoreDamageType: 
   RM_ragdollManager: {fileID: 492485408440410870}
+  V_vehicle: {fileID: 0}
 --- !u!4 &5980659881528856518 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2029201095384133314, guid: bf6965db94003934dae88d13247dafe9, type: 3}
@@ -3763,10 +3774,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6471314785811783806}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 12.5
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -3796,6 +3807,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   B_useHealth: 0
+  F_damageMult: 1
   I_maxHealth: 10
   PF_hitParticles: {fileID: 2647958522976250888, guid: 94d14072ec6d642479ed4915d9d1bb60, type: 3}
   UE_OnHit:
@@ -3818,6 +3830,7 @@ MonoBehaviour:
       m_Calls: []
   ignoreDamageType: 
   RM_ragdollManager: {fileID: 492485408440410870}
+  V_vehicle: {fileID: 0}
 --- !u!114 &2621485879527736937
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3924,10 +3937,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7406645764222037248}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 5
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -4003,6 +4016,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   B_useHealth: 0
+  F_damageMult: 1
   I_maxHealth: 10
   PF_hitParticles: {fileID: 2647958522976250888, guid: 94d14072ec6d642479ed4915d9d1bb60, type: 3}
   UE_OnHit:
@@ -4025,6 +4039,7 @@ MonoBehaviour:
       m_Calls: []
   ignoreDamageType: 
   RM_ragdollManager: {fileID: 492485408440410870}
+  V_vehicle: {fileID: 0}
 --- !u!4 &7508021872130029386 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2803318976240490062, guid: bf6965db94003934dae88d13247dafe9, type: 3}
@@ -4075,10 +4090,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7751306649622900263}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 7.5
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -4154,6 +4169,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   B_useHealth: 0
+  F_damageMult: 1
   I_maxHealth: 10
   PF_hitParticles: {fileID: 2647958522976250888, guid: 94d14072ec6d642479ed4915d9d1bb60, type: 3}
   UE_OnHit:
@@ -4176,6 +4192,7 @@ MonoBehaviour:
       m_Calls: []
   ignoreDamageType: 
   RM_ragdollManager: {fileID: 492485408440410870}
+  V_vehicle: {fileID: 0}
 --- !u!4 &7775556491154357955 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -6539531558418800697, guid: bf6965db94003934dae88d13247dafe9, type: 3}
@@ -4214,10 +4231,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8120761458101464781}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 5
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -4293,6 +4310,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   B_useHealth: 0
+  F_damageMult: 2
   I_maxHealth: 10
   PF_hitParticles: {fileID: 2647958522976250888, guid: 94d14072ec6d642479ed4915d9d1bb60, type: 3}
   UE_OnHit:
@@ -4315,6 +4333,7 @@ MonoBehaviour:
       m_Calls: []
   ignoreDamageType: 
   RM_ragdollManager: {fileID: 492485408440410870}
+  V_vehicle: {fileID: 0}
 --- !u!4 &8340418825200633526 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4425252173966862258, guid: bf6965db94003934dae88d13247dafe9, type: 3}
@@ -4360,10 +4379,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8590713248624898817}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 5
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -4439,6 +4458,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   B_useHealth: 0
+  F_damageMult: 1
   I_maxHealth: 10
   PF_hitParticles: {fileID: 2647958522976250888, guid: 94d14072ec6d642479ed4915d9d1bb60, type: 3}
   UE_OnHit:
@@ -4461,6 +4481,7 @@ MonoBehaviour:
       m_Calls: []
   ignoreDamageType: 
   RM_ragdollManager: {fileID: 492485408440410870}
+  V_vehicle: {fileID: 0}
 --- !u!4 &8633122251271481921 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -5108846495674676411, guid: bf6965db94003934dae88d13247dafe9, type: 3}
@@ -4499,10 +4520,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8682017770307733313}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 12.5
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -4578,6 +4599,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   B_useHealth: 0
+  F_damageMult: 1
   I_maxHealth: 10
   PF_hitParticles: {fileID: 2647958522976250888, guid: 94d14072ec6d642479ed4915d9d1bb60, type: 3}
   UE_OnHit:
@@ -4600,6 +4622,7 @@ MonoBehaviour:
       m_Calls: []
   ignoreDamageType: 
   RM_ragdollManager: {fileID: 492485408440410870}
+  V_vehicle: {fileID: 0}
 --- !u!4 &8853153587051396603 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -5473560659282289409, guid: bf6965db94003934dae88d13247dafe9, type: 3}

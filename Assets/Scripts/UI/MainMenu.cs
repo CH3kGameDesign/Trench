@@ -27,6 +27,7 @@ public class MainMenu : MonoBehaviour
     public panelRefClass settings;
     public storeRefClass store;
     public customizeLayoutRefClass customizeLayout;
+    public customizeGraffitiRefClass customizeGraffiti;
     public loadingLevelRefClass loadingLevel;
     public endLevelRefClass endLevel;
     [Space(10)]
@@ -44,7 +45,7 @@ public class MainMenu : MonoBehaviour
     public GameObject PF_equipParticle;
 
     private panelEnum openedPanel = panelEnum.main;
-    public enum panelEnum { main, customize, store, load, settings, customizeLayout, loadLevel, endLevel}
+    public enum panelEnum { main, customize, store, load, settings, customizeLayout, loadLevel, endLevel, customizeGraffiti}
 
     [System.Serializable]
     public class panelRefClass
@@ -360,6 +361,30 @@ public class MainMenu : MonoBehaviour
         }
     }
     [System.Serializable]
+    public class customizeGraffitiRefClass : panelRefClass
+    {
+        public GraffitiCustomize graffitiCustomize;
+        public GraffitiManager graffitiManager;
+
+        public TextMeshProUGUI TM_buildButton;
+        public TextMeshProUGUI TM_backButton;
+
+
+        public override void Open(AnimCurve _curve, Vector3 v3_camMenuLocalPos, Quaternion q_camLastLocalRot, bool _move = true)
+        {
+            graffitiCustomize.Display();
+            base.Open(_curve, v3_camMenuLocalPos, q_camLastLocalRot, _move);
+        }
+        public override void Close()
+        {
+            base.Close();
+        }
+        public override void OnUpdate(PlayerController _PC)
+        {
+            graffitiCustomize.OnUpdate(_PC);
+        }
+    }
+    [System.Serializable]
     public class loadingLevelRefClass : panelRefClass
     {
         [Header("Prefabs")]
@@ -547,6 +572,7 @@ public class MainMenu : MonoBehaviour
         if (settings != GO) settings.Close();
         if (customizeLayout != GO) customizeLayout.Close();
         if (loadingLevel != GO) loadingLevel.Close();
+        if (customizeGraffiti != GO) customizeGraffiti.Close();
 
         GO.Open(AC_smooth, v3_camMenuLocalPos, q_camLastLocalRot);
 
@@ -705,6 +731,7 @@ public class MainMenu : MonoBehaviour
             case panelEnum.load: Open(load); break;
             case panelEnum.settings: Open(settings); break;
             case panelEnum.customizeLayout: Open(customizeLayout); break;
+            case panelEnum.customizeGraffiti: Open(customizeGraffiti); break;
             case panelEnum.loadLevel: LoadLevel(); break;
             case panelEnum.endLevel: LoadEndLevel(); break;
             default: Open(main); break;
@@ -765,6 +792,8 @@ public class MainMenu : MonoBehaviour
             close = 2;
         if (current == customizeLayout)
             close = 2;
+        if (current == customizeGraffiti)
+            close = 2;
 
         if (close == 1)
             SwitchTo(main);
@@ -792,8 +821,12 @@ public class MainMenu : MonoBehaviour
     public void BuildMenu()
     {
         if (menuOpen)
+        {
             if (current == customizeLayout)
                 LayoutCustomize.Instance.BuildMenu();
+            if (current == customizeGraffiti)
+                GraffitiCustomize.Instance.BuildMenu();
+        }
     }
     public void CheckSelectedButton()
     {
@@ -845,6 +878,9 @@ public class MainMenu : MonoBehaviour
         
         customizeLayout.TM_buildButton.text = "Build".ToString_Input(PlayerController.inputActions.BuildMenu, customizeLayout.TM_buildButton, Interactable.enumType.combine);
         customizeLayout.TM_backButton.text = "Back".ToString_Input(PlayerController.inputActions.Back, customizeLayout.TM_backButton, Interactable.enumType.combine);
+
+        customizeGraffiti.TM_buildButton.text = "Build".ToString_Input(PlayerController.inputActions.BuildMenu, customizeGraffiti.TM_buildButton, Interactable.enumType.combine);
+        customizeGraffiti.TM_backButton.text = "Back".ToString_Input(PlayerController.inputActions.Back, customizeGraffiti.TM_backButton, Interactable.enumType.combine);
     }
 
     
