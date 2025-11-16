@@ -1,9 +1,10 @@
+using PurrNet;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
-using PurrNet;
+using UnityEngine.Animations.Rigging;
 
 
 public class AgentController : BaseController
@@ -44,6 +45,8 @@ public class AgentController : BaseController
     [System.Serializable]
     public class behaviourClass
     {
+        public staggerClass stagger = new staggerClass();
+        [Space(10)]
         public stateClass onFound = new stateClass()
         {
             state = stateEnum.hunt,
@@ -160,7 +163,57 @@ public class AgentController : BaseController
             }
         }
     }
+    [System.Serializable]
+    public class staggerClass
+    {
+        public bool isStaggered => f_timer > 0;
+        public float F_duration = 1f;
+        private float f_timer = 0;
+        [Space(10)]
+        public float F_res_Bullet = 100;
+        public float F_res_Fire = 150;
+        public float F_res_Explosive = 30;
+        public float F_res_Melee = 10;
 
+        public void Stagger(HitObject.damageTypeEnum _type, float _amt, AgentController _AC)
+        {
+            if (isStaggered) return;
+            float _res;
+            switch (_type)
+            {
+                case HitObject.damageTypeEnum.bullet: _res = F_res_Bullet; break;
+                case HitObject.damageTypeEnum.fire: _res = F_res_Fire; break;
+                case HitObject.damageTypeEnum.explosive: _res = F_res_Explosive; break;
+                case HitObject.damageTypeEnum.melee: _res = F_res_Melee; break;
+                default: _res = F_res_Bullet; break;
+            }
+            float _chance = Mathf.Pow(_amt / (_amt + _res),2);
+
+            if (Random.Range(0f, 1f) <= _chance)
+                Stagger(_AC);
+        }
+        public void Stagger(AgentController _AC)
+        {
+            if (isStaggered) return;
+            f_timer = F_duration;
+
+            _AC.A_model.SetTrigger("Staggered");
+            //_AC.RM_ragdoll.Aiming(false, true);
+            _AC.RM_ragdoll.DisableRig(F_duration);
+            _AC.NMA.isStopped = true;
+        }
+        public void Stagger_Update(AgentController _AC)
+        {
+            f_timer -= Time.deltaTime;
+            if (f_timer <= 0)
+                Stagger_End(_AC);
+        }
+        public void Stagger_End(AgentController _AC)
+        {
+            f_timer = 0;
+            _AC.NMA.isStopped = false;
+        }
+    }
 
     public class TargetClass
     {
@@ -367,33 +420,41 @@ public class AgentController : BaseController
     {
         if (!isController)
             return;
-        switch (state)
+        if (behaviour.stagger.isStaggered)
         {
-            case stateEnum.idle:
-                break;
-            case stateEnum.wander:
-                ModelRotate(b_firing);
-                break;
-            case stateEnum.patrol:
-                ModelRotate(b_firing);
-                break;
-            case stateEnum.protect:
-                b_firing = FireManager();
-                ModelRotate(b_firing);
-                break;
-            case stateEnum.hunt:
-                b_firing = FireManager();
-                ModelRotate(b_firing);
-                break;
-            case stateEnum.kamikaze:
-                ModelRotate(false);
-                break;
-            case stateEnum.vehicle:
-                if (V_curVehicle)
-                    V_curVehicle.OnUpdate(this);
-                break;
-            default:
-                break;
+            b_firing = false;
+            behaviour.stagger.Stagger_Update(this);
+        }
+        else
+        {
+            switch (state)
+            {
+                case stateEnum.idle:
+                    break;
+                case stateEnum.wander:
+                    ModelRotate(b_firing);
+                    break;
+                case stateEnum.patrol:
+                    ModelRotate(b_firing);
+                    break;
+                case stateEnum.protect:
+                    b_firing = FireManager();
+                    ModelRotate(b_firing);
+                    break;
+                case stateEnum.hunt:
+                    b_firing = FireManager();
+                    ModelRotate(b_firing);
+                    break;
+                case stateEnum.kamikaze:
+                    ModelRotate(false);
+                    break;
+                case stateEnum.vehicle:
+                    if (V_curVehicle)
+                        V_curVehicle.OnUpdate(this);
+                    break;
+                default:
+                    break;
+            }
         }
         AnimationUpdate(b_firing);
         NavSurface_Update();
@@ -428,6 +489,8 @@ public class AgentController : BaseController
     {
         while (true)
         {
+            if (behaviour.stagger.isStaggered)
+                yield return new WaitForSeconds(behaviour.stagger.F_duration);
             switch (state)
             {
                 case stateEnum.idle:
@@ -708,8 +771,9 @@ public class AgentController : BaseController
             else
                 RM_ragdoll.RB_rigidbodies[0].AddForce(dir, ForceMode.VelocityChange);
         }
-
-        info.Hurt(_bullet.F_damage * _limb.F_damageMult);
+        float _finalDamage = _bullet.F_damage * _limb.F_damageMult;
+        behaviour.stagger.Stagger(_bullet.D_damageType, _finalDamage, this);
+        info.Hurt(_finalDamage);
         if (info.F_curHealth <= 0)
             OnDeath(_bullet, _source, _limb);
         else
