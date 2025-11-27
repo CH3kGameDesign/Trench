@@ -156,6 +156,12 @@ MonoBehaviour:
   DEBUG_EquippedGunNum: -1
   DEBUG_FollowPlayerImmediately: 0
   behaviour:
+    stagger:
+      F_duration: 1
+      F_res_Bullet: 10
+      F_res_Fire: 150
+      F_res_Explosive: 30
+      F_res_Melee: 10
     onFound:
       state: 10
       B_voiceLine: 1
