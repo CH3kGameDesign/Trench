@@ -6,6 +6,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
+using static Mission;
 using static Themes;
 
 public class LevelGen_Holder : NetworkBehaviour
@@ -362,7 +363,30 @@ public class LevelGen_Holder : NetworkBehaviour
 
         playerSpawner.canSpawn = true;
         onReadyEvent?.Invoke();
+        if (SaveData.missionCurrent)
+            SaveData.missionCurrent.OnLevelLoaded();
+        else
+            OnLevelLoaded_NoMission();
         StartCoroutine(FadeLoadingScreen());
+    }
+
+    void OnLevelLoaded_NoMission()
+    {
+        List<LevelGen_Spawn> spawn = new List<LevelGen_Spawn>();
+            spawn.AddRange(LevelGen_Holder.Instance.GetSpawns(
+                eventEnum.levelLoaded,
+                LevelGen_Spawn.spawnTypeEnum.companion));
+
+        foreach (var item in spawn)
+            item.Spawn();
+    }
+
+    public List<LevelGen_Spawn> GetSpawns(Mission.eventEnum _event, LevelGen_Spawn.spawnTypeEnum _spawn)
+    {
+        List<LevelGen_Spawn> _list = new List<LevelGen_Spawn>();
+        foreach(var LG in List)
+            _list.AddRange(LG.GetSpawns(_event, _spawn));
+        return _list;
     }
 
 

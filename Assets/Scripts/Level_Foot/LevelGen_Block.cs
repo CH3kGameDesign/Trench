@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -291,5 +292,19 @@ public class LevelGen_Block : MonoBehaviour
     {
         int _bound = UnityEngine.Random.Range(0, B_bounds.Count);
         return B_bounds[_bound].B_Bounds.bounds.GetRandomPoint(_3D);
+    }
+
+    public List<LevelGen_Spawn> GetSpawns(Mission.eventEnum _event, LevelGen_Spawn.spawnTypeEnum _spawn)
+    {
+        List<LevelGen_Spawn> _list = new List<LevelGen_Spawn>();
+        foreach (var spawn in LGS_Spawns)
+        {
+            if ((_event & spawn.spawnEvent) == 0)
+                continue;
+            if (_spawn != spawn.spawnType)
+                continue;
+            _list.Add(spawn);
+        }
+        return _list;
     }
 }

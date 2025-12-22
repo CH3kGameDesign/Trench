@@ -136,11 +136,11 @@ public class Objective : ScriptableObject
     void SetMission()
     {
         SaveData.objectives.Clear();
-        if (SaveData.missionCurrent != null)
+        if (SaveData.missionCurrent != null) 
         {
             //Main Objective
             SaveData.missionCurrent._steps[0]._objective.mainObjective = true;
-            objectiveClass _main = SaveData.missionCurrent._steps[0]._objective.Clone();
+            objectiveClass _main = SaveData.missionCurrent._steps[0]._objective;
             SaveData.objectives.Add(_main);
             _main.OnCompleted += FinishMainObjective;
 

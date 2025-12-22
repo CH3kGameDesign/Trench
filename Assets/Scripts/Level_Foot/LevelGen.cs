@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using PurrNet;
 using System;
 using System.Collections;
@@ -344,8 +345,6 @@ public class LevelGen : MonoBehaviour
 
     private void SpawnObjects(spawnType _type = spawnType._default)
     {
-        GameObject prefab;
-        GameObject GO;
         List<Transform> spawnPoints = new List<Transform>();
         foreach (var item in LG_Blocks)
         {
@@ -353,6 +352,7 @@ public class LevelGen : MonoBehaviour
             foreach (var spawn in item.LGS_Spawns)
             {
                 if (spawn == null) continue;
+                spawn.Setup(this);
                 switch (spawn.spawnType)
                 {
                     case LevelGen_Spawn.spawnTypeEnum.player:
@@ -360,73 +360,13 @@ public class LevelGen : MonoBehaviour
                             break;
                         spawnPoints.Add(spawn.transform);
                         break;
-                    case LevelGen_Spawn.spawnTypeEnum.companion:
-                        if (!isHost)
-                            break;
-                        if (_type == spawnType.enemyOnly)
-                            break;
-                        if (spawn.PF_override != null) prefab = spawn.PF_override;
-                        else prefab = LG_Theme.GetCompanion(Random_Seeded);
-
-                        Random_Seeded.NextInt();
-                        if (prefab != null)
-                        {
-                            GO = Instantiate(prefab);
-                            AgentController AC = GO.GetComponent<AgentController>();
-                            AC.NMA.transform.position = spawn.transform.position;
-                            AC.NMA.transform.rotation = spawn.transform.rotation;
-                            AC.ChangeState(spawn._state);
-                            AC_agents.Add(AC);
-                        }
-                        break;
-                    case LevelGen_Spawn.spawnTypeEnum.enemy:
-                        if (!isHost)
-                            break;
-                        if (_type == spawnType.friendlyOnly)
-                            break;
-                        if (spawn.PF_override != null) prefab = spawn.PF_override;
-                        else prefab = LG_Theme.GetEnemy(Random_Seeded); 
-
-                        Random_Seeded.NextInt();
-                        if (prefab != null)
-                        {
-                            GO = Instantiate(prefab);
-                            AgentController AC = GO.GetComponent<AgentController>();
-                            AC.NMA.transform.position = spawn.transform.position;
-                            AC.NMA.transform.rotation = spawn.transform.rotation;
-                            AC.ChangeState(spawn._state);
-                            AC_agents.Add(AC);
-                        }
-                        break;
-                    case LevelGen_Spawn.spawnTypeEnum.treasure:
-                        if (!isHost)
-                            break;
-                        if (_type == spawnType.friendlyOnly)
-                            break;
-                        if (spawn.PF_override != null) prefab = spawn.PF_override;
-                        else prefab = LG_Theme.GetTreasure(Random_Seeded);
-
-                        Random_Seeded.NextInt();
-                        if (prefab != null)
-                            GO = Instantiate(prefab, spawn.transform.position, spawn.transform.rotation, transform);
-                        break;
-                    case LevelGen_Spawn.spawnTypeEnum.shoppingCart:
-                        if (!isHost)
-                            break;
-                        if (_type == spawnType.friendlyOnly)
-                            break;
-                        if (spawn.PF_override != null) prefab = spawn.PF_override;
-                        else prefab = null;
-
-                        if (prefab != null)
-                            GO = Instantiate(prefab, spawn.transform.position, spawn.transform.rotation, transform);
-                        break;
                     case LevelGen_Spawn.spawnTypeEnum.boss:
                         if (_type == spawnType.friendlyOnly)
                             break;
                         EnemyTimer.Instance.Setup(spawn.transform);
                         break;
                     default:
+                        //spawn.Spawn(Random_Seeded, _type);
                         break;
                 }
             }
@@ -705,5 +645,13 @@ public class LevelGen : MonoBehaviour
                 continue;
             agent.behaviour.OnDeath(agent, _AC);
         }
+    }
+
+    public List<LevelGen_Spawn> GetSpawns(Mission.eventEnum _event, LevelGen_Spawn.spawnTypeEnum _spawn)
+    {
+        List<LevelGen_Spawn> _list = new List<LevelGen_Spawn>();
+        foreach (var block in LG_Blocks)
+            _list.AddRange(block.GetSpawns(_event, _spawn));
+        return _list;
     }
 }
