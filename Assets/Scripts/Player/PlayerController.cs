@@ -240,6 +240,8 @@ public class PlayerController : BaseController
         public Vector2 v2_camInputDir;
 
         public float f_zoom;
+        public float f_rotate;
+        public Vector2 v2_scale;
 
         public bool b_sprinting = false;
         public bool b_jumping = false;
@@ -1952,6 +1954,8 @@ public class PlayerController : BaseController
     public void Input_Recall(InputAction.CallbackContext cxt) { Inputs.b_recall = Input_GetPressed(cxt); }
     public void Input_Menu(InputAction.CallbackContext cxt) { if (cxt.phase == InputActionPhase.Started) MainMenu.Instance.Menu_Tapped(); }
     public void Input_Zoom(InputAction.CallbackContext cxt) { Inputs.f_zoom = Input_GetFloat(cxt); }
+    public void Input_Rotate(InputAction.CallbackContext cxt) { Inputs.f_rotate = Input_GetFloat(cxt); }
+    public void Input_Scale(InputAction.CallbackContext cxt) { Inputs.v2_scale = Input_GetVector2(cxt); }
 
     public void Input_Purchase(InputAction.CallbackContext cxt)
     {

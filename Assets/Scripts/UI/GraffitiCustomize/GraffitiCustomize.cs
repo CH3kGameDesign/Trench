@@ -50,6 +50,8 @@ public class GraffitiCustomize : MonoBehaviour
     private float F_canvasZoom = 1;
     private Vector2 v2_zoomBounds = new Vector2(0.5f, 2f);
     public float f_cursorSpeed = 50f;
+    public float f_cursorSpeed_Rotate = 60f;
+    public float f_cursorSpeed_Scale = 1f;
 
     private void Awake()
     {
@@ -120,6 +122,8 @@ public class GraffitiCustomize : MonoBehaviour
         if (!G_buildMenu.activeSelf)
         {
             MoveCursor(_PC);
+            RotateCursor(_PC);
+            ScaleCursor(_PC);
             ClickManager(_PC);
         }
     }
@@ -132,6 +136,18 @@ public class GraffitiCustomize : MonoBehaviour
 
         MoveCanvas(_PC);
         ZoomCanvas(_PC);
+    }
+    void RotateCursor(PlayerController _PC)
+    {
+        float _rotation = RT_cursor.localEulerAngles.z;
+        _rotation -= _PC.Inputs.f_rotate * Time.unscaledDeltaTime * f_cursorSpeed_Rotate;
+        RT_cursor.localEulerAngles = new Vector3(0, 0, _rotation);
+    }
+    void ScaleCursor(PlayerController _PC)
+    {
+        Vector2 _scale = RT_cursor.localScale;
+        _scale += _PC.Inputs.v2_scale * Time.unscaledDeltaTime * f_cursorSpeed_Scale;
+        RT_cursor.localScale = new Vector3(_scale.x, _scale.y, 1);
     }
     void ClickManager(PlayerController _PC)
     {
@@ -150,10 +166,6 @@ public class GraffitiCustomize : MonoBehaviour
     {
 
         return false;
-    }
-    public void Rotate(int _dir)
-    {
-
     }
     public void BuildMenu()
     {
@@ -220,17 +232,24 @@ public class GraffitiCustomize : MonoBehaviour
     }
     void MoveCursor_Gamepad(Vector2 dir, float _speed)
     {
-        v2_cursorPosition += dir * _speed;
+        v2_cursorPosition += dir * _speed * Time.unscaledDeltaTime;
 
         v2_cursorPosition.x = Mathf.Clamp(v2_cursorPosition.x, -v2_canvasHalf.x, v2_canvasHalf.x);
         v2_cursorPosition.y = Mathf.Clamp(v2_cursorPosition.y, -v2_canvasHalf.y, v2_canvasHalf.y);
 
         RT_cursor.anchoredPosition = v2_cursorPosition;
     }
-    public void SetCursorPos(Vector3 pos)
+    public void SetCursorPos(Vector3 pos, float? _rotation = null, Vector2? _scale = null)
     {
         v2_cursorPosition = pos;
         RT_cursor.anchoredPosition = v2_cursorPosition;
+        if (_rotation != null)
+            RT_cursor.localEulerAngles = new Vector3(0, 0, _rotation.Value);
+        if (_scale != null)
+        {
+            Vector3 _newScale = _scale.Value;
+            RT_cursor.localEulerAngles = new Vector3(_newScale.x, _newScale.y, 1);
+        }
     }
 
     void MoveCanvas(PlayerController _PC)
