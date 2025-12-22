@@ -50,7 +50,7 @@ public class CreateObject : MonoBehaviour
                 Destroy(gameObject);
             return;
         }
-        if (transform == null)
+        if (gameObject == null)
             return;
 
         GameObject PF = PF_prefabs.GetRandom();
