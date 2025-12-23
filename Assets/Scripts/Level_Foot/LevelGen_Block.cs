@@ -16,6 +16,7 @@ public class LevelGen_Block : MonoBehaviour
     public Vector2Int size;
     public int weight;
     public costClass cost;
+    public List<effectClass> effectList = new List<effectClass>();
     [Space(10)]
     [Header("References")]
     public Transform T_blockHolder;
@@ -36,6 +37,39 @@ public class LevelGen_Block : MonoBehaviour
         public Vector2Int _pos;
         public int _rot;
         public entryTypeEnum _entryType;
+    }
+
+    public enum effectTypeEnum { respawn}
+    [System.Serializable]
+    public class effectClass
+    {
+        public effectTypeEnum _effectType;
+        public float _amt;
+
+        public bool GetEffectAmt(out float f, effectTypeEnum _type)
+        {
+            f = 0;
+            if (_effectType == _type)
+            {
+                f = _amt;
+                return true;
+            }
+            return false;
+        }
+    }
+    public bool GetEffectAmt(out float f, effectTypeEnum _type)
+    {
+        f = 0;
+        bool _valid = false;
+        foreach (effectClass _effect in effectList)
+        {
+            if (_effect.GetEffectAmt(out float _temp, _type))
+            {
+                f += _temp;
+                _valid = true;
+            }
+        }
+        return _valid;
     }
 
     public enum entryTypeEnum { singleDoor, wideDoor, vent, shipDoor, shipPark, any}

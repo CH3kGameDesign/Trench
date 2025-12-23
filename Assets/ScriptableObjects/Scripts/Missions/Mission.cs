@@ -52,9 +52,14 @@ public class Mission : ScriptableObject
         _temp.SpawnOnStart = SpawnOnStart;
 
         _temp._steps = new List<stepClass>();
+
         foreach (var step in _steps)
             _temp._steps.Add(step.Clone());
         _temp._sideObjective = _sideObjective.Clone();
+
+        _temp.SpawnEvents = new List<spawnClass>();
+        foreach (var spawn in SpawnEvents)
+            _temp.SpawnEvents.Add(spawn.Clone());
 
         return _temp;
     }
@@ -171,5 +176,7 @@ public class Mission : ScriptableObject
 
         foreach (var item in spawn)
             item.Spawn();
+
+        SpawnEnemies(eventEnum.levelLoaded);
     }
 }

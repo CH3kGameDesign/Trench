@@ -7,7 +7,7 @@ public class Layout_Defined : ScriptableObject
     public LevelGen_Theme _theme;
     public Layout_Bounds _bounds;
     public List<objectClass> _objects = new List<objectClass>();
-
+    [HideInInspector] public effectClass _effect;
     public Layout_Defined()
     {
         _theme = null;
@@ -21,6 +21,7 @@ public class Layout_Defined : ScriptableObject
         _objects = new List<objectClass>();
         foreach (var item in _temp._objects)
             _objects.Add(new objectClass(item));
+        _effect = new effectClass(this);
     }
     public Layout_Defined(LevelGen_Theme theme, Layout_Bounds bounds, List<objectClass> objects)
     {
@@ -58,5 +59,50 @@ public class Layout_Defined : ScriptableObject
             _rot = rot;
             _locked = locked;
         }
+    }
+
+    [System.Serializable]
+    public class effectClass
+    {
+        public int _respawnTotal = 0;
+        public int _respawnAmt = 0;
+
+        public effectClass(Layout_Defined _layout)
+        {
+            if (_layout.GetEffect(out float f, LevelGen_Block.effectTypeEnum.respawn))
+            {
+                _respawnTotal = Mathf.RoundToInt(f);
+                _respawnAmt = _respawnTotal;
+            }
+            else
+            {
+                _respawnTotal = 0;
+                _respawnAmt = 0;
+            }
+        }
+        public bool Respawn()
+        {
+            if (_respawnAmt <= 0)
+                return false;
+
+            _respawnAmt--;
+            PlayerManager.main.Ref.HUI_health.UpdateRespawns();
+
+            return true;
+        }
+    }
+    public bool GetEffect(out float f, LevelGen_Block.effectTypeEnum _effect)
+    {
+        f = 0;
+        bool _valid = false;
+        foreach (var _obj in _objects)
+        {
+            if (_obj._block.GetEffectAmt(out float _temp, _effect))
+            {
+                f += _temp;
+                _valid = true;
+            }
+        }
+        return _valid;
     }
 }

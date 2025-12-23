@@ -14,6 +14,9 @@ public class HealthUI : MonoBehaviour
     float _health;
     Coroutine _healthUpdate = null;
 
+    public CanvasGroup CG_reviveCounter;
+    public TextMeshProUGUI TM_reviveCounter;
+
     private Material _mat = null;
     private bool _setup = false;
 
@@ -40,6 +43,7 @@ public class HealthUI : MonoBehaviour
         UpdateInfo();
         _con.info.icon.onChanged += UpdateInfo;
         UpdateHealth(true);
+        UpdateRespawns(_con == PlayerManager.main);
     }
     void UpdateInfo<T>(T _temp) { UpdateInfo(); }
     public void UpdateInfo()
@@ -71,6 +75,25 @@ public class HealthUI : MonoBehaviour
         }
         else
             _healthUpdate = StartCoroutine(Health_Update(_controller.info.F_curHealth));
+    }
+
+    public void UpdateRespawns(bool _player = true)
+    {
+        bool _respawn = SaveData.missionCurrent && SaveData.shipLayout;
+        if (!_respawn || !_player)
+        {
+            CG_reviveCounter.gameObject.SetActive(false);
+            return;
+        }
+
+        int _amt = SaveData.shipLayout._effect._respawnAmt;
+
+        CG_reviveCounter.gameObject.SetActive(true);
+        TM_reviveCounter.text = _amt.ToString();
+        if (_amt <= 0)
+            CG_reviveCounter.alpha = 0.4f;
+        else
+            CG_reviveCounter.alpha = 0.8f;
     }
     IEnumerator Health_Update(float _tarHealth)
     {

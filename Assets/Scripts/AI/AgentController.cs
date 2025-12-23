@@ -97,6 +97,8 @@ public class AgentController : BaseController
             {
                 EnemyTimer.Instance.StartTimer_Boss();
                 onFound.Activate(AC);
+                if (SaveData.missionCurrent)
+                    SaveData.missionCurrent.SpawnEnemies(Mission.eventEnum.playerDiscovered);
             }
         }
         public void OnHit(AgentController AC, bool b_player)
@@ -862,13 +864,16 @@ public class AgentController : BaseController
 
     }
 
-    public override void Revive()
+    public override bool Revive(bool _forced = false)
     {
+        if (!base.Revive(_forced))
+            return false;
         if (gun_Equipped)
             gun_Equipped.OnEquip(this);
         info.Revive();
 
         ChangeState(stateEnum.protect);
+        return true;
     }
 
     Relationship.meterClass GetRelationship()

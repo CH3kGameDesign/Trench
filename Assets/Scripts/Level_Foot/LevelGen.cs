@@ -636,6 +636,18 @@ public class LevelGen : MonoBehaviour
         }
         return _value;
     }
+    public int GetEnemyAmount(bool _aliveOnly = true)
+    {
+        int _amt = 0;
+        foreach (AgentController agent in AC_agents)
+        {
+            if (agent == null)
+                continue;
+            if ((_aliveOnly && agent.info.b_alive) || !_aliveOnly)
+                _amt++;
+        }
+        return _amt;
+    }
 
     public void AgentDeath(AgentController _AC)
     {
@@ -646,6 +658,7 @@ public class LevelGen : MonoBehaviour
             agent.behaviour.OnDeath(agent, _AC);
         }
     }
+
 
     public List<LevelGen_Spawn> GetSpawns(Mission.eventEnum _event, LevelGen_Spawn.spawnTypeEnum _spawn)
     {

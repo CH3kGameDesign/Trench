@@ -1602,15 +1602,18 @@ public class PlayerController : BaseController
 
         base.OnHeal(_amt);
     }
-    public override void Revive()
+    public override bool Revive(bool _forced = false)
     {
+        if (!base.Revive(_forced))
+            return false;
         if (PlayerManager.main != this)
-            return;
+            return false;
         gun_Equipped.OnEquip(this);
         info.Revive();
 
         GameState_Change(gameStateEnum.active);
         ChangeState(stateEnum.idle);
+        return true;
     }
 
     public override void HealthUpdate()
@@ -1848,6 +1851,13 @@ public class PlayerController : BaseController
 
         if (V_curVehicle == null)
             CheckReady(AttachToBound);
+
+        if (SaveData.missionCurrent && _bounds && _enter)
+        {
+            LevelGen_Block _LGB;
+            if (LevelGen_Holder.Instance.GetRoom(out _LGB, _bounds.V3ID))
+                SaveData.missionCurrent.SpawnEnemies(Mission.eventEnum.playerEnterRoom, _LGB.BlockType);
+        }
     }
     public override void AttachToBound()
     {

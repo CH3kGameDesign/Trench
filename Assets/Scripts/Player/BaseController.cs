@@ -218,9 +218,15 @@ public class BaseController : NetworkBehaviour
     {
 
     }
-    public virtual void Revive()
+    public virtual bool Revive(bool _forced = false)
     {
-
+        if (info.b_alive)
+            return false;
+        if (SaveData.missionCurrent &&
+            SaveData.shipLayout &&
+            !_forced)
+            return SaveData.shipLayout._effect.Respawn();
+        return true;
     }
     public virtual void OnDeath()
     {

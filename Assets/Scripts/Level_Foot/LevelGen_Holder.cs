@@ -1,5 +1,6 @@
 using PurrNet;
 using PurrNet.Packing;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -350,10 +351,17 @@ public class LevelGen_Holder : NetworkBehaviour
 
     public void AgentDeath(AgentController _AC)
     {
+        int _amtRemaining = 0;
         foreach (var LG in List)
         {
             LG.AgentDeath(_AC);
+            _amtRemaining += LG.GetEnemyAmount();
         }
+        if (SaveData.missionCurrent)
+            SaveData.missionCurrent.SpawnEnemies(
+                Mission.eventEnum.enemyRemaining,
+                null,
+               _amtRemaining);
     }
     public void IsReady()
     {
@@ -412,5 +420,16 @@ public class LevelGen_Holder : NetworkBehaviour
         }
         CG_loadingScreen.alpha = 0f;
         CG_loadingScreen.gameObject.SetActive(false);
+    }
+
+    public bool GetRoom(out LevelGen_Block _LGB, Vector3Int _V3ID)
+    {
+        _LGB = null;
+        if (_V3ID.x < 0) return false;
+        if (_V3ID.y < 0) return false;
+        if (_V3ID.x >= LevelGen_Holder.Instance.List.Count) return false;
+        if (_V3ID.y >= LevelGen_Holder.Instance.List[_V3ID.x].LG_Blocks.Count) return false;
+        _LGB = LevelGen_Holder.Instance.List[_V3ID.x].LG_Blocks[_V3ID.y];
+        return true;
     }
 }

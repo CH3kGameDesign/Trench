@@ -8,7 +8,7 @@ public class Item_RevivePotion : Item_Consumable
         bool b = false;
         foreach (var item in _cont.followers)
         {
-            if (item.info.F_curHealth <= 0)
+            if (!item.info.b_alive)
             {
                 b = true;
                 break;
@@ -20,11 +20,11 @@ public class Item_RevivePotion : Item_Consumable
             return false;
         foreach (var item in _cont.followers)
         {
-            if (item.info.F_curHealth <= 0)
+            if (!item.info.b_alive)
             {
                 if (item == PlayerManager.main.BC_equippedController)
                     PlayerManager.main.DropController();
-                item.Revive();
+                item.Revive(true);
             }
         }
         return true;
