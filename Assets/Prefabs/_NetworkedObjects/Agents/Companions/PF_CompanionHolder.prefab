@@ -127,6 +127,8 @@ MonoBehaviour:
   _visitiblityRules: {fileID: 0}
   info: {fileID: 0}
   NMA: {fileID: 1284363051418628405}
+  FMA: {fileID: 3238904958327275467}
+  B_flying: 0
   T_model: {fileID: 3340136924810737307}
   T_gunHook: {fileID: 6728177349458334553}
   T_barrelHook: {fileID: 7313828478690311588}
@@ -718,6 +720,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6849873132892928614}
   - component: {fileID: 1284363051418628405}
+  - component: {fileID: 3238904958327275467}
   - component: {fileID: 7125570264134322029}
   - component: {fileID: 8741451782662131216}
   - component: {fileID: 8949253357783398663}
@@ -769,6 +772,24 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &3238904958327275467
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4885962304612941317}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9064440cacd448b4facf9a59a0bc2d83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FlightMeshAgent
+  F_maxSpeed: 5
+  F_acceleration: 5
+  F_brakeSpeed: 5
+  F_turnSpeed: 90
+  F_baseStoppingDistance: 0.5
+  isStopped: 0
 --- !u!54 &7125570264134322029
 Rigidbody:
   m_ObjectHideFlags: 0

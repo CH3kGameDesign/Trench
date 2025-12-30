@@ -202,7 +202,10 @@ public class AgentController : BaseController
             _AC.A_model.SetTrigger("Staggered");
             //_AC.RM_ragdoll.Aiming(false, true);
             _AC.RM_ragdoll.DisableRig(F_duration);
-            _AC.NMA.isStopped = true;
+            if (!_AC.B_flying)
+                _AC.NMA.isStopped = true;
+            else
+                _AC.FMA.isStopped = true;
         }
         public void Stagger_Update(AgentController _AC)
         {
@@ -213,7 +216,10 @@ public class AgentController : BaseController
         public void Stagger_End(AgentController _AC)
         {
             f_timer = 0;
-            _AC.NMA.isStopped = false;
+            if (!_AC.B_flying)
+                _AC.NMA.isStopped = false;
+            else
+                _AC.FMA.isStopped = false;
         }
     }
 
@@ -533,6 +539,29 @@ public class AgentController : BaseController
                         FindTarget();
                     yield return new WaitForSeconds(f_searchDelay);
                     break;
+                case stateEnum.flyIdle:
+                    if (fieldOfView != null)
+                        FindTarget();
+                    yield return new WaitForSeconds(0.5f);
+                    break;
+                case stateEnum.flyWander:
+                    if (fieldOfView != null)
+                        FindTarget();
+                    GoToRandomPoint(true);
+                    yield return new WaitForSeconds(f_searchDelay);
+                    break;
+                case stateEnum.flyPatrol:
+                    if (fieldOfView != null)
+                        FindTarget();
+                    GoToRandomPoint(false);
+                    yield return new WaitForSeconds(f_searchDelay);
+                    break;
+                case stateEnum.flyProtect:
+                    Follow(followTarget);
+                    if (fieldOfView != null && !b_firing)
+                        FindTarget();
+                    yield return new WaitForSeconds(f_searchDelay);
+                    break;
                 default:
                     yield return new WaitForSeconds(0.5f);
                     break;
@@ -541,10 +570,15 @@ public class AgentController : BaseController
     }
     void GoToRandomPoint(bool _sameRoom = false)
     {
-        if (!NMA.isOnNavMesh || V_curVehicle != null)
+        if (V_curVehicle != null)
             return;
         //PLACEHOLDER
-        if (!NMA.hasPath || NMA.velocity.sqrMagnitude == 0f)
+        if (B_flying)
+        {
+            if (FMA.AtDestination())
+                SetDestination(LevelGen_Holder.Instance.GetRandomPoint(V3ID, _sameRoom, true));
+        }
+        else if (!NMA.hasPath || NMA.velocity.sqrMagnitude == 0f)
         {
             if (NMA.navMeshOwner == null)
                 return;
@@ -598,6 +632,8 @@ public class AgentController : BaseController
     {
         if (V_curVehicle == null && NMA.isOnNavMesh)
             NMA.SetDestination(_destination);
+        if (FMA != null)
+            FMA.SetDestination(_destination);
     }
 
     void Follow(TargetClass _target)
@@ -734,10 +770,8 @@ public class AgentController : BaseController
                 _bullet.con_Gun.Damage_Objective(Mathf.FloorToInt(_bullet.F_damage * _limb.F_damageMult));
                 info.AttackTarget(_bullet.con_Player.info.owner);
                 _bullet.con_Player.AggroAllies(this);
-                OnHit_Behaviour(true);
             }
-            else
-                PlayerManager.conversation.StartMessage(ConversationID.Banter_FriendlyFire_001, T_messageHook);
+            OnHit_Behaviour(true);
         }
         else
         {

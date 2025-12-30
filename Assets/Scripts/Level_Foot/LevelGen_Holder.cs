@@ -432,4 +432,18 @@ public class LevelGen_Holder : NetworkBehaviour
         _LGB = LevelGen_Holder.Instance.List[_V3ID.x].LG_Blocks[_V3ID.y];
         return true;
     }
+    public Vector3 GetRandomPoint(Vector3Int _V3ID, bool _sameRoom = true, bool _3D = false)
+    {
+        if (_V3ID.x < 0) _sameRoom = false;
+        if (_V3ID.y < 0) _sameRoom = false;
+        if (_V3ID.x >= LevelGen_Holder.Instance.List.Count) _sameRoom = false;
+        if (_V3ID.y >= LevelGen_Holder.Instance.List[_V3ID.x].LG_Blocks.Count) _sameRoom = false;
+        if (!_sameRoom)
+        {
+            _V3ID.x = UnityEngine.Random.Range(0, List.Count);
+            _V3ID.y = UnityEngine.Random.Range(0, List[_V3ID.x].LG_Blocks.Count);
+            _V3ID.z = UnityEngine.Random.Range(0, List[_V3ID.x].LG_Blocks[_V3ID.y].B_bounds.Count);
+        }
+        return List[_V3ID.x].LG_Blocks[_V3ID.y].GetRandomPoint(_3D);
+    }
 }

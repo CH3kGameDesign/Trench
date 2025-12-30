@@ -11,6 +11,8 @@ public class BaseController : NetworkBehaviour
 {
     [HideInInspector] public BaseInfo info;
     public NavMeshAgent NMA;
+    public FlightMeshAgent FMA;
+    [HideInInspector] public bool B_flying = false;
     public Transform T_model;
     public Transform T_gunHook;
     public Transform T_barrelHook;
@@ -50,6 +52,8 @@ public class BaseController : NetworkBehaviour
     {
         idle = 0, wander = 1, patrol = 2, protect = 3,
         hunt = 10, scared = 11, tactical = 12, loud = 13, aggressive = 14, kamikaze = 15,
+        flyIdle = 20, flyWander = 21, flyPatrol = 22, flyProtect = 23, 
+        flyChase = 30, flyCircle = 31, flyPerch = 32,
         ragdoll = -1,
         vehicle = -2,
         unchanged = -10
@@ -85,6 +89,9 @@ public class BaseController : NetworkBehaviour
             default:
                 break;
         }
+        int _stateNum = (int)_state;
+        if (_stateNum >= 20 && _stateNum < 40)
+            EnterFlight();
         state = _state;
         return true;
     }
@@ -117,6 +124,39 @@ public class BaseController : NetworkBehaviour
             default:
                 break;
         }
+        int _stateNum = (int)_state;
+        if (_stateNum >= 20 && _stateNum < 40)
+            ExitFlight();
+    }
+    protected virtual void EnterFlight(bool _forced = false)
+    {
+        if (FMA == null)
+        {
+            NMA.enabled = true;
+            B_flying = false;
+            return;
+        }
+        if (B_flying && !_forced)
+            return;
+        NMA.enabled = false;
+        FMA.enabled = true;
+        FMA.isStopped = false;
+        B_flying = true;
+    }
+    protected virtual void ExitFlight(bool _forced = false)
+    {
+        if (FMA == null)
+        {
+            NMA.enabled = true;
+            B_flying = false;
+            return;
+        }
+        if (!B_flying && !_forced)
+            return;
+        NMA.enabled = true;
+        NMA.isStopped = false;
+        FMA.enabled = false;
+        B_flying = false;
     }
 
     public void GroundedUpdate(bool _grounded)
@@ -145,12 +185,15 @@ public class BaseController : NetworkBehaviour
 
     public virtual void Update()
     {
-        if (b_updateNav && NMA.isOnNavMesh)
+        if (!B_flying)
         {
-            NMA.Move(NMA.transform.position - prevPos);
-            NMA.transform.position = NMA.nextPosition;
+            if (b_updateNav && NMA.isOnNavMesh)
+            {
+                NMA.Move(NMA.transform.position - prevPos);
+                NMA.transform.position = NMA.nextPosition;
+            }
+            prevPos = NMA.transform.position;
         }
-        prevPos = NMA.transform.position;
     }
     public void SetPosition(Vector3 pos)
     {
