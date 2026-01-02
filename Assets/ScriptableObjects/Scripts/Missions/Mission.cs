@@ -10,6 +10,8 @@ public class Mission : ScriptableObject
     public string _description;
     public Sprite _sprite;
     [Space(10)]
+    public LevelGen PF_specificLayout;
+    [Space(10)]
     public spawnOnStartEnum SpawnOnStart = (spawnOnStartEnum)~0;
     [System.Flags]
     public enum spawnOnStartEnum { 
@@ -46,9 +48,14 @@ public class Mission : ScriptableObject
     public Mission Clone()
     {
         Mission _temp = CreateInstance<Mission>();
+        _temp._id = _id;
+
         _temp._name = _name;
         _temp._description = _description;
         _temp._sprite = _sprite;
+
+        _temp.PF_specificLayout = PF_specificLayout;
+
         _temp.SpawnOnStart = SpawnOnStart;
 
         _temp._steps = new List<stepClass>();

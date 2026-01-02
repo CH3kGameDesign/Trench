@@ -211,9 +211,17 @@ public class LevelGen_Holder : NetworkBehaviour
         }
     }
 
+    LevelGen GetLevelGenPrefab()
+    {
+        if (SaveData.missionCurrent != null)
+            if (SaveData.missionCurrent.PF_specificLayout != null)
+                return SaveData.missionCurrent.PF_specificLayout;
+        return PF_levelGen;
+    }
+
     public void CreateNew(_networkTransform _transform)
     {
-        LevelGen LG = Instantiate(PF_levelGen, transform);
+        LevelGen LG = Instantiate(GetLevelGenPrefab(), transform);
 
         Vector3 _pos = Vector3.zero;
         if (_transform.position.Count > 0)
@@ -245,7 +253,7 @@ public class LevelGen_Holder : NetworkBehaviour
         _transform.seed = (uint)UnityEngine.Random.Range(1, int.MaxValue);
         Transforms.value.Add(_transform);
 
-        LevelGen LG = Instantiate(PF_levelGen, transform);
+        LevelGen LG = Instantiate(GetLevelGenPrefab(), transform);
         LG.isHost = true;
         if (_layout == null)
             LG.Setup(_transform.seed, List.Count, _pos, _player, _BC);

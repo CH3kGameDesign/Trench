@@ -12,7 +12,7 @@ using static Themes;
 
 public class LevelGen : MonoBehaviour
 {
-    private Unity.Mathematics.Random Random_Seeded;
+    [HideInInspector] public Unity.Mathematics.Random Random_Seeded;
 
     [SerializeField] private holderTypesClass holderTypes = new holderTypesClass();
 
@@ -22,7 +22,7 @@ public class LevelGen : MonoBehaviour
     [HideInInspector] public Transform T_Holder;
     [HideInInspector] public Ship ship = null;
 
-    private NavMeshSurface[] nm_Surfaces;
+    protected NavMeshSurface[] nm_Surfaces;
 
     [HideInInspector] public List<LevelGen_Block> LG_Blocks = new List<LevelGen_Block>();
 
@@ -50,7 +50,7 @@ public class LevelGen : MonoBehaviour
     }
 
     public enum spawnType { _default, friendlyOnly, enemyOnly};
-    public void Setup(uint _seed, int _id, Vector3 _pos, bool _player = true, BoxCollider _BC = null)
+    public virtual void Setup(uint _seed, int _id, Vector3 _pos, bool _player = true, BoxCollider _BC = null)
     {
         id = _id;
 
@@ -71,7 +71,7 @@ public class LevelGen : MonoBehaviour
         else
             GenerateLayout_Series(LG_Theme, _pos);
     }
-    public void Setup(uint _seed, int _id, Vector3 _pos, Layout_Defined _layoutDefined, bool _player = true, BoxCollider _BC = null)
+    public virtual void Setup(uint _seed, int _id, Vector3 _pos, Layout_Defined _layoutDefined, bool _player = true, BoxCollider _BC = null)
     {
         id = _id;
 
@@ -163,7 +163,7 @@ public class LevelGen : MonoBehaviour
         SpawnObjects(_type);
         LevelGen_Holder.Instance.IsReady();
     }
-    void SetDoors_Auto()
+    protected void SetDoors_Auto()
     {
         List<LevelGen_Door> _doors = new List<LevelGen_Door>();
         foreach (var item in LG_Blocks)
@@ -240,7 +240,7 @@ public class LevelGen : MonoBehaviour
             LevelGen_Holder.Instance.IsReady();
         }
     }
-    void UpdatePosition(Transform lHolder, Vector3 _pos)
+    public void UpdatePosition(Transform lHolder, Vector3 _pos)
     {
         if (!NetworkManager.isServerStatic)
             return;
@@ -248,7 +248,7 @@ public class LevelGen : MonoBehaviour
         LevelGen_Holder.Instance.UpdateTransform(this);
     }
 
-    void SetupVehicle(Transform lHolder, Layout_Defined _save, spawnType _type, BoxCollider _BC = null)
+    protected void SetupVehicle(Transform lHolder, Layout_Defined _save, spawnType _type, BoxCollider _BC = null)
     {
         if (_save == null) SetupVehicle(T_Holder, _type);
         if (SaveData.themeCurrent == themeEnum.ship)
@@ -273,7 +273,7 @@ public class LevelGen : MonoBehaviour
             }
         }
     }
-    void SetupVehicle(Transform lHolder, spawnType _type = spawnType._default, BoxCollider _BC = null)
+    protected void SetupVehicle(Transform lHolder, spawnType _type = spawnType._default, BoxCollider _BC = null)
     {
         if (SaveData.themeCurrent == themeEnum.ship)
         {
@@ -343,7 +343,7 @@ public class LevelGen : MonoBehaviour
         }
     }
 
-    private void SpawnObjects(spawnType _type = spawnType._default)
+    protected void SpawnObjects(spawnType _type = spawnType._default)
     {
         List<Transform> spawnPoints = new List<Transform>();
         foreach (var item in LG_Blocks)
