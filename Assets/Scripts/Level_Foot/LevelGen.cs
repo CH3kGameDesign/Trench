@@ -608,7 +608,7 @@ public class LevelGen : MonoBehaviour
         LevelGen_Holder.Instance.shipBlock = _block;
         EnemyTimer.Instance.LG_Ship = _block;
         if (SaveData.missionCurrent != null)
-            _block.gameObject.SetActive(false);
+            _block.gameObject.SetActive(SaveData.missionCurrent.HasSpawnOnStart(Mission.spawnOnStartEnum.drill));
     }
 
     bool CheckBounds(LevelGen_Block _temp, int _tarAmount = 0)

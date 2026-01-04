@@ -3849,6 +3849,7 @@ GameObject:
   - component: {fileID: 7745250313826271774}
   - component: {fileID: 7315794065340563571}
   - component: {fileID: 2034341073268934150}
+  - component: {fileID: 3768991102865641728}
   m_Layer: 12
   m_Name: New Game Object
   m_TagString: Untagged
@@ -3907,6 +3908,50 @@ MonoBehaviour:
   B_Bounds: {fileID: 7315794065340563571}
   I_roomNum: -1
   V3ID: {x: -1, y: 0, z: 0}
+  OnEnter_Event:
+    _activated: 0
+    _event:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 3768991102865641728}
+          m_TargetAssemblyTypeName: ConversationEvent, Assembly-CSharp
+          m_MethodName: ApplyEffect
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 8968723650582150395}
+          m_TargetAssemblyTypeName: LevelGen_Spawn, Assembly-CSharp
+          m_MethodName: Agent_SetProtect
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    _singleUse: 1
+    _delay: 0.2
+--- !u!114 &3768991102865641728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1083068646009464637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bf3d8bf97f9d094f8ebe8795c5d1921, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ConversationEvent
+  eventID: 8
 --- !u!1 &1143502352823745207
 GameObject:
   m_ObjectHideFlags: 0
@@ -15941,6 +15986,13 @@ MonoBehaviour:
   B_Bounds: {fileID: 4979804584383713371}
   I_roomNum: -1
   V3ID: {x: -1, y: 0, z: 0}
+  OnEnter_Event:
+    _activated: 0
+    _event:
+      m_PersistentCalls:
+        m_Calls: []
+    _singleUse: 1
+    _delay: 0
 --- !u!1 &3084156727226035176
 GameObject:
   m_ObjectHideFlags: 0
@@ -20765,6 +20817,13 @@ MonoBehaviour:
   B_Bounds: {fileID: 7658622221270478384}
   I_roomNum: -1
   V3ID: {x: -1, y: 0, z: 0}
+  OnEnter_Event:
+    _activated: 0
+    _event:
+      m_PersistentCalls:
+        m_Calls: []
+    _singleUse: 1
+    _delay: 0
 --- !u!1 &4224830113073344860
 GameObject:
   m_ObjectHideFlags: 0
@@ -32949,6 +33008,13 @@ MonoBehaviour:
   B_Bounds: {fileID: 6763148836017232029}
   I_roomNum: -1
   V3ID: {x: -1, y: 0, z: 0}
+  OnEnter_Event:
+    _activated: 0
+    _event:
+      m_PersistentCalls:
+        m_Calls: []
+    _singleUse: 1
+    _delay: 0
 --- !u!1 &5869846792777501388
 GameObject:
   m_ObjectHideFlags: 0
@@ -33840,6 +33906,13 @@ MonoBehaviour:
   B_Bounds: {fileID: 8860255212305195630}
   I_roomNum: -1
   V3ID: {x: -1, y: 0, z: 0}
+  OnEnter_Event:
+    _activated: 0
+    _event:
+      m_PersistentCalls:
+        m_Calls: []
+    _singleUse: 1
+    _delay: 0
 --- !u!1 &5939414540076523270
 GameObject:
   m_ObjectHideFlags: 0
@@ -44563,6 +44636,13 @@ MonoBehaviour:
   B_Bounds: {fileID: 6605288495452128103}
   I_roomNum: -1
   V3ID: {x: -1, y: 0, z: 0}
+  OnEnter_Event:
+    _activated: 0
+    _event:
+      m_PersistentCalls:
+        m_Calls: []
+    _singleUse: 1
+    _delay: 0
 --- !u!1 &8866274153727360673
 GameObject:
   m_ObjectHideFlags: 0
@@ -46049,6 +46129,13 @@ MonoBehaviour:
   B_Bounds: {fileID: 4569789454018451579}
   I_roomNum: -1
   V3ID: {x: -1, y: 0, z: 0}
+  OnEnter_Event:
+    _activated: 0
+    _event:
+      m_PersistentCalls:
+        m_Calls: []
+    _singleUse: 1
+    _delay: 0
 --- !u!1 &9051557071884531292
 GameObject:
   m_ObjectHideFlags: 0

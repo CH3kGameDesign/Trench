@@ -20,6 +20,7 @@ public class Mission : ScriptableObject
         enemies = 1 << 1,
         treasure = 1 << 2,
         trolley = 1 << 3,
+        drill = 1 << 4,
     }
     [Space(10)]
     public List<stepClass> _steps = new List<stepClass>();
@@ -185,5 +186,10 @@ public class Mission : ScriptableObject
             item.Spawn();
 
         SpawnEnemies(eventEnum.levelLoaded);
+    }
+
+    public bool HasSpawnOnStart(spawnOnStartEnum _enum)
+    {
+        return SpawnOnStart.HasFlag(_enum);
     }
 }

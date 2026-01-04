@@ -25,6 +25,7 @@ public class AgentLocation : MonoBehaviour
             if (!LGBS.Contains(LGB))
                 LGBS.Add(LGB);
             UpdateRoom();
+            LGB.OnEnter(this);
         }
     }
     private void OnTriggerExit(Collider other)

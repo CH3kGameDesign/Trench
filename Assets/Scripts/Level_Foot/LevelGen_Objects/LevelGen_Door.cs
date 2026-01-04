@@ -9,10 +9,11 @@ public class LevelGen_Door : LevelGen_Object
     public GameObject G_door;
     public GameObject G_frame;
     public bool B_showFrame = true;
-    [HideInInspector] public bool B_connected = false;
+    [Space(10)]
+    public bool B_connected = false;
 
-    [HideInInspector] public bool B_validDoor = true;
-    [HideInInspector] public LevelGen_Door LGD_connectedDoor = null;
+    public bool B_validDoor = true;
+    public LevelGen_Door LGD_connectedDoor = null;
 
     private Prefab_Environment prefabEnvironment;
 

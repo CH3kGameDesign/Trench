@@ -17,6 +17,8 @@ public class LevelGen_Spawn : LevelGen_Object
     [Space(10)]
     public Color C_Color = new Color (1,0,0,0.4f);
 
+    private List<AgentController> _spawnedAgents = new List<AgentController>();
+
     public GameObject G_sceneViewObject;
     private LevelGen LG;
     private LevelGen_Theme LG_Theme;
@@ -85,6 +87,7 @@ public class LevelGen_Spawn : LevelGen_Object
                     AC.NMA.transform.rotation = transform.rotation;
                     AC.ChangeState(_state);
                     LG.AC_agents.Add(AC);
+                    _spawnedAgents.Add(AC);
                 }
                 break;
             case LevelGen_Spawn.spawnTypeEnum.enemy:
@@ -102,6 +105,7 @@ public class LevelGen_Spawn : LevelGen_Object
                     AC.NMA.transform.rotation = transform.rotation;
                     AC.ChangeState(_state);
                     LG.AC_agents.Add(AC);
+                    _spawnedAgents.Add(AC);
                 }
                 break;
             case LevelGen_Spawn.spawnTypeEnum.treasure:
@@ -129,5 +133,13 @@ public class LevelGen_Spawn : LevelGen_Object
 
         used = true;
         return true;
+    }
+
+    public void Agent_SetProtect()
+    {
+        foreach (var item in _spawnedAgents)
+        {
+            item.ChangeState(AgentController.stateEnum.protect);
+        }
     }
 }
