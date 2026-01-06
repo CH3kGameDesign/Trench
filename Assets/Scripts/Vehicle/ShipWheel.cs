@@ -42,6 +42,9 @@ public class ShipWheel : Interactable
     }
     void DEBUG_DropShip()
     {
+        if (SaveData.missionCurrent)
+            if (!SaveData.missionCurrent.MissionCompleted())
+                return;
         LevelGen_Holder.Instance.EndLevel(DEBUG_themeToLoad);
     }
 }

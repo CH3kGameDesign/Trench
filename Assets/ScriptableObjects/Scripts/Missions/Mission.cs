@@ -10,6 +10,7 @@ public class Mission : ScriptableObject
     public string _description;
     public Sprite _sprite;
     [Space(10)]
+    public string S_defaultLandingID = "";
     public LevelGen PF_specificLayout;
     [Space(10)]
     public spawnOnStartEnum SpawnOnStart = (spawnOnStartEnum)~0;
@@ -191,5 +192,15 @@ public class Mission : ScriptableObject
     public bool HasSpawnOnStart(spawnOnStartEnum _enum)
     {
         return SpawnOnStart.HasFlag(_enum);
+    }
+
+    public bool MissionCompleted()
+    {
+        foreach (var item in _steps)
+        {
+            if (!item._objective.completed)
+                return false;
+        }
+        return true;
     }
 }

@@ -89,7 +89,10 @@ public class EnemyTimer : NetworkBehaviour
     [ServerRpc]
     public void StartTimer_Ship()
     {
-        if (!timerActive && SaveData.themeCurrent == Themes.themeEnum._default)
+        if (!timerActive && 
+            SaveData.themeCurrent == Themes.themeEnum._default && 
+            LG_Ship != null && 
+            PF_shipLandingPoint != null)
         {
             G_timerBG.SetActive(true);
             b_active.value = true;
