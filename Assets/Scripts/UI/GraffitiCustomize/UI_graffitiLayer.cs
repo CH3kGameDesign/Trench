@@ -8,6 +8,8 @@ public class UI_graffitiLayer : MonoBehaviour
     public TextMeshProUGUI TM_layerNum;
     public Image I_layerSprite;
 
+    public Button B_button;
+
     private RectTransform RT_mover;
     private Image I_mover;
 

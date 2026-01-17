@@ -17,6 +17,7 @@ public class GraffitiCustomize : MonoBehaviour
     public GameObject G_buildMenu;
     public GameObject G_stampMenu;
     public Button B_defaultSelected;
+    public Button B_defaultStamp;
 
     [Header("References")]
     public RectTransform RT_layerGrid;
@@ -88,6 +89,8 @@ public class GraffitiCustomize : MonoBehaviour
         _size += StampMenu_Setup("Primitives", GraffitiManager.stampTypeEnum.primitives);
         _size += StampMenu_Setup("Complex", GraffitiManager.stampTypeEnum.complex);
         _size += StampMenu_Setup("Letters", GraffitiManager.stampTypeEnum.letters);
+
+        B_defaultStamp = RT_stampGrid.GetComponentInChildren<Button>();
 
         RT_stampGrid.sizeDelta = new Vector2(RT_stampGrid.sizeDelta.x, _size);
     }
@@ -170,7 +173,8 @@ public class GraffitiCustomize : MonoBehaviour
     public void BuildMenu()
     {
         if (!G_buildMenu.activeSelf) ShowBuild(PlayerManager.main);
-        else HideBuild(PlayerManager.main);
+        else if(!PlayerManager.main.Inputs.b_isGamepad)
+            HideBuild(PlayerManager.main);
         PlaceImage();
     }
 
@@ -180,10 +184,14 @@ public class GraffitiCustomize : MonoBehaviour
         curLayer = _graffiti;
         curLayer.Grab(this);
 
-        if (curLayer.B_imageSet) 
-            HideBuild(PlayerManager.main); 
-        else 
-            G_stampMenu.SetActive(true); 
+        if (curLayer.B_imageSet)
+            HideBuild(PlayerManager.main);
+        else
+        {
+            G_stampMenu.SetActive(true);
+            if (PlayerManager.main.Inputs.b_isGamepad)
+                EventSystem.current.SetSelectedGameObject(GetStampMenu_DefaultButton());
+        }
     }
     public void SelectStamp(Stamp_Scriptable _graffiti)
     {
@@ -206,7 +214,22 @@ public class GraffitiCustomize : MonoBehaviour
         G_buildMenu.SetActive(true);
         G_stampMenu.SetActive(false);
         if (_PC.Inputs.b_isGamepad)
-            EventSystem.current.SetSelectedGameObject(B_defaultSelected.gameObject);
+            EventSystem.current.SetSelectedGameObject(GetBuildMenu_DefaultButton());
+    }
+    GameObject GetBuildMenu_DefaultButton()
+    {
+        GameObject _button = null;
+        if (layers.Count > 0)
+            _button = layers[layers.Count - 1].B_button.gameObject;
+        B_defaultSelected = layers[layers.Count - 1].B_button;
+        return _button;
+    }
+    GameObject GetStampMenu_DefaultButton()
+    {
+        GameObject _button = null;
+        _button = B_defaultStamp.gameObject;
+        B_defaultSelected = B_defaultStamp;
+        return _button;
     }
     void HideBuild(PlayerController _PC)
     {
