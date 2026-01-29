@@ -28,6 +28,21 @@ public class GraffitiCustomize : MonoBehaviour
     public GameObject PF_graffitiLayer;
     public LayoutModuleGroup PF_moduleGroup;
     public Image PF_image;
+    [Space(10)]
+    public Image I_color;
+    public Slider S_colorHue;
+    public Slider S_colorSat;
+    public Slider S_colorVig;
+    public Image I_colorSatBG;
+    public Image I_colorVigBG;
+    private Vector3 V3_colorValues;
+    private Color C_color;
+    [Space(10)]
+    public UI_ValueSlider VS_scaleX;
+    public UI_ValueSlider VS_scaleY;
+    public UI_ValueSlider VS_rotation;
+    public UI_ValueSlider VS_positionX;
+    public UI_ValueSlider VS_positionY;
 
     [Header("Cursor")]
     public RectTransform RT_cursor;
@@ -53,6 +68,8 @@ public class GraffitiCustomize : MonoBehaviour
     public float f_cursorSpeed = 50f;
     public float f_cursorSpeed_Rotate = 60f;
     public float f_cursorSpeed_Scale = 1f;
+    public Vector2 v2_scaleLimits = new Vector2(0.05f, 5);
+    private bool b_maintainScale = true;
 
     private void Awake()
     {
@@ -66,6 +83,7 @@ public class GraffitiCustomize : MonoBehaviour
         CanvasSize_Update();
         Layers_Setup();
         StampMenu_Setup();
+        Color_Setup();
     }
 
 
@@ -144,13 +162,43 @@ public class GraffitiCustomize : MonoBehaviour
     {
         float _rotation = RT_cursor.localEulerAngles.z;
         _rotation -= _PC.Inputs.f_rotate * Time.unscaledDeltaTime * f_cursorSpeed_Rotate;
+        _rotation = _rotation % 360;
         RT_cursor.localEulerAngles = new Vector3(0, 0, _rotation);
+
+        VS_rotation.SetValue(_rotation, 0, 360);
     }
     void ScaleCursor(PlayerController _PC)
     {
-        Vector2 _scale = RT_cursor.localScale;
-        _scale += _PC.Inputs.v2_scale * Time.unscaledDeltaTime * f_cursorSpeed_Scale;
-        RT_cursor.localScale = new Vector3(_scale.x, _scale.y, 1);
+        if (curLayer == null)
+            return;
+        Vector2 _scale = curLayer.RT_mover.localScale;
+        if (b_maintainScale)
+        {
+            float _dif = _scale.x / _scale.y;
+
+            _scale.x += _PC.Inputs.v2_scale.y * Time.unscaledDeltaTime * f_cursorSpeed_Scale;
+            _scale.x = Mathf.Clamp(_scale.x, v2_scaleLimits.x, v2_scaleLimits.y);
+
+            _scale.y = _scale.x / _dif;
+            _scale.y = Mathf.Clamp(_scale.y, v2_scaleLimits.x, v2_scaleLimits.y);
+
+            _scale.x = _scale.y * _dif;
+        }
+        else
+            _scale += _PC.Inputs.v2_scale * Time.unscaledDeltaTime * f_cursorSpeed_Scale;
+
+        SetScale(_scale);
+    }
+
+    void SetScale(Vector2 _scale)
+    {
+        _scale.x = Mathf.Clamp(_scale.x, v2_scaleLimits.x, v2_scaleLimits.y);
+        _scale.y = Mathf.Clamp(_scale.y, v2_scaleLimits.x, v2_scaleLimits.y);
+
+        VS_scaleX.SetValue(_scale.x, v2_scaleLimits);
+        VS_scaleY.SetValue(_scale.y, v2_scaleLimits);
+
+        curLayer.RT_mover.localScale = new Vector3(_scale.x, _scale.y, 1);
     }
     void ClickManager(PlayerController _PC)
     {
@@ -172,7 +220,7 @@ public class GraffitiCustomize : MonoBehaviour
     }
     public void BuildMenu()
     {
-        if (!G_buildMenu.activeSelf) ShowBuild(PlayerManager.main);
+        if (!G_buildMenu.activeSelf && !G_stampMenu.activeSelf) ShowBuild(PlayerManager.main);
         else if(!PlayerManager.main.Inputs.b_isGamepad)
             HideBuild(PlayerManager.main);
         PlaceImage();
@@ -185,10 +233,14 @@ public class GraffitiCustomize : MonoBehaviour
         curLayer.Grab(this);
 
         if (curLayer.B_imageSet)
+        {
             HideBuild(PlayerManager.main);
+            Color_Select(curLayer.GetColor());
+        }
         else
         {
             G_stampMenu.SetActive(true);
+            G_buildMenu.SetActive(false);
             if (PlayerManager.main.Inputs.b_isGamepad)
                 EventSystem.current.SetSelectedGameObject(GetStampMenu_DefaultButton());
         }
@@ -198,6 +250,7 @@ public class GraffitiCustomize : MonoBehaviour
         HideBuild(PlayerManager.main);
         if (curLayer == null) return;
         curLayer.SetImage(_graffiti._sprite);
+        curLayer.SetColor(C_color);
     }
 
     public void PlaceImage()
@@ -252,6 +305,9 @@ public class GraffitiCustomize : MonoBehaviour
         v2_cursorPosition.y = Mathf.Clamp(v2_cursorPosition.y, -v2_canvasHalf.y, v2_canvasHalf.y);
 
         RT_cursor.anchoredPosition = v2_cursorPosition;
+
+        VS_positionX.SetValue(v2_cursorPosition.x, -v2_canvasHalf.x, v2_canvasHalf.x);
+        VS_positionY.SetValue(v2_cursorPosition.y, -v2_canvasHalf.y, v2_canvasHalf.y);
     }
     void MoveCursor_Gamepad(Vector2 dir, float _speed)
     {
@@ -261,6 +317,9 @@ public class GraffitiCustomize : MonoBehaviour
         v2_cursorPosition.y = Mathf.Clamp(v2_cursorPosition.y, -v2_canvasHalf.y, v2_canvasHalf.y);
 
         RT_cursor.anchoredPosition = v2_cursorPosition;
+
+        VS_positionX.SetValue(v2_cursorPosition.x, -v2_canvasHalf.x, v2_canvasHalf.x);
+        VS_positionY.SetValue(v2_cursorPosition.y, -v2_canvasHalf.y, v2_canvasHalf.y);
     }
     public void SetCursorPos(Vector3 pos, float? _rotation = null, Vector2? _scale = null)
     {
@@ -273,6 +332,9 @@ public class GraffitiCustomize : MonoBehaviour
             Vector3 _newScale = _scale.Value;
             RT_cursor.localEulerAngles = new Vector3(_newScale.x, _newScale.y, 1);
         }
+
+        VS_positionX.SetValue(v2_cursorPosition.x, -v2_canvasHalf.x, v2_canvasHalf.x);
+        VS_positionY.SetValue(v2_cursorPosition.y, -v2_canvasHalf.y, v2_canvasHalf.y);
     }
 
     void MoveCanvas(PlayerController _PC)
@@ -307,6 +369,7 @@ public class GraffitiCustomize : MonoBehaviour
         F_canvasZoom = Mathf.Clamp(F_canvasZoom, v2_zoomBounds.x, v2_zoomBounds.y);
 
         RT_holder.localScale = Vector3.one * F_canvasZoom;
+        RT_cursor.localScale = Vector3.one * F_canvasZoom;
     }
     public void Display()
     {
@@ -329,6 +392,126 @@ public class GraffitiCustomize : MonoBehaviour
         Save();
         b_active = false;
         HideBuild(PlayerManager.main);
+    }
+    public void MaintainScale_SetBool(bool value)
+    {
+        b_maintainScale = value;
+    }
+
+    void Color_Setup()
+    {
+        V3_colorValues = new Vector3(0.5f, 0f, 1f);
+        S_colorHue.value = V3_colorValues.x;
+        S_colorSat.value = V3_colorValues.y;
+        S_colorVig.value = V3_colorValues.z;
+        Color_Update();
+    }
+    void Color_Select(Color _color)
+    {
+        float _h;
+        float _s;
+        float _v;
+        Color.RGBToHSV(_color, out _h, out _s, out _v);
+        V3_colorValues = new Vector3(_h, _s, _v);
+        S_colorHue.value = _h;
+        S_colorSat.value = _s;
+        S_colorVig.value = _v;
+        Color_Update();
+    }
+    public void PickColor_Hue(float _hue)
+    {
+        V3_colorValues.x = _hue;
+        Color_Update();
+    }
+    public void PickColor_Saturation(float _sat)
+    {
+        V3_colorValues.y = _sat;
+        Color_Update();
+    }
+    public void PickColor_Vignette(float _vig)
+    {
+        V3_colorValues.z = _vig;
+        Color_Update();
+    }
+    public void PickScale_X(float _var)
+    {
+        _var = (_var + 1f) / 2f;
+        if (curLayer == null)
+            return;
+        Vector2 _scale = curLayer.RT_mover.localScale;
+        if (b_maintainScale)
+        {
+            float _dif = _scale.x / _scale.y;
+
+            _scale.x = Mathf.Lerp(v2_scaleLimits.x, v2_scaleLimits.y, _var);
+            _scale.x = Mathf.Clamp(_scale.x, v2_scaleLimits.x, v2_scaleLimits.y);
+
+            _scale.y = _scale.x / _dif;
+            _scale.y = Mathf.Clamp(_scale.y, v2_scaleLimits.x, v2_scaleLimits.y);
+
+            _scale.x = _scale.y * _dif;
+        }
+        else
+            _scale.x = Mathf.Lerp(v2_scaleLimits.x, v2_scaleLimits.y, _var);
+
+        SetScale(_scale);
+    }
+    public void PickScale_Y(float _var)
+    {
+        _var = (_var + 1f) / 2f;
+        if (curLayer == null)
+            return;
+        Vector2 _scale = curLayer.RT_mover.localScale;
+        if (b_maintainScale)
+        {
+            float _dif = _scale.x / _scale.y;
+
+            _scale.y = Mathf.Lerp(v2_scaleLimits.x, v2_scaleLimits.y, _var);
+            _scale.y = Mathf.Clamp(_scale.x, v2_scaleLimits.x, v2_scaleLimits.y);
+
+            _scale.x = _scale.y / _dif;
+            _scale.x = Mathf.Clamp(_scale.y, v2_scaleLimits.x, v2_scaleLimits.y);
+
+            _scale.y = _scale.x * _dif;
+        }
+        else
+            _scale.y = Mathf.Lerp(v2_scaleLimits.x, v2_scaleLimits.y, _var);
+
+        SetScale(_scale);
+    }
+    public void PickRotation(float _var)
+    {
+        _var = (_var + 1f) / 2f;
+
+        float _rotation = Mathf.Lerp(-180, 180, _var);
+        RT_cursor.localEulerAngles = new Vector3(0, 0, _rotation);
+    }
+    public void PickPosition_X(float _var)
+    {
+        _var = (_var + 1f) / 2f;
+
+        v2_cursorPosition.x = Mathf.Lerp(-v2_canvasHalf.x, v2_canvasHalf.x, _var);
+        RT_cursor.anchoredPosition = v2_cursorPosition;
+    }
+    public void PickPosition_Y(float _var)
+    {
+        _var = (_var + 1f) / 2f;
+
+        v2_cursorPosition.y = Mathf.Lerp(-v2_canvasHalf.y, v2_canvasHalf.y, _var);
+        RT_cursor.anchoredPosition = v2_cursorPosition;
+    }
+    void Color_Update()
+    {
+        C_color = Color.HSVToRGB(V3_colorValues.x, V3_colorValues.y, V3_colorValues.z);
+        I_color.color = C_color;
+
+        Color hue = Color.HSVToRGB(V3_colorValues.x, 1, 1);
+        I_colorSatBG.color = hue;
+        hue = Color.HSVToRGB(V3_colorValues.x, V3_colorValues.y, 1);
+        I_colorVigBG.color = hue;
+
+        if (curLayer == null) return;
+        curLayer.SetColor(C_color);
     }
     // Update is called once per frame
     void Update()

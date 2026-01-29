@@ -10,7 +10,7 @@ public class UI_graffitiLayer : MonoBehaviour
 
     public Button B_button;
 
-    private RectTransform RT_mover;
+    [HideInInspector] public RectTransform RT_mover;
     private Image I_mover;
 
     private int i_num;
@@ -47,6 +47,22 @@ public class UI_graffitiLayer : MonoBehaviour
         I_mover.sprite = _sprite;
         B_imageSet = true;
         I_mover.enabled = true;
+    }
+    public void SetColor(Color _color)
+    {
+        if (I_mover == null)
+            return;
+        I_mover.color = _color;
+
+        if (I_layerSprite == null)
+            return;
+        I_layerSprite.color = _color;
+    }
+    public Color GetColor()
+    {
+        if (I_mover != null)
+            return I_mover.color;
+        return I_layerSprite.color;
     }
     public void Place(GraffitiCustomize _GC)
     {
