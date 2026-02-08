@@ -11,7 +11,7 @@ public class GraffitiCustomize : MonoBehaviour
     protected bool b_active;
 
     public int I_spacing = 1;
-
+    
     [Header("Menus")]
     public GameObject G_leftColumn;
     public GameObject G_buildMenu;
@@ -34,9 +34,10 @@ public class GraffitiCustomize : MonoBehaviour
     public Slider S_colorHue;
     public Slider S_colorSat;
     public Slider S_colorVig;
+    public Slider S_colorOpa;
     public Image I_colorSatBG;
     public Image I_colorVigBG;
-    private Vector3 V3_colorValues;
+    private Vector4 V4_colorValues;
     private Color C_color;
     [Space(10)]
     public UI_ValueSlider VS_scaleX;
@@ -422,10 +423,11 @@ public class GraffitiCustomize : MonoBehaviour
 
     void Color_Setup()
     {
-        V3_colorValues = new Vector3(0.5f, 0f, 1f);
-        S_colorHue.value = V3_colorValues.x;
-        S_colorSat.value = V3_colorValues.y;
-        S_colorVig.value = V3_colorValues.z;
+        V4_colorValues = new Vector4(0.5f, 0f, 1f, 1f);
+        S_colorHue.value = V4_colorValues.x;
+        S_colorSat.value = V4_colorValues.y;
+        S_colorVig.value = V4_colorValues.z;
+        S_colorOpa.value = V4_colorValues.w;
         Color_Update();
     }
     void Color_Select(Color _color)
@@ -434,25 +436,31 @@ public class GraffitiCustomize : MonoBehaviour
         float _s;
         float _v;
         Color.RGBToHSV(_color, out _h, out _s, out _v);
-        V3_colorValues = new Vector3(_h, _s, _v);
+        V4_colorValues = new Vector4(_h, _s, _v, _color.a);
         S_colorHue.value = _h;
         S_colorSat.value = _s;
         S_colorVig.value = _v;
+        S_colorOpa.value = _color.a;
         Color_Update();
     }
     public void PickColor_Hue(float _hue)
     {
-        V3_colorValues.x = _hue;
+        V4_colorValues.x = _hue;
         Color_Update();
     }
     public void PickColor_Saturation(float _sat)
     {
-        V3_colorValues.y = _sat;
+        V4_colorValues.y = _sat;
         Color_Update();
     }
     public void PickColor_Vignette(float _vig)
     {
-        V3_colorValues.z = _vig;
+        V4_colorValues.z = _vig;
+        Color_Update();
+    }
+    public void PickColor_Opacity(float _opa)
+    {
+        V4_colorValues.w = _opa;
         Color_Update();
     }
     public void PickScale_X(float _var)
@@ -524,12 +532,13 @@ public class GraffitiCustomize : MonoBehaviour
     }
     void Color_Update()
     {
-        C_color = Color.HSVToRGB(V3_colorValues.x, V3_colorValues.y, V3_colorValues.z);
+        C_color = Color.HSVToRGB(V4_colorValues.x, V4_colorValues.y, V4_colorValues.z);
+        C_color.a = V4_colorValues.w;
         I_color.color = C_color;
 
-        Color hue = Color.HSVToRGB(V3_colorValues.x, 1, 1);
+        Color hue = Color.HSVToRGB(V4_colorValues.x, 1, 1);
         I_colorSatBG.color = hue;
-        hue = Color.HSVToRGB(V3_colorValues.x, V3_colorValues.y, 1);
+        hue = Color.HSVToRGB(V4_colorValues.x, V4_colorValues.y, 1);
         I_colorVigBG.color = hue;
 
         if (curLayer == null) return;

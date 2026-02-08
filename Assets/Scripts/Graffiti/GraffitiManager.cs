@@ -100,8 +100,8 @@ public class GraffitiManager : MonoBehaviour
         tex.ReadPixels(new Rect(0, 0, renderTex.width, renderTex.height), 0, 0);
         tex.Apply();
 
-        //RT_layers.DeleteChildren();
-        //graffitiRenderer.gameObject.SetActive(false);
+        RT_layers.DeleteChildren();
+        graffitiRenderer.gameObject.SetActive(false);
 
         return tex;
     }
