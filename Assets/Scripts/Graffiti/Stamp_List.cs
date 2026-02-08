@@ -53,6 +53,8 @@ public class Stamp_List : ScriptableObject
             if (_temp != null)
             {
                 _temp.stampType = stampType;
+                if (_temp._stampID == "")
+                    _temp._stampID = _temp._name.Replace(" ", "");
                 if (!list.Contains(_temp))
                     list.Add(_temp);
                 EditorUtility.SetDirty(_temp);

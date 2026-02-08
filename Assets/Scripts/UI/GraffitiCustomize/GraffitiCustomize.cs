@@ -23,6 +23,7 @@ public class GraffitiCustomize : MonoBehaviour
     public RectTransform RT_layerGrid;
     public RectTransform RT_stampGrid;
     public RectTransform RT_holder;
+    public RectTransform RT_stampParent;
     [Space(10)]
     public UI_graffitiLayer PF_UI_graffitiLayer;
     public GameObject PF_graffitiLayer;
@@ -43,6 +44,8 @@ public class GraffitiCustomize : MonoBehaviour
     public UI_ValueSlider VS_rotation;
     public UI_ValueSlider VS_positionX;
     public UI_ValueSlider VS_positionY;
+    public Toggle T_flipX;
+    public Toggle T_flipY;
 
     [Header("Cursor")]
     public RectTransform RT_cursor;
@@ -70,6 +73,8 @@ public class GraffitiCustomize : MonoBehaviour
     public float f_cursorSpeed_Scale = 1f;
     public Vector2 v2_scaleLimits = new Vector2(0.05f, 5);
     private bool b_maintainScale = true;
+    private bool b_flipX = false;
+    private bool b_flipY = false;
 
     private void Awake()
     {
@@ -145,6 +150,8 @@ public class GraffitiCustomize : MonoBehaviour
             MoveCursor(_PC);
             RotateCursor(_PC);
             ScaleCursor(_PC);
+            if (curLayer)
+                curLayer.FollowCursor(this);
             ClickManager(_PC);
         }
     }
@@ -156,7 +163,7 @@ public class GraffitiCustomize : MonoBehaviour
             MoveCursor_Gamepad(_PC.Inputs.v2_inputDir, f_cursorSpeed);
 
         MoveCanvas(_PC);
-        ZoomCanvas(_PC);
+        //ZoomCanvas(_PC);
     }
     void RotateCursor(PlayerController _PC)
     {
@@ -171,7 +178,7 @@ public class GraffitiCustomize : MonoBehaviour
     {
         if (curLayer == null)
             return;
-        Vector2 _scale = curLayer.RT_mover.localScale;
+        Vector2 _scale = new Vector2(Mathf.Abs(curLayer.RT_mover.localScale.x), Mathf.Abs(curLayer.RT_mover.localScale.y));
         if (b_maintainScale)
         {
             float _dif = _scale.x / _scale.y;
@@ -187,16 +194,26 @@ public class GraffitiCustomize : MonoBehaviour
         else
             _scale += _PC.Inputs.v2_scale * Time.unscaledDeltaTime * f_cursorSpeed_Scale;
 
+        if (b_flipX) _scale.x = -_scale.x;
+        if (b_flipY) _scale.y = -_scale.y;
+
         SetScale(_scale);
     }
 
     void SetScale(Vector2 _scale)
     {
+        bool _flipX = _scale.x < 0;
+        bool _flipY = _scale.y < 0;
+        _scale = new Vector2(Mathf.Abs(_scale.x), Mathf.Abs(_scale.y));
+
         _scale.x = Mathf.Clamp(_scale.x, v2_scaleLimits.x, v2_scaleLimits.y);
         _scale.y = Mathf.Clamp(_scale.y, v2_scaleLimits.x, v2_scaleLimits.y);
 
         VS_scaleX.SetValue(_scale.x, v2_scaleLimits);
         VS_scaleY.SetValue(_scale.y, v2_scaleLimits);
+
+        if (_flipX) _scale.x = -_scale.x;
+        if (_flipY) _scale.y = -_scale.y;
 
         curLayer.RT_mover.localScale = new Vector3(_scale.x, _scale.y, 1);
     }
@@ -236,6 +253,8 @@ public class GraffitiCustomize : MonoBehaviour
         {
             HideBuild(PlayerManager.main);
             Color_Select(curLayer.GetColor());
+            b_flipX = curLayer.RT_mover.localScale.x < 0;
+            b_flipY = curLayer.RT_mover.localScale.y < 0;
         }
         else
         {
@@ -243,13 +262,17 @@ public class GraffitiCustomize : MonoBehaviour
             G_buildMenu.SetActive(false);
             if (PlayerManager.main.Inputs.b_isGamepad)
                 EventSystem.current.SetSelectedGameObject(GetStampMenu_DefaultButton());
+            b_flipX = false;
+            b_flipY = false;
         }
+        T_flipX.isOn = b_flipX;
+        T_flipY.isOn = b_flipY;
     }
     public void SelectStamp(Stamp_Scriptable _graffiti)
     {
         HideBuild(PlayerManager.main);
         if (curLayer == null) return;
-        curLayer.SetImage(_graffiti._sprite);
+        curLayer.SetImage(_graffiti);
         curLayer.SetColor(C_color);
     }
 
@@ -329,8 +352,8 @@ public class GraffitiCustomize : MonoBehaviour
             RT_cursor.localEulerAngles = new Vector3(0, 0, _rotation.Value);
         if (_scale != null)
         {
-            Vector3 _newScale = _scale.Value;
-            RT_cursor.localEulerAngles = new Vector3(_newScale.x, _newScale.y, 1);
+            Vector2 _newScale = _scale.Value;
+            RT_cursor.localScale = new Vector3(_newScale.x, _newScale.y, 1);
         }
 
         VS_positionX.SetValue(v2_cursorPosition.x, -v2_canvasHalf.x, v2_canvasHalf.x);
@@ -393,10 +416,9 @@ public class GraffitiCustomize : MonoBehaviour
         b_active = false;
         HideBuild(PlayerManager.main);
     }
-    public void MaintainScale_SetBool(bool value)
-    {
-        b_maintainScale = value;
-    }
+    public void MaintainScale_SetBool(bool value) { b_maintainScale = value; }
+    public void FlipX_SetBool(bool value) { b_flipX = value; }
+    public void FlipY_SetBool(bool value) { b_flipY = value; }
 
     void Color_Setup()
     {
@@ -516,6 +538,50 @@ public class GraffitiCustomize : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyUp(KeyCode.Escape))
+        {
+            curGraffiti._layers.Clear();
+            for (int i = 0; i < layers.Count; i++)
+                curGraffiti._layers.Add(layers[i].GetLayerInfo());
+            curGraffiti.GetTexture();
+        }
+    }
 
+    //Deprecated
+    string GetExport_String()
+    {
+        string _temp = "[";
+
+        for (int i = 0; i < layers.Count; i++)
+        {
+            if (layers[i] == null)
+                continue;
+            _temp += layers[i].GetExport();
+        }
+        _temp += "]";
+        return _temp;
+    }
+
+    //Deprecated
+    void ReadImport_String(string _string)
+    {
+        string[] _temp = _string.Split('{');
+        int s = 0;
+        for (int i = 0; i < layers.Count; i++)
+        {
+            s = i + 1;
+            if (s >= _temp.Length)
+                continue;
+            //layers[i].ReadImport(_temp[s]);
+        }
+    }
+
+    void SaveGraffiti()
+    {
+        int _len = Mathf.Max(layers.Count, curGraffiti._layers.Count);
+        for (int i = 0; i < _len; i++)
+        {
+            curGraffiti._layers[i] = layers[i].GetLayerInfo();
+        }
     }
 }
