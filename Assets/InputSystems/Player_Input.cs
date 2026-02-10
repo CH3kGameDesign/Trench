@@ -761,6 +761,15 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""ColourMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""0f08a280-d272-4f17-bb33-c958b1e996de"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""Rotate"",
                     ""type"": ""Value"",
                     ""id"": ""fc4c3b50-a16c-4929-86c4-79b4438857bf"",
@@ -1102,11 +1111,33 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""547d5381-2a88-4960-becc-becdf138eb2e"",
-                    ""path"": ""<Gamepad>/dpad/up"",
+                    ""path"": ""<Gamepad>/buttonWest"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
                     ""action"": ""BuildMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c2083120-c8cb-4fd9-90c9-42229911bacb"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""ColourMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e715ba9d-3240-4892-856e-09db963abcb0"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""ColourMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1345,6 +1376,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
         m_Menu_Menu = m_Menu.FindAction("Menu", throwIfNotFound: true);
         m_Menu_Zoom = m_Menu.FindAction("Zoom", throwIfNotFound: true);
         m_Menu_BuildMenu = m_Menu.FindAction("BuildMenu", throwIfNotFound: true);
+        m_Menu_ColourMenu = m_Menu.FindAction("ColourMenu", throwIfNotFound: true);
         m_Menu_Rotate = m_Menu.FindAction("Rotate", throwIfNotFound: true);
         m_Menu_Scale = m_Menu.FindAction("Scale", throwIfNotFound: true);
     }
@@ -1665,6 +1697,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
     private readonly InputAction m_Menu_Menu;
     private readonly InputAction m_Menu_Zoom;
     private readonly InputAction m_Menu_BuildMenu;
+    private readonly InputAction m_Menu_ColourMenu;
     private readonly InputAction m_Menu_Rotate;
     private readonly InputAction m_Menu_Scale;
     /// <summary>
@@ -1714,6 +1747,10 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Menu/BuildMenu".
         /// </summary>
         public InputAction @BuildMenu => m_Wrapper.m_Menu_BuildMenu;
+        /// <summary>
+        /// Provides access to the underlying input action "Menu/ColourMenu".
+        /// </summary>
+        public InputAction @ColourMenu => m_Wrapper.m_Menu_ColourMenu;
         /// <summary>
         /// Provides access to the underlying input action "Menu/Rotate".
         /// </summary>
@@ -1775,6 +1812,9 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
             @BuildMenu.started += instance.OnBuildMenu;
             @BuildMenu.performed += instance.OnBuildMenu;
             @BuildMenu.canceled += instance.OnBuildMenu;
+            @ColourMenu.started += instance.OnColourMenu;
+            @ColourMenu.performed += instance.OnColourMenu;
+            @ColourMenu.canceled += instance.OnColourMenu;
             @Rotate.started += instance.OnRotate;
             @Rotate.performed += instance.OnRotate;
             @Rotate.canceled += instance.OnRotate;
@@ -1819,6 +1859,9 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
             @BuildMenu.started -= instance.OnBuildMenu;
             @BuildMenu.performed -= instance.OnBuildMenu;
             @BuildMenu.canceled -= instance.OnBuildMenu;
+            @ColourMenu.started -= instance.OnColourMenu;
+            @ColourMenu.performed -= instance.OnColourMenu;
+            @ColourMenu.canceled -= instance.OnColourMenu;
             @Rotate.started -= instance.OnRotate;
             @Rotate.performed -= instance.OnRotate;
             @Rotate.canceled -= instance.OnRotate;
@@ -2053,6 +2096,13 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnBuildMenu(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ColourMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnColourMenu(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Rotate" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

@@ -675,6 +675,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "ColourMenu",
+                    "type": "Button",
+                    "id": "0f08a280-d272-4f17-bb33-c958b1e996de",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Rotate",
                     "type": "Value",
                     "id": "fc4c3b50-a16c-4929-86c4-79b4438857bf",
@@ -1016,11 +1025,33 @@
                 {
                     "name": "",
                     "id": "547d5381-2a88-4960-becc-becdf138eb2e",
-                    "path": "<Gamepad>/dpad/up",
+                    "path": "<Gamepad>/buttonWest",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
                     "action": "BuildMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c2083120-c8cb-4fd9-90c9-42229911bacb",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard",
+                    "action": "ColourMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e715ba9d-3240-4892-856e-09db963abcb0",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "ColourMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

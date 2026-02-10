@@ -327,6 +327,7 @@ public class PlayerController : BaseController
         RightTab,
         Purchase,
         BuildMenu,
+        ColourMenu,
     }
 
     [HideInInspector] public Interactable I_curInteractable = null;
@@ -2000,6 +2001,12 @@ public class PlayerController : BaseController
         if (cxt.phase == InputActionPhase.Started)
             if (GameState == gameStateEnum.menu)
                 MainMenu.Instance.BuildMenu();
+    }
+    public void Input_ColourMenu(InputAction.CallbackContext cxt)
+    {
+        if (cxt.phase == InputActionPhase.Started)
+            if (GameState == gameStateEnum.menu)
+                MainMenu.Instance.ColourMenu();
     }
     public void Input_ChangedInput(PlayerInput input)
     {

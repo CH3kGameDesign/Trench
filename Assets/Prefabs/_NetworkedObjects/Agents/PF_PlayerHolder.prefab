@@ -6921,6 +6921,8 @@ MonoBehaviour:
   _visitiblityRules: {fileID: 0}
   info: {fileID: 0}
   NMA: {fileID: 2806240414845446853}
+  FMA: {fileID: 0}
+  B_flying: 0
   T_model: {fileID: 1073136819019016012}
   T_gunHook: {fileID: 5202432690253969818}
   T_barrelHook: {fileID: 732954458928888256}
@@ -7462,6 +7464,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 0908296d-6794-4a06-9801-612d491c9ce8
     m_ActionName: 'Menu/Scale[/Keyboard/r,/Keyboard/f,/Keyboard/z,/Keyboard/x]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 668208048646576681}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: Input_ColourMenu
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 0f08a280-d272-4f17-bb33-c958b1e996de
+    m_ActionName: 'Menu/ColourMenu[/Keyboard/ctrl,/XInputControllerWindows/dpad/down]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Base

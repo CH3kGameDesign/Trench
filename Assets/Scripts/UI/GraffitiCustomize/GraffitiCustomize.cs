@@ -30,6 +30,9 @@ public class GraffitiCustomize : MonoBehaviour
     public LayoutModuleGroup PF_moduleGroup;
     public Image PF_image;
     [Space(10)]
+    public GameObject G_colourMenuButton;
+    public RectTransform RT_colourMenu;
+    public GameObject G_colourSliderHolder;
     public Image I_color;
     public Slider S_colorHue;
     public Slider S_colorSat;
@@ -243,6 +246,12 @@ public class GraffitiCustomize : MonoBehaviour
             HideBuild(PlayerManager.main);
         PlaceImage();
     }
+    public void ColourMenu()
+    {
+        if (!G_colourSliderHolder.activeSelf) ShowColour(PlayerManager.main);
+        else if(!PlayerManager.main.Inputs.b_isGamepad)
+            HideColour(PlayerManager.main);
+    }
 
     public void SelectBuild(UI_graffitiLayer _graffiti)
     {
@@ -286,6 +295,7 @@ public class GraffitiCustomize : MonoBehaviour
     int i_buildMenuSlide = 400;
     void ShowBuild(PlayerController _PC)
     {
+        HideColour(_PC);
         StartCoroutine(RT_holder.Move(new Vector2(v2_canvasPos.x + i_buildMenuSlide, v2_canvasPos.y), Quaternion.identity, true, 0.1f));
         G_leftColumn.SetActive(false);
         G_buildMenu.SetActive(true);
@@ -308,12 +318,32 @@ public class GraffitiCustomize : MonoBehaviour
         B_defaultSelected = B_defaultStamp;
         return _button;
     }
+    GameObject GetColourMenu_DefaultButton()
+    {
+        GameObject _button = G_colourSliderHolder.transform.GetChild(0).gameObject;
+        return _button;
+    }
     void HideBuild(PlayerController _PC)
     {
         StartCoroutine(RT_holder.Move(v2_canvasPos, Quaternion.identity, true, 0.1f));
         G_leftColumn.SetActive(true);
         G_buildMenu.SetActive(false);
         G_stampMenu.SetActive(false);
+        if (_PC.Inputs.b_isGamepad)
+            EventSystem.current.SetSelectedGameObject(null);
+    }
+    void ShowColour(PlayerController _PC)
+    {
+        HideBuild(_PC);
+        StartCoroutine(RT_colourMenu.Move(new Vector2(0, -540), Quaternion.identity, true, 0.1f));
+        G_colourSliderHolder.SetActive(true);
+        if (_PC.Inputs.b_isGamepad)
+            EventSystem.current.SetSelectedGameObject(GetColourMenu_DefaultButton());
+    }
+    void HideColour(PlayerController _PC)
+    {
+        StartCoroutine(RT_colourMenu.Move(new Vector2(0, -RT_colourMenu.rect.height - 540), Quaternion.identity, true, 0.1f));
+        G_colourSliderHolder.SetActive(false);
         if (_PC.Inputs.b_isGamepad)
             EventSystem.current.SetSelectedGameObject(null);
     }

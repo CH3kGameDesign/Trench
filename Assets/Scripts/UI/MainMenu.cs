@@ -368,6 +368,7 @@ public class MainMenu : MonoBehaviour
 
         public TextMeshProUGUI TM_buildButton;
         public TextMeshProUGUI TM_backButton;
+        public TextMeshProUGUI TM_colourMenuButton;
 
 
         public override void Open(AnimCurve _curve, Vector3 v3_camMenuLocalPos, Quaternion q_camLastLocalRot, bool _move = true)
@@ -828,6 +829,14 @@ public class MainMenu : MonoBehaviour
                 GraffitiCustomize.Instance.BuildMenu();
         }
     }
+    public void ColourMenu()
+    {
+        if (menuOpen)
+        {
+            if (current == customizeGraffiti)
+                GraffitiCustomize.Instance.ColourMenu();
+        }
+    }
     public void CheckSelectedButton()
     {
         if (PlayerManager.main.Inputs.b_isGamepad)
@@ -881,6 +890,7 @@ public class MainMenu : MonoBehaviour
 
         customizeGraffiti.TM_buildButton.text = "Build".ToString_Input(PlayerController.inputActions.BuildMenu, customizeGraffiti.TM_buildButton, Interactable.enumType.combine);
         customizeGraffiti.TM_backButton.text = "Back".ToString_Input(PlayerController.inputActions.Back, customizeGraffiti.TM_backButton, Interactable.enumType.combine);
+        customizeGraffiti.TM_colourMenuButton.text = "Colour".ToString_Input(PlayerController.inputActions.ColourMenu, customizeGraffiti.TM_colourMenuButton, Interactable.enumType.combine);
     }
 
     
