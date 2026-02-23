@@ -12,6 +12,9 @@ public static class SaveData
     public static List<Objective.objectiveClass> objectives = new List<Objective.objectiveClass>();
     public static List<Resource.resourceClass> resources = new List<Resource.resourceClass>();
     public static List<Consumable.save> consumables = new List<Consumable.save>();
+    public static List<GraffitiManager.graffitiClass> graffitiTags = new List<GraffitiManager.graffitiClass>();
+    public static List<GraffitiManager.graffitiClass> graffitiArmor = new List<GraffitiManager.graffitiClass>();
+    public static List<GraffitiManager.graffitiClass> graffitiShips = new List<GraffitiManager.graffitiClass>();
 
     public static Layout_Defined shipLayout = new Layout_Defined();
 

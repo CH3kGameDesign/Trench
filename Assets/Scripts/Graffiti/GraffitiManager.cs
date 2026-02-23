@@ -25,12 +25,19 @@ public class GraffitiManager : MonoBehaviour
     public class graffitiClass
     {
         public string _name;
+        public enum _enumType {
+            tag = 0,
+            helmet = 10, chest = 11, arm = 12, leg = 13,
+            ship = 20
+            };
+        public _enumType _type;
         private Texture2D _texture = null;
         public List<layerClass> _layers = new List<layerClass>();
 
         public graffitiClass()
         {
             _name = "New Graffiti";
+            _type = _enumType.tag;
             _layers = new List<layerClass>(18);
         }
 
@@ -42,6 +49,7 @@ public class GraffitiManager : MonoBehaviour
         }
     }
 
+    public enum graffitiTypeEnum { tags, armor, ships}
     public enum stampTypeEnum { primitives, letters, complex}
     public Stamp_List stampList;
     [Space(10)]

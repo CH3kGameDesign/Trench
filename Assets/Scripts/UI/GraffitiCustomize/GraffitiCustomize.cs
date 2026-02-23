@@ -88,13 +88,10 @@ public class GraffitiCustomize : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        LoadSave();
         CanvasSize_Update();
-        Layers_Setup();
         StampMenu_Setup();
-        Color_Setup();
+        LoadSave(null);
     }
-
 
     public void Layers_Setup()
     {
@@ -132,9 +129,10 @@ public class GraffitiCustomize : MonoBehaviour
             (Mathf.CeilToInt((float)_list.Count / 3) * 120);
     }
 
-    void LoadSave()
+    public void LoadSave(GraffitiManager.graffitiClass _g)
     {
-
+        Layers_Setup();
+        Color_Setup();
     }
 
     void Save()

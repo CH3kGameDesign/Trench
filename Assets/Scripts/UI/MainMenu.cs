@@ -369,6 +369,9 @@ public class MainMenu : MonoBehaviour
         public TextMeshProUGUI TM_buildButton;
         public TextMeshProUGUI TM_backButton;
         public TextMeshProUGUI TM_colourMenuButton;
+        [Space (10)]
+        public TextMeshProUGUI TM_leftTab;
+        public TextMeshProUGUI TM_rightTab;
 
 
         public override void Open(AnimCurve _curve, Vector3 v3_camMenuLocalPos, Quaternion q_camLastLocalRot, bool _move = true)
@@ -817,6 +820,11 @@ public class MainMenu : MonoBehaviour
                 if (_left) LayoutCustomize.Instance.Rotate(1);
                 else LayoutCustomize.Instance.Rotate(-1);
             }
+            if (current == customizeGraffiti)
+            {
+                if (_left) GraffitiSelect.Instance.SwapTabs(-1);
+                else GraffitiSelect.Instance.SwapTabs(1);
+            }
         }
     }
     public void BuildMenu()
@@ -891,6 +899,9 @@ public class MainMenu : MonoBehaviour
         customizeGraffiti.TM_buildButton.text = "Build".ToString_Input(PlayerController.inputActions.BuildMenu, customizeGraffiti.TM_buildButton, Interactable.enumType.combine);
         customizeGraffiti.TM_backButton.text = "Back".ToString_Input(PlayerController.inputActions.Back, customizeGraffiti.TM_backButton, Interactable.enumType.combine);
         customizeGraffiti.TM_colourMenuButton.text = "Colour".ToString_Input(PlayerController.inputActions.ColourMenu, customizeGraffiti.TM_colourMenuButton, Interactable.enumType.combine);
+        
+        customizeGraffiti.TM_leftTab.text = "".ToString_Input(PlayerController.inputActions.LeftTab, customizeGraffiti.TM_leftTab, Interactable.enumType.input);
+        customizeGraffiti.TM_rightTab.text = "".ToString_Input(PlayerController.inputActions.RightTab, customizeGraffiti.TM_rightTab, Interactable.enumType.input);
     }
 
     
