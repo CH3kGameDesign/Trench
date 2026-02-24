@@ -95,6 +95,7 @@ public class GraffitiCustomize : MonoBehaviour
 
     public void Layers_Setup()
     {
+        RT_stampParent.DeleteChildren();
         RT_layerGrid.DeleteChildren();
         layers.Clear();
 
@@ -131,13 +132,9 @@ public class GraffitiCustomize : MonoBehaviour
 
     public void LoadSave(GraffitiManager.graffitiClass _g)
     {
+        curGraffiti = _g;
         Layers_Setup();
         Color_Setup();
-    }
-
-    void Save()
-    {
-
     }
 
     void LoadObjects()
@@ -441,7 +438,7 @@ public class GraffitiCustomize : MonoBehaviour
 
     public void Hide()
     {
-        Save();
+        SaveGraffiti();
         b_active = false;
         HideBuild(PlayerManager.main);
     }
@@ -575,13 +572,7 @@ public class GraffitiCustomize : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyUp(KeyCode.Escape))
-        {
-            curGraffiti._layers.Clear();
-            for (int i = 0; i < layers.Count; i++)
-                curGraffiti._layers.Add(layers[i].GetLayerInfo());
-            curGraffiti.GetTexture();
-        }
+        
     }
 
     //Deprecated
@@ -615,10 +606,14 @@ public class GraffitiCustomize : MonoBehaviour
 
     void SaveGraffiti()
     {
-        int _len = Mathf.Max(layers.Count, curGraffiti._layers.Count);
-        for (int i = 0; i < _len; i++)
-        {
-            curGraffiti._layers[i] = layers[i].GetLayerInfo();
-        }
+        if (curGraffiti == null)
+            curGraffiti = new GraffitiManager.graffitiClass();
+        else
+            curGraffiti._layers.Clear();
+
+        for (int i = 0; i < layers.Count; i++)
+            curGraffiti._layers.Add(layers[i].GetLayerInfo());
+        curGraffiti.GetTexture();
+        SaveData.graffitiTags.Add(curGraffiti);
     }
 }

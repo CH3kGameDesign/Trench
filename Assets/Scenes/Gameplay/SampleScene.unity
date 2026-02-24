@@ -1862,7 +1862,7 @@ RectTransform:
   m_Father: {fileID: 613498408}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0.99981666}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -11777,6 +11777,12 @@ MonoBehaviour:
   TM_controls: {fileID: 329715210}
   PF_button: {fileID: 1744196303099902515, guid: 1f1edeab0217f4f40b00422db9a3d17b, type: 3}
   PF_tabButton: {fileID: 7706273128573017318, guid: efc545052a86b3144b9d0c739f07a192, type: 3}
+  State_NoneSelected:
+    i_image: {fileID: 2800000, guid: 5402faabfb448e6499190375ba423b7f, type: 3}
+    s_description: None
+  State_NewGraffiti:
+    i_image: {fileID: 2800000, guid: 2969d90b86698124696637a6df64a112, type: 3}
+    s_description: New Graffiti
   G_GraffitiSelect: {fileID: 1673673984}
   G_GraffitiCustomize: {fileID: 1376618407}
 --- !u!1 &654552076
@@ -12512,6 +12518,7 @@ MonoBehaviour:
     _backButton: {fileID: 763320129}
     cursorVisible: 1
     graffitiCustomize: {fileID: 652869762}
+    graffitiSelect: {fileID: 652869763}
     graffitiManager: {fileID: 1849924704}
     TM_buildButton: {fileID: 262085107}
     TM_backButton: {fileID: 1216774757}
@@ -25851,7 +25858,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 147642800}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.99981666
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -34195,7 +34202,7 @@ MonoBehaviour:
   graffitiRenderer: {fileID: 1924398014}
   RT_layers: {fileID: 2104052384}
   renderTex: {fileID: 8400000, guid: 7c1479b9ed638a24aae93b9b51c545d8, type: 2}
-  PF_UI_graffitiLayer: {fileID: 7257678320861265889, guid: 1f1edeab0217f4f40b00422db9a3d17b, type: 3}
+  PF_UI_graffitiLayer: {fileID: 7257678320861265889, guid: a05b99e2102a66249a06e9f6268088ef, type: 3}
   PF_image: {fileID: 7929405408524715668, guid: 0dedf810791db7c4e8f15d410516dfe9, type: 3}
 --- !u!1 &1855308503
 GameObject:

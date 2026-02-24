@@ -364,6 +364,7 @@ public class MainMenu : MonoBehaviour
     public class customizeGraffitiRefClass : panelRefClass
     {
         public GraffitiCustomize graffitiCustomize;
+        public GraffitiSelect graffitiSelect;
         public GraffitiManager graffitiManager;
 
         public TextMeshProUGUI TM_buildButton;
@@ -377,11 +378,13 @@ public class MainMenu : MonoBehaviour
         public override void Open(AnimCurve _curve, Vector3 v3_camMenuLocalPos, Quaternion q_camLastLocalRot, bool _move = true)
         {
             graffitiCustomize.Display();
+            graffitiSelect.ShowSelectScreen(true);
             base.Open(_curve, v3_camMenuLocalPos, q_camLastLocalRot, _move);
         }
         public override void Close()
         {
             base.Close();
+            graffitiCustomize.Hide();
         }
         public override void OnUpdate(PlayerController _PC)
         {

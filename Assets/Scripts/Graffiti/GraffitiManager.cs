@@ -34,11 +34,11 @@ public class GraffitiManager : MonoBehaviour
         private Texture2D _texture = null;
         public List<layerClass> _layers = new List<layerClass>();
 
-        public graffitiClass()
+        public graffitiClass(string name = "New Graffiti", _enumType type = _enumType.tag)
         {
-            _name = "New Graffiti";
-            _type = _enumType.tag;
-            _layers = new List<layerClass>(18);
+            _name = name;
+            _type = type;
+            _layers = new List<layerClass>();
         }
 
         public Texture2D GetTexture()
@@ -46,6 +46,14 @@ public class GraffitiManager : MonoBehaviour
             if (_texture == null)
                 _texture = GraffitiManager.Instance.RenderGraffiti(this);
             return _texture;
+        }
+        public graffitiTypeEnum GetTypeEnum()
+        {
+            if ((int)_type < 10)
+                return graffitiTypeEnum.tags;
+            if ((int)_type < 20)
+                return graffitiTypeEnum.armor;
+            return graffitiTypeEnum.ships;
         }
     }
 
