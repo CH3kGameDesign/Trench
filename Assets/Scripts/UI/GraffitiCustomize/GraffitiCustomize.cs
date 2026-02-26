@@ -135,11 +135,20 @@ public class GraffitiCustomize : MonoBehaviour
         curGraffiti = _g;
         Layers_Setup();
         Color_Setup();
+        LoadObjects();
     }
 
     void LoadObjects()
     {
+        if (curGraffiti == null)
+            return;
 
+        int _limit = Mathf.Max(layers.Count, curGraffiti._layers.Count);
+        for (int i = _limit - 1; i >= 0; i--)
+        {
+            layers[i].Setup(this);
+            layers[i].SetLayerInfo(curGraffiti._layers[i]);
+        }
     }
     public void OnUpdate(PlayerController _PC)
     {
@@ -607,13 +616,15 @@ public class GraffitiCustomize : MonoBehaviour
     void SaveGraffiti()
     {
         if (curGraffiti == null)
+        {
             curGraffiti = new GraffitiManager.graffitiClass();
+            SaveData.graffitiTags.Add(curGraffiti);
+        }
         else
             curGraffiti._layers.Clear();
 
         for (int i = 0; i < layers.Count; i++)
             curGraffiti._layers.Add(layers[i].GetLayerInfo());
-        curGraffiti.GetTexture();
-        SaveData.graffitiTags.Add(curGraffiti);
+        curGraffiti.RenderTexture();
     }
 }

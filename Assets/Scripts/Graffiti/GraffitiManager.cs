@@ -44,9 +44,10 @@ public class GraffitiManager : MonoBehaviour
         public Texture2D GetTexture()
         {
             if (_texture == null)
-                _texture = GraffitiManager.Instance.RenderGraffiti(this);
+                RenderTexture();
             return _texture;
         }
+        public void RenderTexture() { _texture = GraffitiManager.Instance.RenderGraffiti(this); }
         public graffitiTypeEnum GetTypeEnum()
         {
             if ((int)_type < 10)

@@ -60,7 +60,7 @@ public class UI_graffitiLayer : MonoBehaviour
         RT_mover.anchoredPosition = Vector2.zero;
         RT_mover.localEulerAngles = Vector3.zero;
     }
-    void Setup(GraffitiCustomize _GC)
+    public void Setup(GraffitiCustomize _GC)
     {
         if (I_mover != null) return;
         I_mover = Instantiate(_GC.PF_image, _GC.RT_stampParent);
