@@ -612,6 +612,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Options",
+                    "type": "Button",
+                    "id": "2ae29bf9-08dd-464e-b0dc-255061df081d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "Press",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Back",
                     "type": "Button",
                     "id": "f45707ae-e1e2-49b0-857a-c4c345c4ae2a",
@@ -744,6 +753,28 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "Confirm",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3c361c5c-2585-4954-905b-f058662608db",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Options",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "496e7976-6377-477a-9c71-8ca52dfadc85",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Options",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

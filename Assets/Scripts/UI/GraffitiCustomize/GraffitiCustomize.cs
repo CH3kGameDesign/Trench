@@ -62,6 +62,7 @@ public class GraffitiCustomize : MonoBehaviour
     private List<UI_graffitiLayer> layers = new List<UI_graffitiLayer>();
 
     private UI_graffitiLayer curLayer;
+    private UI_graffitiLayer selectLayer;
 
     public float F_canvasPosSpeed = 50f;
     private Vector2 v2_canvasPos;
@@ -150,6 +151,44 @@ public class GraffitiCustomize : MonoBehaviour
             layers[i].SetLayerInfo(curGraffiti._layers[i]);
         }
     }
+
+    public void MoveLayer(UI_graffitiLayer _layer, bool _up)
+    {
+        for (int i = 0; i <= layers.Count; i++)
+        {
+            if (layers[i] == _layer)
+            {
+                if (!_up)
+                {
+                    if (i >= layers.Count - 2)
+                        return;
+                    layers[i] = layers[i + 1];
+                    layers[i + 1] = _layer;
+                    if (layers[i].RT_mover != null)
+                        layers[i].RT_mover.SetSiblingIndex(i);
+                    layers[i].transform.SetSiblingIndex(i);
+                }
+                else
+                {
+                    if (i <= 0)
+                        return;
+                    layers[i] = layers[i - 1];
+                    layers[i - 1] = _layer;
+                    if (layers[i - 1].RT_mover != null)
+                        layers[i - 1].RT_mover.SetSiblingIndex(i - 1);
+                    layers[i - 1].transform.SetSiblingIndex(i - 1);
+                }
+            }
+        }
+    }
+    public void SelectLayer(UI_graffitiLayer _layer, bool _select)
+    {
+        if (_select) SelectLayer(_layer);
+        else DeselectLayer(_layer);
+    }
+    public void SelectLayer(UI_graffitiLayer _layer) { selectLayer = _layer; }
+    public void DeselectLayer(UI_graffitiLayer _layer) { if (selectLayer == _layer) selectLayer = null; }
+
     public void OnUpdate(PlayerController _PC)
     {
         if (!b_active) return;
@@ -161,6 +200,10 @@ public class GraffitiCustomize : MonoBehaviour
             if (curLayer)
                 curLayer.FollowCursor(this);
             ClickManager(_PC);
+        } else
+        {
+            if (_PC.Inputs.b_options && selectLayer != null)
+                selectLayer.ShowOptions(true);
         }
     }
     void MoveCursor(PlayerController _PC)
@@ -332,6 +375,13 @@ public class GraffitiCustomize : MonoBehaviour
         StartCoroutine(RT_holder.Move(v2_canvasPos, Quaternion.identity, true, 0.1f));
         G_leftColumn.SetActive(true);
         G_buildMenu.SetActive(false);
+
+        foreach (var item in layers)
+        {
+            item.UpdateSelected(false);
+            item.ShowOptions(false);
+        }
+            
         G_stampMenu.SetActive(false);
         if (_PC.Inputs.b_isGamepad)
             EventSystem.current.SetSelectedGameObject(null);

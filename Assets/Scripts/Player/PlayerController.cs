@@ -249,6 +249,7 @@ public class PlayerController : BaseController
         public bool b_aiming = false;
         public bool b_interact = false;
         public bool b_confirm = false;
+        public bool b_options = false;
         public bool b_crouch = false;
         public bool b_reload = false;
         public bool b_radial = false;
@@ -322,6 +323,7 @@ public class PlayerController : BaseController
         Menu,
         Recall,
         Confirm,
+        Options,
         Back,
         LeftTab,
         RightTab,
@@ -1958,6 +1960,7 @@ public class PlayerController : BaseController
     public void Input_Jump(InputAction.CallbackContext cxt) { Inputs.b_jumping = Input_GetPressed(cxt); }
     public void Input_Interact(InputAction.CallbackContext cxt) { Inputs.b_interact = Input_GetPressed(cxt); }
     public void Input_Confirm(InputAction.CallbackContext cxt) { Inputs.b_confirm = Input_GetPressed(cxt); }
+    public void Input_Options(InputAction.CallbackContext cxt) { Inputs.b_options = Input_GetPressed(cxt); }
     public void Input_Crouch(InputAction.CallbackContext cxt) { Inputs.b_crouch = Input_GetPressed(cxt); }
     public void Input_Reload(InputAction.CallbackContext cxt) { Inputs.b_reload = Input_GetPressed(cxt); }
     public void Input_Radial(InputAction.CallbackContext cxt) { Inputs.b_radial = Input_GetPressed(cxt); }

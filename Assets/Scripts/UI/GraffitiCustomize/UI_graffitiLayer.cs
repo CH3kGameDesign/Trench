@@ -11,6 +11,7 @@ public class UI_graffitiLayer : MonoBehaviour
     string s_stampID = "";
 
     public GameObject G_onSelectedObject;
+    public GameObject G_options;
 
     public Button B_button;
 
@@ -19,12 +20,14 @@ public class UI_graffitiLayer : MonoBehaviour
 
     [HideInInspector] public RectTransform RT_mover;
     private Image I_mover;
+    private Sprite S_default;
 
     private int i_num;
     [HideInInspector] public bool B_imageSet = false;
 
     private void Start()
     {
+        S_default = I_layerSprite.sprite;
         UpdateSelected();
     }
 
@@ -105,7 +108,7 @@ public class UI_graffitiLayer : MonoBehaviour
 
     public void OnSelect(BaseEventData _event) { UpdateSelected(true); }
     public void OnDeselect(BaseEventData _event) { UpdateSelected(false); }
-    void UpdateSelected(bool _sel)
+    public void UpdateSelected(bool _sel)
     {
         B_selected = _sel;
         UpdateSelected();
@@ -114,6 +117,7 @@ public class UI_graffitiLayer : MonoBehaviour
     {
         if (G_onSelectedObject)
             G_onSelectedObject.SetActive(B_selected);
+        GraffitiCustomize.Instance.SelectLayer(this, B_selected);
     }
 
     //Deprecated
@@ -154,5 +158,27 @@ public class UI_graffitiLayer : MonoBehaviour
         RT_mover.localScale = new Vector3(_temp._scale.x, _temp._scale.y, 1);
         RT_mover.localEulerAngles = new Vector3(0, 0, _temp._rotation);
         SetColor(_temp._color);
+    }
+    public void ShowOptions(bool _show)
+    {
+        G_options.SetActive(_show);
+    }
+    public void Move(bool _up)
+    {
+        GraffitiCustomize.Instance.MoveLayer(this, _up);
+    }
+    public void Clear()
+    {
+        I_layerSprite.sprite = S_default; 
+        I_mover.sprite = null;
+        s_stampID = "";
+        B_imageSet = false;
+        I_mover.enabled = false;
+
+        RT_mover.anchoredPosition = Vector2.zero;
+        RT_mover.localScale = Vector3.one;
+        RT_mover.localEulerAngles = Vector3.zero;
+
+        SetColor(Color.white);
     }
 }
