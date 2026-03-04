@@ -394,8 +394,8 @@ public class PlayerController : BaseController
             SetNavIDs();
 
             DebugGunList();
-            gun_secondaryEquipped = gun_EquippedList[SaveData.i_equippedGunNum.y];
-            Gun_Equip(SaveData.i_equippedGunNum.x, true);
+            gun_secondaryEquipped = gun_EquippedList[SaveData.Data.i_equippedGunNum.y];
+            Gun_Equip(SaveData.Data.i_equippedGunNum.x, true);
             reticle_OnFoot.UpdateRoundCount(gun_Equipped);
 
             NMA.updateRotation = false;
@@ -415,9 +415,9 @@ public class PlayerController : BaseController
     public void DebugGunList()
     {
         List<GunClass> _list = new List<GunClass>();
-        for (int i = 0; i < SaveData.equippedGuns.Length; i++)
+        for (int i = 0; i < SaveData.Data.equippedGuns.Length; i++)
         {
-            GunClass _temp = gunManager.GetGunByType(SaveData.equippedGuns[i], this);
+            GunClass _temp = gunManager.GetGunByType(SaveData.Data.equippedGuns[i], this);
             if (_temp.ownedAmt > 0)
             {
                 _list.Add(_temp);
@@ -470,14 +470,14 @@ public class PlayerController : BaseController
 
     void Setup_Consumables()
     {
-        if (SaveData.consumables.Count == 0)
+        if (SaveData.Data.consumables.Count == 0)
         {
-            SaveData.consumables.Add(Consumable.save.Create(Consumable_Type.Item_HealthPotion, 10));
-            SaveData.consumables.Add(Consumable.save.Create(Consumable_Type.Item_RevivePotion, 1));
+            SaveData.Data.consumables.Add(Consumable.save.Create(Consumable_Type.Item_HealthPotion, 10));
+            SaveData.Data.consumables.Add(Consumable.save.Create(Consumable_Type.Item_RevivePotion, 1));
         }
         else
         {
-            foreach (var item in SaveData.consumables)
+            foreach (var item in SaveData.Data.consumables)
                 item._amt = item._totalAmt;
         }
     }
@@ -495,7 +495,7 @@ public class PlayerController : BaseController
         int[] _amt =
         {
             gun_EquippedList.Length,
-            SaveData.consumables.Count,
+            SaveData.Data.consumables.Count,
         };
         Ref.RM_radial.Setup(_amt);
         Update_Radial();
@@ -545,7 +545,7 @@ public class PlayerController : BaseController
     void Update_Radial()
     {
         Ref.RM_radial.Setup_Guns(gun_Equipped, gun_EquippedList);
-        Ref.RM_radial.Setup_Consumables(SaveData.consumables);
+        Ref.RM_radial.Setup_Consumables(SaveData.Data.consumables);
     }
 
     void SetNavIDs()
@@ -983,7 +983,7 @@ public class PlayerController : BaseController
 
         //Add To Save Data
         bool _collected = false;
-        foreach (var item in SaveData.resources)
+        foreach (var item in SaveData.Data.resources)
         {
             if (item._type == _resource._type)
             {
@@ -993,7 +993,7 @@ public class PlayerController : BaseController
             }
         }
         if (!_collected)
-            SaveData.resources.Add(_resource.Clone());
+            SaveData.Data.resources.Add(_resource.Clone());
         //Play Audio
         AH_agentAudioHolder.Play(AgentAudioHolder.type.pickupSmall);
         MusicHandler.AdjustVolume(MusicHandler.typeEnum.synth, 0.1f);
@@ -1004,7 +1004,7 @@ public class PlayerController : BaseController
     public void Pickup_Consumable(Consumable.consumableClass _consumable)
     {
         bool _collected = false;
-        foreach (var item in SaveData.consumables)
+        foreach (var item in SaveData.Data.consumables)
         {
             if (item._type == _consumable._type)
             {
@@ -1014,7 +1014,7 @@ public class PlayerController : BaseController
             }
         }
         if (!_collected)
-            SaveData.consumables.Add(_consumable.CloneToSave());
+            SaveData.Data.consumables.Add(_consumable.CloneToSave());
         AH_agentAudioHolder.Play(AgentAudioHolder.type.pickupSmall);
         MusicHandler.AdjustVolume(MusicHandler.typeEnum.synth, 0.1f);
     }
@@ -1683,11 +1683,11 @@ public class PlayerController : BaseController
     public void Gun_Equip(int _invNum, bool _force = false)
     {
         //Check if already equipped
-        if (SaveData.i_equippedGunNum.x != _invNum || _force)
+        if (SaveData.Data.i_equippedGunNum.x != _invNum || _force)
         {
-            if (SaveData.i_equippedGunNum.x != _invNum)
-                SaveData.i_equippedGunNum.y = SaveData.i_equippedGunNum.x;
-            SaveData.i_equippedGunNum.x = _invNum;
+            if (SaveData.Data.i_equippedGunNum.x != _invNum)
+                SaveData.Data.i_equippedGunNum.y = SaveData.Data.i_equippedGunNum.x;
+            SaveData.Data.i_equippedGunNum.x = _invNum;
             Gun_Equip(gun_EquippedList[_invNum]);
         }
     }

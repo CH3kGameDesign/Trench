@@ -292,7 +292,7 @@ public class MainMenu : MonoBehaviour
             TM_itemRarity.text = S_nullRarity;
             TM_itemDescription.text = S_nullDescription;
 
-            UpdateCurrency(SaveData.i_currency);
+            UpdateCurrency(SaveData.Data.i_currency);
             TM_cost.color = Color.black;
             TM_cost.text = "N/A";
             RT_listHolder.DeleteChildren();
@@ -302,9 +302,9 @@ public class MainMenu : MonoBehaviour
         void UpdateCost(ItemClass _item)
         {
             canAfford = true;
-            UpdateCurrency(SaveData.i_currency);
+            UpdateCurrency(SaveData.Data.i_currency);
             TM_cost.text = _item.cost.coinCost.ToString_Currency();
-            if (SaveData.i_currency < _item.cost.coinCost)
+            if (SaveData.Data.i_currency < _item.cost.coinCost)
             {
                 canAfford = false;
                 TM_cost.color = Color.red;
@@ -527,7 +527,7 @@ public class MainMenu : MonoBehaviour
 
         void DisplayMoneyResources()
         {
-            UI_money.SetMoney(LevelGen_Holder.Instance.GetCollectedValue(), SaveData.i_currency);
+            UI_money.SetMoney(LevelGen_Holder.Instance.GetCollectedValue(), SaveData.Data.i_currency);
             foreach (var item in PlayerManager.Instance.runData.resources)
             {
                 UI_Resource _temp = Instantiate(PF_UIResource, RT_resourceHolder);
@@ -616,7 +616,7 @@ public class MainMenu : MonoBehaviour
     {
         CustomizeShow();
         customize.I_armorType = 0;
-        Armor_Type _enum = SaveData.equippedArmor[customize.I_armorType];
+        Armor_Type _enum = SaveData.Data.equippedArmor[customize.I_armorType];
         ArmorManager.Instance.CreateHelmetUI(customize.G_subOptions.transform, _enum);
         GamepadSwitch();
     }
@@ -624,7 +624,7 @@ public class MainMenu : MonoBehaviour
     {
         CustomizeShow();
         customize.I_armorType = 1;
-        Armor_Type _enum = SaveData.equippedArmor[customize.I_armorType];
+        Armor_Type _enum = SaveData.Data.equippedArmor[customize.I_armorType];
         ArmorManager.Instance.CreateChestUI(customize.G_subOptions.transform, _enum);
         GamepadSwitch();
     }
@@ -632,7 +632,7 @@ public class MainMenu : MonoBehaviour
     {
         CustomizeShow();
         customize.I_armorType = 2;
-        Armor_Type _enum = SaveData.equippedArmor[customize.I_armorType];
+        Armor_Type _enum = SaveData.Data.equippedArmor[customize.I_armorType];
         ArmorManager.Instance.CreateArmUI(customize.G_subOptions.transform, _enum);
         GamepadSwitch();
     }
@@ -640,7 +640,7 @@ public class MainMenu : MonoBehaviour
     {
         CustomizeShow();
         customize.I_armorType = 3;
-        Armor_Type _enum = SaveData.equippedArmor[customize.I_armorType];
+        Armor_Type _enum = SaveData.Data.equippedArmor[customize.I_armorType];
         ArmorManager.Instance.CreateArmUI(customize.G_subOptions.transform, _enum);
         GamepadSwitch();
     }
@@ -648,7 +648,7 @@ public class MainMenu : MonoBehaviour
     {
         CustomizeShow();
         customize.I_armorType = 4;
-        Armor_Type _enum = SaveData.equippedArmor[customize.I_armorType];
+        Armor_Type _enum = SaveData.Data.equippedArmor[customize.I_armorType];
         ArmorManager.Instance.CreateLegUI(customize.G_subOptions.transform, _enum);
         GamepadSwitch();
     }
@@ -656,7 +656,7 @@ public class MainMenu : MonoBehaviour
     {
         CustomizeShow();
         customize.I_armorType = 5;
-        Armor_Type _enum = SaveData.equippedArmor[customize.I_armorType];
+        Armor_Type _enum = SaveData.Data.equippedArmor[customize.I_armorType];
         ArmorManager.Instance.CreateMaterialUI(customize.G_subOptions.transform, _enum);
         GamepadSwitch();
     }
@@ -668,7 +668,7 @@ public class MainMenu : MonoBehaviour
     }
     public void ChooseArmor(ArmorPiece _armor)
     {
-        SaveData.equippedArmor[customize.I_armorType] = _armor.GetEnum();
+        SaveData.Data.equippedArmor[customize.I_armorType] = _armor.GetEnum();
         _armor.Equip(PlayerManager.main.RM_ragdoll, customize.I_armorType != 3);
         _armor.AssignToPlayer(customize.I_armorType != 3);
         EquipParticles(_armor.Hooks(PlayerManager.main.RM_ragdoll));
@@ -747,7 +747,7 @@ public class MainMenu : MonoBehaviour
     public void Open(panelRefClass _panel, float _timeScale = 0f)
     {
         menuOpen = true;
-        _panel.UpdateCurrency(SaveData.i_currency);
+        _panel.UpdateCurrency(SaveData.Data.i_currency);
         v3_camLastLocalPos = PlayerManager.main.T_camHolder.GetChild(0).localPosition;
         q_camLastLocalRot = PlayerManager.main.T_camHolder.GetChild(0).localRotation;
 
@@ -765,13 +765,13 @@ public class MainMenu : MonoBehaviour
     }
     public void LoadLevel()
     {
-        loadingLevel.UpdateCurrency(SaveData.i_currency);
+        loadingLevel.UpdateCurrency(SaveData.Data.i_currency);
         loadingLevel._anim.Play("Open");
         loadingLevel.Open(AC_smooth, v3_camMenuLocalPos, q_camLastLocalRot, false);
     }
     public void LoadEndLevel()
     {
-        endLevel.UpdateCurrency(SaveData.i_currency);
+        endLevel.UpdateCurrency(SaveData.Data.i_currency);
         endLevel._anim.Play("Open");
         endLevel.Open(AC_smooth, v3_camMenuLocalPos, q_camLastLocalRot, false);
     }

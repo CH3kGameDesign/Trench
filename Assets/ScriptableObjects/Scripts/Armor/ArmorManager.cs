@@ -99,12 +99,12 @@ public class ArmorManager : ScriptableObject
     }
     public static void UpdatePlayerArmorSet()
     {
-        SaveData.equippedArmorSet.helmet = (Armor_Helmet)GetArmorType_Static(SaveData.equippedArmor[0]);
-        SaveData.equippedArmorSet.chest = (Armor_Chest)GetArmorType_Static(SaveData.equippedArmor[1]);
-        SaveData.equippedArmorSet.armL = (Armor_Arm)GetArmorType_Static(SaveData.equippedArmor[2]);
-        SaveData.equippedArmorSet.armR = (Armor_Arm)GetArmorType_Static(SaveData.equippedArmor[3]);
-        SaveData.equippedArmorSet.legs = (Armor_Leg)GetArmorType_Static(SaveData.equippedArmor[4]);
-        SaveData.equippedArmorSet.material = (Armor_Material)GetArmorType_Static(SaveData.equippedArmor[5]);
+        SaveData.equippedArmorSet.helmet = (Armor_Helmet)GetArmorType_Static(SaveData.Data.equippedArmor[0]);
+        SaveData.equippedArmorSet.chest = (Armor_Chest)GetArmorType_Static(SaveData.Data.equippedArmor[1]);
+        SaveData.equippedArmorSet.armL = (Armor_Arm)GetArmorType_Static(SaveData.Data.equippedArmor[2]);
+        SaveData.equippedArmorSet.armR = (Armor_Arm)GetArmorType_Static(SaveData.Data.equippedArmor[3]);
+        SaveData.equippedArmorSet.legs = (Armor_Leg)GetArmorType_Static(SaveData.Data.equippedArmor[4]);
+        SaveData.equippedArmorSet.material = (Armor_Material)GetArmorType_Static(SaveData.Data.equippedArmor[5]);
     }
 
     public static void EquipArmor_Static(RagdollManager _RM, Armor_Type[] _AT)

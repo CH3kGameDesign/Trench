@@ -103,7 +103,7 @@ public class LobbyStartHandler : MonoBehaviour
     }
     public void UpdateArmor(RagdollManager _player)
     {
-        ArmorManager.Instance.EquipArmor(_player, SaveData.equippedArmor);
+        ArmorManager.Instance.EquipArmor(_player, SaveData.Data.equippedArmor);
     }
 
     public void UpdatePlayers()

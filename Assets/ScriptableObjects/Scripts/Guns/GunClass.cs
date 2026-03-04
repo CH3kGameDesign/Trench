@@ -431,14 +431,14 @@ public class GunClass : ItemClass
     public override void Setup()
     {
         Gun_Type _enum = GetEnum();
-        if (SaveData.ownedGun.Contains(_enum))
+        if (SaveData.Data.ownedGun.Contains(_enum))
             ownedAmt = 1;
         else
         {
             if (cost.unlockAtStart)
             {
                 ownedAmt = 1;
-                SaveData.ownedGun.Add(_enum);
+                SaveData.Data.ownedGun.Add(_enum);
             }
             else
                 ownedAmt = 0;
@@ -453,8 +453,8 @@ public class GunClass : ItemClass
     {
         base.Purchase();
         Gun_Type _enum = GetEnum();
-        if (!SaveData.ownedGun.Contains(_enum))
-            SaveData.ownedGun.Add(_enum);
+        if (!SaveData.Data.ownedGun.Contains(_enum))
+            SaveData.Data.ownedGun.Add(_enum);
         PlayerManager.main.DebugGunList();
         PlayerManager.main.Setup_Radial();
     }

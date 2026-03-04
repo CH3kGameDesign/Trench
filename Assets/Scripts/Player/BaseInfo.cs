@@ -49,8 +49,8 @@ public class BaseInfo : NetworkBehaviour
             SetHealth(F_maxHealth);
             if (controller is PlayerController)
             {
-                equippedArmor = SaveData.equippedArmor;
-                equippedGun = SaveData.equippedGuns[SaveData.i_equippedGunNum.x];
+                equippedArmor = SaveData.Data.equippedArmor;
+                equippedGun = SaveData.Data.equippedGuns[SaveData.Data.i_equippedGunNum.x];
             }
             EquipArmor();
             EquipGun();

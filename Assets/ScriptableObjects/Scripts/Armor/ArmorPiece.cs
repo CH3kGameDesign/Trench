@@ -21,14 +21,14 @@ public class ArmorPiece : ItemClass
     public override void Setup()
     {
         Armor_Type _enum = GetEnum();
-        if (SaveData.ownedArmor.Contains(_enum))
+        if (SaveData.Data.ownedArmor.Contains(_enum))
             ownedAmt = 1;
         else
         {
             if (cost.unlockAtStart)
             {
                 ownedAmt = 1;
-                SaveData.ownedArmor.Add(_enum);
+                SaveData.Data.ownedArmor.Add(_enum);
             }
             else
                 ownedAmt = 0;
@@ -47,8 +47,8 @@ public class ArmorPiece : ItemClass
     {
         base.Purchase();
         Armor_Type _enum = GetEnum();
-        if (!SaveData.ownedArmor.Contains(_enum))
-            SaveData.ownedArmor.Add(_enum);
+        if (!SaveData.Data.ownedArmor.Contains(_enum))
+            SaveData.Data.ownedArmor.Add(_enum);
         PlayerManager.main.DebugGunList();
         PlayerManager.main.Setup_Radial();
     }

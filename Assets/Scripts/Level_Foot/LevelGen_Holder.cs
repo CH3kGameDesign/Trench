@@ -150,7 +150,7 @@ public class LevelGen_Holder : NetworkBehaviour
             SaveData.missionCurrent = null;
         else
             SaveData.missionCurrent = Objective.Instance.GetMission(_mission).Clone();
-        SaveData.i_currency += Instance.GetCollectedValue();
+        SaveData.Data.i_currency += Instance.GetCollectedValue();
         SceneManager.LoadScene(1);
     }
 

@@ -36,13 +36,13 @@ public class Item_Consumable : ItemClass
     }
     public Consumable.save GetSave()
     {
-        foreach (var item in SaveData.consumables)
+        foreach (var item in SaveData.Data.consumables)
         {
             if (item._type == GetEnum())
                 return item;
         }
         Consumable.save _temp = Consumable.save.Create(GetEnum(),0);
-        SaveData.consumables.Add(_temp);
+        SaveData.Data.consumables.Add(_temp);
         return _temp;
     }
 

@@ -135,7 +135,7 @@ public class LoadingArea : NetworkBehaviour
             return;
 
         RM_players[_i].gameObject.SetActive(true);
-        ArmorManager.Instance.EquipArmor(RM_players[_i], SaveData.equippedArmor);
+        ArmorManager.Instance.EquipArmor(RM_players[_i], SaveData.Data.equippedArmor);
     }
     [ObserversRpc]
     public void ShowPlayers(int _amt)

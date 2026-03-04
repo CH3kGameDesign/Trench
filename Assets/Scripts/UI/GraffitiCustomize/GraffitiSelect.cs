@@ -56,13 +56,13 @@ public class GraffitiSelect : MonoBehaviour
             switch (T_type)
             {
                 case GraffitiManager.graffitiTypeEnum.tags:
-                    _graffiti = SaveData.graffitiTags;
+                    _graffiti = SaveData.Data.graffitiTags;
                     break;
                 case GraffitiManager.graffitiTypeEnum.armor:
-                    _graffiti = SaveData.graffitiArmor;
+                    _graffiti = SaveData.Data.graffitiArmor;
                     break;
                 case GraffitiManager.graffitiTypeEnum.ships:
-                    _graffiti = SaveData.graffitiShips;
+                    _graffiti = SaveData.Data.graffitiShips;
                     break;
                 default:
                     Debug.LogError("Non-specified Enum Type");

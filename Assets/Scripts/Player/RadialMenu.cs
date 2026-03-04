@@ -278,7 +278,7 @@ public class RadialMenu : MonoBehaviour
                 if (Values.i_selChild == 0)
                     ItemInfoRef.Display(PlayerManager.main.gun_EquippedList[sel]);
                 else if (Values.i_selChild == 1)
-                    ItemInfoRef.Display(SaveData.consumables[sel]);
+                    ItemInfoRef.Display(SaveData.Data.consumables[sel]);
             }
             else if (Values.C_CoyoteTime == null)
                 Values.C_CoyoteTime = StartCoroutine(CoyoteTime(Values.F_coyoteTime));
@@ -444,7 +444,7 @@ public class RadialMenu : MonoBehaviour
         else if (Values.i_lastChild == 1)
         {
             if (Values.i_lastSubChild >= 0)
-                PlayerManager.main.Consumable_Use(SaveData.consumables[Values.i_lastSubChild].Get_Item());
+                PlayerManager.main.Consumable_Use(SaveData.Data.consumables[Values.i_lastSubChild].Get_Item());
         }
         Values.i_lastChild = -1;
         Values.i_lastSubChild = -1;

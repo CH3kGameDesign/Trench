@@ -668,7 +668,7 @@ public class GraffitiCustomize : MonoBehaviour
         if (curGraffiti == null)
         {
             curGraffiti = new GraffitiManager.graffitiClass();
-            SaveData.graffitiTags.Add(curGraffiti);
+            SaveData.Data.graffitiTags.Add(curGraffiti);
         }
         else
             curGraffiti._layers.Clear();
@@ -676,5 +676,6 @@ public class GraffitiCustomize : MonoBehaviour
         for (int i = 0; i < layers.Count; i++)
             curGraffiti._layers.Add(layers[i].GetLayerInfo());
         curGraffiti.RenderTexture();
+        SaveData.Save();
     }
 }

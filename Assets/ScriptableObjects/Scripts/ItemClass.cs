@@ -79,7 +79,7 @@ public class ItemClass : ScriptableObject
     public virtual void Purchase()
     {
         ownedAmt++;
-        SaveData.i_currency -= cost.coinCost;
+        SaveData.Data.i_currency -= cost.coinCost;
         foreach (var item in cost.list)
         {
             Resource.resourceClass _temp = SaveData.GetResource(item._type);

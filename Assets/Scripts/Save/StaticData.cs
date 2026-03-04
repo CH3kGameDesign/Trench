@@ -12,6 +12,7 @@ public class StaticData : MonoBehaviour
 
     public void Awake()
     {
+        SaveData.Load();
         _Resource.Setup();
         _Objective.Setup();
         _Consumable.Setup();
