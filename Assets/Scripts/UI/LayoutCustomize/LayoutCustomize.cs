@@ -104,14 +104,16 @@ public class LayoutCustomize : MonoBehaviour
         foreach (var item in LMO_list)
         {
             Layout_Defined.objectClass _obj = new Layout_Defined.objectClass(
-                item.Block, 
-                item.GetCenter(), 
+                item.Block,
+                item.GetCenter(),
                 item.I_rot,
                 item.B_locked
                 );
             save._objects.Add(_obj);
         }
+        SaveData.Data.shipLayout = new Layout_Defined.saveClass(save);
         SaveData.shipLayout = new Layout_Defined(save);
+        SaveData.Save();
     }
 
     void LoadObjects()

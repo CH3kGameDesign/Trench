@@ -662,13 +662,24 @@ public class GraffitiCustomize : MonoBehaviour
             //layers[i].ReadImport(_temp[s]);
         }
     }
-
+    bool CheckValidGraffiti()
+    {
+        foreach (var item in layers)
+        {
+            if (item.s_stampID != "")
+                return true;
+        }
+        return false;
+    }
     void SaveGraffiti()
     {
         if (curGraffiti == null)
         {
-            curGraffiti = new GraffitiManager.graffitiClass();
-            SaveData.Data.graffitiTags.Add(curGraffiti);
+            if (CheckValidGraffiti())
+            {
+                curGraffiti = new GraffitiManager.graffitiClass();
+                SaveData.Data.graffitiTags.Add(curGraffiti);
+            }
         }
         else
             curGraffiti._layers.Clear();

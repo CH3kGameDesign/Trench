@@ -8,7 +8,7 @@ public class UI_graffitiLayer : MonoBehaviour
 {
     public TextMeshProUGUI TM_layerNum;
     public Image I_layerSprite;
-    string s_stampID = "";
+    [HideInInspector] public string s_stampID = "";
 
     public GameObject G_onSelectedObject;
     public GameObject G_options;

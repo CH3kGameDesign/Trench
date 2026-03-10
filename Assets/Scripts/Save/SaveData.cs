@@ -27,6 +27,8 @@ public static class SaveData
         public List<Gun_Type> ownedGun;
         public List<Armor_Type> ownedArmor;
 
+        public Layout_Defined.saveClass shipLayout = null;
+
         public Vector2Int i_equippedGunNum;
         public Gun_Type[] equippedGuns;
         public Armor_Type[] equippedArmor;
@@ -34,16 +36,24 @@ public static class SaveData
         public SaveClass()
         {
             i_currency = 200;
-            objectives = new List<Objective.objectiveClass>();
             resources = new List<Resource.resourceClass>();
             consumables = new List<Consumable.save>();
             graffitiTags = new List<GraffitiManager.graffitiClass>();
             graffitiArmor = new List<GraffitiManager.graffitiClass>();
             graffitiShips = new List<GraffitiManager.graffitiClass>();
 
-
             ownedGun = new List<Gun_Type>();
             ownedArmor = new List<Armor_Type>();
+
+            if (SaveData.shipLayout != null)
+            {
+                if (SaveData.shipLayout._theme != null)
+                    shipLayout = new Layout_Defined.saveClass(SaveData.shipLayout);
+                else
+                    shipLayout = null;
+            }
+            else
+                shipLayout = null;
 
             i_equippedGunNum = new Vector2Int(0,1);
             equippedGuns = new Gun_Type[]
@@ -116,7 +126,15 @@ public static class SaveData
         {
             SaveClass _temp = JsonUtility.FromJson<SaveClass>(json);
             Data = _temp;
+            LoadFinal();
         }
+    }
+
+    static void LoadFinal()
+    {
+        //Data.ShipLayout doesn't seem to load
+        if (Data.shipLayout != null)
+            shipLayout = new Layout_Defined(Data.shipLayout);
     }
     
     public static bool LoadFromFile(string a_FileName, out string result)

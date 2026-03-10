@@ -44,7 +44,34 @@ public class LevelGen_Theme : ScriptableObject
     {
         
     }
-
+    public LevelGen_Block GetBlock(string _name)
+    {
+        LevelGen_Block _temp = null;
+        if (GetBlockFromList(Corridors, _name, out _temp)) return _temp;
+        if (GetBlockFromList(Bridges, _name, out _temp)) return _temp;
+        if (GetBlockFromList(Hangars, _name, out _temp)) return _temp;
+        if (GetBlockFromList(DeadEnds, _name, out _temp)) return _temp;
+        if (GetBlockFromList(Engines, _name, out _temp)) return _temp;
+        if (GetBlockFromList(FoodHalls, _name, out _temp)) return _temp;
+        if (GetBlockFromList(CrewQuarters, _name, out _temp)) return _temp;
+        if (GetBlockFromList(CaptainQuaters, _name, out _temp)) return _temp;
+        if (GetBlockFromList(Vaults, _name, out _temp)) return _temp;
+        if (GetBlockFromList(Ships, _name, out _temp)) return _temp;
+        return null;
+    }
+    private bool GetBlockFromList(List<LevelGen_Block> _list, string _name, out LevelGen_Block _block)
+    {
+        _block = null;
+        foreach (var item in _list)
+        {
+            if (item._name == _name)
+            {
+                _block = item;
+                return true;
+            }
+        }
+        return false;
+    }
     public LevelGen_Block GetBlock(LevelGen_Block.blockTypeEnum _type, LevelGen_Block.entryTypeEnum _entryType, Unity.Mathematics.Random _random)
     {
         switch (_type)

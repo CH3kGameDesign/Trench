@@ -31,6 +31,14 @@ public class Layout_Defined : ScriptableObject
         foreach (var item in objects)
             _objects.Add(new objectClass(item));
     }
+    public Layout_Defined(saveClass save)
+    {
+        _theme = Themes.Instance.GetTheme(save.themeID);
+        _bounds = Themes.Instance.GetBounds(save.boundsID);
+        _objects = new List<objectClass>();
+        foreach (var item in save.objects)
+            _objects.Add(new objectClass(item, _theme));
+    }
     [System.Serializable]
     public class objectClass
     {
@@ -58,6 +66,45 @@ public class Layout_Defined : ScriptableObject
             _pos = pos;
             _rot = rot;
             _locked = locked;
+        }
+        public objectClass(saveClass_Object save, LevelGen_Theme theme)
+        {
+            _block = theme.GetBlock(save.blockID);
+            _pos = save.pos;
+            _rot = save.rot;
+            _locked = save.locked;
+        }
+    }
+    [System.Serializable]
+    public class saveClass
+    {
+        public string themeID;
+        public string boundsID;
+        public List<saveClass_Object> objects = new List<saveClass_Object>();
+
+        public saveClass(Layout_Defined _layout)
+        {
+            themeID = _layout._theme.name;
+            boundsID = _layout._bounds.name;
+            objects = new List<saveClass_Object>();
+            foreach (var item in _layout._objects)
+                objects.Add(new saveClass_Object(item));
+        }
+    }
+    [System.Serializable]
+    public class saveClass_Object
+    {
+        public string blockID;
+        public Vector2Int pos;
+        public int rot = 0;
+        public bool locked = false;
+
+        public saveClass_Object(objectClass _obj)
+        {
+            blockID = _obj._block._name;
+            pos = _obj._pos;
+            rot = _obj._rot;
+            locked = _obj._locked;
         }
     }
 

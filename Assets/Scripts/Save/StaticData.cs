@@ -9,10 +9,10 @@ public class StaticData : MonoBehaviour
     public SpaceManager _SpaceManager;
     public ArmorManager _ArmorManager;
     public GunManager _GunManager;
+    public Themes _Themes;
 
     public void Awake()
     {
-        SaveData.Load();
         _Resource.Setup();
         _Objective.Setup();
         _Consumable.Setup();
@@ -20,5 +20,7 @@ public class StaticData : MonoBehaviour
         _SpaceManager.Setup();
         _ArmorManager.Setup();
         _GunManager.Setup();
+        _Themes.Setup();
+        SaveData.Load();
     }
 }
