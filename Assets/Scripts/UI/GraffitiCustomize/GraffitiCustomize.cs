@@ -680,6 +680,8 @@ public class GraffitiCustomize : MonoBehaviour
                 curGraffiti = new GraffitiManager.graffitiClass();
                 SaveData.Data.graffitiTags.Add(curGraffiti);
             }
+            else
+                return;
         }
         else
             curGraffiti._layers.Clear();
