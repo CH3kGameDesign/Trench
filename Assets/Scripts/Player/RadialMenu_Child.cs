@@ -7,6 +7,7 @@ public class RadialMenu_Child : MonoBehaviour
     public RectTransform RT;
     public Image I_BG;
     public Image I_sprite;
+    public RawImage RI_sprite;
     public TextMeshProUGUI TM_amount;
     Color _trans = new Color(1, 1, 1, 0.3f);
 
@@ -18,6 +19,8 @@ public class RadialMenu_Child : MonoBehaviour
 
     public void Setup(GunClass _gun, bool _equipped = false, int _children = 0)
     {
+        I_sprite.gameObject.SetActive(true);
+        RI_sprite.gameObject.SetActive(false);
         I_sprite.sprite = _gun.sprite;
         TM_amount.text = "";
         I_BG.sprite = _equipped ? S_selected : S_active;
@@ -32,6 +35,8 @@ public class RadialMenu_Child : MonoBehaviour
 
     public bool Setup(Consumable.save _item, bool _main = false, int _children = 0)
     {
+        I_sprite.gameObject.SetActive(true);
+        RI_sprite.gameObject.SetActive(false);
         I_sprite.sprite = _item.Get_Item().sprite;
         TM_amount.text = _item._amt.ToString();
 
@@ -51,5 +56,14 @@ public class RadialMenu_Child : MonoBehaviour
             TM_amount.color = _trans;
         }
         return inStock;
+    }
+
+    public void Setup(GraffitiManager.graffitiClass _graffiti, int _children = 0)
+    {
+        I_sprite.gameObject.SetActive(false);
+        RI_sprite.gameObject.SetActive(true);
+        RI_sprite.texture = _graffiti.GetTexture();
+        TM_amount.text = "";
+        I_BG.sprite = S_active;
     }
 }

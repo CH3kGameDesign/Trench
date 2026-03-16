@@ -49,6 +49,6 @@ public class GunUI : MonoBehaviour
     }
     public void UpdateControl()
     {
-        TM_equipControl.text = "".ToString_Input(PlayerController.inputActions.RadialMenu, TM_equipControl, Interactable.enumType.input);
+        TM_equipControl.text = "".ToString_Input(PlayerController.inputActions.InvRadialMenu, TM_equipControl, Interactable.enumType.input);
     }
 }

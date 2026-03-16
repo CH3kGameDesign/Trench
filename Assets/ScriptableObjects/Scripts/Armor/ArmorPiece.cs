@@ -50,6 +50,6 @@ public class ArmorPiece : ItemClass
         if (!SaveData.Data.ownedArmor.Contains(_enum))
             SaveData.Data.ownedArmor.Add(_enum);
         PlayerManager.main.DebugGunList();
-        PlayerManager.main.Setup_Radial();
+        PlayerManager.main.Setup_InvRadial();
     }
 }

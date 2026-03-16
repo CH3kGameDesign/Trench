@@ -174,7 +174,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""RadialMenu"",
+                    ""name"": ""InvRadialMenu"",
                     ""type"": ""Button"",
                     ""id"": ""1f412c1e-b2c1-404b-ab9c-9c00c8f5cebd"",
                     ""expectedControlType"": """",
@@ -204,6 +204,15 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""name"": ""Recall"",
                     ""type"": ""Button"",
                     ""id"": ""c02b53ee-aefe-417c-87ea-b25d73884eb6"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""TalRadialMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""31f1c20d-c3ac-41f1-a54f-d6b1f22d11e1"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -592,7 +601,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard"",
-                    ""action"": ""RadialMenu"",
+                    ""action"": ""InvRadialMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -603,7 +612,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""RadialMenu"",
+                    ""action"": ""InvRadialMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -670,6 +679,28 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
                     ""action"": ""Recall"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""22ac5717-24b2-465e-a2dd-5d5e820e16fe"",
+                    ""path"": ""<Keyboard>/t"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""TalRadialMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e4b013ab-301a-4df8-bc9c-a5b683992e83"",
+                    ""path"": ""<Gamepad>/dpad/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""TalRadialMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1392,10 +1423,11 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
         m_Base_Interact = m_Base.FindAction("Interact", throwIfNotFound: true);
         m_Base_Crouch = m_Base.FindAction("Crouch", throwIfNotFound: true);
         m_Base_Reload = m_Base.FindAction("Reload", throwIfNotFound: true);
-        m_Base_RadialMenu = m_Base.FindAction("RadialMenu", throwIfNotFound: true);
+        m_Base_InvRadialMenu = m_Base.FindAction("InvRadialMenu", throwIfNotFound: true);
         m_Base_Melee = m_Base.FindAction("Melee", throwIfNotFound: true);
         m_Base_Menu = m_Base.FindAction("Menu", throwIfNotFound: true);
         m_Base_Recall = m_Base.FindAction("Recall", throwIfNotFound: true);
+        m_Base_TalRadialMenu = m_Base.FindAction("TalRadialMenu", throwIfNotFound: true);
         // Menu
         m_Menu = asset.FindActionMap("Menu", throwIfNotFound: true);
         m_Menu_Movement = m_Menu.FindAction("Movement", throwIfNotFound: true);
@@ -1501,10 +1533,11 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
     private readonly InputAction m_Base_Interact;
     private readonly InputAction m_Base_Crouch;
     private readonly InputAction m_Base_Reload;
-    private readonly InputAction m_Base_RadialMenu;
+    private readonly InputAction m_Base_InvRadialMenu;
     private readonly InputAction m_Base_Melee;
     private readonly InputAction m_Base_Menu;
     private readonly InputAction m_Base_Recall;
+    private readonly InputAction m_Base_TalRadialMenu;
     /// <summary>
     /// Provides access to input actions defined in input action map "Base".
     /// </summary>
@@ -1553,9 +1586,9 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Reload => m_Wrapper.m_Base_Reload;
         /// <summary>
-        /// Provides access to the underlying input action "Base/RadialMenu".
+        /// Provides access to the underlying input action "Base/InvRadialMenu".
         /// </summary>
-        public InputAction @RadialMenu => m_Wrapper.m_Base_RadialMenu;
+        public InputAction @InvRadialMenu => m_Wrapper.m_Base_InvRadialMenu;
         /// <summary>
         /// Provides access to the underlying input action "Base/Melee".
         /// </summary>
@@ -1568,6 +1601,10 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Base/Recall".
         /// </summary>
         public InputAction @Recall => m_Wrapper.m_Base_Recall;
+        /// <summary>
+        /// Provides access to the underlying input action "Base/TalRadialMenu".
+        /// </summary>
+        public InputAction @TalRadialMenu => m_Wrapper.m_Base_TalRadialMenu;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1621,9 +1658,9 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
             @Reload.started += instance.OnReload;
             @Reload.performed += instance.OnReload;
             @Reload.canceled += instance.OnReload;
-            @RadialMenu.started += instance.OnRadialMenu;
-            @RadialMenu.performed += instance.OnRadialMenu;
-            @RadialMenu.canceled += instance.OnRadialMenu;
+            @InvRadialMenu.started += instance.OnInvRadialMenu;
+            @InvRadialMenu.performed += instance.OnInvRadialMenu;
+            @InvRadialMenu.canceled += instance.OnInvRadialMenu;
             @Melee.started += instance.OnMelee;
             @Melee.performed += instance.OnMelee;
             @Melee.canceled += instance.OnMelee;
@@ -1633,6 +1670,9 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
             @Recall.started += instance.OnRecall;
             @Recall.performed += instance.OnRecall;
             @Recall.canceled += instance.OnRecall;
+            @TalRadialMenu.started += instance.OnTalRadialMenu;
+            @TalRadialMenu.performed += instance.OnTalRadialMenu;
+            @TalRadialMenu.canceled += instance.OnTalRadialMenu;
         }
 
         /// <summary>
@@ -1671,9 +1711,9 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
             @Reload.started -= instance.OnReload;
             @Reload.performed -= instance.OnReload;
             @Reload.canceled -= instance.OnReload;
-            @RadialMenu.started -= instance.OnRadialMenu;
-            @RadialMenu.performed -= instance.OnRadialMenu;
-            @RadialMenu.canceled -= instance.OnRadialMenu;
+            @InvRadialMenu.started -= instance.OnInvRadialMenu;
+            @InvRadialMenu.performed -= instance.OnInvRadialMenu;
+            @InvRadialMenu.canceled -= instance.OnInvRadialMenu;
             @Melee.started -= instance.OnMelee;
             @Melee.performed -= instance.OnMelee;
             @Melee.canceled -= instance.OnMelee;
@@ -1683,6 +1723,9 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
             @Recall.started -= instance.OnRecall;
             @Recall.performed -= instance.OnRecall;
             @Recall.canceled -= instance.OnRecall;
+            @TalRadialMenu.started -= instance.OnTalRadialMenu;
+            @TalRadialMenu.performed -= instance.OnTalRadialMenu;
+            @TalRadialMenu.canceled -= instance.OnTalRadialMenu;
         }
 
         /// <summary>
@@ -2041,12 +2084,12 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnReload(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "RadialMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "InvRadialMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRadialMenu(InputAction.CallbackContext context);
+        void OnInvRadialMenu(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Melee" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
@@ -2068,6 +2111,13 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnRecall(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "TalRadialMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnTalRadialMenu(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Menu" which allows adding and removing callbacks.

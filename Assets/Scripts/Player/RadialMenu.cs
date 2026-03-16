@@ -52,7 +52,7 @@ public class RadialMenu : MonoBehaviour
             RT_holder.sizeDelta = new Vector2(300, 520);
             TM_name.text = _gun._name;
             TM_type.text = "Weapon";
-            TM_ammo.text = _gun.clipAmmo.ToString_Clip() + "<size=20><color=#B0B0B0>" + _gun.clipVariables.clipSize +"</color></size>";
+            TM_ammo.text = _gun.clipAmmo.ToString_Clip() + "<size=20><color=#B0B0B0>" + _gun.clipVariables.clipSize + "</color></size>";
 
             TM_primary.text = _gun.functionText.primary;
             TM_flavour.text = _gun._description;
@@ -69,6 +69,31 @@ public class RadialMenu : MonoBehaviour
             I_itemSprite_Weapon.texture = _gun.image;
             I_itemSprite_Weapon.gameObject.SetActive(true);
             I_itemSprite_Item.gameObject.SetActive(false);
+        }
+        public void Display(GraffitiManager.graffitiClass _graffiti)
+        {
+            RT_holder.gameObject.SetActive(true);
+            G_Functions.SetActive(true);
+            RT_holder.sizeDelta = new Vector2(300, 520);
+            TM_name.text = _graffiti._name;
+            TM_type.text = "Graffiti";
+            TM_ammo.text = "";
+
+            TM_primary.text = "";
+            TM_flavour.text = "";
+
+            TM_Trigger1.text = "";
+            TM_Description1.text = "";
+
+            TM_Trigger2.text = "";
+            TM_Description2.text = "";
+
+            TM_Trigger3.text = "";
+            TM_Description3.text = "";
+
+            I_itemSprite_Weapon.gameObject.SetActive(false);
+            I_itemSprite_Item.gameObject.SetActive(true);
+            I_itemSprite_Item.texture = _graffiti.GetTexture();
         }
         public void Display(Consumable.save _item)
         {
@@ -125,6 +150,7 @@ public class RadialMenu : MonoBehaviour
         [HideInInspector] public Coroutine C_CoyoteTime = null;
     }
     public ValueClass Values = new ValueClass();
+    private bool _invMenu = true;
     // Start is called before the first frame update
     void Start()
     {
@@ -166,12 +192,22 @@ public class RadialMenu : MonoBehaviour
 
     public void Setup_Guns(GunClass _equippedGun, GunClass[] _gunList)
     {
+        _invMenu = true;
         Ref.rt_radialItems[0].Setup(_equippedGun, true);
         for (int i = 0; i < Mathf.Min(_gunList.Length, Ref.rt_radialItems_Sub[0].Length); i++)
             Ref.rt_radialItems_Sub[0][i].Setup(_gunList[i], _equippedGun == _gunList[i]);
     }
+    public void Setup_Graffiti(List<GraffitiManager.graffitiClass> _graffitiList)
+    {
+        _invMenu = false;
+        if (_graffitiList.Count > 0)
+            Ref.rt_radialItems[0].Setup(_graffitiList[0]);
+        for (int i = 0; i < Mathf.Min(_graffitiList.Count, Ref.rt_radialItems_Sub[0].Length); i++)
+            Ref.rt_radialItems_Sub[0][i].Setup(_graffitiList[i]);
+    }
     public void Setup_Consumables(List<Consumable.save> _consumables)
     {
+        _invMenu = true;
         int _first = 999;
         Color _trans = new Color(1, 1, 1, 0.3f);
 
@@ -275,10 +311,18 @@ public class RadialMenu : MonoBehaviour
                 Values.i_lastChild = Values.i_selChild;
                 Values.i_lastSubChild = Values.i_selSubChild;
                 //Display Info
-                if (Values.i_selChild == 0)
-                    ItemInfoRef.Display(PlayerManager.main.gun_EquippedList[sel]);
-                else if (Values.i_selChild == 1)
-                    ItemInfoRef.Display(SaveData.Data.consumables[sel]);
+                if (_invMenu)
+                {
+                    if (Values.i_selChild == 0)
+                        ItemInfoRef.Display(PlayerManager.main.gun_EquippedList[sel]);
+                    else if (Values.i_selChild == 1)
+                        ItemInfoRef.Display(SaveData.Data.consumables[sel]);
+                }
+                else
+                {
+                    if (Values.i_selChild == 0)
+                        ItemInfoRef.Display(SaveData.Data.graffitiTags[sel]);
+                }
             }
             else if (Values.C_CoyoteTime == null)
                 Values.C_CoyoteTime = StartCoroutine(CoyoteTime(Values.F_coyoteTime));
@@ -436,15 +480,26 @@ public class RadialMenu : MonoBehaviour
     }
     public void Confirm()
     {
-        if (Values.i_lastChild == 0)
+        if (_invMenu)
         {
-            if (Values.i_lastSubChild >= 0)
-                PlayerManager.main.Gun_Equip(Values.i_lastSubChild);
+            if (Values.i_lastChild == 0)
+            {
+                if (Values.i_lastSubChild >= 0)
+                    PlayerManager.main.Gun_Equip(Values.i_lastSubChild);
+            }
+            else if (Values.i_lastChild == 1)
+            {
+                if (Values.i_lastSubChild >= 0)
+                    PlayerManager.main.Consumable_Use(SaveData.Data.consumables[Values.i_lastSubChild].Get_Item());
+            }
         }
-        else if (Values.i_lastChild == 1)
+        else
         {
-            if (Values.i_lastSubChild >= 0)
-                PlayerManager.main.Consumable_Use(SaveData.Data.consumables[Values.i_lastSubChild].Get_Item());
+            if (Values.i_lastChild == 0)
+            {
+                if (Values.i_lastSubChild >= 0)
+                    PlayerManager.main.SprayGraffiti(SaveData.Data.graffitiTags[Values.i_lastSubChild]);
+            }
         }
         Values.i_lastChild = -1;
         Values.i_lastSubChild = -1;

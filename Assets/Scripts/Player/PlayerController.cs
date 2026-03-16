@@ -22,9 +22,11 @@ public class PlayerController : BaseController
     public class RefClass
     {
         public Recall R_recall;
-        public RadialMenu RM_radial;
+        public RadialMenu RM_InvRadial;
+        public RadialMenu RM_TalRadial;
         public TextMeshProUGUI TM_interactText;
         public TextMeshProUGUI TM_controlText;
+        public Decal_Handler PF_decal;
 
         public RectTransform RT_canvasPivot;
         [HideInInspector] public Vector3 V3_canvasRot;
@@ -219,7 +221,9 @@ public class PlayerController : BaseController
         public Vector2 aimDriftMultiplier = Vector2.zero;
     }
 
-    private bool b_radialOpen = false;
+    private bool b_invRadialOpen = false;
+    private bool b_talRadialOpen = false;
+
     private Coroutine C_timeScale = null;
     private Coroutine C_interactCoyote = null;
     private Coroutine C_updateHealth = null;
@@ -252,7 +256,8 @@ public class PlayerController : BaseController
         public bool b_options = false;
         public bool b_crouch = false;
         public bool b_reload = false;
-        public bool b_radial = false;
+        public bool b_invRadial = false;
+        public bool b_talRadial = false;
         public bool b_melee = false;
         public bool b_purchase = false;
         public bool b_back = false;
@@ -273,7 +278,8 @@ public class PlayerController : BaseController
                 b_confirm ||
                 b_crouch ||
                 b_reload ||
-                b_radial ||
+                b_invRadial ||
+                b_talRadial ||
                 b_melee ||
                 b_purchase ||
                 b_recall;
@@ -318,7 +324,8 @@ public class PlayerController : BaseController
         Interact,
         Crouch,
         Reload,
-        RadialMenu,
+        InvRadialMenu,
+        TalRadialMenu,
         Melee,
         Menu,
         Recall,
@@ -401,7 +408,8 @@ public class PlayerController : BaseController
             NMA.updateRotation = false;
             Setup_Camera();
             Setup_Consumables();
-            Setup_Radial();
+            Setup_InvRadial();
+            Setup_TalRadial();
             Update_Objectives();
 
 
@@ -490,15 +498,24 @@ public class PlayerController : BaseController
         StartCoroutine(CanvasPivot());
     }
 
-    public void Setup_Radial()
+    public void Setup_InvRadial()
     {
         int[] _amt =
         {
             gun_EquippedList.Length,
             SaveData.Data.consumables.Count,
         };
-        Ref.RM_radial.Setup(_amt);
-        Update_Radial();
+        Ref.RM_InvRadial.Setup(_amt);
+        Update_InvRadial();
+    }
+    public void Setup_TalRadial()
+    {
+        int[] _amt =
+        {
+            SaveData.Data.graffitiTags.Count
+        };
+        Ref.RM_TalRadial.Setup(_amt);
+        Update_TalRadial();
     }
 
     public override void Update_Objectives()
@@ -542,10 +559,14 @@ public class PlayerController : BaseController
             Update_Objectives();
     }
 
-    void Update_Radial()
+    void Update_InvRadial()
     {
-        Ref.RM_radial.Setup_Guns(gun_Equipped, gun_EquippedList);
-        Ref.RM_radial.Setup_Consumables(SaveData.Data.consumables);
+        Ref.RM_InvRadial.Setup_Guns(gun_Equipped, gun_EquippedList);
+        Ref.RM_InvRadial.Setup_Consumables(SaveData.Data.consumables);
+    }
+    void Update_TalRadial()
+    {
+        Ref.RM_TalRadial.Setup_Graffiti(SaveData.Data.graffitiTags);
     }
 
     void SetNavIDs()
@@ -647,7 +668,8 @@ public class PlayerController : BaseController
         FireManager();
         ReloadHandler();
 
-        RadialHandler();
+        InvRadialHandler();
+        TalRadialHandler();
 
         if (SaveData.themeCurrent == Themes.themeEnum.ship)
             Ref.R_recall._Update();
@@ -1132,45 +1154,91 @@ public class PlayerController : BaseController
             gun_Equipped.OnReload();
     }
 
-    float _radialTimer = 0;
-    void RadialHandler()
+    float _invRadialTimer = 0;
+    void InvRadialHandler()
     {
-        if (Inputs.b_radial)
+        if (Inputs.b_invRadial && !b_talRadialOpen)
         {
-            _radialTimer += Time.deltaTime;
-            if (_radialTimer > 0.2f)
+            _invRadialTimer += Time.deltaTime;
+            if (_invRadialTimer > 0.2f)
             {
-                if (!b_radialOpen)
+                if (!b_invRadialOpen)
                 {
-                    Update_Radial();
-                    Ref.RM_radial.Show();
-                    b_radialOpen = true;
+                    Update_InvRadial();
+                    Ref.RM_InvRadial.Show();
+                    b_invRadialOpen = true;
                     SetTimeScale(0.1f);
                     AH_agentAudioHolder.Play(AgentAudioHolder.type.radial);
                 }
                 if (Inputs.b_isGamepad)
-                    Ref.RM_radial.MoveCursor_Gamepad(Inputs.v2_camInputDir);
+                    Ref.RM_InvRadial.MoveCursor_Gamepad(Inputs.v2_camInputDir);
                 else
-                    Ref.RM_radial.MoveCursor(Inputs.v2_camInputDir);
+                    Ref.RM_InvRadial.MoveCursor(Inputs.v2_camInputDir);
             }
         }
-        else if (b_radialOpen)
+        else if (b_invRadialOpen)
         {
-            Ref.RM_radial.Confirm();
+            Ref.RM_InvRadial.Confirm();
             CloseRadial();
-            _radialTimer = 0;
+            _invRadialTimer = 0;
         }
-        else if (_radialTimer > 0)
+        else if (_invRadialTimer > 0)
         {
             if (gun_secondaryEquipped != null)
                 Gun_Equip(gun_secondaryEquipped);
-            _radialTimer = 0;
+            _invRadialTimer = 0;
+        }
+    }
+    float _talRadialTimer = 0;
+    void TalRadialHandler()
+    {
+        if (Inputs.b_talRadial && !b_invRadialOpen)
+        {
+            _talRadialTimer += Time.deltaTime;
+            if (_talRadialTimer > 0.2f)
+            {
+                if (!b_talRadialOpen)
+                {
+                    Update_TalRadial();
+                    Ref.RM_TalRadial.Show();
+                    b_talRadialOpen = true;
+                    SetTimeScale(0.1f);
+                    AH_agentAudioHolder.Play(AgentAudioHolder.type.radial);
+                }
+                if (Inputs.b_isGamepad)
+                    Ref.RM_TalRadial.MoveCursor_Gamepad(Inputs.v2_camInputDir);
+                else
+                    Ref.RM_TalRadial.MoveCursor(Inputs.v2_camInputDir);
+            }
+        }
+        else if (b_talRadialOpen)
+        {
+            Ref.RM_TalRadial.Confirm();
+            CloseRadial();
+            _talRadialTimer = 0;
+        }
+        else if (_talRadialTimer > 0)
+        {
+            _talRadialTimer = 0;
+        }
+    }
+    public void SprayGraffiti(GraffitiManager.graffitiClass _graffiti)
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit, 10, LM_CameraRay))
+        {
+            Decal_Handler GO = Instantiate(Ref.PF_decal, hit.point, Ref.PF_decal.transform.rotation);
+            GO.SetTexture(_graffiti.GetTexture());
+            GO.transform.forward = hit.normal;
+            GO.transform.parent = hit.transform;
         }
     }
     void CloseRadial()
     {
-        Ref.RM_radial.Hide();
-        b_radialOpen = false;
+        Ref.RM_InvRadial.Hide();
+        Ref.RM_TalRadial.Hide();
+        b_invRadialOpen = false;
+        b_talRadialOpen = false;
         SetTimeScale(1f);
         AH_agentAudioHolder.Stop(AgentAudioHolder.type.radial);
     }
@@ -1235,7 +1303,7 @@ public class PlayerController : BaseController
     {
         float _delta = _fixedDelta ?
             Time.fixedDeltaTime : Time.deltaTime;
-        if (b_radialOpen)
+        if (b_invRadialOpen)
         {
             T_camHolder.transform.rotation = Quaternion.Lerp(T_camHolder.transform.rotation, Quaternion.Euler(v3_camDir), _delta * 10);
             return;
@@ -1963,7 +2031,8 @@ public class PlayerController : BaseController
     public void Input_Options(InputAction.CallbackContext cxt) { Inputs.b_options = Input_GetPressed(cxt); }
     public void Input_Crouch(InputAction.CallbackContext cxt) { Inputs.b_crouch = Input_GetPressed(cxt); }
     public void Input_Reload(InputAction.CallbackContext cxt) { Inputs.b_reload = Input_GetPressed(cxt); }
-    public void Input_Radial(InputAction.CallbackContext cxt) { Inputs.b_radial = Input_GetPressed(cxt); }
+    public void Input_InvRadial(InputAction.CallbackContext cxt) { Inputs.b_invRadial = Input_GetPressed(cxt); }
+    public void Input_TalRadial(InputAction.CallbackContext cxt) { Inputs.b_talRadial = Input_GetPressed(cxt); }
     public void Input_Melee(InputAction.CallbackContext cxt) { Inputs.b_melee = Input_GetPressed(cxt); }
     public void Input_Recall(InputAction.CallbackContext cxt) { Inputs.b_recall = Input_GetPressed(cxt); }
     public void Input_Menu(InputAction.CallbackContext cxt) { if (cxt.phase == InputActionPhase.Started) MainMenu.Instance.Menu_Tapped(); }

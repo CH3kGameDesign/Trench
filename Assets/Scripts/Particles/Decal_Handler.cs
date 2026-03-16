@@ -54,6 +54,11 @@ public class Decal_Handler : MonoBehaviour
             SizeDownCo = StartCoroutine(SizeDownEnum());
     }
 
+    public void SetTexture(Texture2D _tex)
+    {
+        projector.material.SetTexture("Base_Map", _tex);
+    }
+
     void SizeChange()
     {
         if (_Size._active)
