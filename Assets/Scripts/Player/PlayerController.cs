@@ -1229,7 +1229,16 @@ public class PlayerController : BaseController
         {
             Decal_Handler GO = Instantiate(Ref.PF_decal, hit.point, Ref.PF_decal.transform.rotation);
             GO.SetTexture(_graffiti.GetTexture());
-            GO.transform.forward = hit.normal;
+
+            //Get Target Rotation
+            Vector3 _for = hit.normal;
+            Vector3 _up = Vector3.up;
+            if (hit.normal.y > 0.2f)
+                _up = Camera.main.transform.forward;
+            else if (hit.normal.y < -0.2f)
+                _up = -Camera.main.transform.forward;
+            
+            GO.transform.rotation = Quaternion.LookRotation(_for, _up);
             GO.transform.parent = hit.transform;
         }
     }
@@ -1303,7 +1312,7 @@ public class PlayerController : BaseController
     {
         float _delta = _fixedDelta ?
             Time.fixedDeltaTime : Time.deltaTime;
-        if (b_invRadialOpen)
+        if (b_invRadialOpen || b_talRadialOpen)
         {
             T_camHolder.transform.rotation = Quaternion.Lerp(T_camHolder.transform.rotation, Quaternion.Euler(v3_camDir), _delta * 10);
             return;

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5655405729960246836}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ExitPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 6518439235248045467}
   - component: {fileID: 7445101641815066673}
   - component: {fileID: 8457749028940204355}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Seat_Driver
   m_TagString: Interactable
   m_Icon: {fileID: 0}
@@ -86,7 +86,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -202,7 +202,9 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
-  m_RenderingLayerMask: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 3
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 00136626f69df2e4a931a6caff77a98a, type: 2}
@@ -223,9 +225,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &4477262838813691374
 GameObject:
@@ -236,7 +240,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7217130588307205052}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Seat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -305,6 +309,10 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: f777ffcacddabfa46bf96c1c588ea03a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: f777ffcacddabfa46bf96c1c588ea03a, type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: f777ffcacddabfa46bf96c1c588ea03a, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -391,6 +399,10 @@ PrefabInstance:
     - target: {fileID: 3162569735496975595, guid: 39da7d06682b49e43b646219e1610fa5, type: 3}
       propertyPath: m_Name
       value: Console_X3_Vertical
+      objectReference: {fileID: 0}
+    - target: {fileID: 3522738615058523454, guid: 39da7d06682b49e43b646219e1610fa5, type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3522738615058523454, guid: 39da7d06682b49e43b646219e1610fa5, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'

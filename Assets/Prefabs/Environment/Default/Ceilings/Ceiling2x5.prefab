@@ -304,7 +304,9 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
-  m_RenderingLayerMask: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 3
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 7dbbac5cb55aec447b0fbcd82a90d13e, type: 2}
@@ -325,9 +327,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &9087089598431393006
 MeshFilter:
@@ -422,6 +426,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
       objectReference: {fileID: 0}
+    - target: {fileID: 23022673554962116, guid: ac86e58f7706ca04a9df3f348cf148bd, type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 65746028741086564, guid: ac86e58f7706ca04a9df3f348cf148bd, type: 3}
     m_RemovedGameObjects: []
@@ -493,6 +501,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
       objectReference: {fileID: 0}
+    - target: {fileID: 23188833563646552, guid: d04aa01cee4e76b4e828b49f2b83f8a7, type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 65400789183078334, guid: d04aa01cee4e76b4e828b49f2b83f8a7, type: 3}
     m_RemovedGameObjects: []
@@ -563,6 +575,10 @@ PrefabInstance:
     - target: {fileID: 4054441072378972, guid: d04aa01cee4e76b4e828b49f2b83f8a7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 23188833563646552, guid: d04aa01cee4e76b4e828b49f2b83f8a7, type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 65400789183078334, guid: d04aa01cee4e76b4e828b49f2b83f8a7, type: 3}
@@ -638,6 +654,10 @@ PrefabInstance:
     - target: {fileID: 4205763758894276, guid: ac86e58f7706ca04a9df3f348cf148bd, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 23022673554962116, guid: ac86e58f7706ca04a9df3f348cf148bd, type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 65746028741086564, guid: ac86e58f7706ca04a9df3f348cf148bd, type: 3}
