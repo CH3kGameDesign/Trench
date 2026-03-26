@@ -1,6 +1,4 @@
 using PurrNet;
-using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class BaseInfo : NetworkBehaviour
@@ -23,7 +21,6 @@ public class BaseInfo : NetworkBehaviour
         Armor_Type.Leg_Basic,
         Armor_Type.Material_Black
     };
-
 
     private void Awake()
     {

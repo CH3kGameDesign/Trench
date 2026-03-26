@@ -111,10 +111,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cdf8d9738ba9f645b03bfb007e50080, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _isSetup: 0
+  _prefabId: -2147483648
+  _componentIndex: -2147483648
+  _shouldBePooled: 0
+  _parent: {fileID: 0}
+  _invertedPathToNearestParent: 
+  _directChildren: []
+  _networkRules: {fileID: 0}
+  _visitiblityRules: {fileID: 0}
   T_barrelHook: {fileID: 3064005430810797845}
   PS_muzzleFire: {fileID: 3412958741131453478}
   T_secondHandPoint: {fileID: 1366651988237587845}
   T_secondElbowPoint: {fileID: 1029489540077715641}
+  G_activeOnFireReady: []
 --- !u!1 &6574506369598555747
 GameObject:
   m_ObjectHideFlags: 0
@@ -235,6 +245,10 @@ PrefabInstance:
       value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 2386241699224506735, guid: 6a795370242ead248aae1305465c9957, type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2386241699224506735, guid: 6a795370242ead248aae1305465c9957, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 0889fa8fbca5a9642ad0e66baeccf863, type: 2}
@@ -245,6 +259,10 @@ PrefabInstance:
     - target: {fileID: 4184790892734178456, guid: 6a795370242ead248aae1305465c9957, type: 3}
       propertyPath: m_Layer
       value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 6503659700764838457, guid: 6a795370242ead248aae1305465c9957, type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 6503659700764838457, guid: 6a795370242ead248aae1305465c9957, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'

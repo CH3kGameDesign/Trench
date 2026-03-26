@@ -1227,19 +1227,23 @@ public class PlayerController : BaseController
         RaycastHit hit;
         if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit, 10, LM_CameraRay))
         {
-            Decal_Handler GO = Instantiate(Ref.PF_decal, hit.point, Ref.PF_decal.transform.rotation);
-            GO.SetTexture(_graffiti.GetTexture());
+            LevelGen_Block _block;
+            if (_block = hit.transform.GetComponentInParent<LevelGen_Block>())
+            {
+                Decal_Handler GO = Instantiate(Ref.PF_decal, hit.point, Ref.PF_decal.transform.rotation);
+                GO.SetTexture(_graffiti.GetTexture());
 
-            //Get Target Rotation
-            Vector3 _for = hit.normal;
-            Vector3 _up = Vector3.up;
-            if (hit.normal.y > 0.2f)
-                _up = Camera.main.transform.forward;
-            else if (hit.normal.y < -0.2f)
-                _up = -Camera.main.transform.forward;
-            
-            GO.transform.rotation = Quaternion.LookRotation(_for, _up);
-            GO.transform.parent = hit.transform;
+                //Get Target Rotation
+                Vector3 _for = hit.normal;
+                Vector3 _up = Vector3.up;
+                if (hit.normal.y > 0.2f)
+                    _up = Camera.main.transform.forward;
+                else if (hit.normal.y < -0.2f)
+                    _up = -Camera.main.transform.forward;
+
+                GO.transform.rotation = Quaternion.LookRotation(_for, _up);
+                GO.transform.parent = _block.transform;
+            }
         }
     }
     void CloseRadial()
