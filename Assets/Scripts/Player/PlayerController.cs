@@ -30,6 +30,7 @@ public class PlayerController : BaseController
 
         public RectTransform RT_canvasPivot;
         [HideInInspector] public Vector3 V3_canvasRot;
+        public DayUI DUI_day;
 
         public HealthUI HUI_health;
         public GunUI GUI_gun;
@@ -411,6 +412,7 @@ public class PlayerController : BaseController
             Setup_InvRadial();
             Setup_TalRadial();
             Update_Objectives();
+            Update_Day();
 
 
             GameState_Change(gameStateEnum.active);
@@ -517,7 +519,17 @@ public class PlayerController : BaseController
         Ref.RM_TalRadial.Setup(_amt);
         Update_TalRadial();
     }
-
+    public void Update_Day()
+    {
+        if (SaveData.themeCurrent == Themes.themeEnum.spaceStation)
+        {
+            //TEMP - Increase Day
+            SaveData.Data.i_dayCounter++;
+            Ref.DUI_day.Display(SaveData.Data.i_dayCounter);
+        }
+        else
+            Ref.DUI_day.Hide();
+    }
     public override void Update_Objectives()
     {
         Ref.HUD_objective.UpdateObjectives();
@@ -567,6 +579,7 @@ public class PlayerController : BaseController
     void Update_TalRadial()
     {
         Ref.RM_TalRadial.Setup_Graffiti(SaveData.Data.graffitiTags);
+        info.equippedGraffiti_Server.value = SaveData.Data.CloneTags();
     }
 
     void SetNavIDs()
@@ -1222,7 +1235,7 @@ public class PlayerController : BaseController
             _talRadialTimer = 0;
         }
     }
-    public void SprayGraffiti(GraffitiManager.graffitiClass _graffiti)
+    public void SprayGraffiti(GraffitiManager.graffitiClass _graffiti, int _child)
     {
         RaycastHit hit;
         if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit, 10, LM_CameraRay))
@@ -1243,8 +1256,20 @@ public class PlayerController : BaseController
 
                 GO.transform.rotation = Quaternion.LookRotation(_for, _up);
                 GO.transform.parent = _block.transform;
+                info.placedGraffiti.value.Add(new BaseInfo.graffitiLocation(_child, _block.B_bounds[0].V3ID, GO.transform.localPosition, GO.transform.localRotation));
+                info.placedGraffiti_Objects.Add(GO);
             }
         }
+    }
+    public override void PlaceGraffiti_Server(BaseInfo.graffitiLocation _graffiti)
+    {
+        LevelGen_Holder.Instance.GetRoom(out LevelGen_Block _block, _graffiti._V3ID);
+        if (_block == null)
+            return;
+        Decal_Handler GO = Instantiate(Ref.PF_decal, _block.transform);
+        GO.SetTexture(info.equippedGraffiti[_graffiti._graffitiID].GetTexture());
+        GO.transform.localPosition = _graffiti._pos;
+        GO.transform.localRotation = _graffiti._rot;
     }
     void CloseRadial()
     {

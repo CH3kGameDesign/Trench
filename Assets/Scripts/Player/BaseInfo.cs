@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using PurrNet;
 using UnityEngine;
 
@@ -21,6 +22,26 @@ public class BaseInfo : NetworkBehaviour
         Armor_Type.Leg_Basic,
         Armor_Type.Material_Black
     };
+    public SyncVar<List<GraffitiManager.graffitiClass>> equippedGraffiti_Server = new(new List<GraffitiManager.graffitiClass>(), 0, true);
+    public List<GraffitiManager.graffitiClass> equippedGraffiti = new List<GraffitiManager.graffitiClass>();
+    public SyncVar<List<graffitiLocation>> placedGraffiti = new(new List<graffitiLocation>(), 0, true);
+    public List<Decal_Handler> placedGraffiti_Objects = new List<Decal_Handler>();
+    [System.Serializable]
+    public class graffitiLocation
+    {
+        public int _graffitiID = -1;
+        public Vector3Int _V3ID;
+        public Vector3 _pos;
+        public Quaternion _rot;
+
+        public graffitiLocation(int id, Vector3Int v3, Vector3 pos, Quaternion rot)
+        {
+            _graffitiID = id;
+            _V3ID = v3;
+            _pos = pos;
+            _rot = rot;
+        }
+    }
 
     private void Awake()
     {
@@ -43,6 +64,8 @@ public class BaseInfo : NetworkBehaviour
         {
             F_curHealth.onChanged += HealthUpdate;
             b_alive.onChanged += AliveUpdate;
+            equippedGraffiti_Server.onChanged += GraffitiListUpdate;
+            placedGraffiti.onChanged += PlacedGraffitiUpdate;
             SetHealth(F_maxHealth);
             if (controller is PlayerController)
             {
@@ -120,6 +143,17 @@ public class BaseInfo : NetworkBehaviour
             controller.Revive();
         else
             controller.OnDeath();
+    }
+    void GraffitiListUpdate(List<GraffitiManager.graffitiClass> _list)
+    {
+        equippedGraffiti.Clear();
+        foreach (var item in _list)
+            equippedGraffiti.Add(item.Clone());
+    }
+    void PlacedGraffitiUpdate(List<graffitiLocation> _list)
+    {
+        for (int i = placedGraffiti_Objects.Count; i <= _list.Count; i++)
+            controller.PlaceGraffiti_Server(_list[i]);
     }
 
     public void Equip(Gun_Type _gun)

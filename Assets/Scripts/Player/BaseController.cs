@@ -371,6 +371,10 @@ public class BaseController : NetworkBehaviour
     {
 
     }
+    public virtual void PlaceGraffiti_Server(BaseInfo.graffitiLocation _graffiti)
+    {
+        
+    }
     public delegate void OnReadyEvent();
     public event OnReadyEvent onReadyEvent;
     public void CheckReady(OnReadyEvent _event)

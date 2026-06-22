@@ -85,7 +85,7 @@ public class HealthUI : MonoBehaviour
             CG_reviveCounter.gameObject.SetActive(false);
             return;
         }
-
+        
         int _amt = SaveData.shipLayout._effect._respawnAmt;
 
         CG_reviveCounter.gameObject.SetActive(true);

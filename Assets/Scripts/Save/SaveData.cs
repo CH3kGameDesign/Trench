@@ -17,11 +17,20 @@ public static class SaveData
     {
         //Currency
         public int i_currency;
+        public int i_dayCounter = 0;
         public List<Resource.resourceClass> resources;
 
         public List<GraffitiManager.graffitiClass> graffitiTags;
         public List<GraffitiManager.graffitiClass> graffitiArmor;
         public List<GraffitiManager.graffitiClass> graffitiShips;
+        
+        public List<GraffitiManager.graffitiClass> CloneTags()
+        {
+            List<GraffitiManager.graffitiClass> _list = new List<GraffitiManager.graffitiClass>();
+            foreach (var item in graffitiTags)
+                _list.Add(item.Clone());
+            return _list;
+        }
 
         public List<Consumable.save> consumables;
         public List<Gun_Type> ownedGun;
@@ -36,6 +45,7 @@ public static class SaveData
         public SaveClass()
         {
             i_currency = 200;
+            i_dayCounter = 0;
             resources = new List<Resource.resourceClass>();
             consumables = new List<Consumable.save>();
             graffitiTags = new List<GraffitiManager.graffitiClass>();

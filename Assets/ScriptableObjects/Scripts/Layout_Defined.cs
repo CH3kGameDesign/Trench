@@ -13,6 +13,7 @@ public class Layout_Defined : ScriptableObject
         _theme = null;
         _bounds = null;
         _objects = new List<objectClass>();
+        _effect = new effectClass(this);
     }
     public Layout_Defined(Layout_Defined _temp)
     {
@@ -30,6 +31,7 @@ public class Layout_Defined : ScriptableObject
         _objects = new List<objectClass>();
         foreach (var item in objects)
             _objects.Add(new objectClass(item));
+        _effect = new effectClass(this);
     }
     public Layout_Defined(saveClass save)
     {
@@ -38,6 +40,7 @@ public class Layout_Defined : ScriptableObject
         _objects = new List<objectClass>();
         foreach (var item in save.objects)
             _objects.Add(new objectClass(item, _theme));
+        _effect = new effectClass(this);
     }
     [System.Serializable]
     public class objectClass

@@ -19,6 +19,16 @@ public class GraffitiManager : MonoBehaviour
         {
             _stampID = "";
         }
+        public layerClass Clone()
+        {
+            layerClass _new = new layerClass();
+            _new._stampID = _stampID;
+            _new._position = _position;
+            _new._scale = _scale;
+            _new._rotation = _rotation;
+            _new._color = _color;
+            return _new;
+        }
     }
 
     [System.Serializable]
@@ -40,6 +50,13 @@ public class GraffitiManager : MonoBehaviour
             _name = name;
             _type = type;
             _layers = new List<layerClass>();
+        }
+        public graffitiClass Clone()
+        {
+            graffitiClass _new = new graffitiClass(_name, _type);
+            foreach (var item in _layers)
+                _new._layers.Add(item.Clone());
+            return _new;
         }
 
         public Texture2D GetTexture()

@@ -498,7 +498,7 @@ public class RadialMenu : MonoBehaviour
             if (Values.i_lastChild == 0)
             {
                 if (Values.i_lastSubChild >= 0)
-                    PlayerManager.main.SprayGraffiti(SaveData.Data.graffitiTags[Values.i_lastSubChild]);
+                    PlayerManager.main.SprayGraffiti(SaveData.Data.graffitiTags[Values.i_lastSubChild], Values.i_lastSubChild);
             }
         }
         Values.i_lastChild = -1;
