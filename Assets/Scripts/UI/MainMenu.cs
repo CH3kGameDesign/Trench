@@ -22,6 +22,7 @@ public class MainMenu : MonoBehaviour
 
     [SerializeField] private LobbyManager LM;
     public mainRefClass main;
+    public panelRefClass debug;
     public customizeRefClass customize;
     public panelRefClass load;
     public panelRefClass settings;
@@ -45,7 +46,7 @@ public class MainMenu : MonoBehaviour
     public GameObject PF_equipParticle;
 
     private panelEnum openedPanel = panelEnum.main;
-    public enum panelEnum { main, customize, store, load, settings, customizeLayout, loadLevel, endLevel, customizeGraffiti}
+    public enum panelEnum { main, customize, store, load, settings, customizeLayout, loadLevel, endLevel, customizeGraffiti, DEBUG}
 
     [System.Serializable]
     public class panelRefClass
@@ -573,6 +574,7 @@ public class MainMenu : MonoBehaviour
     {
         current = GO;
         if (main != GO) main.Close();
+        if (debug != GO) debug.Close();
         if (customize != GO) customize.Close();
         if (load != GO) load.Close();
         if (store != GO) store.Close();
@@ -684,7 +686,7 @@ public class MainMenu : MonoBehaviour
     #region Store
     public void PurchaseItem()
     {
-        if (store.canAfford)
+        if (store.canAfford || DEBUG.affordAnything())
         {
             store.activeItem.Purchase();
             store.UpdateGrid(store._activeTab);
@@ -713,6 +715,12 @@ public class MainMenu : MonoBehaviour
         LevelGen_Holder.LoadTheme(SaveData.themeCurrent, _id);
     }
     #endregion
+    #region DEBUG
+    public void DebugButton()
+    {
+        SwitchTo(debug);
+    }
+    #endregion
     #region CustomizeLayout
     public void CustomizeLayoutButton()
     {
@@ -733,6 +741,7 @@ public class MainMenu : MonoBehaviour
         switch (_enum)
         {
             case panelEnum.main: Open(main); break;
+            case panelEnum.DEBUG: Open(debug); break;
             case panelEnum.customize: Open(customize, 1f); break;
             case panelEnum.store: Open(store, 1f); break;
             case panelEnum.load: Open(load); break;

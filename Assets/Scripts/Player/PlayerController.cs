@@ -1650,9 +1650,12 @@ public class PlayerController : BaseController
                 Push((PlayerID)owner, dir);
         }
 
-        info.Hurt(_bullet.F_damage * _limb.F_damageMult);
-        Update_Objectives(Objective_Type.Damage_Taken, Mathf.RoundToInt(_bullet.F_damage * _limb.F_damageMult));
-
+        if (!DEBUG.isInvincible_Player())
+        {
+            info.Hurt(_bullet.F_damage * _limb.F_damageMult);
+            Update_Objectives(Objective_Type.Damage_Taken, Mathf.RoundToInt(_bullet.F_damage * _limb.F_damageMult));
+        }
+        
         AggroAllies(_bullet);
         AH_agentAudioHolder.Play(AgentAudioHolder.type.hurt);
 

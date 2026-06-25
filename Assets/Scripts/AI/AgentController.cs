@@ -809,7 +809,10 @@ public class AgentController : BaseController
         }
         float _finalDamage = _bullet.F_damage * _limb.F_damageMult;
         behaviour.stagger.Stagger(_bullet.D_damageType, _finalDamage, this);
-        info.Hurt(_finalDamage);
+        if (_bullet.B_player && DEBUG.instakill())
+            _finalDamage = info.F_curHealth;
+        if (!(b_friendly && DEBUG.isInvincible_Companion()))
+            info.Hurt(_finalDamage);
         if (info.F_curHealth <= 0)
             OnDeath(_bullet, _source, _limb);
         else

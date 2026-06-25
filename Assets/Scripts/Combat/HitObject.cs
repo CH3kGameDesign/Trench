@@ -37,7 +37,11 @@ public class HitObject : MonoBehaviour
         {
             UE_OnHit.Invoke(_bullet, _source, this);
             if (B_useHealth)
+            {
                 f_health -= _bullet.F_damage;
+                if (DEBUG.instakill() && _bullet.B_player)
+                    f_health = 0;
+            }
             if (f_health <= 0)
                 Destroy(_bullet);
         }
