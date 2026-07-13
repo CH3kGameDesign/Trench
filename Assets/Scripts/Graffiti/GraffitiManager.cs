@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEditor.Progress;
 
 public class GraffitiManager : MonoBehaviour
 {
@@ -9,23 +8,23 @@ public class GraffitiManager : MonoBehaviour
     [System.Serializable]
     public class layerClass
     {
-        public string _stampID;
-        public Vector2Int _position;
+        public int _ID;
+        public Vector2Int _pos;
         public Vector2 _scale;
-        public float _rotation;
+        public float _rot;
         public Color _color;
 
         public layerClass()
         {
-            _stampID = "";
+            _ID = -1;
         }
         public layerClass Clone()
         {
             layerClass _new = new layerClass();
-            _new._stampID = _stampID;
-            _new._position = _position;
+            _new._ID = _ID;
+            _new._pos = _pos;
             _new._scale = _scale;
-            _new._rotation = _rotation;
+            _new._rot = _rot;
             _new._color = _color;
             return _new;
         }
@@ -103,7 +102,7 @@ public class GraffitiManager : MonoBehaviour
         Instance = this;
     }
 
-    public Stamp_Scriptable GetStamp(string _stampID)
+    public Stamp_Scriptable GetStamp(int _stampID)
     {
         foreach (var item in stampList.list)
         {
@@ -120,7 +119,7 @@ public class GraffitiManager : MonoBehaviour
 
         for (int i = _graffiti._layers.Count - 1; i >= 0; i--)
         {
-            if (_graffiti._layers[i]._stampID == null)
+            if (_graffiti._layers[i]._ID == null)
                 continue;
             UI_graffitiLayer _temp = Instantiate(PF_UI_graffitiLayer);
             _temp.Setup(this);

@@ -579,7 +579,7 @@ public class PlayerController : BaseController
     void Update_TalRadial()
     {
         Ref.RM_TalRadial.Setup_Graffiti(SaveData.Data.graffitiTags);
-        info.equippedGraffiti_Server.value = SaveData.Data.CloneTags();
+        info.GraffitiListUpdate_Client(SaveData.Data.CloneTags());
     }
 
     void SetNavIDs()

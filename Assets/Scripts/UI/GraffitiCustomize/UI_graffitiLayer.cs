@@ -8,7 +8,7 @@ public class UI_graffitiLayer : MonoBehaviour
 {
     public TextMeshProUGUI TM_layerNum;
     public Image I_layerSprite;
-    [HideInInspector] public string s_stampID = "";
+    [HideInInspector] public int i_stampID = -1;
 
     public GameObject G_onSelectedObject;
     public GameObject G_options;
@@ -81,7 +81,7 @@ public class UI_graffitiLayer : MonoBehaviour
     {
         I_layerSprite.sprite = _stamp._sprite; 
         I_mover.sprite = _stamp._sprite;
-        s_stampID = _stamp._stampID;
+        i_stampID = _stamp._stampID;
         B_imageSet = true;
         I_mover.enabled = true;
     }
@@ -127,7 +127,7 @@ public class UI_graffitiLayer : MonoBehaviour
         if (I_mover == null || !B_imageSet)
             return "{ },";
         _temp += "\n{\n";
-        _temp += s_stampID + ",\n";
+        _temp += i_stampID + ",\n";
         _temp += RT_mover.anchoredPosition + ",\n";
         _temp += RT_mover.localScale + ",\n";
         _temp += RT_mover.localEulerAngles.z + ",\n";
@@ -141,22 +141,22 @@ public class UI_graffitiLayer : MonoBehaviour
         GraffitiManager.layerClass _temp = new GraffitiManager.layerClass();
         if (!B_imageSet)
             return _temp;
-        _temp._stampID = s_stampID;
-        _temp._position = Vector2Int.RoundToInt(RT_mover.anchoredPosition);
+        _temp._ID = i_stampID;
+        _temp._pos = Vector2Int.RoundToInt(RT_mover.anchoredPosition);
         _temp._scale = new Vector2(RT_mover.localScale.x, RT_mover.localScale.y);
-        _temp._rotation = RT_mover.localEulerAngles.z;
+        _temp._rot = RT_mover.localEulerAngles.z;
         _temp._color = I_mover.color;
         return _temp;
     }
     public void SetLayerInfo(GraffitiManager.layerClass _temp)
     {
-        Stamp_Scriptable _stamp = GraffitiManager.Instance.GetStamp(_temp._stampID);
+        Stamp_Scriptable _stamp = GraffitiManager.Instance.GetStamp(_temp._ID);
         if (_stamp == null)
             return;
         SetImage(_stamp);
-        RT_mover.anchoredPosition = _temp._position;
+        RT_mover.anchoredPosition = _temp._pos;
         RT_mover.localScale = new Vector3(_temp._scale.x, _temp._scale.y, 1);
-        RT_mover.localEulerAngles = new Vector3(0, 0, _temp._rotation);
+        RT_mover.localEulerAngles = new Vector3(0, 0, _temp._rot);
         SetColor(_temp._color);
     }
     public void ShowOptions(bool _show)
@@ -171,7 +171,7 @@ public class UI_graffitiLayer : MonoBehaviour
     {
         I_layerSprite.sprite = S_default; 
         I_mover.sprite = null;
-        s_stampID = "";
+        i_stampID = -1;
         B_imageSet = false;
         I_mover.enabled = false;
 

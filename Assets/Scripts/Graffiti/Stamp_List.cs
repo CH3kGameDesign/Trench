@@ -53,8 +53,8 @@ public class Stamp_List : ScriptableObject
             if (_temp != null)
             {
                 _temp.stampType = stampType;
-                if (_temp._stampID == "")
-                    _temp._stampID = _temp._name.Replace(" ", "");
+                if (_temp._stampID == 0)
+                    _temp._stampID = NewStampID();
                 if (!list.Contains(_temp))
                     list.Add(_temp);
                 EditorUtility.SetDirty(_temp);
@@ -62,6 +62,26 @@ public class Stamp_List : ScriptableObject
         }
 
         EditorUtility.SetDirty(this);
+    }
+
+    int NewStampID()
+    {
+        bool _valid = false;
+        int _stampID = 0;
+        while (_valid == false)
+        {
+            _valid = true;
+            _stampID = Random.Range(1, int.MaxValue);
+            foreach (var item in list)
+            {
+                if (_stampID == item._stampID)
+                {
+                    _valid = false;
+                    break;
+                }
+            }
+        }
+        return _stampID;
     }
 #endif
 }

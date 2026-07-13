@@ -3896,9 +3896,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DEBUG
   G_cheatsActive: {fileID: 288054619326135576}
-  G_debugMenu: {fileID: 226747582599709935}
-  A_anim: {fileID: 6439001708520981541}
   TMP_moneyAmt: {fileID: 1469225469912350495}
+  TMP_dayAmt: {fileID: 0}
 --- !u!1 &1966759558270811238
 GameObject:
   m_ObjectHideFlags: 0
@@ -11238,11 +11237,87 @@ MonoBehaviour:
     _ownerAuth: 1
     _sendIntervalInSeconds: 0
   equippedArmor: 01000000080000000c0000000c0000000f00000011000000
-  equippedGraffiti_Server:
-    _value: []
+  equippedGraffiti_Server_1:
+    _value:
+      _name: 
+      _type: 0
+      _layers: []
     _ownerAuth: 1
     _sendIntervalInSeconds: 0
-  equippedGraffiti: []
+  equippedGraffiti_Server_2:
+    _value:
+      _name: 
+      _type: 0
+      _layers: []
+    _ownerAuth: 1
+    _sendIntervalInSeconds: 0
+  equippedGraffiti_Server_3:
+    _value:
+      _name: 
+      _type: 0
+      _layers: []
+    _ownerAuth: 1
+    _sendIntervalInSeconds: 0
+  equippedGraffiti_Server_4:
+    _value:
+      _name: 
+      _type: 0
+      _layers: []
+    _ownerAuth: 1
+    _sendIntervalInSeconds: 0
+  equippedGraffiti_Server_5:
+    _value:
+      _name: 
+      _type: 0
+      _layers: []
+    _ownerAuth: 1
+    _sendIntervalInSeconds: 0
+  equippedGraffiti_Server_6:
+    _value:
+      _name: 
+      _type: 0
+      _layers: []
+    _ownerAuth: 1
+    _sendIntervalInSeconds: 0
+  equippedGraffiti_Server_7:
+    _value:
+      _name: 
+      _type: 0
+      _layers: []
+    _ownerAuth: 1
+    _sendIntervalInSeconds: 0
+  equippedGraffiti_Server_8:
+    _value:
+      _name: 
+      _type: 0
+      _layers: []
+    _ownerAuth: 1
+    _sendIntervalInSeconds: 0
+  equippedGraffiti:
+  - _name: 
+    _type: 0
+    _layers: []
+  - _name: 
+    _type: 0
+    _layers: []
+  - _name: 
+    _type: 0
+    _layers: []
+  - _name: 
+    _type: 0
+    _layers: []
+  - _name: 
+    _type: 0
+    _layers: []
+  - _name: 
+    _type: 0
+    _layers: []
+  - _name: 
+    _type: 0
+    _layers: []
+  - _name: 
+    _type: 0
+    _layers: []
   placedGraffiti:
     _value: []
     _ownerAuth: 1
@@ -11313,7 +11388,6 @@ MonoBehaviour:
     PF_decal: {fileID: 2164564543134343604, guid: 72c0e30898cc26d44b185a5aff4aa586, type: 3}
     RT_canvasPivot: {fileID: 1080855073950625213}
     V3_canvasRot: {x: 0, y: 0, z: 0}
-    D_DEBUG: {fileID: 5262150777608149178}
     DUI_day: {fileID: 7981565814763085085}
     HUI_health: {fileID: 3192161736118307343}
     GUI_gun: {fileID: 6551522107833749381}
@@ -11866,22 +11940,6 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 31f1c20d-c3ac-41f1-a54f-d6b1f22d11e1
     m_ActionName: 'Base/TalRadialMenu[/Keyboard/t,/XInputControllerWindows/dpad/up]'
-  - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 668208048646576681}
-        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: Input_Debug
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-    m_ActionId: b0daeeab-a63d-491b-82ee-6d538e71a1ba
-    m_ActionName: 'Base/Debug[/Keyboard/slash]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Base

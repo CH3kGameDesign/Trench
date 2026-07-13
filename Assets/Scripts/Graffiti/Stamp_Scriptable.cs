@@ -5,6 +5,6 @@ public class Stamp_Scriptable : ScriptableObject
 {
     public GraffitiManager.stampTypeEnum stampType;
     public string _name = "";
-    public string _stampID = "";
+    public int _stampID = 0;
     public Sprite _sprite;
 }

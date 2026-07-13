@@ -666,7 +666,7 @@ public class GraffitiCustomize : MonoBehaviour
     {
         foreach (var item in layers)
         {
-            if (item.s_stampID != "")
+            if (item.i_stampID != -1)
                 return true;
         }
         return false;

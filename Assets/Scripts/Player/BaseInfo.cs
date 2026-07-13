@@ -22,7 +22,14 @@ public class BaseInfo : NetworkBehaviour
         Armor_Type.Leg_Basic,
         Armor_Type.Material_Black
     };
-    public SyncVar<List<GraffitiManager.graffitiClass>> equippedGraffiti_Server = new(new List<GraffitiManager.graffitiClass>(), 0, true);
+    public SyncVar<GraffitiManager.graffitiClass> equippedGraffiti_Server_1 = new(null, 0, true);
+    public SyncVar<GraffitiManager.graffitiClass> equippedGraffiti_Server_2 = new(null, 0, true);
+    public SyncVar<GraffitiManager.graffitiClass> equippedGraffiti_Server_3 = new(null, 0, true);
+    public SyncVar<GraffitiManager.graffitiClass> equippedGraffiti_Server_4 = new(null, 0, true);
+    public SyncVar<GraffitiManager.graffitiClass> equippedGraffiti_Server_5 = new(null, 0, true);
+    public SyncVar<GraffitiManager.graffitiClass> equippedGraffiti_Server_6 = new(null, 0, true);
+    public SyncVar<GraffitiManager.graffitiClass> equippedGraffiti_Server_7 = new(null, 0, true);
+    public SyncVar<GraffitiManager.graffitiClass> equippedGraffiti_Server_8 = new(null, 0, true);
     public List<GraffitiManager.graffitiClass> equippedGraffiti = new List<GraffitiManager.graffitiClass>();
     public SyncVar<List<graffitiLocation>> placedGraffiti = new(new List<graffitiLocation>(), 0, true);
     public List<Decal_Handler> placedGraffiti_Objects = new List<Decal_Handler>();
@@ -64,8 +71,6 @@ public class BaseInfo : NetworkBehaviour
         {
             F_curHealth.onChanged += HealthUpdate;
             b_alive.onChanged += AliveUpdate;
-            equippedGraffiti_Server.onChanged += GraffitiListUpdate;
-            placedGraffiti.onChanged += PlacedGraffitiUpdate;
             SetHealth(F_maxHealth);
             if (controller is PlayerController)
             {
@@ -75,6 +80,15 @@ public class BaseInfo : NetworkBehaviour
             EquipArmor();
             EquipGun();
         }
+            equippedGraffiti_Server_1.onChanged += GraffitiListUpdate_1;
+            equippedGraffiti_Server_2.onChanged += GraffitiListUpdate_2;
+            equippedGraffiti_Server_3.onChanged += GraffitiListUpdate_3;
+            equippedGraffiti_Server_4.onChanged += GraffitiListUpdate_4;
+            equippedGraffiti_Server_5.onChanged += GraffitiListUpdate_5;
+            equippedGraffiti_Server_6.onChanged += GraffitiListUpdate_6;
+            equippedGraffiti_Server_7.onChanged += GraffitiListUpdate_7;
+            equippedGraffiti_Server_8.onChanged += GraffitiListUpdate_8;
+            placedGraffiti.onChanged += PlacedGraffitiUpdate;
     }
     protected override void OnDestroy()
     {
@@ -144,15 +158,49 @@ public class BaseInfo : NetworkBehaviour
         else
             controller.OnDeath();
     }
-    void GraffitiListUpdate(List<GraffitiManager.graffitiClass> _list)
+    public void GraffitiListUpdate_Client(List<GraffitiManager.graffitiClass> _list)
     {
-        equippedGraffiti.Clear();
-        foreach (var item in _list)
-            equippedGraffiti.Add(item.Clone());
+        if (_list.Count > 0) equippedGraffiti_Server_1.value = _list[0];
+        if (_list.Count > 1) equippedGraffiti_Server_2.value = _list[1];
+        if (_list.Count > 2) equippedGraffiti_Server_3.value = _list[2];
+        if (_list.Count > 3) equippedGraffiti_Server_4.value = _list[3];
+        if (_list.Count > 4) equippedGraffiti_Server_5.value = _list[4];
+        if (_list.Count > 5) equippedGraffiti_Server_6.value = _list[5];
+        if (_list.Count > 6) equippedGraffiti_Server_7.value = _list[6];
+        if (_list.Count > 7) equippedGraffiti_Server_8.value = _list[7];
+    }
+    void GraffitiListUpdate_1(GraffitiManager.graffitiClass _temp) { GraffitiListUpdate(0); }
+    void GraffitiListUpdate_2(GraffitiManager.graffitiClass _temp) { GraffitiListUpdate(1); }
+    void GraffitiListUpdate_3(GraffitiManager.graffitiClass _temp) { GraffitiListUpdate(2); }
+    void GraffitiListUpdate_4(GraffitiManager.graffitiClass _temp) { GraffitiListUpdate(3); }
+    void GraffitiListUpdate_5(GraffitiManager.graffitiClass _temp) { GraffitiListUpdate(4); }
+    void GraffitiListUpdate_6(GraffitiManager.graffitiClass _temp) { GraffitiListUpdate(5); }
+    void GraffitiListUpdate_7(GraffitiManager.graffitiClass _temp) { GraffitiListUpdate(6); }
+    void GraffitiListUpdate_8(GraffitiManager.graffitiClass _temp) { GraffitiListUpdate(7); }
+    void GraffitiListUpdate(int _num)
+    {
+        if (isOwner)
+            return;
+        GraffitiManager.graffitiClass _temp;
+        switch (_num)
+        {
+            case 0: _temp = equippedGraffiti_Server_1.value; break;
+            case 1: _temp = equippedGraffiti_Server_2.value; break;
+            case 2: _temp = equippedGraffiti_Server_3.value; break;
+            case 3: _temp = equippedGraffiti_Server_4.value; break;
+            case 4: _temp = equippedGraffiti_Server_5.value; break;
+            case 5: _temp = equippedGraffiti_Server_6.value; break;
+            case 6: _temp = equippedGraffiti_Server_7.value; break;
+            case 7: _temp = equippedGraffiti_Server_8.value; break;
+            default: return;
+        }
+        equippedGraffiti[_num] = _temp.Clone();
     }
     void PlacedGraffitiUpdate(List<graffitiLocation> _list)
     {
-        for (int i = placedGraffiti_Objects.Count; i <= _list.Count; i++)
+        if (isOwner)
+            return;
+        for (int i = placedGraffiti_Objects.Count; i < _list.Count; i++)
             controller.PlaceGraffiti_Server(_list[i]);
     }
 
