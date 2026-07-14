@@ -1257,6 +1257,7 @@ public class PlayerController : BaseController
                 GO.transform.rotation = Quaternion.LookRotation(_for, _up);
                 GO.transform.parent = _block.transform;
                 info.placedGraffiti.value.Add(new BaseInfo.graffitiLocation(_child, _block.B_bounds[0].V3ID, GO.transform.localPosition, GO.transform.localRotation));
+                info.placedGraffiti.SetDirty();
                 info.placedGraffiti_Objects.Add(GO);
             }
         }

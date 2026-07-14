@@ -80,15 +80,16 @@ public class BaseInfo : NetworkBehaviour
             EquipArmor();
             EquipGun();
         }
-            equippedGraffiti_Server_1.onChanged += GraffitiListUpdate_1;
-            equippedGraffiti_Server_2.onChanged += GraffitiListUpdate_2;
-            equippedGraffiti_Server_3.onChanged += GraffitiListUpdate_3;
-            equippedGraffiti_Server_4.onChanged += GraffitiListUpdate_4;
-            equippedGraffiti_Server_5.onChanged += GraffitiListUpdate_5;
-            equippedGraffiti_Server_6.onChanged += GraffitiListUpdate_6;
-            equippedGraffiti_Server_7.onChanged += GraffitiListUpdate_7;
-            equippedGraffiti_Server_8.onChanged += GraffitiListUpdate_8;
-            placedGraffiti.onChanged += PlacedGraffitiUpdate;
+
+        equippedGraffiti_Server_1.onChanged += GraffitiListUpdate_1;
+        equippedGraffiti_Server_2.onChanged += GraffitiListUpdate_2;
+        equippedGraffiti_Server_3.onChanged += GraffitiListUpdate_3;
+        equippedGraffiti_Server_4.onChanged += GraffitiListUpdate_4;
+        equippedGraffiti_Server_5.onChanged += GraffitiListUpdate_5;
+        equippedGraffiti_Server_6.onChanged += GraffitiListUpdate_6;
+        equippedGraffiti_Server_7.onChanged += GraffitiListUpdate_7;
+        equippedGraffiti_Server_8.onChanged += GraffitiListUpdate_8;
+        placedGraffiti.onChanged += PlacedGraffitiUpdate;
     }
     protected override void OnDestroy()
     {
