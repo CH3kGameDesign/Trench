@@ -19,8 +19,9 @@ public class StaticData : MonoBehaviour
         _ConversationManager.Setup();
         _SpaceManager.Setup();
         _ArmorManager.Setup();
-        _GunManager.Setup();
         _Themes.Setup();
         SaveData.Load();
+        //Requires Setup after Save Data Load
+        _GunManager.Setup();
     }
 }

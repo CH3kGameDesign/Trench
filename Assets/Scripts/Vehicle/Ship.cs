@@ -75,9 +75,12 @@ public class Ship : Vehicle
     public float steeringSpeed = 0.5f; // How fast the steering wheel turns.
     [Space(10)]
     [Range(-90f, 0f)]
-    public float downXLimit = -40f;
+    public float downXLimit = -20f;
     [Range(0f, 90f)]
-    public float upXLimit = 40f;
+    public float upXLimit = 20f;
+    [Range(10f, 360f)]
+    public float rollSpeed = 45f; // How fast the ship rolls in degrees per second
+    
 
     [Space(10)]
     [Range(1, 10)]
@@ -526,10 +529,18 @@ public class Ship : Vehicle
     }
 
     Vector3 _curRot = Vector3.zero;
+    float _curRoll = 0;
     float Update_Rotation(PlayerController _player)
     {
         Vector3 _tarRot = _player.v3_camDir;
+
+        ///////////Roll Needs Work - Adjust Camera Dir
+        //_curRoll += _player.Inputs.f_roll * rollSpeed * Time.fixedDeltaTime;
+        //_tarRot.z += _curRoll;
+
+        ///////////Clamp Up/Down
         //_tarRot.x = Mathf.Clamp(_tarRot.x, downXLimit, upXLimit);
+
         Quaternion _target = Quaternion.Euler(_tarRot) * Quaternion.Euler(_rotate);
         _target *= Quaternion.Inverse(T_pilotSeat.rotation);
         _target =  _target * transform.rotation;

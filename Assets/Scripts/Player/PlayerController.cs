@@ -265,6 +265,7 @@ public class PlayerController : BaseController
         public bool b_leftTab = false;
         public bool b_rightTab = false;
         public bool b_recall = false;
+        public float f_roll = 0;
 
         public PlayerInput playerInput;
 
@@ -283,7 +284,8 @@ public class PlayerController : BaseController
                 b_talRadial ||
                 b_melee ||
                 b_purchase ||
-                b_recall;
+                b_recall ||
+                f_roll != 0;
         }
 
 
@@ -305,6 +307,7 @@ public class PlayerController : BaseController
             inputActions.Reload,
             inputActions.Sprint,
             inputActions.Recall,
+            inputActions.Roll
         };
         [HideInInspector]
         public inputActions[] vehicleInputs = new inputActions[]
@@ -330,6 +333,7 @@ public class PlayerController : BaseController
         Melee,
         Menu,
         Recall,
+        Roll,
         Confirm,
         Options,
         Back,
@@ -428,10 +432,7 @@ public class PlayerController : BaseController
         for (int i = 0; i < SaveData.Data.equippedGuns.Length; i++)
         {
             GunClass _temp = gunManager.GetGunByType(SaveData.Data.equippedGuns[i], this);
-            if (_temp.ownedAmt > 0)
-            {
-                _list.Add(_temp);
-            }
+            _list.Add(_temp);
         }
         gun_EquippedList = _list.ToArray();
     }
@@ -2077,6 +2078,7 @@ public class PlayerController : BaseController
     public void Input_TalRadial(InputAction.CallbackContext cxt) { Inputs.b_talRadial = Input_GetPressed(cxt); }
     public void Input_Melee(InputAction.CallbackContext cxt) { Inputs.b_melee = Input_GetPressed(cxt); }
     public void Input_Recall(InputAction.CallbackContext cxt) { Inputs.b_recall = Input_GetPressed(cxt); }
+    public void Input_Roll(InputAction.CallbackContext cxt) { Inputs.f_roll = Input_GetFloat(cxt); }
     public void Input_Menu(InputAction.CallbackContext cxt) { if (cxt.phase == InputActionPhase.Started) MainMenu.Instance.Menu_Tapped(); }
     public void Input_Zoom(InputAction.CallbackContext cxt) { Inputs.f_zoom = Input_GetFloat(cxt); }
     public void Input_Rotate(InputAction.CallbackContext cxt) { Inputs.f_rotate = Input_GetFloat(cxt); }

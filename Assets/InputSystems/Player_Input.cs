@@ -217,6 +217,15 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Roll"",
+                    ""type"": ""Value"",
+                    ""id"": ""5f9d5372-d591-4dd6-8eb6-3eeee397a916"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -703,6 +712,72 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
                     ""action"": ""TalRadialMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""f38bd081-e43b-40cb-809d-ec0e1f95cdc6"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Roll"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""741feb05-9fed-4819-9823-27ecb2d7affe"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""Roll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""feaf05ba-f922-4af4-b129-045361e15556"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""Roll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""622f93c8-8549-4308-91cd-e3088937b37e"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Roll"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""d9219858-23e8-438c-be7d-62917e847945"",
+                    ""path"": ""<Keyboard>/z"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""Roll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""b1829731-0b71-4eec-89f8-a9508e55c18f"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""Roll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         },
@@ -1428,6 +1503,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
         m_Base_Menu = m_Base.FindAction("Menu", throwIfNotFound: true);
         m_Base_Recall = m_Base.FindAction("Recall", throwIfNotFound: true);
         m_Base_TalRadialMenu = m_Base.FindAction("TalRadialMenu", throwIfNotFound: true);
+        m_Base_Roll = m_Base.FindAction("Roll", throwIfNotFound: true);
         // Menu
         m_Menu = asset.FindActionMap("Menu", throwIfNotFound: true);
         m_Menu_Movement = m_Menu.FindAction("Movement", throwIfNotFound: true);
@@ -1538,6 +1614,7 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
     private readonly InputAction m_Base_Menu;
     private readonly InputAction m_Base_Recall;
     private readonly InputAction m_Base_TalRadialMenu;
+    private readonly InputAction m_Base_Roll;
     /// <summary>
     /// Provides access to input actions defined in input action map "Base".
     /// </summary>
@@ -1606,6 +1683,10 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @TalRadialMenu => m_Wrapper.m_Base_TalRadialMenu;
         /// <summary>
+        /// Provides access to the underlying input action "Base/Roll".
+        /// </summary>
+        public InputAction @Roll => m_Wrapper.m_Base_Roll;
+        /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
         public InputActionMap Get() { return m_Wrapper.m_Base; }
@@ -1673,6 +1754,9 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
             @TalRadialMenu.started += instance.OnTalRadialMenu;
             @TalRadialMenu.performed += instance.OnTalRadialMenu;
             @TalRadialMenu.canceled += instance.OnTalRadialMenu;
+            @Roll.started += instance.OnRoll;
+            @Roll.performed += instance.OnRoll;
+            @Roll.canceled += instance.OnRoll;
         }
 
         /// <summary>
@@ -1726,6 +1810,9 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
             @TalRadialMenu.started -= instance.OnTalRadialMenu;
             @TalRadialMenu.performed -= instance.OnTalRadialMenu;
             @TalRadialMenu.canceled -= instance.OnTalRadialMenu;
+            @Roll.started -= instance.OnRoll;
+            @Roll.performed -= instance.OnRoll;
+            @Roll.canceled -= instance.OnRoll;
         }
 
         /// <summary>
@@ -2118,6 +2205,13 @@ public partial class @Player_Input: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnTalRadialMenu(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Roll" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRoll(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Menu" which allows adding and removing callbacks.
