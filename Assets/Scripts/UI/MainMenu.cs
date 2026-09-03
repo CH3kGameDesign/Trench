@@ -29,6 +29,7 @@ public class MainMenu : MonoBehaviour
     public storeRefClass store;
     public customizeLayoutRefClass customizeLayout;
     public customizeGraffitiRefClass customizeGraffiti;
+    public panelRefClass levelSelect;
     public loadingLevelRefClass loadingLevel;
     public endLevelRefClass endLevel;
     [Space(10)]
@@ -46,7 +47,7 @@ public class MainMenu : MonoBehaviour
     public GameObject PF_equipParticle;
 
     private panelEnum openedPanel = panelEnum.main;
-    public enum panelEnum { main, customize, store, load, settings, customizeLayout, loadLevel, endLevel, customizeGraffiti, DEBUG}
+    public enum panelEnum { main, customize, store, load, settings, customizeLayout, loadLevel, endLevel, customizeGraffiti, DEBUG, levelSelect}
 
     [System.Serializable]
     public class panelRefClass
@@ -582,6 +583,7 @@ public class MainMenu : MonoBehaviour
         if (customizeLayout != GO) customizeLayout.Close();
         if (loadingLevel != GO) loadingLevel.Close();
         if (customizeGraffiti != GO) customizeGraffiti.Close();
+        if (levelSelect != GO) levelSelect.Close();
 
         GO.Open(AC_smooth, v3_camMenuLocalPos, q_camLastLocalRot);
 
@@ -727,6 +729,12 @@ public class MainMenu : MonoBehaviour
         SwitchTo(customizeLayout);
     }
     #endregion
+    #region LevelSelect
+    public void LevelSelectButton()
+    {
+        Open(levelSelect);
+    }
+    #endregion
     #region General
     public void Menu_Tapped()
     {
@@ -750,6 +758,7 @@ public class MainMenu : MonoBehaviour
             case panelEnum.customizeGraffiti: Open(customizeGraffiti); break;
             case panelEnum.loadLevel: LoadLevel(); break;
             case panelEnum.endLevel: LoadEndLevel(); break;
+            case panelEnum.levelSelect: Open(levelSelect); break;
             default: Open(main); break;
         }
     }
