@@ -283,10 +283,10 @@ public static class CKUtil
     {
         switch (_entry)
         {
-            case LevelGen_Block.entryTypeEnum.shipDoor:
-                return _exit == LevelGen_Block.entryTypeEnum.shipPark;
-            case LevelGen_Block.entryTypeEnum.shipPark:
-                return _exit == LevelGen_Block.entryTypeEnum.shipDoor;
+            case LevelGen_Block.entryTypeEnum.drillDoor:
+                return _exit == LevelGen_Block.entryTypeEnum.drillPark;
+            case LevelGen_Block.entryTypeEnum.drillPark:
+                return _exit == LevelGen_Block.entryTypeEnum.drillDoor;
             case LevelGen_Block.entryTypeEnum.any:
                 return true;
             default:
@@ -352,9 +352,9 @@ public static class CKUtil
             case Layout_Basic.entryTypeEnum.vent:
                 return LevelGen_Block.entryTypeEnum.vent;
             case Layout_Basic.entryTypeEnum.shipDoor:
-                return LevelGen_Block.entryTypeEnum.shipDoor;
+                return LevelGen_Block.entryTypeEnum.drillDoor;
             case Layout_Basic.entryTypeEnum.shipPark:
-                return LevelGen_Block.entryTypeEnum.shipPark;
+                return LevelGen_Block.entryTypeEnum.drillPark;
             default:
                 return LevelGen_Block.entryTypeEnum.any;
         }

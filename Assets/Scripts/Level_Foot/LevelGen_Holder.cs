@@ -262,6 +262,36 @@ public class LevelGen_Holder : NetworkBehaviour
         List.Add(LG);
     }
 
+    public void CreateNew(LevelGen_Door _door, LevelGen_Block.entryTypeEnum _entry, Layout_Defined _layout, bool _player = true)
+    {
+        _networkTransform _transform = new _networkTransform();
+        _transform.lgID = Transforms.value.Count;
+        //_transform.UpdateTransform(Vector3.zero, Quaternion.identity);
+        _transform.seed = (uint)UnityEngine.Random.Range(1, int.MaxValue);
+        Transforms.value.Add(_transform);
+
+        LevelGen LG = Instantiate(GetLevelGenPrefab(), transform);
+        LG.isHost = true;
+        if (_layout == null)
+            LG.Setup(_transform.seed, List.Count, _door.transform.position, _player);
+        else
+            LG.Setup(_transform.seed, List.Count, _door.transform.position, _layout, _player);
+
+        List.Add(LG);
+        _door.OnConnect();
+        //Moving the New LevelGen to align with the door
+        LevelGen_Door _newDoor = LG.FindDoorOfType(LevelGen_Block.entryTypeEnum.shipDoor);
+        if (_newDoor != null)
+        {
+            Quaternion _rot = Quaternion.FromToRotation(_newDoor.transform.forward, -_door.transform.forward);
+            LG.T_Holder.rotation *= _rot;
+            Vector3 _pos = _door.transform.position - _newDoor.transform.position;
+            LG.T_Holder.position += _pos;
+            UpdateTransform(LG);
+            _newDoor.OnConnect();
+        }
+    }
+
     [ObserversRpc]
     public void UpdateTransform(int _lgID, Vector3 pos, Quaternion rot)
     {

@@ -72,7 +72,7 @@ public class LevelGen_Block : MonoBehaviour
         return _valid;
     }
 
-    public enum entryTypeEnum { singleDoor, wideDoor, vent, shipDoor, shipPark, any}
+    public enum entryTypeEnum { singleDoor, wideDoor, vent, drillDoor, drillPark, any, shipDoor, shipPark}
     // Start is called before the first frame update
     void Start()
     {

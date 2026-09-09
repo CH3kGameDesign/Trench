@@ -79,7 +79,7 @@ public class LevelGen : MonoBehaviour
 
         LG_Theme = themeHolder.GetTheme(SaveData.themeCurrent);
         MusicHandler.Instance.SetupPlaylist(LG_Theme.playlist);
-        if (_layoutDefined._objects.Count > 0 && SaveData.themeCurrent == themeEnum.ship)
+        if (_layoutDefined._objects.Count > 0)
         {
             GenerateLayout_Specific(_layoutDefined, _pos,
                 _player ? spawnType.friendlyOnly : spawnType.enemyOnly, _BC);
@@ -229,6 +229,7 @@ public class LevelGen : MonoBehaviour
         else
         {
             yield return StartCoroutine(GenerateBuildings_Extra(_theme, _layout, T_Holder));
+            
             SetDoors();
             yield return new WaitForEndOfFrame();
             UpdateNavMeshes();
@@ -236,6 +237,8 @@ public class LevelGen : MonoBehaviour
             SetupVehicle(T_Holder);
             yield return new WaitForEndOfFrame();
             SpawnObjects();
+            yield return new WaitForEndOfFrame();
+            SpawnShip();
             yield return new WaitForEndOfFrame();
             LevelGen_Holder.Instance.IsReady();
         }
@@ -342,7 +345,27 @@ public class LevelGen : MonoBehaviour
             item.BuildNavMesh();
         }
     }
-
+    protected void SpawnShip()
+    {
+        foreach (var item in LG_Blocks)
+        {
+            foreach (var entry in item.LGD_Entries)
+            {
+                if (entry.entryType == LevelGen_Block.entryTypeEnum.shipPark)
+                {
+                    LevelGen_Holder.Instance.CreateNew(entry, LevelGen_Block.entryTypeEnum.shipDoor, SaveData.shipLayout);
+                }
+            }
+        }
+    }
+    public LevelGen_Door FindDoorOfType(LevelGen_Block.entryTypeEnum _type)
+    {
+        foreach (var item in LG_Blocks)
+            foreach (var entry in item.LGD_Entries)
+                if (entry.entryType == _type && !entry.B_connected)
+                    return entry;
+        return null;
+    }
     protected void SpawnObjects(spawnType _type = spawnType._default)
     {
         List<Transform> spawnPoints = new List<Transform>();
@@ -406,7 +429,7 @@ public class LevelGen : MonoBehaviour
                             bound.B_Bounds.enabled = false;
                         Physics.SyncTransforms();
                         int _tarOverlaps = 0;
-                        if (entry.entryType == LevelGen_Block.entryTypeEnum.shipPark) _tarOverlaps = 1;
+                        if (entry.entryType == LevelGen_Block.entryTypeEnum.drillPark) _tarOverlaps = 1;
                         if (CheckBounds(_temp, _tarOverlaps))
                         {
                             DestroyImmediate(_temp.gameObject);
@@ -479,7 +502,7 @@ public class LevelGen : MonoBehaviour
                     bound.B_Bounds.enabled = false;
                 Physics.SyncTransforms();
                 int _tarOverlaps = 0;
-                if (entry.entryType == LevelGen_Block.entryTypeEnum.shipPark)
+                if (entry.entryType == LevelGen_Block.entryTypeEnum.drillPark)
                     _tarOverlaps = 1;
                 if (CheckBounds(_temp, _tarOverlaps))
                 {
@@ -526,7 +549,7 @@ public class LevelGen : MonoBehaviour
         {
             switch (entry.entryType)
             {
-                case LevelGen_Block.entryTypeEnum.shipPark:
+                case LevelGen_Block.entryTypeEnum.drillPark:
                     if (shipGenerated)
                         continue;
                     shipGenerated = true;
@@ -551,7 +574,7 @@ public class LevelGen : MonoBehaviour
                     bound.B_Bounds.enabled = false;
                 Physics.SyncTransforms();
                 int _tarOverlaps = 0;
-                if (entry.entryType == LevelGen_Block.entryTypeEnum.shipPark) _tarOverlaps = 1;
+                if (entry.entryType == LevelGen_Block.entryTypeEnum.drillPark) _tarOverlaps = 1;
                 if (CheckBounds(_temp, _tarOverlaps))
                 {
                     DestroyImmediate(_temp.gameObject);
