@@ -10,6 +10,7 @@ public class LevelSelect : MonoBehaviour
     [Header("References")]
     public ButtonAdvanced BA_level1;
     public ButtonAdvanced BA_level2;
+    public ButtonAdvanced BA_level3;
     [Space(10)]
     public List<Location> missionList = new List<Location>();
 
@@ -62,11 +63,13 @@ public class LevelSelect : MonoBehaviour
     {
         BA_level1.Setup(SelectLevel_1, null, null, missionList[0].T2_icon, null, missionList[0].S_name);
         BA_level2.Setup(SelectLevel_2, null, null, missionList[1].T2_icon, null, missionList[1].S_name);
+        BA_level3.Setup(SelectLevel_3, null, null, missionList[2].T2_icon, null, missionList[2].S_name);
         SelectLevel_1();
     }
 
     public void SelectLevel_1() { SelectLevel(missionList[0]); }
     public void SelectLevel_2() { SelectLevel(missionList[1]); }
+    public void SelectLevel_3() { SelectLevel(missionList[2]); }
     
     
     private Location _curLocation;
