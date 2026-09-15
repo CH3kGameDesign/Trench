@@ -17,7 +17,6 @@ public class ShipSeat : MonoBehaviour
         catch (System.Exception)
         {
             Debug.LogError("LayoutHolder doesn't contain Ship Script");
-            throw;
         }
     }
 

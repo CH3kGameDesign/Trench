@@ -35,6 +35,7 @@ public class LevelGen : MonoBehaviour
     [Space(10)]
     [HideInInspector] public bool isHost = false;
     [HideInInspector] public int id = -1;
+    [HideInInspector] public bool isReady = false;
 
     [System.Serializable]
     private class holderTypesClass
@@ -124,7 +125,7 @@ public class LevelGen : MonoBehaviour
             _holder.gameObject.name = "Room: " + item._block._name;
             _holder.parent = T_Holder;
 
-            LevelGen_Block _prefab =  item._block;
+            LevelGen_Block _prefab = item._block;
             LevelGen_Block _temp = Instantiate(_prefab, _holder);
 
             _temp.transform.localEulerAngles = new Vector3(0, -item._rot * 90, 0);
@@ -150,9 +151,9 @@ public class LevelGen : MonoBehaviour
                 bound.B_Bounds.enabled = true;
 
             _holder.localPosition = new Vector3(
-                -item._pos.y + 1 + ((float)_save._bounds.data[0].d.Count / 2f), 
-                0, 
-                item._pos.x - 1 - ((float)_save._bounds.data.Count / 2f)) 
+                -item._pos.y + 1 + ((float)_save._bounds.data[0].d.Count / 2f),
+                0,
+                item._pos.x - 1 - ((float)_save._bounds.data.Count / 2f))
                 * _gridSize;
             _holder.localRotation = Quaternion.identity;
         }
@@ -161,6 +162,11 @@ public class LevelGen : MonoBehaviour
         UpdateNavMeshes();
         SetupVehicle(T_Holder, _save, _type, _BC);
         SpawnObjects(_type);
+        Ready();
+    }
+    protected void Ready()
+    {
+        isReady = true;
         LevelGen_Holder.Instance.IsReady();
     }
     protected void SetDoors_Auto()
@@ -240,7 +246,7 @@ public class LevelGen : MonoBehaviour
             yield return new WaitForEndOfFrame();
             SpawnShip();
             yield return new WaitForEndOfFrame();
-            LevelGen_Holder.Instance.IsReady();
+            Ready();
         }
     }
     public void UpdatePosition(Transform lHolder, Vector3 _pos)

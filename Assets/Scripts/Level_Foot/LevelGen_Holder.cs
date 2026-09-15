@@ -405,6 +405,9 @@ public class LevelGen_Holder : NetworkBehaviour
     {
         if (isReady)
             return;
+        foreach (LevelGen LG in List)
+            if (LG.isReady == false)
+                return;
         isReady = true;
 
         playerSpawner.canSpawn = true;

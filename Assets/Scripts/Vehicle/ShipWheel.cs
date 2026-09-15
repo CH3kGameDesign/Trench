@@ -36,7 +36,11 @@ public class ShipWheel : Interactable
         if (DEBUG_dropShip) { DEBUG_DropShip(); return; }
 
         ShipSet();
-        if (s_Ship == null) { LevelGen_Holder.Instance.EndLevel(Themes.themeEnum.ship); }
+        if (s_Ship == null)
+        {
+            LevelGen_Holder.Instance.EndLevel(Themes.themeEnum.ship);
+            return;
+        }
         
         s_Ship.OnInteract(_player);
 
