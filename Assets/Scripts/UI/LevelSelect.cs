@@ -11,6 +11,7 @@ public class LevelSelect : MonoBehaviour
     public ButtonAdvanced BA_level1;
     public ButtonAdvanced BA_level2;
     public ButtonAdvanced BA_level3;
+    public ButtonAdvanced BA_level4;
     [Space(10)]
     public List<Location> missionList = new List<Location>();
 
@@ -35,18 +36,29 @@ public class LevelSelect : MonoBehaviour
         public void Setup(Location _location, Mission _mission)
         {
             I_locationImage.texture = _location.T2_icon;
-            I_missionImage.sprite = _mission._sprite;
-
             TM_locationName.text = _location.S_name;
-            TM_missionName.text = _mission._name;
-            //Switch to difficulty amount
-            for (int i = 0; i < I_difficultyArray.Length; i++)
-                I_difficultyArray[i].gameObject.SetActive(i < 3);
-
-            TM_description.text = _mission._description;
-            //Switch to variable amount
-            TM_reward.text = "$100";
-            
+            if (_mission != null)
+            {
+                I_missionImage.sprite = _mission._sprite;
+                TM_missionName.text = _mission._name;
+                TM_description.text = _mission._description;
+                //Switch to difficulty amount
+                for (int i = 0; i < I_difficultyArray.Length; i++)
+                    I_difficultyArray[i].gameObject.SetActive(i < 3);
+                //Switch to variable amount
+                TM_reward.text = "$100";
+            }
+            else
+            {
+                I_missionImage.sprite = null;
+                TM_missionName.text = "";
+                TM_description.text = "";
+                //Switch to difficulty amount
+                for (int i = 0; i < I_difficultyArray.Length; i++)
+                    I_difficultyArray[i].gameObject.SetActive(false);
+                //Switch to variable amount
+                TM_reward.text = "";
+            }
             //Add Resource Array functionality
         }
     }
@@ -64,12 +76,14 @@ public class LevelSelect : MonoBehaviour
         BA_level1.Setup(SelectLevel_1, null, null, missionList[0].T2_icon, null, missionList[0].S_name);
         BA_level2.Setup(SelectLevel_2, null, null, missionList[1].T2_icon, null, missionList[1].S_name);
         BA_level3.Setup(SelectLevel_3, null, null, missionList[2].T2_icon, null, missionList[2].S_name);
+        BA_level4.Setup(SelectLevel_4, null, null, missionList[1].T2_icon, null, missionList[1].S_name);
         SelectLevel_1();
     }
 
     public void SelectLevel_1() { SelectLevel(missionList[0]); }
-    public void SelectLevel_2() { SelectLevel(missionList[1]); }
+    public void SelectLevel_2() { SelectLevel(missionList[1], 0); }
     public void SelectLevel_3() { SelectLevel(missionList[2]); }
+    public void SelectLevel_4() { SelectLevel(missionList[1], 1); }
     
     
     private Location _curLocation;
@@ -78,6 +92,12 @@ public class LevelSelect : MonoBehaviour
     {
         _curLocation = _location;
         _curMission = _location.GetRandomMission();
+        missionInfoUI.Setup(_curLocation, _curMission);
+    }
+    public void SelectLevel(Location _location, int _MissionNum)
+    {
+        _curLocation = _location;
+        _curMission = _location.GetSpecificMission(_MissionNum);
         missionInfoUI.Setup(_curLocation, _curMission);
     }
 

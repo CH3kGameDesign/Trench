@@ -19,4 +19,15 @@ public class Location : ScriptableObject
         int _temp = Random.Range(0, availableMissions.Count);
         return availableMissions[_temp];
     }
+    public Mission GetSpecificMission(int _num = 0)
+    {
+        if (availableMissions.Count <= _num)
+        {
+            if (availableMissions.Count == 0)
+                return null;
+            else
+                return availableMissions[0];
+        }
+        return availableMissions[_num];
+    }
 }

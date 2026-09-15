@@ -15,4 +15,5 @@ public enum Objective_Type
 	[Description ("Times Fired")]	[InspectorName ("Damage/Taken")]	Damage_Taken,
 	[Description ("Revive Others")]	[InspectorName ("Revive/Others")]	Revive_Others,
 	[Description ("Times Killed")]	[InspectorName ("Kill/Self")]	Kill_Self,
+	[Description ("Enemies Killed")]	[InspectorName ("Kill/All")]	Kill_All,
 }

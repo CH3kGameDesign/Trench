@@ -77,6 +77,7 @@ public class Objective : ScriptableObject
             _temp.mainObjective = mainObjective;
             _temp.total = total;
             _temp.completed = false;
+            
             return _temp;
         }
         public objectiveClass Clone()

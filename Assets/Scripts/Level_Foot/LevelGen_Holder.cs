@@ -487,4 +487,11 @@ public class LevelGen_Holder : NetworkBehaviour
         }
         return List[_V3ID.x].LG_Blocks[_V3ID.y].GetRandomPoint(_3D);
     }
+    public int GetEnemyAmount(bool _aliveOnly = true)
+    {
+        int _amt = 0;
+        foreach (LevelGen LG in List)
+            _amt += LG.GetEnemyAmount(_aliveOnly);
+        return _amt;
+    }
 }

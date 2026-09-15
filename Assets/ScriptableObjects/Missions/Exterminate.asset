@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f3054368192a7b64eba11ea31a7ee28e, type: 3}
-  m_Name: Run_Grab
+  m_Name: Exterminate
   m_EditorClassIdentifier: 
-  _id: 1
-  _name: Run & Grab
-  _description: Get enough money to pay for rent and get out
-  _sprite: {fileID: 21300000, guid: 03f40cf46250e0a4f9b1b2713966c2cb, type: 3}
+  _id: 0
+  _name: Exterminate
+  _description: Clear the ship of anyone with a unfriendly gun
+  _sprite: {fileID: 21300000, guid: 760affdb2aeb03c4bbae9fccc64c19fb, type: 3}
   S_defaultLandingID: dollyStation
   PF_specificLayout: {fileID: 0}
   SpawnOnStart: -1
   _steps:
   - _objective:
-      _type: 1
+      _type: 13
       _resource: 0
       type:
         _id: 
@@ -37,14 +37,14 @@ MonoBehaviour:
       mainObjective: 1
       completed: 0
     _spawnOnComplete:
-      _event: -1
+      _event: 0
       _spawnAmt: -1
       _delay: 0
       _blockType: 0
       _enemyRemainingAmt: 0
       _activated: 0
   _sideObjective:
-    _type: 0
+    _type: 2
     _resource: 0
     type:
       _id: 
