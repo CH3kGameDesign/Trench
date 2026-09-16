@@ -672,10 +672,13 @@ public class LevelGen : MonoBehaviour
         {
             if (agent == null)
                 continue;
+            //Check Friendly Not Working??
+            //if (agent.CheckFriendly())
+            //    continue;
             if ((_aliveOnly && agent.info.b_alive) || !_aliveOnly)
                 _amt++;
         }
-        return _amt;
+        return _amt - 1;
     }
 
     public void AgentDeath(AgentController _AC)

@@ -193,10 +193,7 @@ public class Mission : ScriptableObject
     void MissionSetup()
     {
         if (_steps[0]._objective._type == Objective_Type.Kill_All)
-        {
-            _steps[0]._objective._type = Objective_Type.Kill_Any;
             _steps[0]._objective.total = LevelGen_Holder.Instance.GetEnemyAmount(true);
-        }
     }
 
     public bool HasSpawnOnStart(spawnOnStartEnum _enum)

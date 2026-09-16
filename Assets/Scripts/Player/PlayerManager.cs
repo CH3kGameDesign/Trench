@@ -44,7 +44,12 @@ public class PlayerManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
+    }
+    
+    public void Update_Objectives(Objective_Type _type, int _amt)
+    {
+        main.Update_Objectives(_type, _amt);
     }
 
     public void AddPlayer(BaseInfo _player)

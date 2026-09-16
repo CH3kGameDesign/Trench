@@ -488,8 +488,7 @@ public class AgentController : BaseController
     {
         while (true)
         {
-            Relationship.meterClass _temp = GetRelationship();
-            b_friendly.value = _temp.hostile <= _temp.friendly;
+            CheckFriendly();
             yield return new WaitForSeconds(1f);
         }
     }
@@ -858,7 +857,8 @@ public class AgentController : BaseController
                     PlayerManager.main.OnKill(this, false);
             }
         }
-
+        if (!b_friendly)
+            PlayerManager.Instance.Update_Objectives(Objective_Type.Kill_All, 1);
         if (gun_Equipped != null)
             gun_Equipped.OnUnEquip();
 
@@ -926,6 +926,13 @@ public class AgentController : BaseController
         }
 
         return _temp;
+    }
+
+    public bool CheckFriendly()
+    {
+        Relationship.meterClass _temp = GetRelationship();
+        b_friendly.value = _temp.hostile <= _temp.friendly;
+        return b_friendly.value;
     }
     public override void UpdateRoom(LevelGen_Bounds _bounds, bool _enter = true)
     {

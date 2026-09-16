@@ -137,6 +137,8 @@ public class PlayerController : BaseController
                 case Objective_Type.Damage_Taken:
                     damageTaken += _amt;
                     break;
+                case Objective_Type.Kill_All:
+                    break;
                 default:
                     Debug.LogError("Missing Objective Type: " + _type.ToString());
                     break;
