@@ -147,7 +147,7 @@ public class Objective : ScriptableObject
 
             //Side Objective
             SaveData.missionCurrent._sideObjective.mainObjective = false;
-            SaveData.objectives.Add(SaveData.missionCurrent._sideObjective.Clone());
+            SaveData.objectives.Add(SaveData.missionCurrent._sideObjective);
         }
     }
 

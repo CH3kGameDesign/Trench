@@ -194,6 +194,8 @@ public class Mission : ScriptableObject
     {
         if (_steps[0]._objective._type == Objective_Type.Kill_All)
             _steps[0]._objective.total = LevelGen_Holder.Instance.GetEnemyAmount(true);
+        if (_sideObjective._type == Objective_Type.Kill_All)
+            _sideObjective.total = LevelGen_Holder.Instance.GetEnemyAmount(true);
     }
 
     public bool HasSpawnOnStart(spawnOnStartEnum _enum)
